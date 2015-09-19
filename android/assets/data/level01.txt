@@ -1,0 +1,35 @@
+	public void loadLevelFile(String name) {
+		FileHandle handle = Gdx.files.internal("data/" + name + ".txt");
+		ArrayList<ArrayList<String>> levelContent = new ArrayList<ArrayList<String>>();
+		BufferedReader br = null;
+		try {
+			String currentLine;
+			br = new BufferedReader(handle.reader());
+
+			while ((currentLine = br.readLine()) != null) {
+				ArrayList<String> row = new ArrayList<String>();
+				String[] values = currentLine.trim().split(" ");
+				for (String string : values) {
+					if (!string.isEmpty()) {
+						row.add(string);
+					}
+
+				}
+				levelContent.add(row);
+
+			}
+		} catch (IOException e) {
+			System.out.println("affe");
+		}
+
+		for (int y = 0; y < levelContent.size(); y++) {
+			for (int x = 0; x < levelContent.get(0).size(); x++) {
+				String type = levelContent.get(y).get(x);
+				if (type.equals("2")) {
+					tiles[x][levelContent.size() - 1 - y] = new Tile(new Vector2(x, levelContent.size() - 1 - y), TileType.BROWN);
+					System.out.println(type);
+				}
+			}
+		}
+
+	}

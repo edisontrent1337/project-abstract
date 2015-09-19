@@ -1,0 +1,40 @@
+
+textures.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+bg-01
+  rotate: false
+  xy: 1, 169
+  size: 800, 480
+  orig: 800, 480
+  offset: 0, 0
+  index: -1
+jumper-01
+  rotate: false
+  xy: 1, 75
+  size: 646, 92
+  orig: 646, 92
+  offset: 0, 0
+  index: -1
+tap-01
+  rotate: false
+  xy: 1, 45
+  size: 421, 28
+  orig: 421, 28
+  offset: 0, 0
+  index: -1
+awesome-01
+  rotate: false
+  xy: 1, 1
+  size: 325, 42
+  orig: 325, 42
+  offset: 0, 0
+  index: -1
+loading-01
+  rotate: false
+  xy: 803, 633
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
