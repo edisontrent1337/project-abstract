@@ -1,5 +1,6 @@
 package com.trent.awesomejumper.testing;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -27,7 +28,7 @@ public class CollisionBox {
      */
 
     private float width, height;
-    private Vector2 position,min,max,a,b,c,d,center;
+    private Vector2 position, min, max, a, b, c, d, center;
     private Array<Vector2> edges, vertices, normals;
 
     // DEBUG DRAWING CONSTANTS
@@ -55,7 +56,7 @@ public class CollisionBox {
         this.b = new Vector2(min.x, max.y);
         this.c = new Vector2(max.x, max.y);
         this.d = new Vector2(max.x, min.y);
-        this.center = new Vector2(max.x/2, max.y/2);
+        this.center = new Vector2(max.x / 2, max.y / 2);
         this.vertices = new Array<>();
         vertices.add(a);
         vertices.add(b);
@@ -70,7 +71,7 @@ public class CollisionBox {
         this.normals = new Array<>();
 
         // LOOP TROUGH ALL VERTICES AND CALCULATE EDGES BETWEEN THEM
-        for(int i = 0 ; i< vertices.size; i++) {
+        for (int i = 0; i < vertices.size; i++) {
             edges.add(subVec(vertices.get(i), vertices.get((i + 1) % 4)));
             normals.add(getNormal(edges.get(i)));
         }
@@ -80,7 +81,6 @@ public class CollisionBox {
 
     // METHODS & FUNCTIONS
     // ---------------------------------------------------------------------------------------------
-
 
 
     // DRAW
@@ -98,14 +98,14 @@ public class CollisionBox {
         renderer.setAutoShapeType(true);
         renderer.set(ShapeRenderer.ShapeType.Filled);
         renderer.setColor(Color.GREEN);
-        for(Vector2 v : vertices) {
+        for (Vector2 v : vertices) {
             renderer.rect(v.x - VHALF, v.y - VHALF, VSIZE, VSIZE);
         }
 
         // NORMALS & EDGES
         renderer.set(ShapeRenderer.ShapeType.Line);
         renderer.setColor(Color.PINK);
-        for(int i = 0; i< edges.size; i++) {
+        for (int i = 0; i < edges.size; i++) {
             // GRAB CURRENT VERTEX, EDGE, NORMAL
             Vector2 edge = edges.get(i);
             Vector2 vertex = vertices.get(i);
@@ -134,10 +134,13 @@ public class CollisionBox {
     public void update(float delta, Vector2 velocity) {
         // UPDATE GENERAL POSITION
         position.add(velocity.cpy().scl(delta));
+        vertices.get(0).set(position);
+        vertices.get(1).set(position.x, position.y + 1);
+        vertices.get(2).set(position.x + 1, position.y + 1);
+        vertices.get(3).set(position.x + 1, position.y);
+
+
         // UPDATE VERTICES POSITIONS
-        for(Vector2 v: vertices) {
-            v.add(velocity.cpy().scl(delta));
-        }
 
     }
 

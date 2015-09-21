@@ -53,6 +53,9 @@ public class Player extends Entity {
             b.update(delta, velocity);
         }
 
+       // head.getPosition().add(velocity.cpy().scl(delta));
+
+
     }
 
     @Override

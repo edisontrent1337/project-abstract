@@ -346,7 +346,7 @@ public class RenderingEngine {
         acc = "ACC: " +  formVec(player.getAcceleration());
         vel = "VEL: " +  formVec(player.getVelocity());
         ste = "STATE: " + player.getState().toString() + "|" + player.isOnGround();
-        pos = "POS: " + formVec(player.getPosition());
+        pos = "POS: " + player.getPosition();
         cps = "CAM: " + formVec(cam.position.x, cam.position.y);
         res = Gdx.graphics.getWidth() + "*" + Gdx.graphics.getHeight() + ", ZOOM: " + zoom + ", FPS :" + Gdx.graphics.getFramesPerSecond();
         consoleFont.draw(uiBatch, acc, 15,15);
@@ -359,6 +359,11 @@ public class RenderingEngine {
         consoleFont.draw(uiBatch, pos, 15,60);
         consoleFont.draw(uiBatch, res, 15,75);
         consoleFont.draw(uiBatch, cps, 15,90);
+        consoleFont.draw(uiBatch, "COLLISION BOX" + player.getCollisionBox().getPosition().toString(), 15,105);
+        consoleFont.draw(uiBatch, "a:" + player.getCollisionBox().getVertices().get(0).toString(), 15,120);
+        consoleFont.draw(uiBatch, "b:" + player.getCollisionBox().getVertices().get(1).toString(), 15,135);
+        consoleFont.draw(uiBatch, "c:" + player.getCollisionBox().getVertices().get(2).toString(), 15,150);
+        consoleFont.draw(uiBatch, "d:" + player.getCollisionBox().getVertices().get(3).toString(), 15,165);
     }
 
 

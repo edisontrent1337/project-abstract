@@ -1,5 +1,6 @@
 package com.trent.awesomejumper.utils;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -57,6 +58,7 @@ public class Utilites {
     public static float dPro(Vector2 v1, Vector2 v2) {
         return v1.x * v2.x + v1.y * v2.y;
     }
+
     // PROJECTION OF A SHAPE ONTO AN AXIS
     /*
      * Returns the projection values of a shape (CollisionBox) onto an axis
@@ -89,12 +91,23 @@ public class Utilites {
      * @param projection2 projection of the second shape onto an axis, x = min, y = max
      */
     public static boolean overlaps(Vector2 projection1, Vector2 projection2) {
-        if (projection1.x < projection2.x) {
-            return projection1.y >= projection2.x;
-        } else {
-            return projection2.y >= projection1.x;
+        // NO OVERLAP OR OVERLAP = 0
+      /*  if (projection1.y <= projection2.x || projection2.y <= projection1.x || projection1.y == projection2.x || projection2.y == projection1.x) {
+            return false;
         }
+        // OVERLAP
+        else if (projection1.y > projection2.x || projection2.y > projection1.x) {
+            return true;
+        }
+        // SAME
+        else if(projection1.x == projection2.x && projection1.y == projection2.y) {
+            return true;
+        }
+        //CONTAINMENT
+        return true;*/
 
+
+        return projection1.x <= projection2.y && projection2.x <= projection1.y;
 
     }
 
@@ -106,12 +119,29 @@ public class Utilites {
      * @param projection2 projection of the second shape onto an axis, x = min, y = max
      */
     public static float getOverlap(Vector2 projection1, Vector2 projection2) {
-        if (projection1.x >= projection2.y) {
+
+
+        if(projection1.y >= projection2.x) {
+            Gdx.app.log("CALCULATED OVERLAP", Float.toString(projection1.y - projection2.x));
+            return projection1.y - projection2.x;
+        }
+        //if(projection2.y >= projection1.x) {
+        else
+            Gdx.app.log("CALCULATED OVERLAP", Float.toString(projection2.y - projection1.x));
             return projection2.y - projection1.x;
-        }
-        else {
+        //}
+
+
+
+       // if(projection1.y >= projection2.x) return
+
+
+
+       /* if (projection1.x >= projection2.y) {
+            return projection2.x - projection1.y;
+        } else {
             return projection1.x - projection2.y;
-        }
+        }*/
 
     }
 
