@@ -11,8 +11,8 @@ public final class PhysicalConstants {
 
     public static final float JUMP_THRESHOLD = 150f;
     public static final float ACCELERATION = 20f;
-    public static final float GRAVITY = -1f; // -22
-    public static final float MAX_JUMPING_VELOCITY = 1f;
+    public static final float GRAVITY = -10f; // -22
+    public static final float MAX_JUMPING_VELOCITY = 5f;
     public static final float MAX_FALLING_SPEED = 1f;
     public static final float MAX_TRAMPOLINE_SPEED = 15.4f;
 
