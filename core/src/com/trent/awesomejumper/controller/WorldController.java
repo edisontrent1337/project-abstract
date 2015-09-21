@@ -130,7 +130,7 @@ public class WorldController {
         MAX_VELOCITY = 2f;
         // INPUT PROCCESSING
         Vector2 resultant = new Vector2(0f, 0f);
-       // processUserInput();
+        processUserInput();
 
         if (player.isOnGround() && player.getState().equals(State.JUMPING)) {
             player.setState(State.IDLE);
@@ -145,6 +145,7 @@ public class WorldController {
 
         player.setAccelY(GRAVITY);
         player.getAcceleration().scl(delta);
+        Gdx.app.log("GRAVITY FORCE", player.getAcceleration().toString());
         //player.getVelocity().add(player.getAcceleration());
         resultant.add(collisionDetection(delta));
         resultant.add(player.getAcceleration());
@@ -163,6 +164,11 @@ public class WorldController {
         Gdx.app.log("PROJECTION2", test2.toString());
 
         Gdx.app.log("CHECK OVERLAP", Boolean.toString(overlaps(test2, test)));*/
+        if(resultant.x > 1 || resultant.y > 1) {
+            Gdx.app.log("HERE","WTF");
+            Gdx.app.log("ODD RESULTANT", resultant.toString());
+        }
+        Gdx.app.log("FINAL RESULTANT", resultant.toString());
         player.getVelocity().add(resultant);
         player.update(delta);
         player.setBounds(player.getPositionX(), player.getPositionY());
@@ -264,7 +270,12 @@ public class WorldController {
             if (tile == null) {
                 continue;
             }
-            Gdx.app.log("ENTERING HORIZONTAL COLLISION DETECTION.", "PLAYER POSITION WAS:" + Utilites.formVec(player.getPosition()) + "TILE IS" + tile.getPosition().toString());
+
+            Gdx.app.log("EVENT","ENTERING VERTICAL COLLISION DETECTION.");
+            Gdx.app.log("PLAYER POSITION", formVec(player.getPosition()));
+            Gdx.app.log("TILE", formVec(tile.getPosition()));
+
+
             for (CollisionBox collisionBox : player.getBody()) {
                 Vector3 resolutionAndMagnitude = checkCollision(tile, collisionBox);
 
@@ -302,10 +313,15 @@ public class WorldController {
             if (tile == null) {
                 continue;
             }
-            Gdx.app.log("ENTERING VERTICAL COLLISION DETECTION.", "PLAYER POSITION WAS:" + Utilites.formVec(player.getPosition()) + "TILE IS" + tile.getPosition().toString());
+
+            Gdx.app.log("EVENT","ENTERING VERTICAL COLLISION DETECTION.");
+            Gdx.app.log("PLAYER POSITION", formVec(player.getPosition()));
+            Gdx.app.log("TILE", formVec(tile.getPosition()));
+
+
+
             for (CollisionBox collisionBox : player.getBody()) {
                 Vector3 resolutionAndMagnitude = checkCollision(tile, collisionBox);
-
                 if (!tile.isPassable()) {
                     if (player.getVelocity().y < 0) {
                         player.groundEntity();
