@@ -1,13 +1,12 @@
 package com.trent.awesomejumper.testing;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
-import static com.trent.awesomejumper.utils.Utilites.getNormal;
-import static com.trent.awesomejumper.utils.Utilites.subVec;
+import static com.trent.awesomejumper.utils.Utilities.getNormal;
+import static com.trent.awesomejumper.utils.Utilities.subVec;
 
 /**
  * Created by Sinthu on 03.07.2015.

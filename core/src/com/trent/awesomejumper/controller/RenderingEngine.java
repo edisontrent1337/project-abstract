@@ -22,7 +22,7 @@ import com.trent.awesomejumper.models.WorldContainer;
 import com.trent.awesomejumper.testing.CollisionBox;
 import com.trent.awesomejumper.tiles.Tile;
 
-import static com.trent.awesomejumper.utils.Utilites.formVec;
+import static com.trent.awesomejumper.utils.Utilities.formVec;
 
 /**
  * Created by trent on 12.06.2015.
