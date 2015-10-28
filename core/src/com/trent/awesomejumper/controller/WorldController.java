@@ -150,20 +150,6 @@ public class WorldController {
         resultant.add(collisionDetection(delta));
         resultant.add(player.getAcceleration());
         managePlayerSpeed();
-        //float test = dPro(new Vector2(0,1), new Vector2(34.45f, 192.63f));
-        //Gdx.app.log("DOT PRODUCT TEST", Float.toString(test));
-
-
-        /*CollisionBox box1 = new CollisionBox(new Vector2(0, 0), 2, 2);
-        CollisionBox box2 = new CollisionBox(new Vector2(3, 0), 2, 2);
-
-        Vector2 test = getProjection(box1, box1.getNormals().get(2));
-        Vector2 test2 = getProjection(box2, box1.getNormals().get(2));
-
-        Gdx.app.log("PROJECTION1", test.toString());
-        Gdx.app.log("PROJECTION2", test2.toString());
-
-        Gdx.app.log("CHECK OVERLAP", Boolean.toString(overlaps(test2, test)));*/
         if(resultant.x > 1 || resultant.y > 1) {
             Gdx.app.log("HERE","WTF");
             Gdx.app.log("ODD RESULTANT", resultant.toString());
@@ -489,6 +475,7 @@ public class WorldController {
 
         if (!level.checkBounds((int) player.getPositionX(), (int) player.getPositionY())) {
             player.setPosition(new Vector2(5f, 12f));
+            player.getCollisionBox().setPosition(new Vector2(5f, 12f));
         }
 
 

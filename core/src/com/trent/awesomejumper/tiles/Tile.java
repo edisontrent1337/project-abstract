@@ -15,6 +15,10 @@ public class Tile {
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
 
+    /**
+     *  Type of a tile. Integer representation (value)
+     *  can be used to identify different types of tiles.
+     */
     public enum TileType {
         AIR(0),
         BROWN(1),

@@ -27,13 +27,16 @@ public class CollisionBox {
      * edges = array that holds all edges of the shape
      * normals = array that holds all normals of the shape
      *
+     *
+     *             n1
      *             e1
      *       b *-------* c
      *         |       |
-     *      e0 |       | e2
+     *   n0 e0 |       | e2 n2
      *         |       |
      *      a  *-------* d
      *             e3
+     *             n3
      */
 
     private float width, height;
@@ -72,7 +75,6 @@ public class CollisionBox {
         vertices.add(c);
         vertices.add(d);
 
-
         // EDGES & NORMALS
         // -----------------------------------------------------------------------------------------
 
@@ -81,13 +83,11 @@ public class CollisionBox {
 
         // LOOP TROUGH ALL VERTICES AND CALCULATE EDGES BETWEEN THEM
         for (int i = 0; i < vertices.size; i++) {
-
             edges.add(subVec(vertices.get(i), vertices.get((i + 1) % 4)));
             normals.add(getNormal(edges.get(i)));
         }
 
     }
-
 
     // METHODS & FUNCTIONS
     // ---------------------------------------------------------------------------------------------
@@ -130,6 +130,8 @@ public class CollisionBox {
             /**
              *  This method uses vector addition to calculate the start and end of
              *  the normal to be drawn.
+             *  start = v + 0.5*e
+             *  end = v + 0.5*e + 0.25*n
              */
 
             Vector2 nStart = vertex.cpy().add(edge.cpy().scl(0.5f));
@@ -172,6 +174,10 @@ public class CollisionBox {
         position.x = x;
         position.y = y;
     }
+    public void setPosition(Vector2 position) {
+        this.position = position;
+    }
+
 
     public float getWidth() {
         return width;
@@ -192,5 +198,6 @@ public class CollisionBox {
     public Array<Vector2> getNormals() {
         return normals;
     }
+
 
 }
