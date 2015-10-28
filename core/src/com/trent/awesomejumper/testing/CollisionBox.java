@@ -18,13 +18,22 @@ public class CollisionBox {
     // ---------------------------------------------------------------------------------------------
 
 
-    /*
+    /**
      * min = lower left corner
      * max = upper right corner
      * a,b,c,d = vertices
+     * center = center of bounding box
      * vertices = array that holds all vertices of the shape
      * edges = array that holds all edges of the shape
      * normals = array that holds all normals of the shape
+     *
+     *             e1
+     *       b *-------* c
+     *         |       |
+     *      e0 |       | e2
+     *         |       |
+     *      a  *-------* d
+     *             e3
      */
 
     private float width, height;
@@ -33,19 +42,18 @@ public class CollisionBox {
 
     // DEBUG DRAWING CONSTANTS
 
-    private final float VSIZE = 0.05f;
-    private final float VHALF = VSIZE / 2;
+    private final float VSIZE = 0.05f;          // size of a vertex for drawing purposes
+    private final float VHALF = VSIZE / 2;      // half vertex size
+    private final float NORMAL_LENGTH = 0.25f;  // length of a normal
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
 
     public CollisionBox(Vector2 position, float width, float height) {
-        this.position = position;
-        // LOWER LEFT CORNER
-        this.min = position;
-        // UPPER RIGHT CORNER;
-        this.max = new Vector2(position.x + width, position.y + height);
 
+        this.position = position;
+        this.min = position;
+        this.max = new Vector2(position.x + width, position.y + height);
         this.width = width;
         this.height = height;
 
@@ -58,6 +66,7 @@ public class CollisionBox {
         this.d = new Vector2(max.x, min.y);
         this.center = new Vector2(max.x / 2, max.y / 2);
         this.vertices = new Array<>();
+        // ADD ALL VERTICES TO THE VERTEX ARRAY
         vertices.add(a);
         vertices.add(b);
         vertices.add(c);
@@ -72,6 +81,7 @@ public class CollisionBox {
 
         // LOOP TROUGH ALL VERTICES AND CALCULATE EDGES BETWEEN THEM
         for (int i = 0; i < vertices.size; i++) {
+
             edges.add(subVec(vertices.get(i), vertices.get((i + 1) % 4)));
             normals.add(getNormal(edges.get(i)));
         }
@@ -84,17 +94,17 @@ public class CollisionBox {
 
 
     // DRAW
-    //----------------------------------------------------------------------------------------------
-    /*
-     * @param renderer Instance of the libGdx ShapRenderer Class used to draw the CollisionBox
+    // ----------------------------------------------------------------------------------------------
+    /**
+     * @param renderer Instance of the libGdx ShapeRenderer Class used to draw the CollisionBox
      */
     public void draw(ShapeRenderer renderer) {
 
-        // OUTER BOUNDING BOX
+        // DRAW OUTER BOUNDING BOX
         renderer.setColor(Color.BLUE);
         renderer.rect(position.x, position.y, width, height);
 
-        // VERTICES
+        // DRAW VERTICES
         renderer.setAutoShapeType(true);
         renderer.set(ShapeRenderer.ShapeType.Filled);
         renderer.setColor(Color.GREEN);
@@ -102,7 +112,7 @@ public class CollisionBox {
             renderer.rect(v.x - VHALF, v.y - VHALF, VSIZE, VSIZE);
         }
 
-        // NORMALS & EDGES
+        // DRAW NORMALS & EDGES
         renderer.set(ShapeRenderer.ShapeType.Line);
         renderer.setColor(Color.PINK);
         for (int i = 0; i < edges.size; i++) {
@@ -117,9 +127,13 @@ public class CollisionBox {
             renderer.line(vertex, vertex.cpy().add(edge));
 
             // DRAW NORMALS
+            /**
+             *  This method uses vector addition to calculate the start and end of
+             *  the normal to be drawn.
+             */
 
             Vector2 nStart = vertex.cpy().add(edge.cpy().scl(0.5f));
-            Vector2 nEnd = vertex.cpy().add(edge.cpy().scl(0.5f)).add(normal.cpy().scl(0.25f));
+            Vector2 nEnd = vertex.cpy().add(edge.cpy().scl(0.5f)).add(normal.cpy().scl(NORMAL_LENGTH));
             renderer.line(nStart.x, nStart.y, nEnd.x, nEnd.y, Color.BLUE, Color.RED);
         }
         renderer.setColor(Color.GREEN);
@@ -127,21 +141,23 @@ public class CollisionBox {
 
     // UPDATE POSITION OF BOUNDS AND VERTICES
     // ---------------------------------------------------------------------------------------------
-    /*
+    /**
      * @param delta     time elapsed since last update
-     * @param velocity  Velocity of the entity that owns this very CollisionBox
+     * @param velocity  velocity of the entity that owns this very CollisionBox
      */
     public void update(float delta, Vector2 velocity) {
-        // UPDATE GENERAL POSITION
+        // UPDATE GENERAL POSITION AND POSITION OF ALL VERTICES
+        /**
+         * O : lower left corner = position,
+         * 1 : upper left corner
+         * 2 : upper right corner
+         * 3 : lower right corner
+         */
         position.add(velocity.cpy().scl(delta));
         vertices.get(0).set(position);
-        vertices.get(1).set(position.x, position.y + 1);
-        vertices.get(2).set(position.x + 1, position.y + 1);
+        vertices.get(1).set(position.x, position.y + height);
+        vertices.get(2).set(position.x + width, position.y + height);
         vertices.get(3).set(position.x + 1, position.y);
-
-
-        // UPDATE VERTICES POSITIONS
-
     }
 
 

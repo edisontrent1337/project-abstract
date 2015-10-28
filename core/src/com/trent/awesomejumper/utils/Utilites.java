@@ -114,7 +114,7 @@ public class Utilites {
 
     // OVERLAP BETWEEN TWO PROJECTIONS
     // ---------------------------------------------------------------------------------------------
-    /*
+    /**
      * @param projection1 projection of the first shape onto an axis, x = min, y = max
      * @param projection2 projection of the second shape onto an axis, x = min, y = max
      */
@@ -147,12 +147,12 @@ public class Utilites {
 
 
     // DIFFERENTIAL VECTOR BETWEEN a AND b
-    public static Vector2 subVec(Vector2 a, Vector2 b) {
-        return new Vector2(b.x - a.x, b.y - a.y);
+    public static Vector2 subVec(Vector2 start, Vector2 end) {
+        return new Vector2(end.x - start.x, end.y - start.y);
     }
 
     // NORMAL VECTOR
-    /*
+    /**
      * Returns a normalized vector n perpendicular
      * to v.
      */
