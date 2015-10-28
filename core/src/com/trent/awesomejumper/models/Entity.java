@@ -39,7 +39,7 @@ public abstract class Entity {
     public float entityTime;
 
     // CONSTRUCTOR
-    // ---------------------------------------------------------------------------------------------
+    // ---------------------------------b------------------------------------------------------------
 
     public Entity(Vector2 position) {
         this.SIZE = DEFAULT_SIZE;
