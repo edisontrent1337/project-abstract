@@ -158,7 +158,7 @@ public class CollisionBox {
         vertices.get(0).set(position);
         vertices.get(1).set(position.x, position.y + height);
         vertices.get(2).set(position.x + width, position.y + height);
-        vertices.get(3).set(position.x + 1, position.y);
+        vertices.get(3).set(position.x + width, position.y);
     }
 
 

@@ -93,6 +93,14 @@ public class GameScreen implements Screen, InputProcessor{
         if (keycode == Keys.D) {
             game.setDebugMode(!game.onDebugMode());
         }
+
+        if(keycode == Keys.G) {
+            controller.increaseGravity();
+        }
+        if(keycode == Keys.H) {
+            controller.decreaseGravity();
+        }
+
         return false;
     }
 

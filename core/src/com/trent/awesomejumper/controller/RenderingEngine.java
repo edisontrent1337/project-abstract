@@ -343,9 +343,9 @@ public class RenderingEngine {
     // ---------------------------------------------------------------------------------------------
 
     public void drawInfo() {
-        acc = "ACC: " +  formVec(player.getAcceleration());
-        vel = "VEL: " +  formVec(player.getVelocity());
-        ste = "STATE: " + player.getState().toString() + "|" + player.isOnGround();
+        acc = "ACC: " +  player.getAcceleration();
+        vel = "VEL: " +  player.getVelocity();
+        ste = "STATE: " + player.getState().toString() + "| grounded: " + player.isOnGround();
         pos = "POS: " + player.getPosition();
         cps = "CAM: " + formVec(cam.position.x, cam.position.y);
         res = Gdx.graphics.getWidth() + "*" + Gdx.graphics.getHeight() + ", ZOOM: " + zoom + ", FPS :" + Gdx.graphics.getFramesPerSecond();

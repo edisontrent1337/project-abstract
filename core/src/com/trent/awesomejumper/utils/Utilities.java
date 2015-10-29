@@ -124,9 +124,9 @@ public class Utilities {
         else
             Gdx.app.log("CALCULATED OVERLAP", Float.toString(proj2.max - proj1.min));
             return proj2.max - proj1.min;*/
-        if(proj1.isSameAs(proj2))
-            return 0;
-        Gdx.app.log("CALCULATED OVERLAP", Float.toString(Math.min(proj1.max, proj2.max) - Math.max(proj1.min, proj2.min)));
+        if(proj1.isSameAs(proj2)) {
+            return 0f;
+        }
         return Math.min(proj1.max, proj2.max) - Math.max(proj1.min, proj2.min);
 
     }

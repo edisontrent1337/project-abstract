@@ -29,7 +29,7 @@ public class Player extends Entity {
         leftArm = new Rectangle(position.x + (SIZE - armHitBoxSize)/2 - 0.2f, position.y + SIZE / 2.8f, armHitBoxSize, armHitBoxSize);
         rightFoot = new Rectangle(position.x + (SIZE - legHitBoxSize)/2 + 0.2f, position.y, legHitBoxSize, legHitBoxSize);
         leftFoot = new Rectangle(position.x + (SIZE - legHitBoxSize)/2 - 0.2f, position.y, legHitBoxSize, legHitBoxSize);*/
-        /*head = new CollisionBox(new Vector2(position.x + (SIZE - headHitboxSize) / 2, position.y + SIZE / 1.6f), headHitboxSize, headHitboxSize);
+       /* head = new CollisionBox(new Vector2(position.x + (SIZE - headHitboxSize) / 2, position.y + SIZE / 1.6f), headHitboxSize, headHitboxSize);
         rightArm = new CollisionBox(new Vector2(position.x + (SIZE - armHitBoxSize) / 2 + 0.2f, position.y + SIZE / 2.8f), armHitBoxSize, armHitBoxSize);
         leftArm = new CollisionBox(new Vector2(position.x + (SIZE - armHitBoxSize) / 2 - 0.2f, position.y + SIZE / 2.8f), armHitBoxSize, armHitBoxSize);
         rightFoot = new CollisionBox(new Vector2(position.x + (SIZE - legHitBoxSize) / 2 + 0.2f, position.y), legHitBoxSize, legHitBoxSize);
@@ -52,9 +52,6 @@ public class Player extends Entity {
         for (CollisionBox b : getBody()) {
             b.update(delta, velocity);
         }
-
-       // head.getPosition().add(velocity.cpy().scl(delta));
-
 
     }
 
