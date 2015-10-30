@@ -519,7 +519,6 @@ public class WorldController {
                 if (Math.abs(overlap) < Math.abs(minOverlapMagnitude) && overlap != 0) {
                     minOverlapMagnitude = overlap;
                     Gdx.app.log("NEW MAGNITUDE", Float.toString(minOverlapMagnitude));
-                    //mtd = new Vector3(normalsB.get(i).x, normalsB.get(i).y, minOverlapMagnitude);
 
                     Vector2 playerTileDifference = subVec(tile.getPosition(), player.getPosition());
 
