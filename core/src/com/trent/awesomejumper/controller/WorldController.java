@@ -125,12 +125,12 @@ public class WorldController {
 
     public void increaseGravity() {
 
-        player.setAccelY(++GRAVITY);
+       // player.setAccelY(++GRAVITY);
         player.setVelocityY(0f);
     }
 
     public void decreaseGravity() {
-        player.setAccelY(--GRAVITY);
+       // player.setAccelY(--GRAVITY);
         player.setVelocityY(0f);
     }
 
@@ -165,17 +165,17 @@ public class WorldController {
 
         resultantY.add(collisionDetectionY(delta));
         resultantX.add(collisionDetectionX(delta));
-        if(Math.abs(resultantY.y) > Math.abs(resultantX.x)) {
+       // if(Math.abs(resultantY.y) > Math.abs(resultantX.x)) {
             player.getVelocity().add(resultantY);
             player.getVelocity().add(resultantX);
 
-        }
+       /* }
 
         else {
             player.getVelocity().add(resultantX);
             player.getVelocity().add(resultantY);
 
-        }
+        }*/
 
 
         managePlayerSpeed();
@@ -373,7 +373,7 @@ public class WorldController {
                     if (resolutionAndMagnitude != null) {
                         Gdx.app.log("RESOLUTION AND MAGANITUDE", resolutionAndMagnitude.toString());
                         collisionResultant.add(resolutionAndMagnitude);
-                        //collisionResultant.scl(5f);
+                        collisionResultant.scl(1.8f);
                         Gdx.app.log("VERTIVCAL CD", "RESET VY= 0");
                         if(collisionResultant.y != 0) {
                             player.setVelocityY(0f);
