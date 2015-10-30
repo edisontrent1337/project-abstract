@@ -15,6 +15,7 @@ public abstract class Entity {
     // ---------------------------------------------------------------------------------------------
 
     Vector2 position = new Vector2();
+    Vector2 center = new Vector2();
     Vector2 acceleration = new Vector2();
     Vector2 velocity = new Vector2();
     private Rectangle bounds;
@@ -49,12 +50,14 @@ public abstract class Entity {
         this.onGround = true;
         this.bounds = new Rectangle();
         this.collisionBox = new CollisionBox(position, DEFAULT_SIZE, DEFAULT_SIZE);
+        this.center = new Vector2(position.x + 0.5f*DEFAULT_SIZE, position.y + 0.5f*DEFAULT_SIZE);
     }
 
 
     public Entity(Vector2 position, float size, float hitPoints) {
         this.position = position;
         this.SIZE = size;
+        this.center = new Vector2(position.x + 0.5f*SIZE, position.y + 0.5f*SIZE);
         this.state = State.IDLE;
         this.hitPoints = hitPoints;
         this.bounds = new Rectangle(position.x, position.y, size, size);
@@ -92,6 +95,11 @@ public abstract class Entity {
         this.bounds.height = height;
 
     }
+
+    public Vector2 getCenter() {
+        return center;
+    }
+
 
     public Vector2 getPosition() {
         return position;

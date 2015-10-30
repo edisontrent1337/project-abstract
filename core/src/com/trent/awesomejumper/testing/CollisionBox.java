@@ -88,6 +88,12 @@ public class CollisionBox {
 
     }
 
+
+    public CollisionBox(float x, float y, float width, float height) {
+        this(new Vector2(x,y), width, height);
+    }
+
+
     // METHODS & FUNCTIONS
     // ---------------------------------------------------------------------------------------------
 
@@ -100,19 +106,15 @@ public class CollisionBox {
     public void draw(ShapeRenderer renderer) {
 
         // DRAW OUTER BOUNDING BOX
+        renderer.set(ShapeRenderer.ShapeType.Line);
         renderer.setColor(Color.BLUE);
         renderer.rect(position.x, position.y, width, height);
 
         // DRAW VERTICES
         renderer.setAutoShapeType(true);
-        renderer.set(ShapeRenderer.ShapeType.Filled);
-        renderer.setColor(Color.GREEN);
-        for (Vector2 v : vertices) {
-            renderer.rect(v.x - VHALF, v.y - VHALF, VSIZE, VSIZE);
-        }
+
 
         // DRAW NORMALS & EDGES
-        renderer.set(ShapeRenderer.ShapeType.Line);
         renderer.setColor(Color.PINK);
         for (int i = 0; i < edges.size; i++) {
             // GRAB CURRENT VERTEX, EDGE, NORMAL
@@ -136,6 +138,18 @@ public class CollisionBox {
             Vector2 nStart = vertex.cpy().add(edge.cpy().scl(0.5f));
             Vector2 nEnd = vertex.cpy().add(edge.cpy().scl(0.5f)).add(normal.cpy().scl(NORMAL_LENGTH));
             renderer.line(nStart.x, nStart.y, nEnd.x, nEnd.y, Color.BLUE, Color.RED);
+
+
+
+
+
+
+        }
+
+        renderer.set(ShapeRenderer.ShapeType.Filled);
+        renderer.setColor(Color.GREEN);
+        for (Vector2 v : vertices) {
+            renderer.rect(v.x - VHALF, v.y - VHALF, VSIZE, VSIZE);
         }
         renderer.setColor(Color.GREEN);
     }

@@ -1,5 +1,6 @@
 package com.trent.awesomejumper.models;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -21,11 +22,10 @@ public class WorldContainer {
     private Player player;
     private Level level;
     private ArrayList tilesToBeDrawn;
-    private Array<Rectangle> collisionRectangles = new Array<>();
+    private ArrayList<Tile> collisionTiles = new ArrayList<>();
 
     public CollisionBox c1, c2;
 
-    private Array<Rectangle> cRectanglesAhead = new Array<>();
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
@@ -82,6 +82,21 @@ public class WorldContainer {
 
     }
 
+    // LIST OF TILES FOR COLLISION
+
+    public void createCollisionTiles(int sx, int sy, int ex, int ey) {
+        collisionTiles.clear();
+        for (int x = sx; x <= ex; x++) {
+            for (int y = sy; y <= ey; y++) {
+                // CHECK WHETHER TILE IS IN LEVEL BOUNDS
+                if (level.checkBounds(x, y)) {
+                    collisionTiles.add(level.getTile(x, y));
+                }
+            }
+        }
+
+    }
+
     // GETTER & SETTER
     // ---------------------------------------------------------------------------------------------
 
@@ -93,13 +108,7 @@ public class WorldContainer {
         return level;
     }
 
-    public Array<Rectangle> getCollisionRectangles() {
-        return collisionRectangles;
+    public ArrayList<Tile> getCollisionTiles() {
+        return collisionTiles;
     }
-
-    public Array<Rectangle> getcRectanglesAhead() {
-        return cRectanglesAhead;
-    }
-
-
 }

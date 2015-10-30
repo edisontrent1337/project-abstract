@@ -2,6 +2,7 @@ package com.trent.awesomejumper.controller;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -22,6 +23,7 @@ import com.trent.awesomejumper.models.WorldContainer;
 import com.trent.awesomejumper.testing.CollisionBox;
 import com.trent.awesomejumper.tiles.Tile;
 
+import static com.trent.awesomejumper.utils.Utilities.WIDTH;
 import static com.trent.awesomejumper.utils.Utilities.formVec;
 
 /**
@@ -43,10 +45,12 @@ public class RenderingEngine {
     static final int CAMERA_HEIGHT = 9;
     static final float SIZE = 1f;
 
+    /**
+     * Pixel per unit scale. The screen shows 16 * 9 units, for pixel perfect accuracy we need
+     * to know how many pixels are equal to 1 screen unit.
+     */
+    static float ppuX, ppuY;
 
-    // TEST PURPOSES FOR SAT
-
-    private CollisionBox c1;
 
     // TEXTURES: PLAYER
     private TextureRegion playerIdleLeft, playerIdleRight, playerJumpL, playerJumpR, currentPlayerFrame;
@@ -91,10 +95,11 @@ public class RenderingEngine {
         this.nearSky02 = worldContainer.getLevel().getSkyBoxes().get(3);
         this.player = worldContainer.getPlayer();
 
+        this.ppuX = Gdx.graphics.getWidth() / CAMERA_WIDTH;
+        this.ppuX = Gdx.graphics.getHeight() / CAMERA_HEIGHT;
+
 
         // TESTING FOR SAT
-
-        this.c1 = worldContainer.c1;
 
 
         /** CAMERA SETUP: MAIN VIEW
@@ -103,6 +108,7 @@ public class RenderingEngine {
           */
         cam = new OrthographicCamera(1f, 0.5625f);
         cam.zoom = 16.6666667f;
+        //cam.zoom = 16f;
         cam.position.set(player.getPositionX(), player.getPositionY(), 0);
         cam.update();
 
@@ -183,15 +189,17 @@ public class RenderingEngine {
         moveCamera(player.getPositionX(), player.getPositionY());
         sb.setProjectionMatrix(cam.combined);
         sb.begin();
+        if(!game.onDebugMode())
             drawBg();
             drawTiles();
+        if(game.onDebugMode()) {
+                sb.end();
+                drawDebugInfo();
+                sb.begin();
+            }
+        if(!game.onDebugMode())
             drawPlayer();
         sb.end();
-
-
-        if(game.onDebugMode()) {
-            drawDebugInfo();
-        }
 
 
         // UI, DEBUG ETC
@@ -231,25 +239,34 @@ public class RenderingEngine {
         for(Tile newTile : worldContainer.getTilesToBeRendered(CAMERA_WIDTH,CAMERA_HEIGHT)) {
             int type = newTile.getType();
             Vector2 position = newTile.getPosition();
-            switch (type) {
-                case 1:
-                    sb.draw(brownNormal, position.x, position.y, Tile.SIZE, Tile.SIZE);
-                    break;
-                case 2:
-                    sb.draw(greyNormal, position.x, position.y, Tile.SIZE, Tile.SIZE);
-                    break;
-                case 3:
-                    sb.draw(brownShadow, position.x, position.y, Tile.SIZE, Tile.SIZE);
-                    break;
-                case 4:
-                    sb.draw(iceNormal, position.x, position.y, Tile.SIZE, Tile.SIZE);
-                    break;
-                case 5:
-                    sb.draw(iceNormal, position.x, position.y, Tile.SIZE, Tile.SIZE);
-                    break;
+            if(!game.onDebugMode()) {
+                switch (type) {
+                    case 1:
+                        sb.draw(brownNormal, position.x, position.y, Tile.SIZE, Tile.SIZE);
+                        break;
+                    case 2:
+                        sb.draw(greyNormal, position.x, position.y, Tile.SIZE, Tile.SIZE);
+                        break;
+                    case 3:
+                        sb.draw(brownShadow, position.x, position.y, Tile.SIZE, Tile.SIZE);
+                        break;
+                    case 4:
+                        sb.draw(iceNormal, position.x, position.y, Tile.SIZE, Tile.SIZE);
+                        break;
+                    case 5:
+                        sb.draw(iceNormal, position.x, position.y, Tile.SIZE, Tile.SIZE);
+                        break;
 
+                }
+
+                // ENVIRONMENT, GRASS ETC
+
+                for(Environment environment : worldContainer.getLevel().getEnvironment()) {
+                    if(environment.getType().equals(Environment.EnvironmentType.GRASS)) {
+                        sb.draw(grass01, environment.getPosition().x, environment.getPosition().y, Environment.SIZE * 2, Environment.SIZE * 2);
+                    }
+                }
             }
-
 
 
 
@@ -265,13 +282,7 @@ public class RenderingEngine {
                 sb.begin();
             }
 
-            // ENVIRONMENT, GRASS ETC
 
-            for(Environment environment : worldContainer.getLevel().getEnvironment()) {
-                if(environment.getType().equals(Environment.EnvironmentType.GRASS)) {
-                    sb.draw(grass01, environment.getPosition().x, environment.getPosition().y, Environment.SIZE * 2, Environment.SIZE * 2);
-                }
-            }
 
         }
 
@@ -370,31 +381,44 @@ public class RenderingEngine {
     public void drawDebugInfo() {
         debugRenderer.setProjectionMatrix(cam.combined);
         debugRenderer.begin(ShapeRenderer.ShapeType.Line);
-        debugRenderer.setColor(0, 1, 0, 1);
 
+
+        debugRenderer.setColor(0, 1, 0, 1);
         // PLAYER HITBOXES
 
+        debugRenderer.rect(player.getPositionX() + player.getVelocity().cpy().scl(player.getPlayerDelta()).x + player.getAcceleration().scl(player.getPlayerDelta()).x,
+                           player.getPositionY() + player.getVelocity().cpy().scl(player.getPlayerDelta()).y + player.getAcceleration().scl(player.getPlayerDelta()).y,
+                           player.getBody().get(0).getWidth(),
+                           player.getBody().get(0).getHeight());
+
+
+
         for(CollisionBox r: player.getBody()) {
-           // debugRenderer.rect(r.x, r.y, r.width, r.height);
             r.draw(debugRenderer);
         }
-        debugRenderer.rect(player.getBounds().x, player.getBounds().y, player.getBounds().width, player.getBounds().height);
+       //debugRenderer.rect(player.getBounds().x, player.getBounds().y, player.getBounds().width, player.getBounds().height);
 
-
-      /* for(Rectangle r: worldContainer.getcRectanglesAhead()) {
-            debugRenderer.setColor(Color.BLUE);
-            debugRenderer.rect(r.x, r.y, r.width,r.height);
-        }
-*/
         debugRenderer.end();
         // HITBOXES OF TILES AFFECTED BY COLLISION DETECTION
-        debugRenderer.begin(ShapeRenderer.ShapeType.Line);
-        debugRenderer.setColor(Color.RED);
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        debugRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        debugRenderer.setColor(0, 0.5f, 0.5f, 1);
+        /**
+         * vertical and horizontal components are separated here to show  which impact is bigger
+         */
+        Vector2 playerX = new Vector2(player.getVelocity().x,0f).cpy().scl(player.getPlayerDelta()).scl(25000);
+        Vector2 playerY = new Vector2(0f,player.getVelocity().y).cpy().scl(player.getPlayerDelta()).scl(25000);
 
-        for(Rectangle r: worldContainer.getCollisionRectangles()) {
-            debugRenderer.rect(r.x, r.y, r.width, r.height);
+        debugRenderer.rectLine(player.getPosition(), player.getPosition().cpy().add(playerX), 5 * (1 / ppuX));
+        debugRenderer.rectLine(player.getPosition(), player.getPosition().cpy().add(playerY), 5 * (1 / ppuX));
+
+        debugRenderer.setColor(1f, 0f, 0f, 0.5f);
+        for (Tile t : worldContainer.getCollisionTiles()) {
+            if(t != null)
+                debugRenderer.rect(t.getPosition().x, t.getPosition().y, Tile.SIZE, Tile.SIZE);
         }
         debugRenderer.end();
+        Gdx.gl.glDisable(GL20.GL_BLEND);
     }
 
 

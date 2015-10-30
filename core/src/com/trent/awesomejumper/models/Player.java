@@ -16,6 +16,8 @@ public class Player extends Entity {
 
     private CollisionBox head, rightArm, rightFoot, leftArm, leftFoot;
 
+    private float playerDelta;
+
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
 
@@ -39,7 +41,7 @@ public class Player extends Entity {
         body.add(leftArm);
         body.add(rightFoot);
         body.add(leftFoot);*/
-        head = new CollisionBox(position, 1f, 1f);
+        head = new CollisionBox(position, 0.7f, 0.7f);
         body.add(head);
 
     }
@@ -47,7 +49,9 @@ public class Player extends Entity {
     @Override
     public void update(float delta) {
         entityTime += delta;
+        playerDelta = delta;
         position.add(velocity.cpy().scl(delta));
+        center.add(velocity.cpy().scl(delta));
         // UPDATE POSITION OF ALL VERTICES
         for (CollisionBox b : getBody()) {
             b.update(delta, velocity);
@@ -62,5 +66,10 @@ public class Player extends Entity {
         leftArm.setPosition(position.x + (SIZE - armHitBoxSize) / 2 - 0.2f, position.y + SIZE / 2.8f);
         rightFoot.setPosition(position.x + (SIZE - legHitBoxSize) / 2 + 0.2f, position.y);
         leftFoot.setPosition(position.x + (SIZE - legHitBoxSize) / 2 - 0.2f, position.y);
+    }
+
+
+    public float getPlayerDelta() {
+        return playerDelta;
     }
 }
