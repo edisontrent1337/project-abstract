@@ -139,7 +139,7 @@ public class WorldController {
 
     public void update(float delta) {
         DAMPING = 0.8f;
-        MAX_VELOCITY = 3.5f;
+        MAX_VELOCITY = 8f;
         // INPUT PROCCESSING
         Vector2 resultantX = new Vector2(0f, 0f);
         Vector2 resultantY = new Vector2(0f, 0f);
@@ -176,9 +176,30 @@ public class WorldController {
         }*/
 
         resultantY.add(collisionDetectionY(delta));
-        player.getVelocity().add(resultantY);
         resultantX.add(collisionDetectionX(delta));
-        player.getVelocity().add(resultantX);
+
+        float a = player.getPositionX();
+        float mid = (float) Math.ceil(player.getPositionX());
+        float b = player.getPositionX() + player.getBody().get(0).getWidth();
+
+        Gdx.app.log("A", Float.toString(a));
+        Gdx.app.log("MID", Float.toString(mid));
+        Gdx.app.log("B", Float.toString(b));
+
+        float areaX =  (mid - a)*resultantX.y;
+        float areaY =  (b - mid)*resultantY.y;
+
+        Gdx.app.log("AREAX", Float.toString(areaX));
+        Gdx.app.log("AREAY", Float.toString(areaY));
+
+        if(Math.abs(areaX) > Math.abs(areaY)) {
+            player.getVelocity().add(resultantX);
+            player.getVelocity().add(resultantY);
+        }
+        else {
+            player.getVelocity().add(resultantY);
+            player.getVelocity().add(resultantX);
+        }
         managePlayerSpeed();
 
         player.update(delta);
@@ -334,11 +355,13 @@ public class WorldController {
         // VERTICAL COLLISION DETECTION
         // -----------------------------------------------------------------------------------------
 
-        CollisionBox dummy = new CollisionBox(player.getPositionX() + player.getVelocity().x,
-                player.getPositionY() + player.getVelocity().y,
+        CollisionBox dummy = new CollisionBox(player.getPositionX(),
+                player.getPositionY(),
                 player.getBody().get(0).getWidth(),
                 player.getBody().get(0).getHeight());
 
+        if(player.getVelocity().y < 0.01*delta)
+            dummy.getPosition().add(player.getVelocity());
 
         cdStartX = (int) player.getBounds().x;
         cdEndX = (int) (player.getBounds().x + player.getBounds().width);
@@ -375,11 +398,6 @@ public class WorldController {
                         if(collisionResultant.y != 0) {
                             player.setVelocityY(0f);
                             break;
-                        }
-
-                        if(Math.abs(collisionResultant.y) < 0.0001f) {
-                            player.setVelocityY(0f);
-                            return new Vector2(0f,0f);
                         }
 
 
@@ -534,9 +552,7 @@ public class WorldController {
 
         }
 
-        if (Math.abs(player.getVelocity().y) < 0.001f) {
-            player.setVelocityY(0f);
-        }
+
 
         if (player.getVelocity().x > MAX_VELOCITY) {
             player.setVelocityX(MAX_VELOCITY);
