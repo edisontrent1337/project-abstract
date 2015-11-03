@@ -388,10 +388,10 @@ public class RenderingEngine {
         debugRenderer.setColor(0, 1, 0, 1);
         // PLAYER HITBOXES
 
-        debugRenderer.rect(player.getPositionX() ,
-                           player.getPositionY() ,
-                           player.getBody().get(0).getWidth() + player.getVelocity().cpy().scl(player.getPlayerDelta()).x,
-                           player.getBody().get(0).getHeight() + player.getVelocity().cpy().scl(player.getPlayerDelta()).y);
+        debugRenderer.rect(player.getPositionX() + player.getVelocity().cpy().scl(player.getPlayerDelta()).x,
+                           player.getPositionY() + player.getVelocity().cpy().scl(player.getPlayerDelta()).y,
+                           player.getBody().get(0).getWidth(),
+                           player.getBody().get(0).getHeight());
 
 
 
