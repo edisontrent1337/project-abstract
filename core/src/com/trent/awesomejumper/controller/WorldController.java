@@ -285,6 +285,15 @@ public class WorldController {
         // -----------------------------------------------------------------------------------------
         // HORIZONTAL COLLISION DETECTION
         // -----------------------------------------------------------------------------------------
+
+
+        /**
+         * TODO
+         *
+         * VERTICAL CD HAS TO ONLY LOOK AT A CERTAIN COLLISIONBOX AND CERTAIN NORMALS
+         *
+         */
+
         int cdStartX, cdEndX, cdStartY, cdEndY;
 
 
@@ -382,7 +391,12 @@ public class WorldController {
         // VERTICAL COLLISION DETECTION
         // -----------------------------------------------------------------------------------------
 
-
+        /**
+         * TODO
+         *
+         * VERTICAL CD HAS TO ONLY LOOK AT A CERTAIN COLLISIONBOX AND CERTAIN NORMALS
+         *
+         */
 
 
         cdStartX = (int) player.getBounds().x;
