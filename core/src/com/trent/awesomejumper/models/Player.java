@@ -41,7 +41,7 @@ public class Player extends Entity {
         body.add(leftArm);
         body.add(rightFoot);
         body.add(leftFoot);*/
-        head = new CollisionBox(position, 0.7f, 0.7f);
+        head = new CollisionBox(position, 1f, 1f);
         body.add(head);
 
     }

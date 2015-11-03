@@ -24,8 +24,6 @@ public class WorldContainer {
     private ArrayList tilesToBeDrawn;
     private ArrayList<Tile> collisionTiles = new ArrayList<>();
 
-    public CollisionBox c1, c2;
-
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------

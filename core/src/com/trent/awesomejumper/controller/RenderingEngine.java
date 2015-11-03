@@ -37,6 +37,8 @@ public class RenderingEngine {
     // ---------------------------------------------------------------------------------------------
 
     private WorldContainer worldContainer;
+
+
     private Player player;
     private AwesomeJumperMain game;
     private SkyBox farSky01, farSky02, nearSky01, nearSky02;
@@ -386,10 +388,11 @@ public class RenderingEngine {
         debugRenderer.setColor(0, 1, 0, 1);
         // PLAYER HITBOXES
 
-        debugRenderer.rect(player.getPositionX() + player.getVelocity().cpy().scl(player.getPlayerDelta()).x + player.getAcceleration().scl(player.getPlayerDelta()).x,
-                           player.getPositionY() + player.getVelocity().cpy().scl(player.getPlayerDelta()).y + player.getAcceleration().scl(player.getPlayerDelta()).y,
-                           player.getBody().get(0).getWidth(),
-                           player.getBody().get(0).getHeight());
+        debugRenderer.rect(player.getPositionX() ,
+                           player.getPositionY() ,
+                           player.getBody().get(0).getWidth() + player.getVelocity().cpy().scl(player.getPlayerDelta()).x,
+                           player.getBody().get(0).getHeight() + player.getVelocity().cpy().scl(player.getPlayerDelta()).y);
+
 
 
 
@@ -406,8 +409,8 @@ public class RenderingEngine {
         /**
          * vertical and horizontal components are separated here to show  which impact is bigger
          */
-        Vector2 playerX = new Vector2(player.getVelocity().x,0f).cpy().scl(player.getPlayerDelta()).scl(25000);
-        Vector2 playerY = new Vector2(0f,player.getVelocity().y).cpy().scl(player.getPlayerDelta()).scl(25000);
+        Vector2 playerX = new Vector2(player.getVelocity().x,0f).cpy().scl(player.getPlayerDelta()).scl(250);
+        Vector2 playerY = new Vector2(0f,player.getVelocity().y).cpy().scl(player.getPlayerDelta()).scl(250);
 
         debugRenderer.rectLine(player.getPosition(), player.getPosition().cpy().add(playerX), 5 * (1 / ppuX));
         debugRenderer.rectLine(player.getPosition(), player.getPosition().cpy().add(playerY), 5 * (1 / ppuX));

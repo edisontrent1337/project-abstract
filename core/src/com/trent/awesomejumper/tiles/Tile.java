@@ -51,7 +51,7 @@ public class Tile {
         this.bounds.height = SIZE;
         this.bounds.x = position.x;
         this.bounds.y = position.y;
-        this.collisionBox = new CollisionBox(position, width, height);
+        this.collisionBox = new CollisionBox(position, SIZE, SIZE);
         this.friction = 1;
     }
 
@@ -63,7 +63,7 @@ public class Tile {
         this.bounds.y = position.y;
         this.type = type;
         this.passable = passable;
-        this.collisionBox = new CollisionBox(position, width, height);
+        this.collisionBox = new CollisionBox(position, SIZE, SIZE);
         this.friction = 1;
     }
 
