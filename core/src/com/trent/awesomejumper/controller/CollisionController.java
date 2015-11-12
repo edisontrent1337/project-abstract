@@ -25,6 +25,24 @@ public class CollisionController {
     private boolean isColliding;
 
 
+    /**
+     *
+     * Idee:
+     *
+     * Zunächst soll die vertikale Kollision erkannt werden.
+     * Unter allen Tiles die in Frage kommen soll die Kollision gefunden werden,
+     * deren minimum translation vector am kleinsten ist.
+     * Man sucht das Minimum aus allen Tiles und CollisionBoxes.
+     * Erst, wenn das komplette Array aus Tiles durchlaufen wurde, wird der minimum translation
+     * vector auf den Spieler angwandt und somit die Kollision resolviert.
+     *
+     * Erst, wenn die vertikale Kollision resolviert wurde, kann die horizontale Kollision erkannt
+     * und resolviert werden.
+     *
+     */
+
+
+
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
 
