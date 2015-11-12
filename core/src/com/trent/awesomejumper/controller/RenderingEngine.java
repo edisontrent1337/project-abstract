@@ -111,7 +111,7 @@ public class RenderingEngine {
         cam = new OrthographicCamera(1f, 0.5625f);
         cam.zoom = 16.6666667f;
         //cam.zoom = 16f;
-        cam.position.set(player.getPositionX(), player.getPositionY(), 0);
+        cam.position.set(player.getPositionX(), player.getPositionY() + 2, 0);
         cam.update();
 
         // CAMERA SETUP: UI

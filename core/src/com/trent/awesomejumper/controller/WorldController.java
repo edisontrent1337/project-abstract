@@ -214,7 +214,7 @@ public class WorldController {
             player.getPosition().add(resultantX.scl(delta).scl(1.6f));
         }*/
 
-        if(Math.abs(resultantX.x) > Math.abs(resultantY.y)) {
+        if(Math.abs(resultantX.x) < Math.abs(resultantY.y)) {
             player.getPosition().add(resultantX);
             Gdx.app.log("EVENT", "ADDED" + resultantX.toString() + "TO X");
         }
@@ -306,14 +306,20 @@ public class WorldController {
 
         int cdStartX, cdEndX, cdStartY, cdEndY;
         cdStartY = (int) (player.getBounds().y);
-        cdEndY = (int) (player.getBounds().y + player.getBounds().height);
+        cdEndY = (int) (player.getBounds().y + player.getBody().get(0).getHeight());
         // X AXIS INTERVAL DEPENDS ON PLAYERS MOVEMENT DIRECTION
-        if (player.getVelocity().x < 0) {
+        if (player.getVelocity().x <= 0) {
             cdStartX = cdEndX = (int) (Math.floor(player.getBounds().x + player.getVelocity().x));
         } else {
-            cdStartX = cdEndX = (int) (Math.floor(player.getBounds().x + player.getBounds().width
+            cdStartX = cdEndX = (int) (Math.floor(player.getBounds().x + player.getBody().get(0).getWidth()
                     + player.getVelocity().x));
         }
+        /*
+        cdStartX = (int) Math.floor(player.getBody().get(0).getPosition().x-1);
+        cdEndX = (int) Math.floor(player.getBody().get(0).getPosition().x+1);
+
+        cdStartY = (int) Math.floor(player.getBody().get(0).getPosition().y-1);
+        cdEndY = (int) Math.floor(player.getBody().get(0).getPosition().y+1);*/
 
         // FIND ALL TILES THE PLAYER CAN COLLIDE WITH
         worldContainer.createCollisionTiles(cdStartX, cdStartY, cdEndX, cdEndY);
@@ -353,10 +359,7 @@ public class WorldController {
                     }
 
                 }
-                else {
-                    player.getVelocity().scl(1/delta);
-                    return null;
-                }
+
 
 
 
@@ -384,12 +387,18 @@ public class WorldController {
          */
         cdStartX = (int) player.getBounds().x;
         cdEndX = (int) (player.getBounds().x + player.getBody().get(0).getWidth());
-        if (player.getVelocity().y < 0) {
+        if (player.getVelocity().y <= 0) {
             cdStartY = cdEndY = (int) (Math.floor(player.getBounds().y + player.getVelocity().y));
         }
         else {
             cdStartY = cdEndY = (int) (Math.floor(player.getBounds().y + player.getBody().get(0).getHeight() + player.getVelocity().y));
         }
+        /*
+        cdStartX = (int) Math.floor(player.getBody().get(0).getPosition().x-1);
+        cdEndX = (int) Math.floor(player.getBody().get(0).getPosition().x+1);
+
+        cdStartY = (int) Math.floor(player.getBody().get(0).getPosition().y-1);
+        cdEndY = (int) Math.floor(player.getBody().get(0).getPosition().y+1);*/
 
 
         worldContainer.createCollisionTiles(cdStartX, cdStartY, cdEndX, cdEndY);
@@ -426,10 +435,7 @@ public class WorldController {
                         }
 
                     }
-                    else {
-                        player.getVelocity().scl(1/delta);
-                        return null;
-                    }
+
 
                     /**
                      * TODO:
