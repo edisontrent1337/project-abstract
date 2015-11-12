@@ -53,6 +53,7 @@ public class Tile {
         this.bounds.y = position.y;
         this.collisionBox = new CollisionBox(position, SIZE, SIZE);
         this.friction = 1;
+        this.passable = false;
     }
 
     public Tile(Vector2 position, TileType type, boolean passable) {
@@ -71,9 +72,7 @@ public class Tile {
     public Tile(Vector2 position, TileType type, float width, float height, float friction, float maxVelocity, float maxJumpSpeed, boolean passable, boolean interactable) {
         this.position = position;
         this.type = type;
-
         this.collisionBox = new CollisionBox(position, width, height);
-
         this.bounds.width = width;
         this.bounds.height = height;
         this.bounds.x = position.x;

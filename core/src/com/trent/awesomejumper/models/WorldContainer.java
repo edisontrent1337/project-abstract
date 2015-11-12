@@ -34,7 +34,7 @@ public class WorldContainer {
     }
 
     private void createWorld() {
-        player = new Player(new Vector2(6f, 10f));
+        player = new Player(new Vector2(5f, 12f));
         level = new Level();
     }
 
@@ -88,7 +88,10 @@ public class WorldContainer {
             for (int y = sy; y <= ey; y++) {
                 // CHECK WHETHER TILE IS IN LEVEL BOUNDS
                 if (level.checkBounds(x, y)) {
-                    collisionTiles.add(level.getTile(x, y));
+                    if(level.getTile(x,y) != null) {
+                        if(!level.getTile(x,y).isPassable())
+                        collisionTiles.add(level.getTile(x, y));
+                    }
                 }
             }
         }

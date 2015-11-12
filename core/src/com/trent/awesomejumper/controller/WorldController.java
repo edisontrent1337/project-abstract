@@ -2,6 +2,7 @@ package com.trent.awesomejumper.controller;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.trent.awesomejumper.models.Entity.State;
 import com.trent.awesomejumper.models.Level;
@@ -41,7 +42,6 @@ public class WorldController {
     private SkyBox farSky01, farSky02, nearSky01, nearSky02;
     private Array<Tile> collisionCandidateTiles = new Array<>();
 
-    private CollisionController collisionController;
 
     // JUMPING AND TIMING
     private long pressedJumpTime;
@@ -51,12 +51,12 @@ public class WorldController {
     // MAXIMUM VELOCITY  & DAMPING DETERMINED BY TILE
     public float MAX_VELOCITY, DAMPING;
 
-    // COLLISION DEBUG
-    private final float CSRESSCALE = 1.0f;
-
-
     // WEATHER SIMULATION
     private float windSpeed, windDelta;
+
+    // COLLISION RESOLUTION VECTORS
+
+    private Vector2 resolutionX, resolutionY;
 
     //KEY MAP
     static Map<Keys, Boolean> keyMap = new HashMap<>();
@@ -84,7 +84,8 @@ public class WorldController {
         this.nearSky01 = level.getSkyBoxes().get(2);
         this.nearSky02 = level.getSkyBoxes().get(3);
 
-        this.collisionController = new CollisionController(worldContainer);
+        this.resolutionX = new Vector2(0.0f, 0.0f);
+        this.resolutionY = new Vector2(0.0f, 0.0f);
     }
 
     // BUTTON PRESSING METHODS
@@ -146,7 +147,7 @@ public class WorldController {
 
     public void update(float delta) {
         DAMPING = 0.8f;
-        MAX_VELOCITY = 6f;
+        MAX_VELOCITY = 5.8f;
         // INPUT PROCCESSING
         Vector2 resultantX = new Vector2(0f, 0f);
         Vector2 resultantY = new Vector2(0f, 0f);
@@ -169,25 +170,28 @@ public class WorldController {
         player.getAcceleration().scl(delta);
         player.getVelocity().add(player.getAcceleration());
 
+      /*  if(Math.abs(player.getVelocity().y) > Math.abs(player.getVelocity().x)) {
+            resultantY.add(collisionDetectionY(delta));
+            player.getVelocity().add(resultantY);
+            resultantX.add(collisionDetectionX(delta));
+            player.getVelocity().add(resultantX);
+        }
 
-        /**
-         * CD STUFF BEGINGS HERE
-         */
+        else {
+            resultantX.add(collisionDetectionX(delta));
+            player.getVelocity().add(resultantX);
+            resultantY.add(collisionDetectionY(delta));
+            player.getVelocity().add(resultantY);
+        }*/
 
         Vector2 x = collisionDetectionX(delta);
+        if(x != null)
+            resultantX.add(x).scl(delta);
         Vector2 y = collisionDetectionY(delta);
-        // if x == null, there was no collision on x side
-        if(x != null && y == null) {
-            resultantX.add(x);
-            Gdx.app.log("RESULTANT FOR CD X", x.toString());
-        }
-        // if y == null, there was no collision on y side
-        if(y != null && x == null) {
-            resultantY.add(y);
-            Gdx.app.log("RESULTANT FOR CD Y", y.toString());
-        }
+        if(y != null)
+            resultantY.add(y).scl(delta);
 
-        float a = player.getPositionX();
+      /*  float a = player.getPositionX();
         float mid = (float) Math.ceil(player.getPositionX());
         float b = player.getPositionX() + player.getBody().get(0).getWidth();
 
@@ -202,14 +206,22 @@ public class WorldController {
         Gdx.app.log("AREAY", Float.toString(areaY));
 
         if(Math.abs(areaX) > Math.abs(areaY)) {
-            player.getPosition().add(resultantX.scl(delta).scl(CSRESSCALE));
-            player.getPosition().add(resultantY.scl(delta));
+            player.getPosition().add(resultantX.scl(delta).scl(1.6f));
+            player.getPosition().add(resultantY.scl(delta).scl(1.6f));
         }
         else {
-            player.getPosition().add(resultantY.scl(delta));
-            player.getPosition().add(resultantX.scl(delta).scl(CSRESSCALE));
-        }
+            player.getPosition().add(resultantY.scl(delta).scl(1.6f));
+            player.getPosition().add(resultantX.scl(delta).scl(1.6f));
+        }*/
 
+        if(Math.abs(resultantX.x) > Math.abs(resultantY.y)) {
+            player.getPosition().add(resultantX);
+            Gdx.app.log("EVENT", "ADDED" + resultantX.toString() + "TO X");
+        }
+        else {
+            player.getPosition().add(resultantY);
+            Gdx.app.log("EVENT", "ADDED" + resultantY.toString() + "TO Y");
+        }
         managePlayerSpeed();
 
         player.update(delta);
@@ -280,7 +292,7 @@ public class WorldController {
     // ---------------------------------------------------------------------------------------------
 
     private Vector2 collisionDetectionX(float delta) {
-        Vector2 resolutionAndMagnitude = new Vector2(0f, 0f);
+        Vector2 collisionResultant = new Vector2(0f, 0f);
         player.getVelocity().scl(delta);
         // -----------------------------------------------------------------------------------------
         // HORIZONTAL COLLISION DETECTION
@@ -293,147 +305,131 @@ public class WorldController {
          */
 
         int cdStartX, cdEndX, cdStartY, cdEndY;
-        // Y AXIS INTERVAL
         cdStartY = (int) (player.getBounds().y);
         cdEndY = (int) (player.getBounds().y + player.getBounds().height);
-
-
         // X AXIS INTERVAL DEPENDS ON PLAYERS MOVEMENT DIRECTION
         if (player.getVelocity().x < 0) {
             cdStartX = cdEndX = (int) (Math.floor(player.getBounds().x + player.getVelocity().x));
         } else {
             cdStartX = cdEndX = (int) (Math.floor(player.getBounds().x + player.getBounds().width
                     + player.getVelocity().x));
-
         }
+
         // FIND ALL TILES THE PLAYER CAN COLLIDE WITH
         worldContainer.createCollisionTiles(cdStartX, cdStartY, cdEndX, cdEndY);
-
         Gdx.app.log("EVENT", "ENTERING HORIZONTAL COLLISION DETECTION.");
-        Gdx.app.log("*~*~*", "----------------------------------------");
+        Gdx.app.log("~~~~~~~~~~~~~~", "----------------------------------------------");
+
+        for(Tile tile: worldContainer.getCollisionTiles()) {
+            Gdx.app.log("CANDIDATE:", tile.getPosition().toString());
+        }
+        Gdx.app.log("~~~~~~~~~~~~~~", "----------------------------------------------");
+
         // ACTUAL CD
         for (Tile tile : worldContainer.getCollisionTiles()) {
 
-
-            if (tile == null) { // air tiles
-                continue;
-            }
-
-
-
             // LOGGING
             Gdx.app.log("PLAYER POSITION", formVec(player.getPosition()));
-            Gdx.app.log("TILE", formVec(tile.getPosition()));
-
+            Gdx.app.log("TILE POSITION", formVec(tile.getPosition()));
             /**
              * For every collisionBox of the players body, the collision check is
-             * performed.
-             */
+             * performed.*/
 
             for (CollisionBox collisionBox : player.getBody()) {
 
-                CollisionBox dummy = new CollisionBox(
-                             collisionBox.getPosition().x + player.getVelocity().x,
-                             collisionBox.getPosition().y,
-                             collisionBox.getWidth(),
-                             collisionBox.getHeight());
+                CollisionBox dummy = new CollisionBox(collisionBox.getPosition().x + player.getVelocity().x,
+                        collisionBox.getPosition().y,
+                        collisionBox.getWidth(),
+                        collisionBox.getHeight());
 
-
-                resolutionAndMagnitude = checkCollision(tile, dummy);
-                // If there is a collision and the tile is solid
+                Vector2 resolutionAndMagnitude = checkCollision(tile, dummy);
                 if (resolutionAndMagnitude != null && !tile.isPassable()) {
-                  Gdx.app.log("RESOLUTION AND MAGANITUDE", resolutionAndMagnitude.toString());
-                  Gdx.app.log("HORIZONTAL CD", "RESET VX = 0");
-                   if(resolutionAndMagnitude.x != 0f) {
+                    Gdx.app.log("RESOLUTION AND MAGNITUDE", resolutionAndMagnitude.toString());
+                        collisionResultant.add(resolutionAndMagnitude);
+                    if(collisionResultant.x != 0f) {
+                        Gdx.app.log("HORIZONTAL CD", "RESET VX TO 0");
                         player.setVelocityX(0f);
                         player.setState(State.IDLE);
-                   }
-
-                    // BREAK THE PLAYER BODY LOOP
-                    break;
+                    }
 
                 }
-
-                /**
-                 * TODO:
-                 * PROBLEM: EARLY EXIT FROM THIS FUNCTION WHEN THE FIRST TILE TESTED RETURNS NULL...
-                 * WE EXIT THIS FUNCTION TOO EARLY, NOT CHECKING POTENTIAL OTHER CANDIDATES IN
-                 * THE ARRAY collisioncandidates.
-                 * SOLUTION: COLLIDER CLASS WHICH WORKS WITH BOOLS AND MANIPULATES GLOBAL RESOLUTION VECTORS
-                 * */
-
-                // If there is no collision or the tile is passable
-            /*    else {
-                    player.getVelocity().scl(1 / delta);
+                else {
+                    player.getVelocity().scl(1/delta);
                     return null;
-                }*/
+                }
+
+
 
 
             }
 
         }
         player.getVelocity().scl(1/delta);
-        return resolutionAndMagnitude;
+        return collisionResultant;
     }
 
 
     private Vector2 collisionDetectionY(float delta) {
-        Vector2 resolutionAndMagnitude = new Vector2(0.0f,0.0f);
+        Vector2 collisionResultant = new Vector2(0f, 0f);
         player.getVelocity().scl(delta);
         int cdStartX, cdEndX, cdStartY, cdEndY;
         // -----------------------------------------------------------------------------------------
         // VERTICAL COLLISION DETECTION
         // -----------------------------------------------------------------------------------------
-
         /**
          * TODO
          *
          * VERTICAL CD HAS TO ONLY LOOK AT A CERTAIN COLLISIONBOX AND CERTAIN NORMALS
          *
          */
-
-
         cdStartX = (int) player.getBounds().x;
-        cdEndX = (int) (player.getBounds().x + player.getBounds().width);
+        cdEndX = (int) (player.getBounds().x + player.getBody().get(0).getWidth());
         if (player.getVelocity().y < 0) {
             cdStartY = cdEndY = (int) (Math.floor(player.getBounds().y + player.getVelocity().y));
-        } else {
-            cdStartY = cdEndY = (int) (Math.floor(player.getBounds().y + player.getBounds().height + player.getVelocity().y));
         }
+        else {
+            cdStartY = cdEndY = (int) (Math.floor(player.getBounds().y + player.getBody().get(0).getHeight() + player.getVelocity().y));
+        }
+
 
         worldContainer.createCollisionTiles(cdStartX, cdStartY, cdEndX, cdEndY);
         Gdx.app.log("EVENT", "ENTERING VERTICAL COLLISION DETECTION.");
-        Gdx.app.log("*~*~*", "----------------------------------------");
+        Gdx.app.log("~~~~~~~~~~~~~~", "----------------------------------------------");
+        for(Tile tile: worldContainer.getCollisionTiles()) {
+            Gdx.app.log("CANDIDATE:", tile.getPosition().toString());
+        }
+        Gdx.app.log("~~~~~~~~~~~~~~", "----------------------------------------------");
+
         for (Tile tile : worldContainer.getCollisionTiles()) {
-
-
-            if (tile == null) {
-                continue;
-            }
 
             Gdx.app.log("PLAYER POSITION", formVec(player.getPosition()));
             Gdx.app.log("TILE", formVec(tile.getPosition()));
 
-
             for (CollisionBox collisionBox : player.getBody()) {
-                CollisionBox dummy = new CollisionBox(
-                             collisionBox.getPosition().x,
-                             collisionBox.getPosition().y + player.getVelocity().y,
-                             collisionBox.getWidth(),
-                             collisionBox.getHeight());
+                CollisionBox dummy = new CollisionBox(collisionBox.getPosition().x,
+                        collisionBox.getPosition().y + player.getVelocity().y,
+                        collisionBox.getWidth(),
+                        collisionBox.getHeight());
 
-                resolutionAndMagnitude = checkCollision(tile, dummy);
-                if (!tile.isPassable() && resolutionAndMagnitude != null) {
+                Vector2 resolutionAndMagnitude = checkCollision(tile, dummy);
+                if (!tile.isPassable()) {
                     if (player.getVelocity().y < 0) {
                         player.groundEntity();
                     }
 
+                    if (resolutionAndMagnitude != null) {
                         Gdx.app.log("RESOLUTION AND MAGNITUDE", resolutionAndMagnitude.toString());
-                        Gdx.app.log("VERTICAL CD", "RESET VY= 0");
-                        if(resolutionAndMagnitude.y != 0) {
+                            collisionResultant.add(resolutionAndMagnitude);
+                        if (collisionResultant.y != 0) {
+                            Gdx.app.log("VERTICAL CD", "RESET VY TO 0");
                             player.setVelocityY(0f);
-                            break;
-                       }
+                        }
+
+                    }
+                    else {
+                        player.getVelocity().scl(1/delta);
+                        return null;
+                    }
 
                     /**
                      * TODO:
@@ -443,12 +439,9 @@ public class WorldController {
                      * SOLUTION: COLLIDER CLASS WHICH WORKS WITH BOOLS AND MANIPULATES GLOBAL RESOLUTION VECTORS
                      * */
 
-                 /*    else {
 
-                        player.getVelocity().scl(1/delta);
-                        return null;
-
-                    }*/
+                    //DAMPING = tile.getFriction();
+                    //MAX_VELOCITY = tile.getMaxVelocity();
 
                 }
 
@@ -457,10 +450,14 @@ public class WorldController {
         }
 
         player.getVelocity().scl(1 / delta);
-        return resolutionAndMagnitude;
+        return collisionResultant;
 
     }
 
+
+
+
+    // TEST: x,y: Vector2 resolutionAxis, z: magnitude
 
 
     private Vector2 checkCollision(Tile tile, CollisionBox collisionBox) {
@@ -470,6 +467,7 @@ public class WorldController {
         // GET NORMALS OF EACH SHAPE
         Array<Vector2> normalsA = collisionBox.getNormals();
         Array<Vector2> normalsB = tile.getCollisionBox().getNormals();
+
 
         // CALCULATE FOR EVERY NORMAL AND BOTH SHAPES THEIR PROJECTION
         // NORMALS OF SHAPE A
@@ -484,7 +482,7 @@ public class WorldController {
             Gdx.app.log("PROJECTION PLAYER", projectionA.toString());
             Gdx.app.log("PROJECTION B", projectionB.toString());
             if (!overlaps(projectionA, projectionB)) {
-                Gdx.app.log("EVENT", "NO OVERLAP. EXITING COLLISION DETECTION.");
+                Gdx.app.log("EVENT", "NO OVERLAP. EXITING COLLISION DETECTION FOR CURRENT TILE.");
                 Gdx.app.log("-", "----------------------------------------------");
                 Gdx.app.log("-", "----------------------------------------------");
                 return null;
@@ -499,7 +497,7 @@ public class WorldController {
 
                 if (Math.abs(overlap) < Math.abs(minOverlapMagnitude) && overlap != 0) {
                     minOverlapMagnitude = overlap;
-                   Gdx.app.log("NEW MAGNITUDE", Float.toString(minOverlapMagnitude));
+                    Gdx.app.log("NEW MAGNITUDE", Float.toString(minOverlapMagnitude));
                     Vector2 playerTileDifference = subVec(tile.getPosition(), collisionBox.getPosition());
 
                     mtd = new Vector2(normalsA.get(i));
@@ -519,9 +517,12 @@ public class WorldController {
         }
 
 
+
+
         // NORMALS OF SHAPE B
         Gdx.app.log("TILE BOX (SHAPE B)", "...");
         for (int i = 0; i < normalsB.size; i++) {
+
 
 
             Gdx.app.log("CHECKING NORMAL", normalsB.get(i).toString());
@@ -532,7 +533,7 @@ public class WorldController {
             Gdx.app.log("PROJECTION B", projectionB.toString());
 
             if (!overlaps(projectionA, projectionB)) {
-                Gdx.app.log("EVENT", "NO OVERLAP. EXITING COLLISION DETECTION.");
+                Gdx.app.log("EVENT", "NO OVERLAP. EXITING COLLISION DETECTION FOR CURRENT TILE.");
                 return null;
             } else {
 
@@ -561,7 +562,9 @@ public class WorldController {
 
         }
 
+
         return mtd;
+
     }
 
 
@@ -604,5 +607,11 @@ public class WorldController {
     }
 
 
+    // GETTER & SETTER
+    // ---------------------------------------------------------------------------------------------
+
+    public Array<Tile> getCollisionCandidates() {
+        return collisionCandidateTiles;
+    }
 
 }

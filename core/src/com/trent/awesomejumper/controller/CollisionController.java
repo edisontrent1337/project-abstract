@@ -69,6 +69,9 @@ public class CollisionController {
         player.getVelocity().scl(delta);
         int cdStartX, cdEndX, cdStartY, cdEndY;
 
+
+
+
         cdStartY = (int) (player.getBounds().y);
         cdEndY = (int) (player.getBounds().y + player.getBounds().height);
 
