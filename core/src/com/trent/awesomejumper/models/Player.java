@@ -12,7 +12,6 @@ public class Player extends Entity {
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
     private final float headHitboxSize, armHitBoxSize, legHitBoxSize;
-    // private Rectangle head, rightArm, rightFoot, leftArm, leftFoot;
 
     private CollisionBox head, rightArm, rightFoot, leftArm, leftFoot;
 

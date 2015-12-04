@@ -88,6 +88,10 @@ public class GameScreen implements Screen, InputProcessor{
             controller.upPressed();
         }
 
+        if(keycode == Keys.DOWN) {
+            controller.downPressed();
+        }
+
         if (keycode == Keys.D) {
             game.setDebugMode(!game.onDebugMode());
         }
@@ -113,6 +117,10 @@ public class GameScreen implements Screen, InputProcessor{
         if (keycode == Keys.UP) {
             controller.upReleased();
         }
+        if(keycode == Keys.DOWN) {
+            controller.downReleased();
+        }
+
         if (keycode == Keys.D) {
         }
         return false;

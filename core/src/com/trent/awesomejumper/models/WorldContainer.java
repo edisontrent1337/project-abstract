@@ -34,7 +34,7 @@ public class WorldContainer {
     }
 
     private void createWorld() {
-        player = new Player(new Vector2(5f, 12f));
+        player = new Player(new Vector2(12.5f, 7f));
         level = new Level();
     }
 

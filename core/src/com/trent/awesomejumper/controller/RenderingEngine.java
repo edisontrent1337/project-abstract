@@ -43,8 +43,8 @@ public class RenderingEngine {
     private AwesomeJumperMain game;
     private SkyBox farSky01, farSky02, nearSky01, nearSky02;
     public OrthographicCamera cam, uiCam;
-    static final int CAMERA_WIDTH = 16;
-    static final int CAMERA_HEIGHT = 9;
+    static final int CAMERA_WIDTH = 32;
+    static final int CAMERA_HEIGHT =18;
     static final float SIZE = 1f;
 
     /**
@@ -108,8 +108,8 @@ public class RenderingEngine {
          * ZOOM = 16.66667 , other options: initialize camera with parameters
          * 16,9 and leave zoom at 1.
           */
-        cam = new OrthographicCamera(1f, 0.5625f);
-        cam.zoom = 16.6666667f;
+        cam = new OrthographicCamera(32f, 18f);
+        cam.zoom = 0.75f;
         //cam.zoom = 16f;
         cam.position.set(player.getPositionX(), player.getPositionY() + 2, 0);
         cam.update();
@@ -277,6 +277,7 @@ public class RenderingEngine {
                 debugRenderer.setProjectionMatrix(cam.combined);
                 //moveCamera(player.getPositionX(),player.getPositionY());
                 debugRenderer.begin(ShapeRenderer.ShapeType.Line);
+                if(!newTile.isPassable())
                 newTile.getCollisionBox().draw(debugRenderer);
                // debugRenderer.setColor(Color.GREEN);
                // debugRenderer.rect(position.x, position.y, Tile.SIZE, Tile.SIZE);
@@ -358,7 +359,7 @@ public class RenderingEngine {
     public void drawInfo() {
         acc = "ACC: " +  player.getAcceleration();
         vel = "VEL: " +  player.getVelocity();
-        ste = "STATE: " + player.getState().toString() + "| grounded: " + player.isOnGround();
+        ste = "STATE: " + player.getState().toString();
         pos = "POS: " + player.getPosition();
         cps = "CAM: " + formVec(cam.position.x, cam.position.y);
         res = Gdx.graphics.getWidth() + "*" + Gdx.graphics.getHeight() + ", ZOOM: " + zoom + ", FPS :" + Gdx.graphics.getFramesPerSecond();

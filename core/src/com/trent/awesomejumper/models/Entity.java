@@ -34,7 +34,6 @@ public abstract class Entity {
     public float hitPoints;
     public State state;
 
-    private boolean onGround = false;
     public boolean facingL = false;
 
     public float entityTime;
@@ -47,7 +46,6 @@ public abstract class Entity {
         this.hitPoints = 100f;
         this.state = State.IDLE;
         this.position = position;
-        this.onGround = true;
         this.bounds = new Rectangle();
         this.collisionBox = new CollisionBox(position, DEFAULT_SIZE, DEFAULT_SIZE);
         this.center = new Vector2(position.x + 0.5f*DEFAULT_SIZE, position.y + 0.5f*DEFAULT_SIZE);
@@ -170,18 +168,6 @@ public abstract class Entity {
 
     public void setVelocityX(float vx) {
         this.velocity.x = vx;
-    }
-
-    public void groundEntity() {
-        onGround = true;
-    }
-
-    public void elevateEntity() {
-        onGround = false;
-    }
-
-    public boolean isOnGround() {
-        return onGround;
     }
 
     public void setFacingL(boolean facingL) {

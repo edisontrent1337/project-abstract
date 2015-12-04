@@ -29,18 +29,21 @@ public class Utilities {
     // CONSOLE FORMATTING UTILS
     // ---------------------------------------------------------------------------------------------
 
-    // NICE BRACKETS
-
-    public static String brackify(int a, int b) {
-        return "[" + a + "  |   " + b + "]";
-    }
-
     // FORMAT VECTORS FOR CONSOLE OUTPUT
-
+    /**
+     * Formats an input vector v for console output. Rounded to 3 decimal places.
+     * @param v - input vector
+     */
     public static String formVec(Vector2 v) {
-        return "[" + String.format("%.3f", v.x) + "|" + String.format("%.3f", v.y) + "]";
+        return "(" + String.format("%.3f", v.x) + "|" + String.format("%.3f", v.y) + ")";
     }
 
+
+    /**
+     * Formats an input vector (x,y) for console output. Rounded to 3 decimal places.
+     * @param x input x component
+     * @param y inpit y component
+     */
     public static String formVec(float x, float y) {
         return formVec(new Vector2(x, y));
     }
@@ -62,10 +65,9 @@ public class Utilities {
 
     // PROJECTION OF A SHAPE ONTO AN AXIS
     /**
-     * Returns the projection values of a shape (CollisionBox) onto an axis
+     * Returns the projection min and max values of a shape (CollisionBox) onto an axis
      * @param box represents the shape which will be projected.
      * @param axis represents the axis on which the shape will be projected.
-     *
      */
     public static Interval getProjection(CollisionBox box, Vector2 axis) {
         float min = dPro(box.getVertices().get(0), axis);
@@ -97,9 +99,7 @@ public class Utilities {
      * @param proj2 projection of the second shape onto an axis, x = min, y = max
      */
     public static boolean overlaps(Interval proj1, Interval proj2) {
-
         return proj1.min <= proj2.max && proj2.min <= proj1.max;
-
     }
 
 
@@ -111,19 +111,6 @@ public class Utilities {
      */
     public static float getOverlap(Interval proj1, Interval proj2) {
 
-        /**
-         * The first projections maximum is bigger than the second projections minimum
-         */
-      /*  if(Math.abs(proj1.max) >= Math.abs(proj2.min)) {
-            Gdx.app.log("CALCULATED OVERLAP", Float.toString(proj1.max - proj2.min));
-            return proj1.max - proj2.min;
-        }
-        /**
-         * The second projections maximum is bigger than the first projections minimum
-
-        else
-            Gdx.app.log("CALCULATED OVERLAP", Float.toString(proj2.max - proj1.min));
-            return proj2.max - proj1.min;*/
         if(proj1.isSameAs(proj2)) {
             return 0f;
         }
