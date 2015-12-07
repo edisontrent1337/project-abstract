@@ -26,7 +26,6 @@ public class Level {
     private Tile[][]tiles;
     private Array<SkyBox> skyBoxes;
     Array<Environment> environment = new Array<Environment>();
-    Array<String> colorCodes = new Array<String>();
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------

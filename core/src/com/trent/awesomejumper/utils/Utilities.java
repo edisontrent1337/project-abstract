@@ -99,13 +99,14 @@ public class Utilities {
      * @param proj2 projection of the second shape onto an axis, x = min, y = max
      */
     public static boolean overlaps(Interval proj1, Interval proj2) {
-        return proj1.min <= proj2.max && proj2.min <= proj1.max;
+        return proj1.min < proj2.max && proj2.min < proj1.max;
     }
 
 
     // OVERLAP BETWEEN TWO PROJECTIONS
     // ---------------------------------------------------------------------------------------------
     /**
+     * Returns the overlap of two Intervals
      * @param proj1 projection of the first shape onto an axis, x = min, y = max
      * @param proj2 projection of the second shape onto an axis, x = min, y = max
      */

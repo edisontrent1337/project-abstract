@@ -47,7 +47,6 @@ public class WorldController {
     // COLLISION RESOLUTION VECTORS
 
     private Vector2 resolutionVector;
-    private boolean collidedX, collidedY;
 
     //KEY MAP
     static Map<Keys, Boolean> keyMap = new HashMap<>();
@@ -92,10 +91,6 @@ public class WorldController {
         keyMap.put(Keys.DOWN, true);
     }
 
-    public void activateDebugMode() {
-        keyMap.put(Keys.D, true);
-    }
-
     public void leftReleased() {
         keyMap.put(Keys.LEFT, false);
     }
@@ -112,19 +107,13 @@ public class WorldController {
         keyMap.put(Keys.DOWN, false);
     }
 
-    public void increaseGravity() {
-        player.setVelocityY(0f);
-    }
 
-    public void decreaseGravity() {
-        player.setVelocityY(0f);
-    }
 
     // UPDATE FUNCTION: INPUT PROCRESSING & COLLISION DETECTION
     // ---------------------------------------------------------------------------------------------
 
     public void update(float delta) {
-        DAMPING = 0.55f;
+        DAMPING = 0.75f;
         MAX_VELOCITY = 5f;
         // INPUT PROCCESSING
         processUserInput();
@@ -132,86 +121,27 @@ public class WorldController {
         player.getAcceleration().scl(delta);
         player.getVelocity().add(player.getAcceleration());
 
-
-
-        //Vector2 y = collisionDetectionY(delta);
-        //if (y != null)
-          //  resultantY.add(y).scl(delta);
-
-      /*  float a = player.getPositionX();
-        float mid = (float) Math.ceil(player.getPositionX());
-        float b = player.getPositionX() + player.getBody().get(0).getWidth();
-
-        Gdx.app.log("A", Float.toString(a));
-        Gdx.app.log("MID", Float.toString(mid));
-        Gdx.app.log("B", Float.toString(b));
-
-        float areaX =  (mid - a)*resultantY.y;
-        float areaY =  (b - mid)*resultantY.y;
-
-        Gdx.app.log("AREAX", Float.toString(areaX));
-        Gdx.app.log("AREAY", Float.toString(areaY));
-
-        if(Math.abs(areaX) > Math.abs(areaY)) {
-            player.getPosition().add(resultantX.scl(delta).scl(1.6f));
-            player.getPosition().add(resultantY.scl(delta).scl(1.6f));
-        }
-        else {
-            player.getPosition().add(resultantY.scl(delta).scl(1.6f));
-            player.getPosition().add(resultantX.scl(delta).scl(1.6f));
-        }*/
-
-        /*if (Math.abs(resultantX.x) < Math.abs(resultantY.y)) {
-            player.getPosition().add(resultantX);
-            Gdx.app.log("EVENT", "ADDED" + resultantX.toString() + "TO X");
-        } else {
-            player.getPosition().add(resultantY);
-            Gdx.app.log("EVENT", "ADDED" + resultantY.toString() + "TO Y");
-        }*/
-
-
-        //TOUCH FLOOR
-        //AREA 1
-
-        // player position
-        float px = player.getPositionX();
-        float endx = player.getPositionX() + player.getBody().get(0).getWidth();
-        float py = player.getPositionY();
-        float endy = player.getPositionY() + player.getBody().get(0).getHeight();
-
-        // intersection points with world
-        float cpx = (float) Math.ceil(px);
-        float cpy = (float) Math.ceil(py);
-
-
-
-
-       // collisionDetectionY(delta);
         collisionDetection(delta);
 
+        /**
+         * TODO: Adding resolution vector to player position should be part of the collision detection method.
+         */
 
         Gdx.app.log("RESULT OF COLLISIONDETECTION BEFORE ADDING", resolutionVector.toString());
         player.getPosition().add(resolutionVector);
+
+
         resolutionVector.x = 0f;
         resolutionVector.y = 0f;
-        /*if(Math.abs(resolutionVector.x) >= Math.abs(resolutionVector.y)) {
-            player.getPosition().y += resolutionVector.y;
-            Gdx.app.log("ADDED, X GREATER Y", Float.toString(resolutionVector.y));
-        }
 
-        if(Math.abs(resolutionVector.x) <= Math.abs(resolutionVector.y) ){
-
-            player.getPosition().x += resolutionVector.x;
-            Gdx.app.log("ADDED, X SMALLER Y", Float.toString(resolutionVector.x));
-        }*/
-
-
-       // player.getPosition().add(resolutionVector);
         managePlayerSpeed();
 
         player.update(delta);
         player.setBounds(player.getPositionX(), player.getPositionY());
 
+        /**
+         * TODO: FOG IMPLEMENTATION WITH THE OLD SKYBOXES
+         */
         /*for (SkyBox s : level.getSkyBoxes()) {
             s.update(delta);
         }*/
@@ -225,20 +155,20 @@ public class WorldController {
     private void processUserInput() {
         // WALKING UP
 
-        if (keyMap.get(Keys.UP) & !(keyMap.get(Keys.DOWN) || keyMap.get(Keys.RIGHT) || keyMap.get(Keys.LEFT))) {
+        if (keyMap.get(Keys.UP) &!(keyMap.get(Keys.DOWN) || keyMap.get(Keys.RIGHT) || keyMap.get(Keys.LEFT))) {
             player.setState(State.WALKING);
             player.setAccelY(ACCELERATION);
             player.setAccelX(0f);
         }
         // WALKING DOWN
-        else if (keyMap.get(Keys.DOWN) & !(keyMap.get(Keys.UP) || keyMap.get(Keys.RIGHT) || keyMap.get(Keys.LEFT))) {
+        else if (keyMap.get(Keys.DOWN) &!(keyMap.get(Keys.UP) || keyMap.get(Keys.RIGHT) || keyMap.get(Keys.LEFT))) {
             player.setState(State.WALKING);
             player.setAccelY(-ACCELERATION);
             player.setAccelX(0f);
         }
 
         // WALKING RIGHT
-        else if (keyMap.get(Keys.RIGHT) & !(keyMap.get(Keys.LEFT) || keyMap.get(Keys.UP) || keyMap.get(Keys.DOWN))) {
+        else if (keyMap.get(Keys.RIGHT) &!(keyMap.get(Keys.LEFT) || keyMap.get(Keys.UP) || keyMap.get(Keys.DOWN))) {
             player.setFacingL(false);
             player.setState(State.WALKING);
             player.setAccelX(ACCELERATION);
@@ -246,7 +176,7 @@ public class WorldController {
         }
 
         // WALKING LEFT
-        else if (keyMap.get(Keys.LEFT) & !(keyMap.get(Keys.RIGHT) || keyMap.get(Keys.UP) || keyMap.get(Keys.DOWN))) {
+        else if (keyMap.get(Keys.LEFT) &!(keyMap.get(Keys.RIGHT) || keyMap.get(Keys.UP) || keyMap.get(Keys.DOWN))) {
             player.setFacingL(true);
             player.setState(State.WALKING);
             player.setAccelX(-ACCELERATION);
@@ -298,7 +228,7 @@ public class WorldController {
 
     /**
      *
-     * TODO: move vertical collision algorithm here and put an if condition wheter overlap is still present
+     * TODO: move vertical collision algorithm here and put an if condition whether overlap is still present
      * then go to x collision detection :D
      */
 
@@ -323,9 +253,9 @@ public class WorldController {
         cdStartX = (int) player.getBounds().x;
         cdEndX = (int) (player.getBounds().x + player.getBody().get(0).getWidth());
         if (player.getVelocity().y <= 0) {
-            cdStartY = cdEndY = (int) (Math.floor(player.getBounds().y));
+            cdStartY = cdEndY = (int) (Math.floor(player.getBody().get(0).getPosition().y));
         } else {
-            cdStartY = cdEndY = (int) (Math.floor(player.getBounds().y + player.getBody().get(0).getHeight()));
+            cdStartY = cdEndY = (int) (Math.floor(player.getBody().get(0).getPosition().y + player.getBody().get(0).getHeight()));
         }
 
 
@@ -343,18 +273,17 @@ public class WorldController {
             Gdx.app.log("TILE", formVec(tile.getPosition()));
 
             CollisionBox collisionBox = player.getBody().get(0);
-            
+
 
             if (checkCollision(tile, collisionBox) && !tile.isPassable()) {
-                if(resolutionVector.y != 0f) {
                     Gdx.app.log("RESOLUTION AND MAGNITUDE", resolutionVector.toString());
                     player.setVelocityY(0f);
                     Gdx.app.log("VERTICAL CD", "RESET VY TO 0");
-                }
                 return;
 
             }
             else {
+                resolutionVector.y = 0f;
                 break;
             }
 
@@ -366,8 +295,8 @@ public class WorldController {
         // HORIZONTAL COLLISION DETECTION
         // -----------------------------------------------------------------------------------------
 
-        cdStartY = (int) (player.getBounds().y);
-        cdEndY = (int) (player.getBounds().y + player.getBody().get(0).getHeight());
+        cdStartY = (int) (player.getBody().get(0).getPosition().y);
+        cdEndY = (int) (player.getBody().get(0).getPosition().y + player.getBody().get(0).getHeight());
         // X AXIS INTERVAL DEPENDS ON PLAYERS MOVEMENT DIRECTION
         if (player.getVelocity().x <= 0) {
             cdStartX = cdEndX = (int) (Math.floor(player.getBounds().x));
@@ -420,6 +349,7 @@ public class WorldController {
                 }
             else {
                     resolutionVector.x = 0f;
+                    break;
                 }
 
 
@@ -428,62 +358,20 @@ public class WorldController {
         player.getVelocity().scl(1 / delta);
     }
 
-
-    private void collisionDetectionY(float delta) {
-        resolutionVector.y = 0f;
-        player.getVelocity().scl(delta);
-        int cdStartX, cdEndX, cdStartY, cdEndY;
-        // -----------------------------------------------------------------------------------------
-        // VERTICAL COLLISION DETECTION
-        // -----------------------------------------------------------------------------------------
-
-        cdStartX = (int) player.getBounds().x;
-        cdEndX = (int) (player.getBounds().x + player.getBody().get(0).getWidth());
-        if (player.getVelocity().y <= 0) {
-            cdStartY = cdEndY = (int) (Math.floor(player.getBounds().y));
-        } else {
-            cdStartY = cdEndY = (int) (Math.floor(player.getBounds().y + player.getBody().get(0).getHeight()));
-        }
-
-
-        worldContainer.createCollisionTiles(cdStartX, cdStartY, cdEndX, cdEndY);
-        Gdx.app.log("EVENT", "ENTERING VERTICAL COLLISION DETECTION.");
-        Gdx.app.log("~~~~~~~~~~~~~~", "----------------------------------------------");
-        for (Tile tile : worldContainer.getCollisionTiles()) {
-            Gdx.app.log("CANDIDATE:", tile.getPosition().toString());
-        }
-        Gdx.app.log("~~~~~~~~~~~~~~", "----------------------------------------------");
-
-        for (Tile tile : worldContainer.getCollisionTiles()) {
-
-            Gdx.app.log("PLAYER POSITION", formVec(player.getPosition()));
-            Gdx.app.log("TILE", formVec(tile.getPosition()));
-
-            CollisionBox collisionBox = player.getBody().get(0);
-
-
-
-                    if (checkCollision(tile,collisionBox) && !tile.isPassable()) {
-
-                        Gdx.app.log("RESOLUTION AND MAGNITUDE", resolutionVector.toString());
-                        if(resolutionVector.y != 0) {
-                            player.setVelocityY(0f);
-                            Gdx.app.log("VERTICAL CD", "RESET VY TO 0");
-                        }
-
-                }
-
-
-        }
-
-        player.getVelocity().scl(1 / delta);
-
-    }
 
 
     // TEST: x,y: Vector2 resolutionAxis, z: magnitude
 
 
+    /**
+     * Calculates the minimum translation vector needed two push two
+     * actors away from each other to resolve a collision
+     * @param tile World tile and its collision box
+     * @param collisionBox collision box of the player
+     * @return false, when no collision was detected
+     *         true, when an collision was detected. resolutionVector holds the information
+     *         about how to resolve the collision.
+     */
     private boolean checkCollision(Tile tile, CollisionBox collisionBox) {
         float minOverlapMagnitude = 100000f;
 
@@ -524,12 +412,12 @@ public class WorldController {
                  */
 
                 float overlap = getOverlap(projectionA, projectionB);
+                if(overlap == 0f)
+                    return false;
 
 
                 if (Math.abs(overlap) < Math.abs(minOverlapMagnitude)) {
                     minOverlapMagnitude = overlap;
-                    if(minOverlapMagnitude == 0)
-                        return false;
                     Gdx.app.log("NEW MAGNITUDE", Float.toString(minOverlapMagnitude));
                     Vector2 playerTileDifference = subVec(tile.getPosition(), collisionBox.getPosition());
 
@@ -604,7 +492,7 @@ public class WorldController {
         if (player.getAcceleration().x == 0) {
             player.getVelocity().x *= DAMPING;
 
-            if (Math.abs(player.getVelocity().x) < 0.001f) {
+            if (Math.abs(player.getVelocity().x) < MIN_WALKING_SPEED) {
                 player.setVelocityX(0f);
             }
         }
@@ -612,7 +500,7 @@ public class WorldController {
         if (player.getAcceleration().y == 0) {
             player.getVelocity().y *= DAMPING;
 
-            if (Math.abs(player.getVelocity().y) < 0.001f) {
+            if (Math.abs(player.getVelocity().y) < MIN_WALKING_SPEED) {
                 player.setVelocityY(0f);
             }
 

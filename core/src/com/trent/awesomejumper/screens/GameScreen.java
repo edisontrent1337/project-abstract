@@ -97,10 +97,10 @@ public class GameScreen implements Screen, InputProcessor{
         }
 
         if(keycode == Keys.G) {
-            controller.increaseGravity();
+            //controller.increaseGravity();
         }
         if(keycode == Keys.H) {
-            controller.decreaseGravity();
+            //controller.decreaseGravity();
         }
 
         return false;
@@ -121,8 +121,6 @@ public class GameScreen implements Screen, InputProcessor{
             controller.downReleased();
         }
 
-        if (keycode == Keys.D) {
-        }
         return false;
     }
 
