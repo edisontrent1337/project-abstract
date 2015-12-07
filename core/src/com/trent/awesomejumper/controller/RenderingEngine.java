@@ -365,10 +365,7 @@ public class RenderingEngine {
         res = Gdx.graphics.getWidth() + "*" + Gdx.graphics.getHeight() + ", ZOOM: " + zoom + ", FPS :" + Gdx.graphics.getFramesPerSecond();
         consoleFont.draw(uiBatch, acc, 15,15);
         consoleFont.draw(uiBatch, vel, 15,30);
-        if(player.getVelocity().y < 0f)
-            consoleFont.setColor(Color.RED);
-        else
-            consoleFont.setColor(Color.GREEN);
+        consoleFont.setColor(Color.GREEN);
         consoleFont.draw(uiBatch, ste, 15,45);
         consoleFont.draw(uiBatch, pos, 15,60);
         consoleFont.draw(uiBatch, res, 15,75);
@@ -414,7 +411,7 @@ public class RenderingEngine {
         Vector2 playerY = new Vector2(0f,player.getVelocity().y).cpy().scl(player.getPlayerDelta()).scl(250);
 
         debugRenderer.rectLine(player.getPosition(), player.getPosition().cpy().add(playerX), 5 * (1 / ppuX));
-        debugRenderer.rectLine(player.getPosition(), player.getPosition().cpy().add(playerY), 5 * (1 / ppuX));
+        debugRenderer.rectLine(player.getPosition(), player.getPosition().cpy().add(playerY), 5 * (1 / ppuY));
 
         debugRenderer.setColor(1f, 0f, 0f, 0.5f);
         for (Tile t : worldContainer.getCollisionTiles()) {

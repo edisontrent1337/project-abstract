@@ -112,9 +112,6 @@ public class Utilities {
      */
     public static float getOverlap(Interval proj1, Interval proj2) {
 
-        if(proj1.isSameAs(proj2)) {
-            return 0f;
-        }
         return Math.min(proj1.max, proj2.max) - Math.max(proj1.min, proj2.min);
 
     }
