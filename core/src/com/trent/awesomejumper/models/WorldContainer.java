@@ -1,17 +1,15 @@
 package com.trent.awesomejumper.models;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.trent.awesomejumper.testing.CollisionBox;
 import com.trent.awesomejumper.tiles.Tile;
-
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Sinthu on 12.06.2015.
+ * Holds the player, the level with its environmental items such as random paths of dirt,
+ * rocks, flowers etc. and also items, collectables and enemies.
+ *
  */
 public class WorldContainer {
 

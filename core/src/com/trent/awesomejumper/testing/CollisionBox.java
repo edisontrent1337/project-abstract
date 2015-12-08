@@ -1,5 +1,6 @@
 package com.trent.awesomejumper.testing;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -54,17 +55,17 @@ public class CollisionBox {
     public CollisionBox(Vector2 position, float width, float height) {
 
         this.position = position;
-        this.min = position;
-        this.max = new Vector2(position.x + width, position.y + height);
+        this.min = position.cpy();
+        this.max = new Vector2(position.cpy().x + width, position.cpy().y + height);
         this.width = width;
         this.height = height;
 
         // VERTICES
         // -----------------------------------------------------------------------------------------
 
-        this.a = new Vector2(min.x, min.y);
-        this.b = new Vector2(min.x, max.y);
-        this.c = new Vector2(max.x, max.y);
+        this.a = new Vector2(min.cpy().x, min.cpy().y);
+        this.b = new Vector2(min.cpy().x, max.cpy().y);
+        this.c = new Vector2(max.cpy().x, max.cpy().y);
         this.d = new Vector2(max.x, min.y);
         this.center = new Vector2(max.x / 2, max.y / 2);
         this.vertices = new Array<>();
@@ -151,16 +152,20 @@ public class CollisionBox {
         for (Vector2 v : vertices) {
             renderer.rect(v.x - VHALF, v.y - VHALF, VSIZE, VSIZE);
         }
+
+        renderer.setColor(Color.RED);
+
+        renderer.rect(center.x - VHALF, center.y - VHALF, VSIZE, VSIZE);
+
         renderer.setColor(Color.GREEN);
     }
 
     // UPDATE POSITION OF BOUNDS AND VERTICES
     // ---------------------------------------------------------------------------------------------
     /**
-     * @param delta     time elapsed since last update
      * @param velocity  velocity of the entity that owns this very CollisionBox
      */
-    public void update(float delta, Vector2 velocity) {
+    public void update(Vector2 velocity) {
         // UPDATE GENERAL POSITION AND POSITION OF ALL VERTICES
         /**
          * O : lower left corner = position,
@@ -168,13 +173,16 @@ public class CollisionBox {
          * 2 : upper right corner
          * 3 : lower right corner
          */
-        position.add(velocity.cpy().scl(delta));
+
+        position.add(velocity);
+
         vertices.get(0).set(position);
         vertices.get(1).set(position.x, position.y + height);
         vertices.get(2).set(position.x + width, position.y + height);
         vertices.get(3).set(position.x + width, position.y);
-    }
 
+
+    }
 
     // GETTER & SETTER
     // ---------------------------------------------------------------------------------------------

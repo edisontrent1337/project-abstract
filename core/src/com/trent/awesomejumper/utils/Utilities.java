@@ -63,6 +63,18 @@ public class Utilities {
         return v1.x * v2.x + v1.y * v2.y;
     }
 
+    /**
+     * Returns the dot product of two vectors.
+     * @param x1 x component of vector 1
+     * @param x2 x component of vector 2
+     * @param y1 y component of vector 1
+     * @param y2 y component of vector 2
+     *
+     */
+    public static float dPro(float x1, float y1, float x2, float y2) {
+        return x1 * x2 + y1 * y2;
+    }
+
     // PROJECTION OF A SHAPE ONTO AN AXIS
     /**
      * Returns the projection min and max values of a shape (CollisionBox) onto an axis

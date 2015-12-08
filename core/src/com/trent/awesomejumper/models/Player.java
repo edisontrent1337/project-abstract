@@ -21,7 +21,7 @@ public class Player extends Entity {
     // ---------------------------------------------------------------------------------------------
 
     public Player(Vector2 position) {
-        super(position, 1f, 100f);
+        super(position, 0.5f, 100f);
         headHitboxSize = 0.2f;
         armHitBoxSize = 0.2f;
         legHitBoxSize = 0.2f;
@@ -53,7 +53,7 @@ public class Player extends Entity {
         center.add(velocity.cpy().scl(delta));
         // UPDATE POSITION OF ALL VERTICES
         for (CollisionBox b : getBody()) {
-            b.update(delta, velocity);
+            b.update(velocity.cpy().scl(delta));
         }
 
     }
