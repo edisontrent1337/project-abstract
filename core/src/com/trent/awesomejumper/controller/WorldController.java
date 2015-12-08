@@ -118,19 +118,10 @@ public class WorldController {
         MAX_VELOCITY = 3.8f;
         // INPUT PROCCESSING
         processUserInput();
-
         player.getAcceleration().scl(delta);
         player.getVelocity().add(player.getAcceleration());
 
         collisionDetection(delta);
-
-        /**
-         * TODO: Adding resolution vector to player position should be part of the collision detection method.
-         */
-
-        Gdx.app.log("RESULT OF COLLISIONDETECTION BEFORE ADDING", resolutionVector.toString());
-        //player.getPosition().add(resolutionVector);
-
 
         resolutionVector.x = 0f;
         resolutionVector.y = 0f;
@@ -366,9 +357,6 @@ public class WorldController {
                     player.getVelocity().scl(1/delta);
                     return;
                 }
-
-
-
 
         }
         player.getVelocity().scl(1 / delta);
