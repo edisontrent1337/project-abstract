@@ -1,11 +1,9 @@
 package com.trent.awesomejumper.utils;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.trent.awesomejumper.testing.CollisionBox;
-import com.trent.awesomejumper.testing.Interval;
 
 /**
  * Created by Sinthu on 12.06.2015.

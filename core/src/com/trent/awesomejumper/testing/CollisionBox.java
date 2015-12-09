@@ -40,7 +40,7 @@ public class CollisionBox {
      */
 
     private float width, height;
-    private Vector2 position, min, max, a, b, c, d, center;
+    private Vector2 position, min, max, a, b, c, d;
     private Array<Vector2> edges, vertices, normals;
 
     // DEBUG DRAWING CONSTANTS
@@ -63,11 +63,10 @@ public class CollisionBox {
         // VERTICES
         // -----------------------------------------------------------------------------------------
 
-        this.a = new Vector2(min.cpy().x, min.cpy().y);
-        this.b = new Vector2(min.cpy().x, max.cpy().y);
-        this.c = new Vector2(max.cpy().x, max.cpy().y);
+        this.a = new Vector2(min.x, min.y);
+        this.b = new Vector2(min.x, max.y);
+        this.c = new Vector2(max.x, max.y);
         this.d = new Vector2(max.x, min.y);
-        this.center = new Vector2(max.x / 2, max.y / 2);
         this.vertices = new Array<>();
         // ADD ALL VERTICES TO THE VERTEX ARRAY
         vertices.add(a);
@@ -87,11 +86,6 @@ public class CollisionBox {
             normals.add(getNormal(edges.get(i)));
         }
 
-    }
-
-
-    public CollisionBox(float x, float y, float width, float height) {
-        this(new Vector2(x,y), width, height);
     }
 
 
@@ -153,9 +147,6 @@ public class CollisionBox {
             renderer.rect(v.x - VHALF, v.y - VHALF, VSIZE, VSIZE);
         }
 
-        renderer.setColor(Color.RED);
-
-        renderer.rect(center.x - VHALF, center.y - VHALF, VSIZE, VSIZE);
 
         renderer.setColor(Color.GREEN);
     }
@@ -175,7 +166,6 @@ public class CollisionBox {
          */
 
         position.add(velocity);
-
         vertices.get(0).set(position);
         vertices.get(1).set(position.x, position.y + height);
         vertices.get(2).set(position.x + width, position.y + height);

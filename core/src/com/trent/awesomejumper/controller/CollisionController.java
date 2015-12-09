@@ -7,10 +7,8 @@ import com.trent.awesomejumper.models.Level;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.WorldContainer;
 import com.trent.awesomejumper.testing.CollisionBox;
-import com.trent.awesomejumper.testing.Interval;
+import com.trent.awesomejumper.utils.Interval;
 import com.trent.awesomejumper.tiles.Tile;
-
-import java.util.ArrayList;
 
 import static com.trent.awesomejumper.utils.Utilities.dPro;
 import static com.trent.awesomejumper.utils.Utilities.getOverlap;

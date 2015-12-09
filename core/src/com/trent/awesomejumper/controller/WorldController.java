@@ -1,27 +1,17 @@
 package com.trent.awesomejumper.controller;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
 import com.trent.awesomejumper.models.Entity.State;
 import com.trent.awesomejumper.models.Level;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.WorldContainer;
-import com.trent.awesomejumper.testing.CollisionBox;
-import com.trent.awesomejumper.testing.Interval;
-import com.trent.awesomejumper.tiles.Tile;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import static com.trent.awesomejumper.utils.PhysicalConstants.*;
 import static com.trent.awesomejumper.utils.Utilities.dPro;
 import static com.trent.awesomejumper.utils.Utilities.formVec;
-import static com.trent.awesomejumper.utils.Utilities.getOverlap;
-import static com.trent.awesomejumper.utils.Utilities.getProjection;
-import static com.trent.awesomejumper.utils.Utilities.overlaps;
-import static com.trent.awesomejumper.utils.Utilities.subVec;
 
 /**
  * Created by Sinthu on 12.06.2015.
