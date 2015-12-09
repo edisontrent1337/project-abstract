@@ -3,13 +3,13 @@ package com.trent.awesomejumper.engine.modelcomponents;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.trent.awesomejumper.models.Entity;
+import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.testing.CollisionBox;
-
-import java.util.ArrayList;
 
 /**
  * Created by Sinthu on 09.12.2015.
+ * Body component implementation. Holds information about position, acceleration, velocity and
+ * dimensions of entities. Also holds the hitbox skeleton used to calculate damage.
  */
 public class Body {
     // MEMBERS & INSTANCES
@@ -28,29 +28,30 @@ public class Body {
     private Rectangle bounds;
 
     // Hitboxes
-    Array<CollisionBox> bodyHitboxes = new Array<CollisionBox>();
+    Array<CollisionBox> hitboxSkeleton = new Array<>();
 
 
-    public Body(Entity entity) {
+    public Body(Entity entity, float width, float height) {
         /**
          * Initialises all members with default values.
          * The constructor of the entity or the specific subclass then applies a more useful
          * start configuration to all values.
          */
         this.entity = entity;
+        entity.hasBody = true;
         this.position = new Vector2(0f,0f);
         this.velocity = new Vector2(0f,0f);
         this.acceleration = new Vector2(0f,0f);
-        this.bounds = new Rectangle(position.x, position.y, DEFAULT_SIZE, DEFAULT_SIZE);
-        bodyHitboxes.clear();
+        this.bounds = new Rectangle(position.x, position.y, width, height);
+        hitboxSkeleton.clear();
     }
 
 
 
     public void update(float delta) {
         position.add(velocity.cpy().scl(delta));
-        for(CollisionBox b : bodyHitboxes) {
-            b.update(velocity.cpy().scl(delta));
+        for(CollisionBox b : hitboxSkeleton) {
+            b.update(position);
         }
 
     }
@@ -90,7 +91,7 @@ public class Body {
 
     // Velocity
     public Vector2 getVelocity() {
-        return  velocity;
+        return velocity;
     }
     public float getVelocityX() {
         return velocity.x;
@@ -160,11 +161,13 @@ public class Body {
     }
 
     // Hitboxes
-    public Array<CollisionBox> getBodyHitboxes() {
-        return bodyHitboxes;
+    public Array<CollisionBox> getHitboxSkeleton() {
+        return hitboxSkeleton;
     }
 
-
+    public void add(CollisionBox box) {
+        hitboxSkeleton.add(box);
+    }
 
 
 

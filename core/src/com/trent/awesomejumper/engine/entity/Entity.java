@@ -1,4 +1,4 @@
-package com.trent.awesomejumper.models;
+package com.trent.awesomejumper.engine.entity;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -12,24 +12,39 @@ import com.trent.awesomejumper.testing.CollisionBox;
 /**
  * Created by Sinthu on 12.06.2015.
  */
-public class Entity implements EntityInterface{
+public class Entity implements EntityInterface {
 
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
 
     public static int entityCount = 0;
-    Body body;
-    Graphics graphics;
-    Health health;
-    Weapon weapon;
+    public boolean hasBody = false, hasGraphics = false, hasHealth = false, hasWeapon = false;
+    protected Body body;
+    protected Graphics graphics;
+    protected Health health;
+    protected Weapon weapon;
 
 
 
     public enum State {
-        IDLE, WALKING, JUMPING, FALLING, ATTACKING, DEAD
+        IDLE(0),
+        WALKING(1),
+        JUMPING(2),
+        FALLING(3),
+        ATTACKING(4),
+        DEAD(5);
+
+        private final int value;
+        State(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+
     }
 
-    public float SIZE = 1f;
     public float hitPoints;
     public State state;
 
@@ -59,9 +74,8 @@ public class Entity implements EntityInterface{
 
     }
 
-
     public Array<CollisionBox> getBodyHitboxes() {
-        return body.getBodyHitboxes();
+        return body.getHitboxSkeleton();
     }
 
     public void setBoundDimensions(float width, float height) {
@@ -125,6 +139,14 @@ public class Entity implements EntityInterface{
         body.setWidth(width);
     }
 
+    public float getHeight() {
+        return body.getHeight();
+    }
+
+    public void setHeight(float height) {
+        body.setHeight(height);
+    }
+
     public Vector2 getVelocity() {
         return body.getVelocity();
     }
@@ -149,24 +171,18 @@ public class Entity implements EntityInterface{
         return entityTime;
     }
 
-    public  void setHitboxes(Vector2 position) {}
-
-
-
-
-
-
 
 
 
     @Override
     public void update(float delta) {
-        body.update(delta);
+        if(hasBody)
+            body.update(delta);
     }
 
     @Override
     public void render() {
-
+        //graphics.render();
     }
 
     @Override
@@ -186,7 +202,7 @@ public class Entity implements EntityInterface{
 
     @Override
     public Graphics getGraphics() {
-        return null;
+        return graphics;
     }
 
     @Override

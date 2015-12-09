@@ -69,9 +69,9 @@ public class CollisionController {
          * intended movement.
          */
         if(player.getVelocity().y <= 0)
-            cdStartY = cdEndY = (int) Math.floor(player.getBounds().y + player.getVelocity().y);
+            cdStartY = cdEndY = (int) Math.floor(player.getBounds().y);
         else
-            cdStartY = cdEndY = (int) Math.floor(player.getBounds().y + player.getBounds().getHeight() + player.getVelocity().y);
+            cdStartY = cdEndY = (int) Math.floor(player.getBounds().y + player.getBounds().getHeight());
 
         // Create array of tiles surrounding the player which are covered by the collision detection
         worldContainer.createCollisionTiles(cdStartX, cdStartY, cdEndX, cdEndY);
@@ -126,9 +126,9 @@ public class CollisionController {
          * intended movement.
          */
         if (player.getVelocity().x <= 0) {
-            cdStartX = cdEndX = (int) Math.floor(player.getBounds().x + player.getVelocity().x);
+            cdStartX = cdEndX = (int) Math.floor(player.getBounds().x);
         } else {
-            cdStartX = cdEndX = (int) Math.floor(player.getBounds().x + player.getBounds().getWidth() + player.getVelocity().x);
+            cdStartX = cdEndX = (int) Math.floor(player.getBounds().x + player.getBounds().getWidth());
         }
 
         // Create array of tiles surrounding the player which are covered by the collision detection

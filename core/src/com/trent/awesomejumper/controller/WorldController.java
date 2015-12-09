@@ -1,7 +1,7 @@
 package com.trent.awesomejumper.controller;
 
 import com.badlogic.gdx.math.Vector2;
-import com.trent.awesomejumper.models.Entity.State;
+import com.trent.awesomejumper.engine.entity.Entity.State;
 import com.trent.awesomejumper.models.Level;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.WorldContainer;
@@ -10,8 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.trent.awesomejumper.utils.PhysicalConstants.*;
-import static com.trent.awesomejumper.utils.Utilities.dPro;
-import static com.trent.awesomejumper.utils.Utilities.formVec;
 
 /**
  * Created by Sinthu on 12.06.2015.
@@ -32,13 +30,6 @@ public class WorldController {
 
     // MAXIMUM VELOCITY  & DAMPING DETERMINED BY TILE
     public float MAX_VELOCITY, DAMPING;
-
-    // WEATHER SIMULATION
-    private float windSpeed, windDelta;
-
-    // COLLISION RESOLUTION VECTORS
-
-    private Vector2 resolutionVector;
 
     //KEY MAP
     static Map<Keys, Boolean> keyMap = new HashMap<>();
@@ -62,7 +53,6 @@ public class WorldController {
         this.level = worldContainer.getLevel();
         this.player = worldContainer.getPlayer();
         this.collisionController = new CollisionController(worldContainer);
-        this.resolutionVector = new Vector2(0.0f, 0.0f);
     }
 
     // BUTTON PRESSING METHODS
@@ -107,7 +97,7 @@ public class WorldController {
 
     public void update(float delta) {
         DAMPING = 0.55f;
-        MAX_VELOCITY = 3.8f;
+        MAX_VELOCITY = 5f;
         // INPUT PROCCESSING
         processUserInput();
         player.getAcceleration().scl(delta);

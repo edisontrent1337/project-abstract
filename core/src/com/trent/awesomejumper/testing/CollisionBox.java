@@ -41,13 +41,14 @@ public class CollisionBox {
 
     private float width, height;
     private Vector2 position, min, max, a, b, c, d;
+    private Vector2 offset;
     private Array<Vector2> edges, vertices, normals;
 
     // DEBUG DRAWING CONSTANTS
 
     private final float VSIZE = 0.05f;          // size of a vertex for drawing purposes
     private final float VHALF = VSIZE / 2;      // half vertex size
-    private final float NORMAL_LENGTH = 0.25f;  // length of a normal
+    private final float NORMAL_LENGTH = 0.125f;  // length of a normal
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
@@ -55,6 +56,7 @@ public class CollisionBox {
     public CollisionBox(Vector2 position, float width, float height) {
 
         this.position = position;
+        this.offset = new Vector2(0f,0f);
         this.min = position.cpy();
         this.max = new Vector2(position.cpy().x + width, position.cpy().y + height);
         this.width = width;
@@ -156,7 +158,7 @@ public class CollisionBox {
     /**
      * @param velocity  velocity of the entity that owns this very CollisionBox
      */
-    public void update(Vector2 velocity) {
+    public void update(Vector2 newPosition) {
         // UPDATE GENERAL POSITION AND POSITION OF ALL VERTICES
         /**
          * O : lower left corner = position,
@@ -165,11 +167,11 @@ public class CollisionBox {
          * 3 : lower right corner
          */
 
-        position.add(velocity);
-        vertices.get(0).set(position);
-        vertices.get(1).set(position.x, position.y + height);
-        vertices.get(2).set(position.x + width, position.y + height);
-        vertices.get(3).set(position.x + width, position.y);
+        position.set(newPosition);
+        vertices.get(0).set(position).add(offset);
+        vertices.get(1).set(position.x, position.y + height).add(offset);
+        vertices.get(2).set(position.x + width, position.y + height).add(offset);
+        vertices.get(3).set(position.x + width, position.y).add(offset);
 
 
     }
@@ -189,6 +191,10 @@ public class CollisionBox {
         this.position = position;
     }
 
+    public void setOffset(float x, float y) {
+        offset.x = x;
+        offset.y = y;
+    }
 
     public float getWidth() {
         return width;

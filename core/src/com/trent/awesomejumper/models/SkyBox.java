@@ -2,6 +2,7 @@ package com.trent.awesomejumper.models;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.Body;
 
 /**
@@ -15,7 +16,7 @@ public class SkyBox extends Entity {
 
     //TODO: BUGGY!
     public SkyBox(Vector2 position, float width, float speed) {
-        body = new Body(this);
+        body = new Body(this, width, width);
         body.setBounds(new Rectangle(position.x, position.y, 2f * width, 2 * 0.5625f * width));
         body.setVelocity(speed, 0);
     }
@@ -25,9 +26,5 @@ public class SkyBox extends Entity {
         super.update(delta);
     }
 
-    @Override
-    public void setHitboxes(Vector2 position) {
-
-    }
 
 }

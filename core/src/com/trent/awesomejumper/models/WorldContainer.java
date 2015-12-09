@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.trent.awesomejumper.tiles.Tile;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Created by Sinthu on 12.06.2015.
@@ -17,7 +18,7 @@ public class WorldContainer {
     // ---------------------------------------------------------------------------------------------
 
 
-    private Array<Entity> entities;
+    private HashSet<com.trent.awesomejumper.engine.entity.Entity> entities;
 
     private Array<Tile> tiles = new Array<>();
     private Player player;
@@ -37,6 +38,8 @@ public class WorldContainer {
     private void createWorld() {
         player = new Player(new Vector2(12.5f, 7f));
         level = new Level();
+        entities = new HashSet<>();
+        entities.add(player);
     }
 
     // LIST OF TILES TO BE DRAWN
@@ -113,4 +116,9 @@ public class WorldContainer {
     public ArrayList<Tile> getCollisionTiles() {
         return collisionTiles;
     }
+
+    public HashSet<com.trent.awesomejumper.engine.entity.Entity> getEntities() {
+        return entities;
+    }
+
 }

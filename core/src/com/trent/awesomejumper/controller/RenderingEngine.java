@@ -11,11 +11,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
-import com.trent.awesomejumper.models.Entity;
+import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.models.Environment;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.SkyBox;
@@ -23,7 +22,6 @@ import com.trent.awesomejumper.models.WorldContainer;
 import com.trent.awesomejumper.testing.CollisionBox;
 import com.trent.awesomejumper.tiles.Tile;
 
-import static com.trent.awesomejumper.utils.Utilities.WIDTH;
 import static com.trent.awesomejumper.utils.Utilities.formVec;
 
 /**
@@ -230,7 +228,7 @@ public class RenderingEngine {
         if (player.getState().equals(Entity.State.WALKING)) {
             currentPlayerFrame = player.facingL ? walkLeftAnimation.getKeyFrame(player.getEntityTime(), true) : walkRightAnimation.getKeyFrame(player.getEntityTime(), true);
         }
-        sb.draw(currentPlayerFrame, player.getPosition().x, player.getPosition().y, player.SIZE, player.SIZE);
+        sb.draw(currentPlayerFrame, player.getPosition().x, player.getPosition().y, player.getWidth(), player.getHeight());
 
     }
 
@@ -364,12 +362,13 @@ public class RenderingEngine {
         cps = "CAM: " + formVec(cam.position.x, cam.position.y);
         res = Gdx.graphics.getWidth() + "*" + Gdx.graphics.getHeight() + ", ZOOM: " + zoom + ", FPS :" + Gdx.graphics.getFramesPerSecond();
         consoleFont.draw(uiBatch, acc, 15,15);
-        consoleFont.draw(uiBatch, vel, 15,30);
+        consoleFont.draw(uiBatch, vel, 15, 30);
         consoleFont.setColor(Color.GREEN);
-        consoleFont.draw(uiBatch, ste, 15,45);
+        consoleFont.draw(uiBatch, ste, 15, 45);
         consoleFont.draw(uiBatch, pos, 15,60);
         consoleFont.draw(uiBatch, res, 15,75);
         consoleFont.draw(uiBatch, cps, 15,90);
+        consoleFont.draw(uiBatch, new String("Entities:") +  Float.toString(Entity.entityCount), 15,115);
     }
 
 
