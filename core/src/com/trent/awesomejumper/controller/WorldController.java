@@ -244,7 +244,6 @@ public class WorldController {
         if (!level.checkBounds((int) player.getPositionX(), (int) player.getPositionY())) {
             player.setPosition(new Vector2(5f, 12f));
             player.setBounds(player.getPositionX(), player.getPositionY());
-            player.getCollisionBox().setPosition(new Vector2(5f, 12f));
         }
 
 

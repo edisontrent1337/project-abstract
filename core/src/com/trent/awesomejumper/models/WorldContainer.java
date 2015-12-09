@@ -16,6 +16,9 @@ public class WorldContainer {
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
 
+
+    private Array<Entity> entities;
+
     private Array<Tile> tiles = new Array<>();
     private Player player;
     private Level level;

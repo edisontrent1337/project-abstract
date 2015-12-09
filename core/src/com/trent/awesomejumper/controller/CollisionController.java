@@ -78,7 +78,7 @@ public class CollisionController {
 
         for(Tile tile: worldContainer.getCollisionTiles()) {
             // TODO: add a big bounding box for all objects which is used for game object / world collision detection only
-            CollisionBox playerCollisionBox = player.getBody().get(0);
+            CollisionBox playerCollisionBox = player.getBodyHitboxes().get(0);
             CollisionBox tileBox = tile.getCollisionBox();
 
             /**
@@ -136,7 +136,7 @@ public class CollisionController {
 
         for(Tile tile: worldContainer.getCollisionTiles()) {
             // TODO: add a big bounding box for all objects which is used for gameobject / world collision detection only
-            CollisionBox playerCollisionBox = player.getBody().get(0);
+            CollisionBox playerCollisionBox = player.getBodyHitboxes().get(0);
             CollisionBox tileBox = tile.getCollisionBox();
 
             /**

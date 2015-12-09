@@ -1,36 +1,35 @@
 package com.trent.awesomejumper.models;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.trent.awesomejumper.engine.modelcomponents.Body;
+import com.trent.awesomejumper.engine.modelcomponents.Graphics;
+import com.trent.awesomejumper.engine.modelcomponents.Health;
+import com.trent.awesomejumper.engine.modelcomponents.Weapon;
 import com.trent.awesomejumper.testing.CollisionBox;
 
 /**
  * Created by Sinthu on 12.06.2015.
  */
-public abstract class Entity {
+public class Entity implements EntityInterface{
 
-    // MEMBERS & INSTANTCES
+    // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
 
-    Vector2 position = new Vector2();
-    Vector2 center = new Vector2();
-    Vector2 acceleration = new Vector2();
-    Vector2 velocity = new Vector2();
-    private Rectangle bounds;
-    private CollisionBox collisionBox;
-    //Array<Rectangle> body = new Array<>();
-    Array<CollisionBox> body = new Array<>();
+    public static int entityCount = 0;
+    Body body;
+    Graphics graphics;
+    Health health;
+    Weapon weapon;
 
-    private final float DEFAULT_SIZE = 1f;
 
 
     public enum State {
         IDLE, WALKING, JUMPING, FALLING, ATTACKING, DEAD
     }
 
-    public final float SIZE;
+    public float SIZE = 1f;
     public float hitPoints;
     public State state;
 
@@ -41,100 +40,73 @@ public abstract class Entity {
     // CONSTRUCTOR
     // ---------------------------------b------------------------------------------------------------
 
-    public Entity(Vector2 position) {
-        this.SIZE = DEFAULT_SIZE;
-        this.hitPoints = 100f;
-        this.state = State.IDLE;
-        this.position = position;
-        this.bounds = new Rectangle();
-        this.collisionBox = new CollisionBox(position, DEFAULT_SIZE, DEFAULT_SIZE);
-        this.center = new Vector2(position.x + 0.5f*DEFAULT_SIZE, position.y + 0.5f*DEFAULT_SIZE);
+    public Entity(){
+        entityCount++;
     }
 
-
-    public Entity(Vector2 position, float size, float hitPoints) {
-        this.position = position;
-        this.SIZE = size;
-        this.center = new Vector2(position.x + 0.5f*SIZE, position.y + 0.5f*SIZE);
-        this.state = State.IDLE;
-        this.hitPoints = hitPoints;
-        this.bounds = new Rectangle(position.x, position.y, size, size);
-        this.collisionBox = new CollisionBox(position,size,size);
-        this.entityTime = 0f;
-        Gdx.app.log("WORLD EVENT:   ", this.getClass().toString() + " INSTANTIATED AT" + position.x + "," + position.y + ";" + hitPoints + "(HP)" + "[" + state + "]");
-
-    }
 
     // GETTER AND SETTER
     // ---------------------------------------------------------------------------------------------
 
     public Rectangle getBounds() {
-        return bounds;
+        return body.getBounds();
     }
     public void setBounds(Rectangle bounds) {
-        this.bounds = bounds;
+        body.setBounds(bounds);
     }
     public void setBounds(float x, float y) {
-        this.bounds.x = x;
-        this.bounds.y = y;
+        body.setBounds(x, y);
+
     }
 
 
-    public CollisionBox getCollisionBox() {
-        return collisionBox;
-    }
-
-    public Array<CollisionBox> getBody() {
-        return body;
+    public Array<CollisionBox> getBodyHitboxes() {
+        return body.getBodyHitboxes();
     }
 
     public void setBoundDimensions(float width, float height) {
-        this.bounds.width = width;
-        this.bounds.height = height;
+        body.getBounds().width = width;
+        body.getBounds().height = height;
 
     }
-
-    public Vector2 getCenter() {
-        return center;
-    }
-
 
     public Vector2 getPosition() {
-        return position;
+        return body.getPosition();
     }
+
     public void setPosition(Vector2 position) {
-        this.position = position;
+        body.setPosition(position);
     }
 
     public float getPositionX() {
-        return position.x;
+        return body.getPositionX();
     }
+
     public void setPositionX(float x) {
-        this.position.x = x;
+        body.setPositionX(x);
     }
 
     public float getPositionY() {
-        return position.y;
+        return body.getPositionY();
     }
-
     public void setPositionY(float y) {
-        this.position.y = y;
+        body.setPositionY(y);
     }
 
     public Vector2 getAcceleration() {
-        return acceleration;
+        return body.getAcceleration();
     }
 
     public void setAcceleration(Vector2 acceleration) {
-        this.acceleration = acceleration;
+        body.setAcceleration(acceleration);
     }
 
     public void setAccelX(float ax) {
-        this.acceleration.x = ax;
+        body.setAccelerationX(ax);
     }
 
     public void setAccelY(float ay) {
-        this.acceleration.y = ay;
+        body.setAccelerationY(ay);
     }
 
     public State getState() {
@@ -146,28 +118,27 @@ public abstract class Entity {
     }
 
     public float getWidth() {
-        return bounds.getWidth();
+        return body.getWidth();
     }
 
     public void setWidth(float width) {
-        bounds.setWidth(width);
+        body.setWidth(width);
     }
 
     public Vector2 getVelocity() {
-        return velocity;
+        return body.getVelocity();
     }
 
     public void setVelocity(float vx, float vy) {
-        this.velocity.x = vx;
-        this.velocity.y = vy;
+        body.setVelocity(vx, vy);
     }
 
     public void setVelocityY(float vy) {
-        this.velocity.y = vy;
+        body.setVelocityY(vy);
     }
 
     public void setVelocityX(float vx) {
-        this.velocity.x = vx;
+        body.setVelocityX(vx);
     }
 
     public void setFacingL(boolean facingL) {
@@ -178,8 +149,71 @@ public abstract class Entity {
         return entityTime;
     }
 
-    public abstract void update(float delta);
-    public abstract void setHitboxes(Vector2 position);
+    public  void setHitboxes(Vector2 position) {}
+
+
+
+
+
+
+
+
+
+    @Override
+    public void update(float delta) {
+        body.update(delta);
+    }
+
+    @Override
+    public void render() {
+
+    }
+
+    @Override
+    public void destroy() {
+
+    }
+
+    @Override
+    public Body getBody() {
+        return null;
+    }
+
+    @Override
+    public void setBody(Body body) {
+
+    }
+
+    @Override
+    public Graphics getGraphics() {
+        return null;
+    }
+
+    @Override
+    public void setGraphics(Graphics graphics) {
+
+    }
+
+    @Override
+    public Health getHealth() {
+        return null;
+    }
+
+    @Override
+    public void setHealth(Health health) {
+
+    }
+
+    @Override
+    public Weapon getWeapon() {
+        return null;
+    }
+
+    @Override
+    public void setWeapon(Weapon weapon) {
+
+    }
+
 
 
 

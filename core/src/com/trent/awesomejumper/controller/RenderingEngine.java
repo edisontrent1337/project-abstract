@@ -370,11 +370,6 @@ public class RenderingEngine {
         consoleFont.draw(uiBatch, pos, 15,60);
         consoleFont.draw(uiBatch, res, 15,75);
         consoleFont.draw(uiBatch, cps, 15,90);
-        consoleFont.draw(uiBatch, "COLLISION BOX" + player.getCollisionBox().getPosition().toString(), 15,105);
-        consoleFont.draw(uiBatch, "a:" + player.getCollisionBox().getVertices().get(0).toString(), 15,120);
-        consoleFont.draw(uiBatch, "b:" + player.getCollisionBox().getVertices().get(1).toString(), 15,135);
-        consoleFont.draw(uiBatch, "c:" + player.getCollisionBox().getVertices().get(2).toString(), 15,150);
-        consoleFont.draw(uiBatch, "d:" + player.getCollisionBox().getVertices().get(3).toString(), 15,165);
     }
 
 
@@ -388,13 +383,13 @@ public class RenderingEngine {
 
         debugRenderer.rect(player.getPositionX() + player.getVelocity().cpy().scl(player.getPlayerDelta()).x,
                            player.getPositionY() + player.getVelocity().cpy().scl(player.getPlayerDelta()).y,
-                           player.getBody().get(0).getWidth(),
-                           player.getBody().get(0).getHeight());
+                           player.getBodyHitboxes().get(0).getWidth(),
+                           player.getBodyHitboxes().get(0).getHeight());
 
 
 
 
-        for(CollisionBox r: player.getBody()) {
+        for(CollisionBox r: player.getBodyHitboxes()) {
             r.draw(debugRenderer);
         }
        //debugRenderer.rect(player.getBounds().x, player.getBounds().y, player.getBounds().width, player.getBounds().height);
