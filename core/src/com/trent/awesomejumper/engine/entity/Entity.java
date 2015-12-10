@@ -1,5 +1,6 @@
 package com.trent.awesomejumper.engine.entity;
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -7,7 +8,7 @@ import com.trent.awesomejumper.engine.modelcomponents.Body;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.engine.modelcomponents.Health;
 import com.trent.awesomejumper.engine.modelcomponents.Weapon;
-import com.trent.awesomejumper.testing.CollisionBox;
+import com.trent.awesomejumper.engine.physics.CollisionBox;
 
 /**
  * Created by Sinthu on 12.06.2015.
@@ -50,7 +51,7 @@ public class Entity implements EntityInterface {
 
     public boolean facingL = false;
 
-    public float entityTime;
+    public float time;
 
     // CONSTRUCTOR
     // ---------------------------------b------------------------------------------------------------
@@ -66,9 +67,6 @@ public class Entity implements EntityInterface {
     public Rectangle getBounds() {
         return body.getBounds();
     }
-    public void setBounds(Rectangle bounds) {
-        body.setBounds(bounds);
-    }
     public void setBounds(float x, float y) {
         body.setBounds(x, y);
 
@@ -76,12 +74,6 @@ public class Entity implements EntityInterface {
 
     public Array<CollisionBox> getBodyHitboxes() {
         return body.getHitboxSkeleton();
-    }
-
-    public void setBoundDimensions(float width, float height) {
-        body.getBounds().width = width;
-        body.getBounds().height = height;
-
     }
 
     public Vector2 getPosition() {
@@ -109,10 +101,6 @@ public class Entity implements EntityInterface {
 
     public Vector2 getAcceleration() {
         return body.getAcceleration();
-    }
-
-    public void setAcceleration(Vector2 acceleration) {
-        body.setAcceleration(acceleration);
     }
 
     public void setAccelX(float ax) {
@@ -167,9 +155,6 @@ public class Entity implements EntityInterface {
         this.facingL = facingL;
     }
 
-    public float getEntityTime() {
-        return entityTime;
-    }
 
 
 
@@ -181,8 +166,9 @@ public class Entity implements EntityInterface {
     }
 
     @Override
-    public void render() {
-        //graphics.render();
+    public void render(SpriteBatch spriteBatch) {
+        if(hasGraphics)
+            graphics.render(spriteBatch);
     }
 
     @Override

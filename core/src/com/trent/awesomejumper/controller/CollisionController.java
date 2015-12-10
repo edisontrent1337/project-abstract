@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.Array;
 import com.trent.awesomejumper.models.Level;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.WorldContainer;
-import com.trent.awesomejumper.testing.CollisionBox;
+import com.trent.awesomejumper.engine.physics.CollisionBox;
 import com.trent.awesomejumper.utils.Interval;
 import com.trent.awesomejumper.tiles.Tile;
 
@@ -88,14 +88,13 @@ public class CollisionController {
              */
             if(checkCollision(tileBox, playerCollisionBox) &! tile.isPassable()) {
 
-                player.getPosition().add(resolutionVector);
-
                 if(resolutionVector.x != 0f)
                     player.setVelocityX(0f);
 
                 if(resolutionVector.y != 0f)
                     player.setVelocityY(0f);
 
+                player.getPosition().add(resolutionVector);
                 player.getVelocity().scl(1/delta);
                 return;
 
@@ -146,14 +145,13 @@ public class CollisionController {
              */
             if(checkCollision(tileBox, playerCollisionBox) &! tile.isPassable()) {
 
-                player.getPosition().add(resolutionVector);
-
                 if(resolutionVector.x != 0f)
                     player.setVelocityX(0f);
 
                 if(resolutionVector.y != 0f)
                     player.setVelocityY(0f);
 
+                player.getPosition().add(resolutionVector);
                 player.getVelocity().scl(1/delta);
                 return;
 

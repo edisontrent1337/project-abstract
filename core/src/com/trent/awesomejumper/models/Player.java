@@ -1,12 +1,13 @@
 package com.trent.awesomejumper.models;
 
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.Body;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
-import com.trent.awesomejumper.testing.CollisionBox;
+import com.trent.awesomejumper.engine.physics.CollisionBox;
 
 /**
  * Created by Sinthu on 12.06.2015.
@@ -30,7 +31,7 @@ public class Player extends Entity {
 
     public Player(Vector2 position) {
         this.body = new Body(this, WIDTH, HEIGHT);
-        this.graphics = new Graphics(PLAYER_RUN_FRAME_DURATION, this);
+        this.graphics = new Graphics(PLAYER_RUN_FRAME_DURATION, this, "player-white-0");
 
         //TODO: bounds and collisionBox should share the same dimensions..... otherwise modifying one
         // of the values will result in buggy collision resolution...
@@ -69,10 +70,15 @@ public class Player extends Entity {
 
     @Override
     public void update(float delta) {
-        entityTime += delta;
+        time += delta;
         playerDelta = delta;
         super.update(delta);
 
+    }
+
+    @Override
+    public void render(SpriteBatch spriteBatch) {
+        super.render(spriteBatch);
     }
 
     public float getPlayerDelta() {

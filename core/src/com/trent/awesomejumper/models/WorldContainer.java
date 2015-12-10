@@ -2,6 +2,7 @@ package com.trent.awesomejumper.models;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.tiles.Tile;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -18,7 +19,7 @@ public class WorldContainer {
     // ---------------------------------------------------------------------------------------------
 
 
-    private HashSet<com.trent.awesomejumper.engine.entity.Entity> entities;
+    private HashSet<Entity> entities;
 
     private Array<Tile> tiles = new Array<>();
     private Player player;
@@ -117,7 +118,7 @@ public class WorldContainer {
         return collisionTiles;
     }
 
-    public HashSet<com.trent.awesomejumper.engine.entity.Entity> getEntities() {
+    public HashSet<Entity> getEntities() {
         return entities;
     }
 

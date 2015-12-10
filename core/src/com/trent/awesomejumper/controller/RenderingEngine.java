@@ -13,13 +13,14 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.models.Environment;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.SkyBox;
 import com.trent.awesomejumper.models.WorldContainer;
-import com.trent.awesomejumper.testing.CollisionBox;
+import com.trent.awesomejumper.engine.physics.CollisionBox;
 import com.trent.awesomejumper.tiles.Tile;
 
 import static com.trent.awesomejumper.utils.Utilities.formVec;
@@ -139,7 +140,21 @@ public class RenderingEngine {
         // -----------------------------------------------------------------------------------------
 
         TextureAtlas allTextures = game.getAssetManager().get(("img/textures.pack"), TextureAtlas.class);
-        // PLAYER TEXTURES
+
+        for(Entity e : worldContainer.getEntities()) {
+            if(e.hasGraphics) {
+                Graphics g = e.getGraphics();
+                g.setIdleFrames(allTextures.findRegion(g.getTextureRegName() + "1"));
+
+                for(int i = 0; i < g.FRAMES; i++) {
+                    g.addKeyFrame(allTextures.findRegion(g.getTextureRegName() + (i + 2)));
+                }
+                g.createWalkAnimations();
+            }
+
+        }
+
+       /* // PLAYER TEXTURES
         // IDLE
         playerIdleLeft = allTextures.findRegion("player-white-01");
         playerIdleRight = new TextureRegion(playerIdleLeft);
@@ -157,7 +172,7 @@ public class RenderingEngine {
             walkRFrames[i].flip(true, false);
         }
         walkLeftAnimation = new Animation(PLAYER_RUN_FRAME_DURATION, walkLFrames);
-        walkRightAnimation = new Animation(PLAYER_RUN_FRAME_DURATION, walkRFrames);
+        walkRightAnimation = new Animation(PLAYER_RUN_FRAME_DURATION, walkRFrames);*/
 
         // TILE TEXTURES
         brownNormal = allTextures.findRegion("brown-01");
@@ -217,18 +232,14 @@ public class RenderingEngine {
     }
 
 
-    // DRAW PLAYER
+    // DRAW ENTITIES
     // ---------------------------------------------------------------------------------------------
 
+
     public void drawPlayer() {
-        currentPlayerFrame = player.facingL ? playerIdleLeft : playerIdleRight;
-        if (player.getState().equals(Entity.State.JUMPING) || player.getState().equals(Entity.State.FALLING)) {
-            currentPlayerFrame = player.facingL ? playerJumpL : playerJumpR;
+        for(Entity e : worldContainer.getEntities()) {
+            e.render(sb);
         }
-        if (player.getState().equals(Entity.State.WALKING)) {
-            currentPlayerFrame = player.facingL ? walkLeftAnimation.getKeyFrame(player.getEntityTime(), true) : walkRightAnimation.getKeyFrame(player.getEntityTime(), true);
-        }
-        sb.draw(currentPlayerFrame, player.getPosition().x, player.getPosition().y, player.getWidth(), player.getHeight());
 
     }
 

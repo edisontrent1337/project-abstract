@@ -14,7 +14,7 @@ public final class PhysicalConstants {
     public static final float MAX_TRAMPOLINE_SPEED = 15.4f;
     public static final float GRAVITY = -20f;
 
-    public static final float MIN_WALKING_SPEED = 0.1f;
+    public static final float MIN_WALKING_SPEED = 0.001f;
 
     public static final float STANDARD_MAX_WALKING_VELOCITY = 5f;
 

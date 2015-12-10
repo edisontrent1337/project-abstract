@@ -4,14 +4,14 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.trent.awesomejumper.engine.entity.Entity;
-import com.trent.awesomejumper.testing.CollisionBox;
+import com.trent.awesomejumper.engine.physics.CollisionBox;
 
 /**
  * Created by Sinthu on 09.12.2015.
  * Body component implementation. Holds information about position, acceleration, velocity and
  * dimensions of entities. Also holds the hitbox skeleton used to calculate damage.
  */
-public class Body {
+public class Body extends ModelComponent{
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
 
@@ -78,10 +78,7 @@ public class Body {
     public void setPosition(Vector2 position) {
         this.position = position;
     }
-    public void setPosition(float x, float y) {
-        position.x = x;
-        position.y = y;
-    }
+
     public void setPositionX(float x) {
         position.x = x;
     }
@@ -93,12 +90,7 @@ public class Body {
     public Vector2 getVelocity() {
         return velocity;
     }
-    public float getVelocityX() {
-        return velocity.x;
-    }
-    public float getVelocityY() {
-        return velocity.y;
-    }
+
     public void setVelocity(Vector2 velocity) {
         this.velocity = velocity;
     }
@@ -165,6 +157,10 @@ public class Body {
         return hitboxSkeleton;
     }
 
+    /**
+     * Adds a collisionBox to the skeleton of the entity.
+     * @param box
+     */
     public void add(CollisionBox box) {
         hitboxSkeleton.add(box);
     }

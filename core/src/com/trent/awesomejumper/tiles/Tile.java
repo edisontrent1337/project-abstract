@@ -3,9 +3,7 @@ package com.trent.awesomejumper.tiles;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.models.Player;
-import com.trent.awesomejumper.testing.CollisionBox;
-
-import static com.trent.awesomejumper.utils.PhysicalConstants.*;
+import com.trent.awesomejumper.engine.physics.CollisionBox;
 
 /**
  * Created by Sinthu on 12.06.2015.

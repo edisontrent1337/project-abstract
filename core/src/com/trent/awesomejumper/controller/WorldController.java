@@ -1,9 +1,11 @@
 package com.trent.awesomejumper.controller;
 
 import com.badlogic.gdx.math.Vector2;
+import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.entity.Entity.State;
 import com.trent.awesomejumper.models.Level;
 import com.trent.awesomejumper.models.Player;
+import com.trent.awesomejumper.models.SkyBox;
 import com.trent.awesomejumper.models.WorldContainer;
 
 import java.util.HashMap;
@@ -106,15 +108,18 @@ public class WorldController {
         collisionController.collisionDetection(delta);
         managePlayerSpeed();
 
-        player.update(delta);
+        for(Entity e : worldContainer.getEntities()) {
+            e.update(delta);
+        }
+
         player.setBounds(player.getPositionX(), player.getPositionY());
 
         /**
          * TODO: FOG IMPLEMENTATION WITH THE OLD SKYBOXES
          */
-        /*for (SkyBox s : level.getSkyBoxes()) {
+        for (SkyBox s : level.getSkyBoxes()) {
             s.update(delta);
-        }*/
+        }
 
     }
 

@@ -1,5 +1,6 @@
 package com.trent.awesomejumper.engine.entity;
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.trent.awesomejumper.engine.modelcomponents.*;
 
 /**
@@ -11,7 +12,7 @@ public interface EntityInterface {
      * Actions an entity can perform.
      */
     void update(float delta);
-    void render();
+    void render(SpriteBatch spriteBatch);
     void destroy();
 
     Body getBody();

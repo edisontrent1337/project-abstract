@@ -1,4 +1,4 @@
-package com.trent.awesomejumper.testing;
+package com.trent.awesomejumper.engine.physics;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -8,15 +8,6 @@ import com.badlogic.gdx.utils.Array;
 
 import static com.trent.awesomejumper.utils.Utilities.getNormal;
 import static com.trent.awesomejumper.utils.Utilities.subVec;
-
-/**
- * Created by Sinthu on 03.07.2015.
- */
-public class CollisionBox {
-
-    // MEMBERS & INSTANCES
-    // ---------------------------------------------------------------------------------------------
-
 
     /**
      * min = lower left corner
@@ -38,9 +29,18 @@ public class CollisionBox {
      *             e3
      *             n3
      */
+/**
+ * Created by Sinthu on 03.07.2015.
+ */
+public class CollisionBox {
+
+    // MEMBERS & INSTANCES
+    // ---------------------------------------------------------------------------------------------
+
+
 
     private float width, height;
-    private Vector2 position, min, max, a, b, c, d;
+    private Vector2 position, min, max;
     private Vector2 offset;
     private Array<Vector2> edges, vertices, normals;
 
@@ -65,16 +65,12 @@ public class CollisionBox {
         // VERTICES
         // -----------------------------------------------------------------------------------------
 
-        this.a = new Vector2(min.x, min.y);
-        this.b = new Vector2(min.x, max.y);
-        this.c = new Vector2(max.x, max.y);
-        this.d = new Vector2(max.x, min.y);
         this.vertices = new Array<>();
         // ADD ALL VERTICES TO THE VERTEX ARRAY
-        vertices.add(a);
-        vertices.add(b);
-        vertices.add(c);
-        vertices.add(d);
+        vertices.add(new Vector2(min.x, min.y));
+        vertices.add(new Vector2(min.x, max.y));
+        vertices.add(new Vector2(max.x, max.y));
+        vertices.add(new Vector2(max.x, min.y));
 
         // EDGES & NORMALS
         // -----------------------------------------------------------------------------------------
@@ -97,7 +93,7 @@ public class CollisionBox {
 
     // DRAW
     // ----------------------------------------------------------------------------------------------
-    /**
+    /** Draws the outline, the vertices and the normals of the collisionBox
      * @param renderer Instance of the libGdx ShapeRenderer Class used to draw the CollisionBox
      */
     public void draw(ShapeRenderer renderer) {
@@ -107,7 +103,6 @@ public class CollisionBox {
         renderer.setColor(Color.BLUE);
         renderer.rect(position.x, position.y, width, height);
 
-        // DRAW VERTICES
         renderer.setAutoShapeType(true);
 
 
@@ -136,11 +131,6 @@ public class CollisionBox {
             Vector2 nEnd = vertex.cpy().add(edge.cpy().scl(0.5f)).add(normal.cpy().scl(NORMAL_LENGTH));
             renderer.line(nStart.x, nStart.y, nEnd.x, nEnd.y, Color.BLUE, Color.RED);
 
-
-
-
-
-
         }
 
         renderer.set(ShapeRenderer.ShapeType.Filled);
@@ -156,24 +146,21 @@ public class CollisionBox {
     // UPDATE POSITION OF BOUNDS AND VERTICES
     // ---------------------------------------------------------------------------------------------
     /**
-     * @param velocity  velocity of the entity that owns this very CollisionBox
+     * Updates the position of the collisionBox in the world. Position is set to the position of the
+     * object that holds this collisionBox. An offset is added.
+     * @param newPosition  position of the entity that owns this very CollisionBox
+     * O : lower left corner = position,
+     * 1 : upper left corner
+     * 2 : upper right corner
+     * 3 : lower right corner
      */
     public void update(Vector2 newPosition) {
-        // UPDATE GENERAL POSITION AND POSITION OF ALL VERTICES
-        /**
-         * O : lower left corner = position,
-         * 1 : upper left corner
-         * 2 : upper right corner
-         * 3 : lower right corner
-         */
 
         position.set(newPosition);
         vertices.get(0).set(position).add(offset);
         vertices.get(1).set(position.x, position.y + height).add(offset);
         vertices.get(2).set(position.x + width, position.y + height).add(offset);
         vertices.get(3).set(position.x + width, position.y).add(offset);
-
-
     }
 
     // GETTER & SETTER
