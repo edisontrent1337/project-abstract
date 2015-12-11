@@ -44,17 +44,14 @@ public class RenderingEngine {
     public OrthographicCamera cam, uiCam;
     static final int CAMERA_WIDTH = 32;
     static final int CAMERA_HEIGHT =18;
-    static final float SIZE = 1f;
+
 
     /**
      * Pixel per unit scale. The screen shows 16 * 9 units, for pixel perfect accuracy we need
      * to know how many pixels are equal to 1 screen unit.
      */
-    static float ppuX, ppuY;
+    private float ppuX, ppuY;
 
-
-    // TEXTURES: PLAYER
-    private TextureRegion playerIdleLeft, playerIdleRight, playerJumpL, playerJumpR, currentPlayerFrame;
 
     // TEXTURES: TILES
     private TextureRegion brownNormal, greyNormal, brownShadow, iceNormal;
@@ -65,8 +62,6 @@ public class RenderingEngine {
     // TEXTURES: SKY
     private TextureRegion background01, farSkyTexture, nearSkyTexture, sunTexture;
 
-    // ANIMATIONS: PLAYER
-    private Animation walkLeftAnimation, walkRightAnimation;
 
     // FONTS
     private BitmapFont consoleFont, uiFont;
@@ -84,6 +79,10 @@ public class RenderingEngine {
     private SpriteBatch sb, uiBatch;
 
 
+
+    //TODO: ADD CAMERA ACCELERATION
+
+
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
 
@@ -97,7 +96,8 @@ public class RenderingEngine {
         this.player = worldContainer.getPlayer();
 
         this.ppuX = Gdx.graphics.getWidth() / CAMERA_WIDTH;
-        this.ppuX = Gdx.graphics.getHeight() / CAMERA_HEIGHT;
+        this.ppuY = Gdx.graphics.getHeight() / CAMERA_HEIGHT;
+        Gdx.app.log("ds", Float.toHexString(ppuX) + Float.toString(ppuY));
 
 
         // TESTING FOR SAT
@@ -130,10 +130,16 @@ public class RenderingEngine {
 
     public void loadTextures() {
         //FONTS
-        consoleFont = new BitmapFont();
+        consoleFont = new BitmapFont(Gdx.files.internal("fonts/munro_regular_14.fnt"),Gdx.files.internal("fonts/munro_regular_14_0.png"),false);
         consoleFont.setColor(Color.WHITE);
-        consoleFont.setUseIntegerPositions(false);
+        CharSequence sequence;
+        //sequence = "()|[]1234567890";
+        sequence = "";
+
         consoleFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        consoleFont.setFixedWidthGlyphs(sequence);
+
+       // consoleFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
 
         // TEXTURE ATLAS
@@ -146,33 +152,16 @@ public class RenderingEngine {
                 Graphics g = e.getGraphics();
                 g.setIdleFrames(allTextures.findRegion(g.getTextureRegName() + "1"));
 
-                for(int i = 0; i < g.FRAMES; i++) {
-                    g.addKeyFrame(allTextures.findRegion(g.getTextureRegName() + (i + 2)));
+                if(g.FRAMES > 1) {
+                    for (int i = 0; i < g.FRAMES; i++) {
+                        g.addKeyFrame(allTextures.findRegion(g.getTextureRegName() + (i + 2)));
+                    }
+                    g.createWalkAnimations();
                 }
-                g.createWalkAnimations();
             }
 
         }
 
-       /* // PLAYER TEXTURES
-        // IDLE
-        playerIdleLeft = allTextures.findRegion("player-white-01");
-        playerIdleRight = new TextureRegion(playerIdleLeft);
-        playerIdleRight.flip(true, false);
-        // JUMPING
-        playerJumpL = allTextures.findRegion("player-white-07");
-        playerJumpR = new TextureRegion(playerJumpL);
-        playerJumpR.flip(true, false);
-        // WALINKG ARRAYS & ANIMATIONS
-        TextureRegion[] walkLFrames = new TextureRegion[5];
-        TextureRegion[] walkRFrames = new TextureRegion[5];
-        for (int i = 0; i < 5; i++) {
-            walkLFrames[i] = allTextures.findRegion("player-white-0" + (i + 2));
-            walkRFrames[i] = new TextureRegion(walkLFrames[i]);
-            walkRFrames[i].flip(true, false);
-        }
-        walkLeftAnimation = new Animation(PLAYER_RUN_FRAME_DURATION, walkLFrames);
-        walkRightAnimation = new Animation(PLAYER_RUN_FRAME_DURATION, walkRFrames);*/
 
         // TILE TEXTURES
         brownNormal = allTextures.findRegion("brown-01");
@@ -201,12 +190,16 @@ public class RenderingEngine {
          * SPRITEBATCH sb IS USED TO DRAW EVERYTHING TO THE SCREEN
          * SPRITEBATCH uiBatch IS USED TO DRAW UI INFORMATION
          */
+        uiCam.update();
+
         moveCamera(player.getPositionX(), player.getPositionY());
         sb.setProjectionMatrix(cam.combined);
         sb.begin();
         if(!game.onDebugMode())
             drawBg();
-            drawTiles();
+
+        drawTiles();
+
         if(game.onDebugMode()) {
                 sb.end();
                 drawDebugInfo();
@@ -217,17 +210,29 @@ public class RenderingEngine {
         sb.end();
 
 
-        // UI, DEBUG ETC
         uiBatch.setProjectionMatrix(uiCam.combined);
         uiBatch.begin();
-        if (game.onDebugMode())
-            drawInfo();
+        drawInfo();
         uiBatch.end();
     }
 
     // CAMERA MOVEMENT
     private void moveCamera(float x, float y) {
-        cam.position.set(x, y, 0);
+        //TODO: save last position of cam before it stopped due to the player reaching level limits
+        float tempX = cam.position.x;
+        float tempY = cam.position.y;
+
+        float xLerk =  (x - tempX)*0.05f;
+        float yLerk =  (y - tempY)*0.05f;
+
+        if(cam.position.x + xLerk  > 8)
+            tempX += xLerk;
+        if(player.getPositionY() > 4)
+            tempY += yLerk;
+
+
+        cam.position.set(((int) (tempX*ppuX)) / ppuX, ((int) (tempY*ppuY))/ppuY, 0);
+
         cam.update();
     }
 
@@ -372,14 +377,15 @@ public class RenderingEngine {
         pos = "POS: " + player.getPosition();
         cps = "CAM: " + formVec(cam.position.x, cam.position.y);
         res = Gdx.graphics.getWidth() + "*" + Gdx.graphics.getHeight() + ", ZOOM: " + zoom + ", FPS :" + Gdx.graphics.getFramesPerSecond();
-        consoleFont.draw(uiBatch, acc, 15,15);
-        consoleFont.draw(uiBatch, vel, 15, 30);
-        consoleFont.setColor(Color.GREEN);
-        consoleFont.draw(uiBatch, ste, 15, 45);
-        consoleFont.draw(uiBatch, pos, 15,60);
-        consoleFont.draw(uiBatch, res, 15,75);
-        consoleFont.draw(uiBatch, cps, 15,90);
-        consoleFont.draw(uiBatch, new String("Entities:") +  Float.toString(Entity.entityCount), 15,115);
+        consoleFont.draw(uiBatch, acc, 14,40);
+        consoleFont.draw(uiBatch, vel, 14, 66);
+        consoleFont.setColor(Color.BLUE);
+        consoleFont.draw(uiBatch, ste, 14, 94);
+        consoleFont.draw(uiBatch, pos, 14,120);
+        consoleFont.draw(uiBatch, res, 14,148);
+        consoleFont.draw(uiBatch, cps, 14,174);
+        consoleFont.draw(uiBatch, new String("Entities:") +  Integer.toString(Entity.entityCount), 15,202);
+        consoleFont.draw(uiBatch, Float.toString(player.getHealth().getHp()), 14, Gdx.graphics.getHeight() - 30);
     }
 
 
@@ -402,7 +408,6 @@ public class RenderingEngine {
         for(CollisionBox r: player.getBodyHitboxes()) {
             r.draw(debugRenderer);
         }
-       //debugRenderer.rect(player.getBounds().x, player.getBounds().y, player.getBounds().width, player.getBounds().height);
 
         debugRenderer.end();
         // HITBOXES OF TILES AFFECTED BY COLLISION DETECTION
@@ -427,5 +432,12 @@ public class RenderingEngine {
         Gdx.gl.glDisable(GL20.GL_BLEND);
     }
 
+
+    public void resize(int w, int h) {
+        uiCam = new OrthographicCamera(w,h);
+        uiCam.position.set(w/2,h/2,0);
+        ppuX = Gdx.graphics.getWidth() / CAMERA_WIDTH;
+        ppuY = Gdx.graphics.getHeight() / CAMERA_HEIGHT;
+    }
 
 }

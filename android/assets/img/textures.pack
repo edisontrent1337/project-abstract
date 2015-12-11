@@ -227,7 +227,7 @@ tile
   orig: 32, 32
   offset: 0, 0
   index: -1
-wood_chest
+wood_chest-01
   rotate: false
   xy: 803, 821
   size: 32, 32

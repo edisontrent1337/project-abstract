@@ -3,6 +3,7 @@ package com.trent.awesomejumper.models;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.trent.awesomejumper.engine.entity.Entity;
+import com.trent.awesomejumper.models.testing.Chest;
 import com.trent.awesomejumper.tiles.Tile;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -23,6 +24,7 @@ public class WorldContainer {
 
     private Array<Tile> tiles = new Array<>();
     private Player player;
+    private Chest chest;
     private Level level;
     private ArrayList tilesToBeDrawn;
     private ArrayList<Tile> collisionTiles = new ArrayList<>();
@@ -38,9 +40,11 @@ public class WorldContainer {
 
     private void createWorld() {
         player = new Player(new Vector2(12.5f, 7f));
+        chest = new Chest(new Vector2(5,5));
         level = new Level();
         entities = new HashSet<>();
         entities.add(player);
+        entities.add(chest);
     }
 
     // LIST OF TILES TO BE DRAWN

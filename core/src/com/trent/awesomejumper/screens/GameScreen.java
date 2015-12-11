@@ -55,6 +55,7 @@ public class GameScreen implements Screen, InputProcessor{
 
     @Override
     public void resize(int width, int height) {
+        renderingEngine.resize(width,height);
     }
 
     @Override

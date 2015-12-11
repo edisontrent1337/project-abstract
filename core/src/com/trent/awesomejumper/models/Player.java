@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.Body;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
+import com.trent.awesomejumper.engine.modelcomponents.Health;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
 
 /**
@@ -31,7 +32,8 @@ public class Player extends Entity {
 
     public Player(Vector2 position) {
         this.body = new Body(this, WIDTH, HEIGHT);
-        this.graphics = new Graphics(PLAYER_RUN_FRAME_DURATION, this, "player-white-0");
+        this.graphics = new Graphics(this,PLAYER_RUN_FRAME_DURATION, "player-white-0",5);
+        this.health = new Health(this, 100);
 
         //TODO: bounds and collisionBox should share the same dimensions..... otherwise modifying one
         // of the values will result in buggy collision resolution...
@@ -62,6 +64,7 @@ public class Player extends Entity {
         body.add(rightFoot);
         body.add(leftFoot);
 
+        state = State.IDLE;
     }
 
 

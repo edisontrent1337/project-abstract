@@ -1,5 +1,6 @@
 package com.trent.awesomejumper.engine.entity;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -178,7 +179,7 @@ public class Entity implements EntityInterface {
 
     @Override
     public Body getBody() {
-        return null;
+        return body;
     }
 
     @Override
@@ -198,7 +199,7 @@ public class Entity implements EntityInterface {
 
     @Override
     public Health getHealth() {
-        return null;
+        return health;
     }
 
     @Override

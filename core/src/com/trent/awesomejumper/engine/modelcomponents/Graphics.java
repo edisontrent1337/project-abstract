@@ -11,13 +11,16 @@ import com.trent.awesomejumper.engine.entity.Entity;
  * Created by Sinthu on 09.12.2015.
  * Graphics component implementation. Holds textures and animations of game entities.
  * Manages current frame to be displayed.
+ * TODO: maybe outsource render method to RenderingEngine because component should more ore less
+ * only represent data and functions to create or hold data, not to modify it as this is the task of
+ * the controllers.
  */
-public class Graphics {
+public class Graphics extends ModelComponent{
 
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
     public final int ANIMATIONS = 2; // supports 2 different animations at the moment
-    public final int FRAMES = 5;     // 5 frames per animation
+    public final int FRAMES;     // 5 frames per animation
 
     private final float FRAME_DURATION;
     private String textureRegName;
@@ -27,12 +30,16 @@ public class Graphics {
     private Animation walkLeftAnimation, walkRightAnimation;
     private Array<Animation> animations;
 
-    private Entity entity;
-
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
-    public Graphics(float duration, Entity entity, String textureRegionName) {
+    public Graphics( Entity entity,float duration, String textureRegionName, int frames) {
+        /**
+         * Initialises all members with default values.
+         * The renderingEngine then loads textures from the asset manager and applies a more useful
+         * start configuration to all values.
+         */
+        FRAMES = frames;
         this.entity = entity;
         this.textureRegName = textureRegionName;
         this.animations = new Array<>(ANIMATIONS);

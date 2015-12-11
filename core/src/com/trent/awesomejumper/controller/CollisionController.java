@@ -3,6 +3,7 @@ package com.trent.awesomejumper.controller;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.models.Level;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.WorldContainer;
@@ -159,6 +160,31 @@ public class CollisionController {
 
 
         }
+
+
+
+        for(Entity e: worldContainer.getEntities()) {
+            if(e.equals(player))
+                continue;
+            CollisionBox playerCollisionBox = player.getBodyHitboxes().get(0);
+            CollisionBox b = e.getBodyHitboxes().get(0);
+
+            if(checkCollision(b, playerCollisionBox)) {
+
+                if(resolutionVector.x != 0f)
+                    player.setVelocityX(0f);
+
+                if(resolutionVector.y != 0f)
+                    player.setVelocityY(0f);
+
+                player.getPosition().add(resolutionVector);
+                player.getVelocity().scl(1/delta);
+                return;
+
+            }
+
+        }
+
 
         /**
          * If we made it this far, no collision has occurred and the player's velocity can remain

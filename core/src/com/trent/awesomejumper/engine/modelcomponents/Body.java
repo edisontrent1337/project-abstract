@@ -12,11 +12,10 @@ import com.trent.awesomejumper.engine.physics.CollisionBox;
  * dimensions of entities. Also holds the hitbox skeleton used to calculate damage.
  */
 public class Body extends ModelComponent{
+
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
 
-    // Represented entity
-    private Entity entity;
 
     // Movement
     private Vector2 position;

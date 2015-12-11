@@ -22,7 +22,7 @@ public class Level {
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
 
-    private int levelWidth, levelHeight;
+    private final int levelWidth, levelHeight;
     private Tile[][]tiles;
     private Array<SkyBox> skyBoxes;
     Array<Environment> environment = new Array<Environment>();
@@ -31,12 +31,12 @@ public class Level {
     // ---------------------------------------------------------------------------------------------
 
     public Level() {
+        levelHeight = 100;
+        levelWidth = 100;
         loadDemoLevel();
     }
 
     private void loadDemoLevel() {
-        levelHeight = 100;
-        levelWidth = 100;
         tiles = new Tile[levelWidth][levelHeight];
         skyBoxes = new Array<>();
         // FAR AWAY CLOUDS

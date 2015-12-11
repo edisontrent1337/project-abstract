@@ -7,7 +7,7 @@ import com.trent.awesomejumper.engine.entity.Entity;
  */
 public abstract class ModelComponent {
 
-    private Entity entity;
+    protected Entity entity;
 
     public ModelComponent() {
 

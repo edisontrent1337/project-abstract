@@ -98,12 +98,15 @@ public class WorldController {
     // ---------------------------------------------------------------------------------------------
 
     public void update(float delta) {
-        DAMPING = 0.55f;
+        DAMPING = 0.8f;
         MAX_VELOCITY = 5f;
         // INPUT PROCCESSING
         processUserInput();
         player.getAcceleration().scl(delta);
         player.getVelocity().add(player.getAcceleration());
+
+
+        //TODO: Cycle: detect collisions, when collisions occur, send signal, and after that update all entites.
 
         collisionController.collisionDetection(delta);
         managePlayerSpeed();
