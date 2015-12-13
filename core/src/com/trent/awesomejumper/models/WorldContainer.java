@@ -54,8 +54,8 @@ public class WorldContainer {
 
         // GET CURRENT FOV COORDINATES AND ONLY RENDER WHAT THE PLAYER SEES
         // BOTTOM LEFT CORNER
-        int fovStartX = (int)(player.getPositionX() - camW/2 - 1);
-        int fovStartY = (int)(player.getPositionY() - camH/2 - 1);
+        int fovStartX = (int)(player.getPosition().x - camW/2 - 1);
+        int fovStartY = (int)(player.getPosition().y - camH/2 - 1);
 
         // TOP RIGHT CORNER
         int fovEndX = fovStartX + camW + 3;

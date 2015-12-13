@@ -62,24 +62,24 @@ public class CollisionController {
         // VERTICAL COLLISION DETECTION
         // -----------------------------------------------------------------------------------------
 
-        cdStartX = (int) (player.getBounds().x);
-        cdEndX = (int)  (player.getBounds().x + player.getBounds().getWidth());
+        cdStartX = (int) (player.getBounds().getPosition().x);
+        cdEndX = (int)  (player.getBounds().getPosition().x + player.getBounds().getWidth());
 
         /**
          * The players velocity is added here to cover tiles which might be in the range of the players
          * intended movement.
          */
         if(player.getVelocity().y <= 0)
-            cdStartY = cdEndY = (int) Math.floor(player.getBounds().y);
+            cdStartY = cdEndY = (int) Math.floor(player.getBounds().getPosition().y);
         else
-            cdStartY = cdEndY = (int) Math.floor(player.getBounds().y + player.getBounds().getHeight());
+            cdStartY = cdEndY = (int) Math.floor(player.getBounds().getPosition().y + player.getBounds().getHeight());
 
         // Create array of tiles surrounding the player which are covered by the collision detection
         worldContainer.createCollisionTiles(cdStartX, cdStartY, cdEndX, cdEndY);
 
         for(Tile tile: worldContainer.getCollisionTiles()) {
-            // TODO: add a big bounding box for all objects which is used for game object / world collision detection only
-            CollisionBox playerCollisionBox = player.getBodyHitboxes().get(0);
+
+            CollisionBox playerCollisionBox = player.getBounds();
             CollisionBox tileBox = tile.getCollisionBox();
 
             /**
@@ -118,25 +118,25 @@ public class CollisionController {
         // HORIZONTAL COLLISION DETECTION
         // -----------------------------------------------------------------------------------------
 
-        cdStartY = (int) (player.getBounds().y);
-        cdEndY = (int) (player.getBounds().y + player.getBounds().getHeight());
+        cdStartY = (int) (player.getBounds().getPosition().y);
+        cdEndY = (int) (player.getBounds().getPosition().y + player.getBounds().getHeight());
 
         /**
          * The players velocity is added here to cover tiles which might be in the range of the players
          * intended movement.
          */
         if (player.getVelocity().x <= 0) {
-            cdStartX = cdEndX = (int) Math.floor(player.getBounds().x);
+            cdStartX = cdEndX = (int) Math.floor(player.getBounds().getPosition().x);
         } else {
-            cdStartX = cdEndX = (int) Math.floor(player.getBounds().x + player.getBounds().getWidth());
+            cdStartX = cdEndX = (int) Math.floor(player.getBounds().getPosition().x + player.getBounds().getWidth());
         }
 
         // Create array of tiles surrounding the player which are covered by the collision detection
         worldContainer.createCollisionTiles(cdStartX, cdStartY, cdEndX, cdEndY);
 
         for(Tile tile: worldContainer.getCollisionTiles()) {
-            // TODO: add a big bounding box for all objects which is used for gameobject / world collision detection only
-            CollisionBox playerCollisionBox = player.getBodyHitboxes().get(0);
+
+            CollisionBox playerCollisionBox = player.getBounds();
             CollisionBox tileBox = tile.getCollisionBox();
 
             /**
@@ -166,11 +166,13 @@ public class CollisionController {
         for(Entity e: worldContainer.getEntities()) {
             if(e.equals(player))
                 continue;
-            CollisionBox playerCollisionBox = player.getBodyHitboxes().get(0);
-            CollisionBox b = e.getBodyHitboxes().get(0);
+            CollisionBox playerCollisionBox = player.getBounds();
+            CollisionBox b = e.getBounds();
 
             if(checkCollision(b, playerCollisionBox)) {
 
+                player.getHealth().takeDamage((int)(Math.random() * 17) + 13);
+                //player.getGraphics().addEvent(damage, dmg);
                 if(resolutionVector.x != 0f)
                     player.setVelocityX(0f);
 
@@ -252,7 +254,6 @@ public class CollisionController {
 
                     minOverlap = overlap;
                     resolutionVector = new Vector2(normalA);
-                    // TODO: test whether or not swapping arguments here has any influence...
                     Vector2 difference = subVec(aBox.getPosition(), bBox.getPosition());
 
                     /**
@@ -312,7 +313,6 @@ public class CollisionController {
 
                     minOverlap = overlap;
                     resolutionVector = new Vector2(normalB);
-                    // TODO: test whether or not swapping arguments here has any influence...
                     Vector2 difference = subVec(bBox.getPosition(), aBox.getPosition());
 
                     /**

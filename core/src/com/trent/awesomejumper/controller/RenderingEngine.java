@@ -22,6 +22,7 @@ import com.trent.awesomejumper.models.SkyBox;
 import com.trent.awesomejumper.models.WorldContainer;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
 import com.trent.awesomejumper.tiles.Tile;
+import com.trent.awesomejumper.utils.Interval;
 
 import static com.trent.awesomejumper.utils.Utilities.formVec;
 
@@ -44,6 +45,7 @@ public class RenderingEngine {
     public OrthographicCamera cam, uiCam;
     static final int CAMERA_WIDTH = 32;
     static final int CAMERA_HEIGHT =18;
+    private final float LERP_FACTOR = 0.075f;
 
 
     /**
@@ -72,8 +74,6 @@ public class RenderingEngine {
     private boolean debug = false;
     ShapeRenderer debugRenderer = new ShapeRenderer();
 
-    // FRAME DURATION
-    private static final float PLAYER_RUN_FRAME_DURATION = 0.066f;
 
     // SPRITE BATCHES
     private SpriteBatch sb, uiBatch;
@@ -110,7 +110,7 @@ public class RenderingEngine {
         cam = new OrthographicCamera(32f, 18f);
         cam.zoom = 0.75f;
         zoom = cam.zoom;
-        cam.position.set(player.getPositionX(), player.getPositionY() + 2, 0);
+        cam.position.set(player.getPosition().x, player.getPosition().y + 2, 0);
         cam.update();
 
         // CAMERA SETUP: UI
@@ -128,31 +128,30 @@ public class RenderingEngine {
     // LOAD TEXTURES
     // ---------------------------------------------------------------------------------------------
 
+    /**
+     * Loads all textures from the asset manager and generates corresponding animations for each entity.
+     * Also loads world tile textures.
+     */
     public void loadTextures() {
         //FONTS
         consoleFont = new BitmapFont(Gdx.files.internal("fonts/munro_regular_14.fnt"),Gdx.files.internal("fonts/munro_regular_14_0.png"),false);
         consoleFont.setColor(Color.WHITE);
-        CharSequence sequence;
-        //sequence = "()|[]1234567890";
-        sequence = "";
-
         consoleFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-        consoleFont.setFixedWidthGlyphs(sequence);
-
-       // consoleFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
 
         // TEXTURE ATLAS
         // -----------------------------------------------------------------------------------------
 
         TextureAtlas allTextures = game.getAssetManager().get(("img/textures.pack"), TextureAtlas.class);
-
+        /**
+         * Iterate over all entities and manipulate their graphics component.
+         */
         for(Entity e : worldContainer.getEntities()) {
             if(e.hasGraphics) {
                 Graphics g = e.getGraphics();
                 g.setIdleFrames(allTextures.findRegion(g.getTextureRegName() + "1"));
 
-                if(g.FRAMES > 1) {
+                if(g.FRAMES > 1) { // if there is more than one frame, create animations
                     for (int i = 0; i < g.FRAMES; i++) {
                         g.addKeyFrame(allTextures.findRegion(g.getTextureRegName() + (i + 2)));
                     }
@@ -183,7 +182,7 @@ public class RenderingEngine {
 
     // RENDERING
     // ---------------------------------------------------------------------------------------------
-
+    // TODO: outsource all user interface related code to a separate class UserInterface
     public void render() {
 
         /**
@@ -192,7 +191,7 @@ public class RenderingEngine {
          */
         uiCam.update();
 
-        moveCamera(player.getPositionX(), player.getPositionY());
+        moveCamera(player.getPosition().x, player.getPosition().y);
         sb.setProjectionMatrix(cam.combined);
         sb.begin();
         if(!game.onDebugMode())
@@ -217,22 +216,49 @@ public class RenderingEngine {
     }
 
     // CAMERA MOVEMENT
+
+    /**
+     * Moves the camera smoothly behind the player and stops it at the edges of the level
+     * @param x player's x position
+     * @param y player's y position
+     */
     private void moveCamera(float x, float y) {
-        //TODO: save last position of cam before it stopped due to the player reaching level limits
+
         float tempX = cam.position.x;
         float tempY = cam.position.y;
+        float xLerp;
+        float yLerp;
 
-        float xLerk =  (x - tempX)*0.05f;
-        float yLerk =  (y - tempY)*0.05f;
+        xLerp = (x - tempX) * LERP_FACTOR;
+        tempX += xLerp;
 
-        if(cam.position.x + xLerk  > 8)
-            tempX += xLerk;
-        if(player.getPositionY() > 4)
-            tempY += yLerk;
+        yLerp =  (y - tempY) * LERP_FACTOR;
+        tempY += yLerp;
 
 
-        cam.position.set(((int) (tempX*ppuX)) / ppuX, ((int) (tempY*ppuY))/ppuY, 0);
+        float updatedX, updatedY;
+        if(x - cam.position.x >= 0f) {
+            updatedX = ((int) (Math.floor(tempX * ppuX))) / ppuX;
+        }
+        else {
+            updatedX = ((int) (Math.ceil(tempX * ppuX))) / ppuX;
 
+        }
+
+        if(y - cam.position.y >= 0f) {
+            updatedY = ((int) (Math.floor(tempY * ppuY))) / ppuY;
+        }
+        else {
+            updatedY = ((int) (Math.ceil(tempY * ppuY))) / ppuY;
+
+        }
+
+        if(updatedX < 4)
+            updatedX = 4;
+        if(updatedY < 4)
+            updatedY = 4;
+
+        cam.position.set(updatedX, updatedY, 0);
         cam.update();
     }
 
@@ -240,7 +266,10 @@ public class RenderingEngine {
     // DRAW ENTITIES
     // ---------------------------------------------------------------------------------------------
 
-
+    /**
+     * Iterates over all entities in the world and renders them on the screen.
+     * TODO: get only entities which are in the field of view
+     */
     public void drawPlayer() {
         for(Entity e : worldContainer.getEntities()) {
             e.render(sb);
@@ -311,16 +340,16 @@ public class RenderingEngine {
     // ---------------------------------------------------------------------------------------------
 
     public void drawBg() {
-        float skyBoxPos01X = farSky01.getPositionX();
-        float skyBoxPos02X = farSky02.getPositionX();
+        float skyBoxPos01X = farSky01.getPosition().x;
+        float skyBoxPos02X = farSky02.getPosition().y;
 
         // ----- FAR AWAY CLOUDS
         // VECTOR: X = X POSITION, Y = WIDTH, Z = HEIGHT;
-        Vector3 fClouds01 = new Vector3(farSky01.getPosition().x, farSky01.getBounds().width, farSky01.getBounds().height);
-        Vector3 fClouds02 = new Vector3(farSky01.getPosition().x, farSky02.getBounds().width, farSky02.getBounds().height);
+        Vector3 fClouds01 = new Vector3(farSky01.getPosition().x, farSky01.getBounds().getWidth(), farSky01.getBounds().getHeight());
+        Vector3 fClouds02 = new Vector3(farSky01.getPosition().x, farSky02.getBounds().getHeight(), farSky02.getBounds().getHeight());
         // ----- NEAR CLOUDS
-        Vector3 nClouds01 = new Vector3(nearSky01.getPosition().x, nearSky01.getBounds().width, nearSky01.getBounds().height);
-        Vector3 nClouds02 = new Vector3(nearSky02.getPosition().x, nearSky02.getBounds().width, nearSky02.getBounds().height);
+        Vector3 nClouds01 = new Vector3(nearSky01.getPosition().x, nearSky01.getBounds().getWidth(), nearSky01.getBounds().getHeight());
+        Vector3 nClouds02 = new Vector3(nearSky02.getPosition().x, nearSky02.getBounds().getWidth(), nearSky02.getBounds().getHeight());
         // ----- BACKGROUND SKY
         sb.draw(background01, skyBoxPos01X, 0, fClouds01.y, fClouds01.z);
         sb.draw(background01, skyBoxPos02X, 0, fClouds01.y, fClouds01.z);
@@ -377,14 +406,14 @@ public class RenderingEngine {
         pos = "POS: " + player.getPosition();
         cps = "CAM: " + formVec(cam.position.x, cam.position.y);
         res = Gdx.graphics.getWidth() + "*" + Gdx.graphics.getHeight() + ", ZOOM: " + zoom + ", FPS :" + Gdx.graphics.getFramesPerSecond();
-        consoleFont.draw(uiBatch, acc, 14,40);
+        consoleFont.draw(uiBatch, acc, 14, 40);
         consoleFont.draw(uiBatch, vel, 14, 66);
         consoleFont.setColor(Color.BLUE);
         consoleFont.draw(uiBatch, ste, 14, 94);
-        consoleFont.draw(uiBatch, pos, 14,120);
-        consoleFont.draw(uiBatch, res, 14,148);
-        consoleFont.draw(uiBatch, cps, 14,174);
-        consoleFont.draw(uiBatch, new String("Entities:") +  Integer.toString(Entity.entityCount), 15,202);
+        consoleFont.draw(uiBatch, pos, 14, 120);
+        consoleFont.draw(uiBatch, res, 14, 148);
+        consoleFont.draw(uiBatch, cps, 14, 174);
+        consoleFont.draw(uiBatch, new String("Entities:") + Integer.toString(Entity.entityCount), 15, 202);
         consoleFont.draw(uiBatch, Float.toString(player.getHealth().getHp()), 14, Gdx.graphics.getHeight() - 30);
     }
 
@@ -397,18 +426,18 @@ public class RenderingEngine {
         debugRenderer.setColor(0, 1, 0, 1);
         // PLAYER HITBOXES
 
-        debugRenderer.rect(player.getPositionX() + player.getVelocity().cpy().scl(player.getPlayerDelta()).x,
-                           player.getPositionY() + player.getVelocity().cpy().scl(player.getPlayerDelta()).y,
+        debugRenderer.rect(player.getPosition().x + player.getVelocity().cpy().scl(player.getPlayerDelta()).x,
+                           player.getPosition().y + player.getVelocity().cpy().scl(player.getPlayerDelta()).y,
                            player.getBodyHitboxes().get(0).getWidth(),
                            player.getBodyHitboxes().get(0).getHeight());
 
 
 
-
-        for(CollisionBox r: player.getBodyHitboxes()) {
-            r.draw(debugRenderer);
+        for(Entity e : worldContainer.getEntities()) {
+            for (CollisionBox r : e.getBodyHitboxes()) {
+                r.draw(debugRenderer);
+            }
         }
-
         debugRenderer.end();
         // HITBOXES OF TILES AFFECTED BY COLLISION DETECTION
         Gdx.gl.glEnable(GL20.GL_BLEND);
@@ -428,6 +457,7 @@ public class RenderingEngine {
             if(t != null)
                 debugRenderer.rect(t.getPosition().x, t.getPosition().y, Tile.SIZE, Tile.SIZE);
         }
+
         debugRenderer.end();
         Gdx.gl.glDisable(GL20.GL_BLEND);
     }

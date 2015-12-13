@@ -65,7 +65,7 @@ public class Entity implements EntityInterface {
     // GETTER AND SETTER
     // ---------------------------------------------------------------------------------------------
 
-    public Rectangle getBounds() {
+    public CollisionBox getBounds() {
         return body.getBounds();
     }
     public void setBounds(float x, float y) {
@@ -85,17 +85,13 @@ public class Entity implements EntityInterface {
         body.setPosition(position);
     }
 
-    public float getPositionX() {
-        return body.getPositionX();
-    }
+
 
     public void setPositionX(float x) {
         body.setPositionX(x);
     }
 
-    public float getPositionY() {
-        return body.getPositionY();
-    }
+
     public void setPositionY(float y) {
         body.setPositionY(y);
     }
@@ -158,10 +154,9 @@ public class Entity implements EntityInterface {
 
 
 
-
-
     @Override
     public void update(float delta) {
+        time += delta;
         if(hasBody)
             body.update(delta);
     }

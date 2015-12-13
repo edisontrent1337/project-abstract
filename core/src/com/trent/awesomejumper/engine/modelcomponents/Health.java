@@ -1,5 +1,6 @@
 package com.trent.awesomejumper.engine.modelcomponents;
 
+import com.badlogic.gdx.Gdx;
 import com.trent.awesomejumper.engine.entity.Entity;
 
 /**
@@ -13,6 +14,9 @@ public class Health extends ModelComponent {
     private final float MAX_HP;
     private float def;
     private float regeneration;
+
+    private final float invincibilityTime;
+    private float tookDamage = 0f;
 
 
     // TODO: dicussion worthy.
@@ -30,6 +34,7 @@ public class Health extends ModelComponent {
         this.entity = entity;
         this.MAX_HP = MAX_HP;
         this.hp = MAX_HP;
+        this.invincibilityTime = 1.00f;
 
         // enable health for entity
         entity.hasHealth = true;
@@ -46,11 +51,18 @@ public class Health extends ModelComponent {
 
 
     public void takeDamage(float dmg) {
+        Gdx.app.log("EntityTime", Float.toString(entity.time));
+
+        if(entity.time - tookDamage < invincibilityTime)
+            return;
         hp -= dmg;
 
-        if(hp < 0) {
+        if(hp <= 0) {
+            hp = 0;
             entity.setState(Entity.State.DEAD);
         }
+        tookDamage = entity.time;
+
 
     }
 

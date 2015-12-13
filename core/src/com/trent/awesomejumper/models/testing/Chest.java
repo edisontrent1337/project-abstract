@@ -1,7 +1,6 @@
 package com.trent.awesomejumper.models.testing;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.Body;
@@ -22,7 +21,7 @@ public class Chest extends Entity {
         this.graphics = new Graphics(this, 0f,"wood_chest-0",1);
 
         body.setPosition(position);
-        body.setBounds(new Rectangle(position.x, position.y, WIDTH, HEIGHT));
+        body.setBounds(new CollisionBox(position, WIDTH, HEIGHT));
         body.add(new CollisionBox(position,WIDTH,HEIGHT));
         state = State.IDLE;
     }

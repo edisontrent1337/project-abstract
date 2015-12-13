@@ -30,6 +30,8 @@ public class Graphics extends ModelComponent{
     private Animation walkLeftAnimation, walkRightAnimation;
     private Array<Animation> animations;
 
+    //private ArrayList<> events;
+
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
@@ -93,7 +95,7 @@ public class Graphics extends ModelComponent{
                 break;
         }
 
-        spriteBatch.draw(currentFrame, entity.getPositionX(), entity.getPositionY(), entity.getWidth(), entity.getHeight());
+        spriteBatch.draw(currentFrame, entity.getPosition().x, entity.getPosition().y, entity.getWidth(), entity.getHeight());
 
     }
 

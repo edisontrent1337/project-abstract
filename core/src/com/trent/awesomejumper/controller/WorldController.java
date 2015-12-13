@@ -98,15 +98,17 @@ public class WorldController {
     // ---------------------------------------------------------------------------------------------
 
     public void update(float delta) {
-        DAMPING = 0.8f;
+        DAMPING = 0.55f;
         MAX_VELOCITY = 5f;
-        // INPUT PROCCESSING
         processUserInput();
-        player.getAcceleration().scl(delta);
-        player.getVelocity().add(player.getAcceleration());
+
+        for(Entity e: worldContainer.getEntities()) {
+            e.getAcceleration().scl(delta);
+            e.getVelocity().add(e.getAcceleration());
+        }
 
 
-        //TODO: Cycle: detect collisions, when collisions occur, send signal, and after that update all entites.
+        //TODO: Cycle: detect collisions, when collisions occur, send signal, and after that update all entities.
 
         collisionController.collisionDetection(delta);
         managePlayerSpeed();
@@ -114,8 +116,6 @@ public class WorldController {
         for(Entity e : worldContainer.getEntities()) {
             e.update(delta);
         }
-
-        player.setBounds(player.getPositionX(), player.getPositionY());
 
         /**
          * TODO: FOG IMPLEMENTATION WITH THE OLD SKYBOXES
@@ -239,9 +239,9 @@ public class WorldController {
         }
 
         // IF PLAYER FALLS OUT OF BOUNDS, HE IS PUT BACK TO THE START
-        if (!level.checkBounds((int) player.getPositionX(), (int) player.getPositionY())) {
+        if (!level.checkBounds((int) player.getPosition().x, (int) player.getPosition().y)) {
             player.setPosition(new Vector2(5f, 12f));
-            player.setBounds(player.getPositionX(), player.getPositionY());
+            player.setBounds(player.getPosition().x, player.getPosition().y);
         }
 
 

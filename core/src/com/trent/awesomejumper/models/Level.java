@@ -23,6 +23,7 @@ public class Level {
     // ---------------------------------------------------------------------------------------------
 
     private final int levelWidth, levelHeight;
+    // TODO: change this into a two dimensional array list
     private Tile[][]tiles;
     private Array<SkyBox> skyBoxes;
     Array<Environment> environment = new Array<Environment>();
@@ -121,7 +122,7 @@ public class Level {
                     Tile upperLayer = tiles[x][y + 1];
                     Tile leftLayer = tiles[x - 1][y];
                     Tile rightLayer = tiles[x + 1][y];
-                    if (underLayer != null && upperLayer == null && underLayer.isPassable() == false) {
+                    if (underLayer != null && upperLayer == null && !underLayer.isPassable()) {
                         if (underLayer.getType() != 4) {
                             if (leftLayer != null && rightLayer != null) {
                                 environment.add(new Environment(new Vector2(x, y), Environment.EnvironmentType.GRASS));

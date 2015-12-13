@@ -2,7 +2,6 @@ package com.trent.awesomejumper.models;
 
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.Body;
@@ -31,21 +30,26 @@ public class Player extends Entity {
     // ---------------------------------------------------------------------------------------------
 
     public Player(Vector2 position) {
+
         this.body = new Body(this, WIDTH, HEIGHT);
         this.graphics = new Graphics(this,PLAYER_RUN_FRAME_DURATION, "player-white-0",5);
         this.health = new Health(this, 100);
 
-        //TODO: bounds and collisionBox should share the same dimensions..... otherwise modifying one
-        // of the values will result in buggy collision resolution...
-        // Other solution: collision algorithm uses rectangle instead of first element of the
-        // hitbox skeleton.
         body.setPosition(position);
-        body.setBounds(new Rectangle(position.x, position.y, WIDTH, HEIGHT));
+        body.setBounds(new CollisionBox(position, WIDTH, HEIGHT));
         headHitboxSize = 0.2f;
         armHitBoxSize = 0.2f;
         legHitBoxSize = 0.2f;
 
-        rightArm = new CollisionBox(position, armHitBoxSize, armHitBoxSize);
+        rightArm = new CollisionBox(position, armHitBoxSize, armHitBoxSize, CollisionBox.BoxType.RECTANGLE, new float[]{
+                0.0f,0.0f,
+                0.0f,1.0f,
+                1.0f,1.0f,
+                2.5f,1.3f
+        }
+        );
+
+        //rightArm = new CollisionBox(position, armHitBoxSize, armHitBoxSize);
         rightArm.setOffset((WIDTH - armHitBoxSize) / 2 + 0.2f, HEIGHT / 2.8f);
 
         leftArm = new CollisionBox(position, armHitBoxSize, armHitBoxSize);
@@ -73,7 +77,6 @@ public class Player extends Entity {
 
     @Override
     public void update(float delta) {
-        time += delta;
         playerDelta = delta;
         super.update(delta);
 

@@ -6,6 +6,8 @@ import com.badlogic.gdx.utils.Array;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
 
+import java.util.HashMap;
+
 /**
  * Created by Sinthu on 09.12.2015.
  * Body component implementation. Holds information about position, acceleration, velocity and
@@ -22,12 +24,15 @@ public class Body extends ModelComponent{
     private Vector2 velocity;
     private Vector2 acceleration;
 
-    // Dimensions
-    private static final float DEFAULT_SIZE = 1f;
-    private Rectangle bounds;
+    //private Rectangle bounds;
+    private CollisionBox bounds;
 
     // Hitboxes
+    // TODO: Either address this array with an enum to get Head, Arm, Leg etc... or
+    // TODO: use a HashMap where the key represents the kind of hitbox.
     Array<CollisionBox> hitboxSkeleton = new Array<>();
+
+    HashMap<String, CollisionBox> skeleton = new HashMap<>();
 
 
     public Body(Entity entity, float width, float height) {
@@ -41,14 +46,16 @@ public class Body extends ModelComponent{
         this.position = new Vector2(0f,0f);
         this.velocity = new Vector2(0f,0f);
         this.acceleration = new Vector2(0f,0f);
-        this.bounds = new Rectangle(position.x, position.y, width, height);
+        this.bounds = new CollisionBox(position, width, height);
         hitboxSkeleton.clear();
     }
 
 
-
     public void update(float delta) {
         position.add(velocity.cpy().scl(delta));
+        // update outer general bounds
+        bounds.update(position);
+        // update skeleton
         for(CollisionBox b : hitboxSkeleton) {
             b.update(position);
         }
@@ -67,12 +74,6 @@ public class Body extends ModelComponent{
     // Position
     public Vector2 getPosition() {
         return position;
-    }
-    public float getPositionX() {
-        return position.x;
-    }
-    public float getPositionY() {
-        return position.y;
     }
     public void setPosition(Vector2 position) {
         this.position = position;
@@ -134,21 +135,20 @@ public class Body extends ModelComponent{
     public float getHeight(){
         return bounds.getHeight();
     }
-    public Rectangle getBounds() {
+    public CollisionBox getBounds() {
         return bounds;
     }
     public void setWidth(float width) {
-        bounds.width = width;
+        bounds.setWidth(width);
     }
     public void setHeight(float height) {
-        bounds.height = height;
+        bounds.setHeight(height);
     }
-    public void setBounds(Rectangle bounds) {
+    public void setBounds(CollisionBox bounds) {
         this.bounds = bounds;
     }
     public void setBounds(float x, float y) {
-        bounds.x = x;
-        bounds.y = y;
+        bounds.setPosition(x,y);
     }
 
     // Hitboxes

@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
+import sun.security.provider.certpath.Vertex;
+
 import static com.trent.awesomejumper.utils.Utilities.getNormal;
 import static com.trent.awesomejumper.utils.Utilities.subVec;
 
@@ -37,22 +39,37 @@ public class CollisionBox {
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
 
-
+    public enum BoxType {
+        TRIANGLE(3),
+        RECTANGLE(4),
+        PENTAGON(5),
+        HEXAGON(6);
+        private final int VERTICES;
+        BoxType(int value) {
+            this.VERTICES = value;
+        }
+    }
 
     private float width, height;
-    private Vector2 position, min, max;
-    private Vector2 offset;
+    private Vector2 position, min, max, offset;
     private Array<Vector2> edges, vertices, normals;
 
+    public BoxType type;
+    private Array<Vector2>vertexData;
     // DEBUG DRAWING CONSTANTS
 
     private final float VSIZE = 0.05f;          // size of a vertex for drawing purposes
     private final float VHALF = VSIZE / 2;      // half vertex size
     private final float NORMAL_LENGTH = 0.125f;  // length of a normal
 
-    // CONSTRUCTOR
+    // CONSTRUCTORS
     // ---------------------------------------------------------------------------------------------
+    // TODO: Add custom vertex array support
+    // TODO: As a rule, constructors with fewer arguments should call those with more.
+    // TODO: add a constructor with a generic data array. Damage information can then be stored
+    // inside collision boxes.
 
+    // DEFAULT CONSTRUCTOR FOR RECTANGULAR OBJECTS
     public CollisionBox(Vector2 position, float width, float height) {
 
         this.position = position;
@@ -61,35 +78,98 @@ public class CollisionBox {
         this.max = new Vector2(position.cpy().x + width, position.cpy().y + height);
         this.width = width;
         this.height = height;
+        this.type = BoxType.RECTANGLE;
 
         // VERTICES
         // -----------------------------------------------------------------------------------------
 
-        this.vertices = new Array<>();
-        // ADD ALL VERTICES TO THE VERTEX ARRAY
-        vertices.add(new Vector2(min.x, min.y));
+        /**
+         * Adding all vertices starting from the bottom left corner.
+         */
+        this.vertices = new Array<>(type.VERTICES);
+        this.vertexData = new Array<>(type.VERTICES);
+        vertices.add(min);
         vertices.add(new Vector2(min.x, max.y));
-        vertices.add(new Vector2(max.x, max.y));
+        vertices.add(max);
         vertices.add(new Vector2(max.x, min.y));
+        vertexData.addAll(vertices);
 
         // EDGES & NORMALS
         // -----------------------------------------------------------------------------------------
 
-        this.edges = new Array<>();
-        this.normals = new Array<>();
+        addEdgesAndNormals();
 
-        // LOOP TROUGH ALL VERTICES AND CALCULATE EDGES BETWEEN THEM
-        for (int i = 0; i < vertices.size; i++) {
-            edges.add(subVec(vertices.get(i), vertices.get((i + 1) % 4)));
-            normals.add(getNormal(edges.get(i)));
-        }
 
     }
+
+
+    public CollisionBox(Vector2 position, float width, float height, BoxType type, float[]vertexData) {
+        /**
+         * Throw an IllegalArgumentException because the vertex array data is the only critcal
+         * parameter.
+         */
+        if(vertexData.length % 2 != 0) {
+            throw new IllegalArgumentException("The vertexData is invalid. Its length is: " + vertexData.length +
+                    "Some values are missing.");
+        }
+        this.position = position;
+        this.width = width;
+        this.height = height;
+        this.min = new Vector2(0f,0f);
+        this.max = new Vector2(0f,0f);
+        this.offset = new Vector2(0f,0f);
+        this.type = type;
+
+        this.vertices = new Array<>(type.VERTICES);
+
+        for(int i = 0; i < vertexData.length; i+=2) {
+            // The values in the vertexData array should come in (x,y) tuples.
+            Gdx.app.log("SIZE", Integer.toString(vertices.size));
+            float x = vertexData[i];
+            float y = vertexData[i + 1];
+
+            /**
+             * Get the last vertex in vertices and add the new data on top of it to create the next
+             * vertex. Finally add the next vertex to the vertices array.
+             */
+            Vector2 temp = new Vector2(x, y).add(position);
+
+            Gdx.app.log("LAST VERTEX", temp.toString());
+            vertices.add(temp);
+
+            if(temp.x < min.x)
+                min.x = temp.x;
+            if(temp.y < min.y)
+                min.y = temp.y;
+            if(temp.x > max.x)
+                max.x = temp.x;
+            if(temp.y > max.y)
+                max.y = temp.y;
+
+
+        }
+
+        addEdgesAndNormals();
+
+    }
+
+
 
 
     // METHODS & FUNCTIONS
     // ---------------------------------------------------------------------------------------------
 
+    private void addEdgesAndNormals() {
+        this.edges = new Array<>();
+        this.normals = new Array<>();
+        for (int i = 0; i < vertices.size; i++) {
+            edges.add(subVec(vertices.get(i), vertices.get((i + 1) % vertices.size)));
+            normals.add(getNormal(edges.get(i)));
+        }
+
+
+
+    }
 
     // DRAW
     // ----------------------------------------------------------------------------------------------
@@ -149,18 +229,24 @@ public class CollisionBox {
      * Updates the position of the collisionBox in the world. Position is set to the position of the
      * object that holds this collisionBox. An offset is added.
      * @param newPosition  position of the entity that owns this very CollisionBox
-     * O : lower left corner = position,
-     * 1 : upper left corner
-     * 2 : upper right corner
-     * 3 : lower right corner
      */
     public void update(Vector2 newPosition) {
 
         position.set(newPosition);
-        vertices.get(0).set(position).add(offset);
-        vertices.get(1).set(position.x, position.y + height).add(offset);
-        vertices.get(2).set(position.x + width, position.y + height).add(offset);
-        vertices.get(3).set(position.x + width, position.y).add(offset);
+
+        /**
+         * Iterate over all vertices, set their base position to position and add the "path" created
+         * by all edges combined to the new position of the vertex.
+         */
+
+        for(int i = 0; i < vertices.size; i++) {
+            vertices.get(i).set(position.cpy());
+            for(int y = 0; y < i; y++) {
+                vertices.get(i).add(edges.get(y));
+            }
+            vertices.get(i).add(offset);
+        }
+
     }
 
     // GETTER & SETTER
@@ -189,6 +275,13 @@ public class CollisionBox {
 
     public float getHeight() {
         return height;
+    }
+
+    public void setWidth(float width) {
+        this.width = width;
+    }
+    public void setHeight(float height) {
+        this.height = height;
     }
 
     public Array<Vector2> getVertices() {

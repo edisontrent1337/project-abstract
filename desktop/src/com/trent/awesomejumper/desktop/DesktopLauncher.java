@@ -2,6 +2,7 @@ package com.trent.awesomejumper.desktop;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
 
 public class DesktopLauncher {
