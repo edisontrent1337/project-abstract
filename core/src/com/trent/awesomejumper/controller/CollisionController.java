@@ -1,6 +1,7 @@
 package com.trent.awesomejumper.controller;
 
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.trent.awesomejumper.engine.entity.Entity;
@@ -11,6 +12,7 @@ import com.trent.awesomejumper.engine.physics.CollisionBox;
 import com.trent.awesomejumper.utils.Interval;
 import com.trent.awesomejumper.tiles.Tile;
 import com.trent.awesomejumper.utils.Message;
+
 
 import static com.trent.awesomejumper.utils.Utilities.dPro;
 import static com.trent.awesomejumper.utils.Utilities.getOverlap;
@@ -52,6 +54,7 @@ public class CollisionController {
      * Detects and resolves any occurring collisions between the player and other objects in the world.
      * @param delta time which has passed since the last update frame
      */
+    // TODO: add param entity for entity world collision support for all entities.
     public void collisionDetection(float delta) {
 
         // reset resolutionVector to (0f,0f)
@@ -170,10 +173,10 @@ public class CollisionController {
             CollisionBox b = e.getBounds();
 
             if(checkCollision(b, playerCollisionBox)) {
-
+                //TODO: Edit damage font to look thicker and add a white border (optional)
                 int dmg = (int)(Math.random() * 17) + 13;
                 if(player.getHealth().takeDamage(dmg))
-                    player.getGraphics().addMessageToCategory("HEALTH", new Message("-" + Integer.toString(dmg), player.time));
+                    player.getGraphics().addMessageToCategory("HEALTH", new Message("-" + Integer.toString(dmg), player.time, 2.00f, Color.RED));
                 //player.getGraphics().addEvent(damage, dmg);
                 if(resolutionVector.x != 0f)
                     player.setVelocityX(0f);

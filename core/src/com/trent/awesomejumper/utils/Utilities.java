@@ -143,4 +143,11 @@ public class Utilities {
     }
 
 
+    public float getAngle(Vector2 v1, Vector2 v2) {
+
+        return (float)Math.acos(dPro(v1,v2)/ (v1.len()*v2.len()));
+
+    }
+
+
 }

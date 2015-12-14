@@ -9,13 +9,10 @@ import com.badlogic.gdx.utils.Array;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.utils.Message;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by Sinthu on 09.12.2015.
@@ -46,7 +43,7 @@ public class Graphics extends ModelComponent{
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
-    public Graphics(Entity entity,float duration, String textureRegionName, int frames) {
+    public Graphics(Entity entity,float frameDuration, String textureRegionName, int frames) {
         /**
          * Initialises all members with default values.
          * The renderingEngine then loads textures from the asset manager and applies a more useful
@@ -60,7 +57,7 @@ public class Graphics extends ModelComponent{
         this.walkRightFrames = new Array<>(FRAMES);
         this.messages = new HashMap<>();
 
-        FRAME_DURATION = duration;
+        FRAME_DURATION = frameDuration;
 
         // Enable graphics component
         entity.hasGraphics = true;
@@ -109,26 +106,32 @@ public class Graphics extends ModelComponent{
         }
 
         spriteBatch.draw(currentFrame, entity.getPosition().x, entity.getPosition().y, entity.getWidth(), entity.getHeight());
+        //TODO: Call here renderMessages e.g. if(!messages.isEmpty) renderMessages...
 
     }
 
-
+    /**
+     * Renders event messages sorted by category e.g. information when entities take damage or level
+     * up using the class Message which can hold Strings and Textures to be displayed.
+     * @param spriteBatch
+     * @param font
+     */
     public void renderMessages(SpriteBatch spriteBatch, BitmapFont font) {
         for(Map.Entry<String, LinkedList<Message>> entry : messages.entrySet()) {
             LinkedList<Message> messageList = entry.getValue();
             for(Iterator<Message> it = messageList.iterator(); it.hasNext();) {
                 Message m = it.next();
-                if(entity.time - m.getTime() > 2) {
+                if(entity.time - m.getTimeStamp() > m.getDuration()) {
                     it.remove();
                     continue;
                 }
 
                 //TODO: add constants here for different parameters.
-                float alpha = (entity.time - m.getTime()) / 2f;
+                float alpha = (entity.time - m.getTimeStamp()) / m.getDuration();
                 float offset = (float)Math.cos(entity.time*7f)*0.125f;
 
-                font.setColor(1, 0, 0, 1 - alpha);
-                font.draw(spriteBatch, m.getMessage(), entity.getPosition().x + entity.getWidth() / 2 + offset, entity.getPosition().y + entity.getHeight() + alpha);
+                font.setColor(m.getColor().r, m.getColor().g, m.getColor().b, 1 - alpha);
+                font.draw(spriteBatch, m.getMessage(), entity.getPosition().x + entity.getWidth() / 2 + offset, entity.getPosition().y + entity.getHeight() + 2*alpha);
 
             }
 
@@ -213,6 +216,10 @@ public class Graphics extends ModelComponent{
     // ---------------------------------------------------------------------------------------------
     public String getTextureRegName() {
         return textureRegName;
+    }
+
+    public float getFrameDuration() {
+        return FRAME_DURATION;
     }
 
     public Array<Animation> getAnimations() {

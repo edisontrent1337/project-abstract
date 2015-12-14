@@ -79,10 +79,6 @@ public class RenderingEngine {
     private SpriteBatch sb, uiBatch;
 
 
-
-    //TODO: ADD CAMERA ACCELERATION
-
-
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
 
@@ -312,11 +308,11 @@ public class RenderingEngine {
 
                 // ENVIRONMENT, GRASS ETC
 
-                for(Environment environment : worldContainer.getLevel().getEnvironment()) {
+               /* for(Environment environment : worldContainer.getLevel().getEnvironment()) {
                     if(environment.getType().equals(Environment.EnvironmentType.GRASS)) {
                         sb.draw(grass01, environment.getPosition().x, environment.getPosition().y, Environment.SIZE * 2, Environment.SIZE * 2);
                     }
-                }
+                }*/
             }
 
 

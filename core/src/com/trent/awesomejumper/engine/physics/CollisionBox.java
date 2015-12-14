@@ -64,7 +64,7 @@ public class CollisionBox {
 
     // CONSTRUCTORS
     // ---------------------------------------------------------------------------------------------
-    // TODO: Add custom vertex array support
+
     // TODO: As a rule, constructors with fewer arguments should call those with more.
     // TODO: add a constructor with a generic data array. Damage information can then be stored
     // inside collision boxes.
