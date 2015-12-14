@@ -2,10 +2,20 @@ package com.trent.awesomejumper.engine.modelcomponents;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.trent.awesomejumper.engine.entity.Entity;
+import com.trent.awesomejumper.utils.Message;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by Sinthu on 09.12.2015.
@@ -22,20 +32,21 @@ public class Graphics extends ModelComponent{
     public final int ANIMATIONS = 2; // supports 2 different animations at the moment
     public final int FRAMES;     // 5 frames per animation
 
-    private final float FRAME_DURATION;
-    private String textureRegName;
+    private final float FRAME_DURATION; // frame duration for animations
+    private String textureRegName;      // prefix of the name of textures
     private TextureRegion idleFrameR, idleFrameL, currentFrame;
     private Array<TextureRegion> walkLeftFrames, walkRightFrames;
 
     private Animation walkLeftAnimation, walkRightAnimation;
     private Array<Animation> animations;
 
-    //private ArrayList<> events;
+    // messages to be rendered by category
+    private HashMap<String,LinkedList<Message>> messages;
 
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
-    public Graphics( Entity entity,float duration, String textureRegionName, int frames) {
+    public Graphics(Entity entity,float duration, String textureRegionName, int frames) {
         /**
          * Initialises all members with default values.
          * The renderingEngine then loads textures from the asset manager and applies a more useful
@@ -47,6 +58,8 @@ public class Graphics extends ModelComponent{
         this.animations = new Array<>(ANIMATIONS);
         this.walkLeftFrames = new Array<>(FRAMES);
         this.walkRightFrames = new Array<>(FRAMES);
+        this.messages = new HashMap<>();
+
         FRAME_DURATION = duration;
 
         // Enable graphics component
@@ -100,6 +113,30 @@ public class Graphics extends ModelComponent{
     }
 
 
+    public void renderMessages(SpriteBatch spriteBatch, BitmapFont font) {
+        for(Map.Entry<String, LinkedList<Message>> entry : messages.entrySet()) {
+            LinkedList<Message> messageList = entry.getValue();
+            for(Iterator<Message> it = messageList.iterator(); it.hasNext();) {
+                Message m = it.next();
+                if(entity.time - m.getTime() > 2) {
+                    it.remove();
+                    continue;
+                }
+
+                //TODO: add constants here for different parameters.
+                float alpha = (entity.time - m.getTime()) / 2f;
+                float offset = (float)Math.cos(entity.time*7f)*0.125f;
+
+                font.setColor(1, 0, 0, 1 - alpha);
+                font.draw(spriteBatch, m.getMessage(), entity.getPosition().x + entity.getWidth() / 2 + offset, entity.getPosition().y + entity.getHeight() + alpha);
+
+            }
+
+        }
+
+    }
+
+
     /**
      * Adds frames to the arrays holding the animation frames.
      * @param frame current frame to be added.
@@ -116,6 +153,60 @@ public class Graphics extends ModelComponent{
         }
     }
 
+    /**
+     * Adds a new category and an empty message queue to the message hash map.
+     * @param category category String
+     */
+    public void putMessageCategory(String category) {
+        if(messages.containsKey(category))
+            return;
+        messages.put(category, new LinkedList<Message>());
+    }
+
+    /**
+     * Adds a new category and an initial message queue to the message hash map.
+     * @param category category String
+     * @param messageList message queue
+     */
+    public void putMessageList(String category, LinkedList<Message>messageList) {
+        if(messages.containsKey(category)) {
+            return;
+        }
+        messages.put(category, messageList);
+
+    }
+
+    /**
+     * Adds a message to a corresponding category in the message hash map.
+     * @param category category String
+     * @param message message String
+     */
+    public void addMessageToCategory(String category, Message message) {
+        if(!messages.containsKey(category))
+            return;
+        messages.get(category).add(message);
+    }
+
+    /**
+     * Adds a message queue to a corresponding category in the message hash map.
+     * @param category category String
+     * @param messageList message queue
+     */
+    public void addMessageListToCategory(String category, LinkedList<Message>messageList) {
+        if(!messages.containsKey(category))
+            return;
+        messages.get(category).addAll(messageList);
+    }
+    /**
+     * Removes the last message from the message queue of the corresponding category.
+     * @param category category String
+     */
+    public void removeMessageFromCategory(String category) {
+        if(!messages.containsKey(category))
+            return;
+        messages.get(category).removeFirst();
+
+    }
 
 
     // GETTER AND SETTER
@@ -130,4 +221,8 @@ public class Graphics extends ModelComponent{
 
 
 
+
+
 }
+
+

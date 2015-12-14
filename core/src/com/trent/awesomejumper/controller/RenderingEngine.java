@@ -66,7 +66,7 @@ public class RenderingEngine {
 
 
     // FONTS
-    private BitmapFont consoleFont, uiFont;
+    private BitmapFont consoleFont, uiFont, messageFont;
 
     // DEBUG & STRINGS
     private String acc, vel, ste, pos, res, cps;
@@ -137,6 +137,11 @@ public class RenderingEngine {
         consoleFont = new BitmapFont(Gdx.files.internal("fonts/munro_regular_14.fnt"),Gdx.files.internal("fonts/munro_regular_14_0.png"),false);
         consoleFont.setColor(Color.WHITE);
         consoleFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+
+        messageFont = new BitmapFont(Gdx.files.internal("fonts/munro_regular_14.fnt"),Gdx.files.internal("fonts/munro_regular_14_0.png"),false);
+        messageFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        messageFont.getData().setScale(1/ppuX, 1/ppuY);
+
 
 
         // TEXTURE ATLAS
@@ -273,6 +278,7 @@ public class RenderingEngine {
     public void drawPlayer() {
         for(Entity e : worldContainer.getEntities()) {
             e.render(sb);
+            e.getGraphics().renderMessages(sb, messageFont);
         }
 
     }
@@ -468,6 +474,8 @@ public class RenderingEngine {
         uiCam.position.set(w/2,h/2,0);
         ppuX = Gdx.graphics.getWidth() / CAMERA_WIDTH;
         ppuY = Gdx.graphics.getHeight() / CAMERA_HEIGHT;
+
+        messageFont.getData().setScale(1/ppuX, 1/ppuY);
     }
 
 }

@@ -15,7 +15,7 @@ public class Health extends ModelComponent {
     private float def;
     private float regeneration;
 
-    private final float invincibilityTime;
+    private final float INVINCIBILITY_TIME;
     private float tookDamage = 0f;
 
 
@@ -34,7 +34,7 @@ public class Health extends ModelComponent {
         this.entity = entity;
         this.MAX_HP = MAX_HP;
         this.hp = MAX_HP;
-        this.invincibilityTime = 1.00f;
+        this.INVINCIBILITY_TIME = 1.00f;
 
         // enable health for entity
         entity.hasHealth = true;
@@ -50,11 +50,10 @@ public class Health extends ModelComponent {
     }
 
 
-    public void takeDamage(float dmg) {
-        Gdx.app.log("EntityTime", Float.toString(entity.time));
+    public boolean takeDamage(float dmg) {
 
-        if(entity.time - tookDamage < invincibilityTime)
-            return;
+        if(entity.time - tookDamage < INVINCIBILITY_TIME)
+            return false;
         hp -= dmg;
 
         if(hp <= 0) {
@@ -63,7 +62,7 @@ public class Health extends ModelComponent {
         }
         tookDamage = entity.time;
 
-
+    return true;
     }
 
     public float getHp() {

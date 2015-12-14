@@ -10,6 +10,7 @@ import com.trent.awesomejumper.models.WorldContainer;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
 import com.trent.awesomejumper.utils.Interval;
 import com.trent.awesomejumper.tiles.Tile;
+import com.trent.awesomejumper.utils.Message;
 
 import static com.trent.awesomejumper.utils.Utilities.dPro;
 import static com.trent.awesomejumper.utils.Utilities.getOverlap;
@@ -162,7 +163,6 @@ public class CollisionController {
         }
 
 
-
         for(Entity e: worldContainer.getEntities()) {
             if(e.equals(player))
                 continue;
@@ -171,7 +171,9 @@ public class CollisionController {
 
             if(checkCollision(b, playerCollisionBox)) {
 
-                player.getHealth().takeDamage((int)(Math.random() * 17) + 13);
+                int dmg = (int)(Math.random() * 17) + 13;
+                if(player.getHealth().takeDamage(dmg))
+                    player.getGraphics().addMessageToCategory("HEALTH", new Message("-" + Integer.toString(dmg), player.time));
                 //player.getGraphics().addEvent(damage, dmg);
                 if(resolutionVector.x != 0f)
                     player.setVelocityX(0f);

@@ -33,7 +33,8 @@ public class Player extends Entity {
 
         this.body = new Body(this, WIDTH, HEIGHT);
         this.graphics = new Graphics(this,PLAYER_RUN_FRAME_DURATION, "player-white-0",5);
-        this.health = new Health(this, 100);
+        graphics.putMessageCategory("HEALTH");
+        this.health = new Health(this, 2000);
 
         body.setPosition(position);
         body.setBounds(new CollisionBox(position, WIDTH, HEIGHT));
