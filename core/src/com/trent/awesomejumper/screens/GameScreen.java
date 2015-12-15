@@ -24,9 +24,11 @@ public class GameScreen implements Screen, InputProcessor{
     private AwesomeJumperMain game;
     private RenderingEngine renderingEngine;
 
-    private final int WIDTH = Gdx.graphics.getWidth();
-    private final int HEIGHT = Gdx.graphics.getHeight();
+    private int WIDTH = Gdx.graphics.getWidth();
+    private int HEIGHT = Gdx.graphics.getHeight();
 
+    // TODO: Add rectangles or even a segmented circle to catch touch events and control the player.
+    // TODO: The coordinate system for touch events is flipped on the y axis!
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
@@ -55,6 +57,8 @@ public class GameScreen implements Screen, InputProcessor{
 
     @Override
     public void resize(int width, int height) {
+        this.WIDTH = width;
+        this.HEIGHT = height;
         renderingEngine.resize(width,height);
     }
 
@@ -98,12 +102,6 @@ public class GameScreen implements Screen, InputProcessor{
             game.setDebugMode(!game.onDebugMode());
         }
 
-        if(keycode == Keys.G) {
-            //controller.increaseGravity();
-        }
-        if(keycode == Keys.H) {
-            //controller.decreaseGravity();
-        }
 
         return false;
     }

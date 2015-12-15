@@ -439,6 +439,7 @@ public class RenderingEngine {
             for (CollisionBox r : e.getBodyHitboxes()) {
                 r.draw(debugRenderer);
             }
+            e.getBounds().draw(debugRenderer);
         }
         debugRenderer.end();
         // HITBOXES OF TILES AFFECTED BY COLLISION DETECTION

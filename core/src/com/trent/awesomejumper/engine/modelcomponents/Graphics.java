@@ -39,6 +39,8 @@ public class Graphics extends ModelComponent{
 
     // messages to be rendered by category
     private HashMap<String,LinkedList<Message>> messages;
+    private final float MSG_FREQ = 7f;      // frequency with which the message offset is modified
+    private final float MSG_AMP = 0.125f;   // amplitude with which the message offset is modified
 
 
     // CONSTRUCTOR
@@ -117,18 +119,27 @@ public class Graphics extends ModelComponent{
      * @param font
      */
     public void renderMessages(SpriteBatch spriteBatch, BitmapFont font) {
+        if(messages.isEmpty())
+            return;
+        /**
+         * Iterate over the entrySet of the message HashMap and render each message by category.
+         * TODO: Categories should either be more than just Strings or completely deprecated.
+         */
         for(Map.Entry<String, LinkedList<Message>> entry : messages.entrySet()) {
             LinkedList<Message> messageList = entry.getValue();
             for(Iterator<Message> it = messageList.iterator(); it.hasNext();) {
-                Message m = it.next();
+                Message m = it.next(); // get the current message
+                /**
+                 * If the messages timeStamp is older than its duration, it will get removed
+                 * from the message list.
+                 */
                 if(entity.time - m.getTimeStamp() > m.getDuration()) {
                     it.remove();
                     continue;
                 }
 
-                //TODO: add constants here for different parameters.
                 float alpha = (entity.time - m.getTimeStamp()) / m.getDuration();
-                float offset = (float)Math.cos(entity.time*7f)*0.125f;
+                float offset = (float)Math.cos((entity.time-m.getTimeStamp())*MSG_FREQ)*MSG_AMP;
 
                 font.setColor(m.getColor().r, m.getColor().g, m.getColor().b, 1 - alpha);
                 font.draw(spriteBatch, m.getMessage(), entity.getPosition().x + entity.getWidth() / 2 + offset, entity.getPosition().y + entity.getHeight() + 2*alpha);

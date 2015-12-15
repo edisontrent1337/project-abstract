@@ -30,6 +30,9 @@ public class Body extends ModelComponent{
     // Hitboxes
     // TODO: Either address this array with an enum to get Head, Arm, Leg etc... or
     // TODO: use a HashMap where the key represents the kind of hitbox.
+    // TODO: Replace current state of bounds by calculating a minimal bounding box that contains the location of all hitboxes in the
+    // skeleton. The bounds are used for World / Entity collision, the skeleton for entity/bullet
+    // collision.
     Array<CollisionBox> hitboxSkeleton = new Array<>();
 
     HashMap<String, CollisionBox> skeleton = new HashMap<>();

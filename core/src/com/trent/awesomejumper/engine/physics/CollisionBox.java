@@ -32,6 +32,8 @@ import static com.trent.awesomejumper.utils.Utilities.subVec;
      *             n3
      */
 /**
+ * CollisionBox class representing hit boxes for every entity with physical attributes or the need
+ * to resolve collisions.
  * Created by Sinthu on 03.07.2015.
  */
 public class CollisionBox {
@@ -65,9 +67,10 @@ public class CollisionBox {
     // CONSTRUCTORS
     // ---------------------------------------------------------------------------------------------
 
-    // TODO: As a rule, constructors with fewer arguments should call those with more.
     // TODO: add a constructor with a generic data array. Damage information can then be stored
     // inside collision boxes.
+    // TODO: Add a method which creates regular polygonal collision boxes. It could be useful ;)
+    // TODO: Implement a collision interface and support <<collision circles>> :D
 
     // DEFAULT CONSTRUCTOR FOR RECTANGULAR OBJECTS
     public CollisionBox(Vector2 position, float width, float height) {
@@ -166,7 +169,6 @@ public class CollisionBox {
             edges.add(subVec(vertices.get(i), vertices.get((i + 1) % vertices.size)));
             normals.add(getNormal(edges.get(i)));
         }
-
 
 
     }

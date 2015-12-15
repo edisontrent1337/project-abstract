@@ -1,6 +1,7 @@
 package com.trent.awesomejumper.controller;
 
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -83,29 +84,31 @@ public class CollisionController {
 
         for(Tile tile: worldContainer.getCollisionTiles()) {
 
-            CollisionBox playerCollisionBox = player.getBounds();
-            CollisionBox tileBox = tile.getCollisionBox();
+            //CollisionBox playerCollisionBox = player.getBounds();
+            for(CollisionBox playerCollisionBox: player.getBodyHitboxes()) {
+                CollisionBox tileBox = tile.getCollisionBox();
 
-            /**
-             * If a collision occurs between a solid world tile and the player the corresponding player's
-             * velocity component will be reset to 0 and the resolutionVector is added to the player's
-             * position to resolve the conflict.
-             */
-            if(checkCollision(tileBox, playerCollisionBox) &! tile.isPassable()) {
+                /**
+                 * If a collision occurs between a solid world tile and the player the corresponding player's
+                 * velocity component will be reset to 0 and the resolutionVector is added to the player's
+                 * position to resolve the conflict.
+                 */
+                if (checkCollision(tileBox, playerCollisionBox) & !tile.isPassable()) {
 
-                if(resolutionVector.x != 0f)
-                    player.setVelocityX(0f);
+                    if (resolutionVector.x != 0f)
+                        player.setVelocityX(0f);
 
-                if(resolutionVector.y != 0f)
-                    player.setVelocityY(0f);
+                    if (resolutionVector.y != 0f)
+                        player.setVelocityY(0f);
 
-                player.getPosition().add(resolutionVector);
-                player.getVelocity().scl(1/delta);
-                return;
+                    Gdx.app.log("RESVECTOR", resolutionVector.toString());
+                    player.getPosition().add(resolutionVector);
+                    player.getVelocity().scl(1 / delta);
+                    return;
+
+                }
 
             }
-
-
         }
 
         /**
@@ -140,28 +143,29 @@ public class CollisionController {
 
         for(Tile tile: worldContainer.getCollisionTiles()) {
 
-            CollisionBox playerCollisionBox = player.getBounds();
-            CollisionBox tileBox = tile.getCollisionBox();
+            //CollisionBox playerCollisionBox = player.getBounds();
+            for(CollisionBox playerCollisionBox: player.getBodyHitboxes()) {
+                CollisionBox tileBox = tile.getCollisionBox();
 
-            /**
-             * If a collision occurs between a solid world tile and the player the corresponding player's
-             * velocity component will be reset to 0 and the resolutionVector is added to the player's
-             * position to resolve the conflict.
-             */
-            if(checkCollision(tileBox, playerCollisionBox) &! tile.isPassable()) {
+                /**
+                 * If a collision occurs between a solid world tile and the player the corresponding player's
+                 * velocity component will be reset to 0 and the resolutionVector is added to the player's
+                 * position to resolve the conflict.
+                 */
+                if (checkCollision(tileBox, playerCollisionBox) & !tile.isPassable()) {
 
-                if(resolutionVector.x != 0f)
-                    player.setVelocityX(0f);
+                    if (resolutionVector.x != 0f)
+                        player.setVelocityX(0f);
 
-                if(resolutionVector.y != 0f)
-                    player.setVelocityY(0f);
+                    if (resolutionVector.y != 0f)
+                        player.setVelocityY(0f);
+                    Gdx.app.log("RESVECTOR", resolutionVector.toString());
+                    player.getPosition().add(resolutionVector);
+                    player.getVelocity().scl(1 / delta);
+                    return;
 
-                player.getPosition().add(resolutionVector);
-                player.getVelocity().scl(1/delta);
-                return;
-
+                }
             }
-
 
         }
 
@@ -220,8 +224,8 @@ public class CollisionController {
         float minOverlap = 10000f;
 
         // Get normals of each shape
-        Array<Vector2> normalsA = aBox.getNormals();
-        Array<Vector2> normalsB = bBox.getNormals();
+        Array<Vector2> normalsA = aBox.getNormals(); // WORLD
+        Array<Vector2> normalsB = bBox.getNormals(); // PLAYER
 
         /**
          * Calculating the projection of both shapes onto the each of the normals of shape A.
@@ -247,8 +251,11 @@ public class CollisionController {
                  * Early exit #2: Both projections are touching, but no overlap is present. Hence no
                  * real collision is occurring.
                  */
-                if(overlap == 0f)
+                if(overlap == 0f) {
+                    Gdx.app.log("PROJA_A", projectionA.toString());
+                    Gdx.app.log("PROJB_A", projectionA.toString());
                     return false;
+                }
 
                 /**
                  * A real overlap has occurred, the minimal overlap is updated and a resolution
@@ -259,20 +266,22 @@ public class CollisionController {
 
                     minOverlap = overlap;
                     resolutionVector = new Vector2(normalA);
-                    Vector2 difference = subVec(aBox.getPosition(), bBox.getPosition());
+                    Vector2 difference = subVec(bBox.getPosition(), aBox.getPosition());
+                    Gdx.app.log("DIFF VECA", difference.toString());
+                    Gdx.app.log("NORMAL VECA", normalA.toString());
 
                     /**
                      * The orientation of the resolution vector is checked. If the dot product
                      * between the relative vector between a and b and the resolution vector is < 0,
                      * the resolution vector is pointing in the wrong direction.
                      */
-                    if(dPro(difference, resolutionVector) < 0.0f) {
+                     // finally scaling the resolution vector
+                     resolutionVector.scl(minOverlap);
+                     if(dPro(difference, resolutionVector) > 0.0f) {
                         resolutionVector.x = -resolutionVector.x;
                         resolutionVector.y = -resolutionVector.y;
                     }
 
-                    // finally scaling the resolution vector
-                    resolutionVector.scl(minOverlap);
 
                 }
 
@@ -306,8 +315,9 @@ public class CollisionController {
                  * Early exit #2: Both projections are touching, but no overlap is present. Hence no
                  * real collision is occurring.
                  */
-                if(overlap == 0f)
+                if(overlap == 0f) {
                     return false;
+                }
 
                 /**
                  * A real overlap has occurred, the minimal overlap is updated and a resolution
@@ -325,13 +335,13 @@ public class CollisionController {
                      * between the relative vector between a and b and the resolution vector is < 0,
                      * the resolution vector is pointing in the wrong direction.
                      */
-                    if(dPro(difference, resolutionVector) < 0.0f) {
+                    // finally scaling the resolution vector
+                    resolutionVector.scl(minOverlap);
+                    if(dPro(difference, resolutionVector) > 0.0f) {
                         resolutionVector.x = -resolutionVector.x;
                         resolutionVector.y = -resolutionVector.y;
                     }
 
-                    // finally scaling the resolution vector
-                    resolutionVector.scl(minOverlap);
 
                 }
 

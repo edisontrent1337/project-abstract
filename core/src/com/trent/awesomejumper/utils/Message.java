@@ -22,6 +22,9 @@ public class Message<E> {
     private final float DEFAULT_DURATION = 1.00f;
     private final Color DEFALUT_COLOR = new Color(1,1,1,1);
 
+    public final float ANIMATION_FREQUNCY = 7f;
+    public final float ANIMATION_ = 7f;
+
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------

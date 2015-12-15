@@ -13,7 +13,7 @@ public class Interval {
 
     }
 
-
+    @Override
     public String toString() {
         return "min:  " + min + " | " + "max: " + max;
     }

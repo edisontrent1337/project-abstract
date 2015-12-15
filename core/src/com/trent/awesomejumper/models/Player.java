@@ -1,6 +1,7 @@
 package com.trent.awesomejumper.models;
 
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.entity.Entity;
@@ -42,15 +43,14 @@ public class Player extends Entity {
         armHitBoxSize = 0.2f;
         legHitBoxSize = 0.2f;
 
-        rightArm = new CollisionBox(position, armHitBoxSize, armHitBoxSize, CollisionBox.BoxType.RECTANGLE, new float[]{
+        /*rightArm = new CollisionBox(position, armHitBoxSize, armHitBoxSize, CollisionBox.BoxType.TRIANGLE, new float[]{
                 0.0f,0.0f,
-                0.0f,1.0f,
-                1.0f,1.0f,
-                2.5f,1.3f
+                0.0f,0.4f,
+                0.4f,0.0f,
         }
-        );
+        );*/
 
-        //rightArm = new CollisionBox(position, armHitBoxSize, armHitBoxSize);
+        rightArm = new CollisionBox(position, armHitBoxSize, armHitBoxSize);
         rightArm.setOffset((WIDTH - armHitBoxSize) / 2 + 0.2f, HEIGHT / 2.8f);
 
         leftArm = new CollisionBox(position, armHitBoxSize, armHitBoxSize);
@@ -62,12 +62,16 @@ public class Player extends Entity {
         leftFoot = new CollisionBox(position, legHitBoxSize, legHitBoxSize);
         leftFoot.setOffset((WIDTH - legHitBoxSize) / 2 - 0.2f, 0f);
 
-        head = new CollisionBox(position, WIDTH, HEIGHT);
-        body.add(head);
+        //head = new CollisionBox(position, WIDTH, HEIGHT);
+        //body.add(head);
         body.add(rightArm);
         body.add(leftArm);
         body.add(rightFoot);
         body.add(leftFoot);
+
+        for(Vector2 n : rightArm.getNormals()) {
+            Gdx.app.log("NORMAL", n.toString());
+        }
 
         state = State.IDLE;
     }
