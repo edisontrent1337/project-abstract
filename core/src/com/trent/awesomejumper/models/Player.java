@@ -43,14 +43,14 @@ public class Player extends Entity {
         armHitBoxSize = 0.2f;
         legHitBoxSize = 0.2f;
 
-        /*rightArm = new CollisionBox(position, armHitBoxSize, armHitBoxSize, CollisionBox.BoxType.TRIANGLE, new float[]{
+        rightArm = new CollisionBox(position, armHitBoxSize, armHitBoxSize, CollisionBox.BoxType.TRIANGLE, new float[]{
                 0.0f,0.0f,
                 0.0f,0.4f,
                 0.4f,0.0f,
         }
-        );*/
+        );
 
-        rightArm = new CollisionBox(position, armHitBoxSize, armHitBoxSize);
+        //rightArm = new CollisionBox(position, armHitBoxSize, armHitBoxSize);
         rightArm.setOffset((WIDTH - armHitBoxSize) / 2 + 0.2f, HEIGHT / 2.8f);
 
         leftArm = new CollisionBox(position, armHitBoxSize, armHitBoxSize);

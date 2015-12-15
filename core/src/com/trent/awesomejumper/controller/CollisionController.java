@@ -170,6 +170,10 @@ public class CollisionController {
         }
 
 
+        // Entity entity collision
+
+        //TODO: stop both entities and add half of the resolution vector to each entity.
+        // TODO: Maybe it it necessary to have two resolution vector variables, one for each entity.
         for(Entity e: worldContainer.getEntities()) {
             if(e.equals(player))
                 continue;
@@ -181,7 +185,6 @@ public class CollisionController {
                 int dmg = (int)(Math.random() * 17) + 13;
                 if(player.getHealth().takeDamage(dmg))
                     player.getGraphics().addMessageToCategory("HEALTH", new Message("-" + Integer.toString(dmg), player.time, 2.00f, Color.RED));
-                //player.getGraphics().addEvent(damage, dmg);
                 if(resolutionVector.x != 0f)
                     player.setVelocityX(0f);
 
