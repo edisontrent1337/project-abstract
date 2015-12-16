@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import com.trent.awesomejumper.controller.RenderingEngine;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.utils.Message;
 
@@ -148,7 +149,8 @@ public class Graphics extends ModelComponent{
 
 
                 font.setColor(1,0,0, 1 - alpha);
-                font.draw(spriteBatch, m.getMessage(), entity.getPosition().x + entity.getWidth() / 2 + offset + font.getScaleX()/2f, entity.getPosition().y + entity.getHeight() + 2 * alpha + font.getScaleX()/2f);
+                font.draw(spriteBatch, m.getMessage(), entity.getPosition().x + entity.getWidth() / 2 + offset, entity.getPosition().y + entity.getHeight() + 2 * alpha);
+                //font.draw(spriteBatch, m.getMessage(), 100, 100);
 
 
 

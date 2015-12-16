@@ -52,7 +52,7 @@ public class RenderingEngine {
      * Pixel per unit scale. The screen shows 16 * 9 units, for pixel perfect accuracy we need
      * to know how many pixels are equal to 1 screen unit.
      */
-    private float ppuX, ppuY;
+    public static float ppuX, ppuY;
 
 
     // TEXTURES: TILES
@@ -135,8 +135,8 @@ public class RenderingEngine {
         consoleFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
         messageFont = new BitmapFont(Gdx.files.internal("fonts/munro_outlined.fnt"),Gdx.files.internal("fonts/munro_outlined_0.png"),false);
-        messageFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-        messageFont.getData().setScale(1/ppuX, 1/ppuY);
+        messageFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        messageFont.getData().setScale(1f/ppuX, 1f/ppuY);
 
 
 
@@ -481,7 +481,7 @@ public class RenderingEngine {
         ppuX = Gdx.graphics.getWidth() / CAMERA_WIDTH;
         ppuY = Gdx.graphics.getHeight() / CAMERA_HEIGHT;
 
-        messageFont.getData().setScale(1/ppuX, 1/ppuY);
+        messageFont.getData().setScale(1.2f/ppuX, 1.2f/ppuY);
     }
 
 }
