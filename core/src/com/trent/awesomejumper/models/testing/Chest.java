@@ -25,7 +25,7 @@ public class Chest extends Entity {
 
         body.setPosition(position);
         body.setMass(0.7f);
-        body.setFriction(0.95f);
+        body.setFriction(0.9675f);
         CollisionBox bounds = new CollisionBox(position, 0.75f, 0.4375f);
         bounds.setOffset(0.125f,0f);
         body.setBounds(bounds);

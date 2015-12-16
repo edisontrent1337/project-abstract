@@ -175,7 +175,7 @@ public class CollisionController {
         // -----------------------------------------------------------------------------------------
 
 
-
+        //TODO: add a container for entities that are in range of other entities
 
         for(Entity other: worldContainer.getEntities()) {
             if(other.equals(entity))
@@ -191,19 +191,39 @@ public class CollisionController {
                         player.getGraphics().addMessageToCategory("HEALTH", new Message("-" + Integer.toString(dmg), player.time, 2.00f, Color.RED));
                 }
 
+                /**
+                 * Relative velocity between both participants of the ongoing collision (scaled back to original
+                 * value)
+                 * The masses are added up and used as a scale for the impulse that is added to resolve
+                 * the collision.
+                 */
                 Vector2 deltaVelocity = subVec(entity.getVelocity().cpy().scl(1 / delta), other.getVelocity());
                 float entityMass = entity.getBody().getMass();
                 float otherMass = other.getBody().getMass();
                 float massSum = entityMass + otherMass;
 
+                /**
+                 * If the current entity did not collide with the world earlier, it can receive an
+                 * impulse.
+                 */
+                if (!entity.getBody().isCollidedWithWorld()) {
+                    entity.getBody().addImpulse(deltaVelocity.cpy().scl(otherMass / massSum));
+                }
 
-                    if (!entity.getBody().isCollidedWithWorld()) {
-                        entity.getBody().addImpulse(deltaVelocity.cpy().scl(otherMass / massSum));
-                    }
-                    if (!other.getBody().isCollidedWithWorld()) {
-                        other.getPosition().add(resolutionVector.cpy().scl(-1f));
-                        other.getBody().addImpulse(deltaVelocity.cpy().scl(-entityMass / massSum));
-                    }
+                /**
+                 * If the opponent entity (other) did not collide with the world earlier, it can
+                 * receive an impulse. Also, the opposing entity is pushed backwards.
+                 */
+
+                if (!other.getBody().isCollidedWithWorld()) {
+                    other.getPosition().add(resolutionVector.cpy().scl(-1f));
+                    other.getBody().addImpulse(deltaVelocity.cpy().scl(-entityMass / massSum));
+                }
+                /**
+                 * If the opponent did collide with the world, we need to stop our movement.
+                 * The resolution vector is added to our position so the collision can be resolved.
+                 * The opponent still gets the impulse to avoid entities being "glued" to the wall.
+                 */
                 else {
                         if(resolutionVector.x != 0f)
                         entity.setVelocityX(0f);
