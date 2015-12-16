@@ -185,11 +185,10 @@ public class CollisionController {
 
             if(checkCollision(b, playerCollisionBox)) {
                 //TODO: Edit damage font to look thicker and add a white border (optional)
-                if(entity.equals(player)) {
                     int dmg = (int) (Math.random() * 17) + 13;
-                    if (player.getHealth().takeDamage(dmg))
-                        player.getGraphics().addMessageToCategory("HEALTH", new Message("-" + Integer.toString(dmg), player.time, 2.00f, Color.RED));
-                }
+                    if (entity.getHealth().takeDamage(dmg))
+                        entity.getGraphics().addMessageToCategory("HEALTH", new Message("-" + Integer.toString(dmg), entity.time, 2.00f, Color.RED));
+
 
                 /**
                  * Relative velocity between both participants of the ongoing collision (scaled back to original

@@ -134,7 +134,7 @@ public class RenderingEngine {
         consoleFont.setColor(Color.WHITE);
         consoleFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
-        messageFont = new BitmapFont(Gdx.files.internal("fonts/munro_regular_14.fnt"),Gdx.files.internal("fonts/munro_regular_14_0.png"),false);
+        messageFont = new BitmapFont(Gdx.files.internal("fonts/munro_outlined.fnt"),Gdx.files.internal("fonts/munro_outlined_0.png"),false);
         messageFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         messageFont.getData().setScale(1/ppuX, 1/ppuY);
 
@@ -271,7 +271,6 @@ public class RenderingEngine {
 
     /**
      * Iterates over all entities in the world and renders them on the screen.
-     * TODO: get only entities which are in the field of view
      */
     public void drawPlayer() {
         for(Entity e : worldContainer.getEntitiesToBeRendered(CAMERA_WIDTH, CAMERA_HEIGHT)) {
@@ -446,7 +445,7 @@ public class RenderingEngine {
                 debugRenderer.end();
                 debugRenderer.begin(ShapeRenderer.ShapeType.Filled);
                 debugRenderer.setColor(Color.RED);
-                debugRenderer.rect(e.getBounds().getPosition().x, e.getBounds().getPosition().y, e.getBounds().getWidth(), e.getBounds().getHeight());
+                debugRenderer.rect(e.getBounds().getPositionAndOffset().x, e.getBounds().getPositionAndOffset().y, e.getBounds().getWidth(), e.getBounds().getHeight());
                 debugRenderer.end();
                 debugRenderer.begin(ShapeRenderer.ShapeType.Line);
             }

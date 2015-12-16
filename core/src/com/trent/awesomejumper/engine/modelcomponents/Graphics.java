@@ -145,8 +145,12 @@ public class Graphics extends ModelComponent{
                 float alpha = (entity.time - m.getTimeStamp()) / m.getDuration();
                 float offset = (float)Math.cos((entity.time-m.getTimeStamp())*MSG_FREQ)*MSG_AMP;
 
-                font.setColor(m.getColor().r, m.getColor().g, m.getColor().b, 1 - alpha);
-                font.draw(spriteBatch, m.getMessage(), entity.getPosition().x + entity.getWidth() / 2 + offset, entity.getPosition().y + entity.getHeight() + 2*alpha);
+
+
+                font.setColor(1,0,0, 1 - alpha);
+                font.draw(spriteBatch, m.getMessage(), entity.getPosition().x + entity.getWidth() / 2 + offset + font.getScaleX()/2f, entity.getPosition().y + entity.getHeight() + 2 * alpha + font.getScaleX()/2f);
+
+
 
             }
 
