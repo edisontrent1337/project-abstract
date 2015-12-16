@@ -3,6 +3,7 @@ package com.trent.awesomejumper.engine.modelcomponents;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
@@ -42,10 +43,11 @@ public class Graphics extends ModelComponent{
     private final float MSG_FREQ = 7f;      // frequency with which the message offset is modified
     private final float MSG_AMP = 0.125f;   // amplitude with which the message offset is modified
 
+    private float width, height;
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
-    public Graphics(Entity entity,float frameDuration, String textureRegionName, int frames) {
+    public Graphics(Entity entity,float frameDuration, String textureRegionName, int frames, float width, float height) {
         /**
          * Initialises all members with default values.
          * The renderingEngine then loads textures from the asset manager and applies a more useful
@@ -58,6 +60,8 @@ public class Graphics extends ModelComponent{
         this.walkLeftFrames = new Array<>(FRAMES);
         this.walkRightFrames = new Array<>(FRAMES);
         this.messages = new HashMap<>();
+        this.width = width;
+        this.height = height;
 
         FRAME_DURATION = frameDuration;
 
@@ -107,7 +111,7 @@ public class Graphics extends ModelComponent{
                 break;
         }
 
-        spriteBatch.draw(currentFrame, entity.getPosition().x, entity.getPosition().y, entity.getWidth(), entity.getHeight());
+        spriteBatch.draw(currentFrame, entity.getPosition().x, entity.getPosition().y, width, height);
         //TODO: Call here renderMessages e.g. if(!messages.isEmpty) renderMessages...
 
     }

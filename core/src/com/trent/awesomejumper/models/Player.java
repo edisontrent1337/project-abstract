@@ -19,38 +19,44 @@ public class Player extends Entity {
     // ---------------------------------------------------------------------------------------------
     private final float headHitboxSize, armHitBoxSize, legHitBoxSize;
 
-    private final float WIDTH = 0.8f;
-    private final float HEIGHT = 0.8f;
+    private static final float WIDTH = 0.5f;
+    private static final float HEIGHT = 0.625f;
+    private static final float SPRITE_WIDTH = 1f; //
+    private static final float SPRITE_HEIGHT = 1f;
+    private static final float PLAYER_RUN_FRAME_DURATION = 0.066f;
 
     private CollisionBox head, rightArm, rightFoot, leftArm, leftFoot;
 
     private float playerDelta;
-    private static final float PLAYER_RUN_FRAME_DURATION = 0.066f;
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
 
     public Player(Vector2 position) {
 
-        this.body = new Body(this, WIDTH, HEIGHT);
-        this.graphics = new Graphics(this,PLAYER_RUN_FRAME_DURATION, "player-white-0",5);
+        body = new Body(this, WIDTH, HEIGHT);
+        graphics = new Graphics(this,PLAYER_RUN_FRAME_DURATION, "player-white-0",5,SPRITE_WIDTH,SPRITE_HEIGHT);
         graphics.putMessageCategory("HEALTH");
-        this.health = new Health(this, 2000);
+        health = new Health(this, 2000);
 
         body.setPosition(position);
-        body.setBounds(new CollisionBox(position, WIDTH, HEIGHT));
+        // TODO: Implement method that calculates smallest bounding box around skeleton
+        body.setBounds(new CollisionBox(position, 0.5f, (float)20/32));
+        body.setMass(2f);
+        body.setFriction(0.55f);
+        body.getBounds().setOffset(0.2f,0f);
         headHitboxSize = 0.2f;
         armHitBoxSize = 0.2f;
         legHitBoxSize = 0.2f;
 
-        rightArm = new CollisionBox(position, armHitBoxSize, armHitBoxSize, CollisionBox.BoxType.TRIANGLE, new float[]{
+        /*rightArm = new CollisionBox(position, armHitBoxSize, armHitBoxSize, CollisionBox.BoxType.TRIANGLE, new float[]{
                 0.0f,0.0f,
-                0.0f,0.4f,
-                0.4f,0.0f,
+                0.0f,0.2f,
+                0.2f,0.2f,
         }
-        );
+        );*/
 
-        //rightArm = new CollisionBox(position, armHitBoxSize, armHitBoxSize);
+        rightArm = new CollisionBox(position, armHitBoxSize, armHitBoxSize);
         rightArm.setOffset((WIDTH - armHitBoxSize) / 2 + 0.2f, HEIGHT / 2.8f);
 
         leftArm = new CollisionBox(position, armHitBoxSize, armHitBoxSize);

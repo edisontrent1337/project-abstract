@@ -147,6 +147,8 @@ public class RenderingEngine {
         /**
          * Iterate over all entities and manipulate their graphics component.
          */
+        //TODO: change way animations are created and stored in graphics component. (use features of TextureAtlas!)
+        // e.g.: Animation animation = new Animation(0.45f,allTextures.createSprites("dds"));
         for(Entity e : worldContainer.getEntities()) {
             if(e.hasGraphics) {
                 Graphics g = e.getGraphics();
@@ -272,7 +274,7 @@ public class RenderingEngine {
      * TODO: get only entities which are in the field of view
      */
     public void drawPlayer() {
-        for(Entity e : worldContainer.getEntities()) {
+        for(Entity e : worldContainer.getEntitiesToBeRendered(CAMERA_WIDTH, CAMERA_HEIGHT)) {
             e.render(sb);
             e.getGraphics().renderMessages(sb, messageFont);
         }
@@ -415,7 +417,7 @@ public class RenderingEngine {
         consoleFont.draw(uiBatch, pos, 14, 120);
         consoleFont.draw(uiBatch, res, 14, 148);
         consoleFont.draw(uiBatch, cps, 14, 174);
-        consoleFont.draw(uiBatch, new String("Entities:") + Integer.toString(Entity.entityCount), 15, 202);
+        consoleFont.draw(uiBatch, "Entities,Drawn :" + Integer.toString(Entity.entityCount) + " , " + Integer.toString(WorldContainer.nodes), 14, 202);
         consoleFont.draw(uiBatch, Float.toString(player.getHealth().getHp()), 14, Gdx.graphics.getHeight() - 30);
     }
 
@@ -440,6 +442,14 @@ public class RenderingEngine {
                 r.draw(debugRenderer);
             }
             e.getBounds().draw(debugRenderer);
+            if(e.getBody().isCollidedWithWorld()) {
+                debugRenderer.end();
+                debugRenderer.begin(ShapeRenderer.ShapeType.Filled);
+                debugRenderer.setColor(Color.RED);
+                debugRenderer.rect(e.getBounds().getPosition().x, e.getBounds().getPosition().y, e.getBounds().getWidth(), e.getBounds().getHeight());
+                debugRenderer.end();
+                debugRenderer.begin(ShapeRenderer.ShapeType.Line);
+            }
         }
         debugRenderer.end();
         // HITBOXES OF TILES AFFECTED BY COLLISION DETECTION

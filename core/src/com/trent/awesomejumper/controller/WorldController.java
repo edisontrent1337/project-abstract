@@ -9,6 +9,8 @@ import com.trent.awesomejumper.models.SkyBox;
 import com.trent.awesomejumper.models.WorldContainer;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
 
 import static com.trent.awesomejumper.utils.PhysicalConstants.*;
@@ -94,11 +96,11 @@ public class WorldController {
 
 
 
-    // UPDATE FUNCTION: INPUT PROCRESSING & COLLISION DETECTION
+    // UPDATE FUNCTION: INPUT PROCESSING & COLLISION DETECTION
     // ---------------------------------------------------------------------------------------------
 
     public void update(float delta) {
-        DAMPING = 0.55f;
+        DAMPING = 0.95f;
         MAX_VELOCITY = 5f;
         processUserInput();
 
@@ -110,8 +112,19 @@ public class WorldController {
 
         //TODO: Cycle: detect collisions, when collisions occur, send signal, and after that update all entities.
 
-        collisionController.collisionDetection(delta);
-        managePlayerSpeed();
+        for(Entity e: worldContainer.getEntities()) {
+            collisionController.collisionDetection(e, delta);
+        }
+
+        for(Entity e: worldContainer.getEntities()) {
+            LinkedList<Vector2> impulseList = e.getBody().getImpulses();
+            for(Iterator<Vector2> it = impulseList.iterator(); it.hasNext();) {
+                e.getVelocity().add(it.next());
+                it.remove();
+            }
+
+        }
+        manageEntitySpeed();
 
         for(Entity e : worldContainer.getEntities()) {
             e.update(delta);
@@ -205,46 +218,47 @@ public class WorldController {
     }
 
 
-    private void managePlayerSpeed() {
+    private void manageEntitySpeed() {
+        for (Entity entity : worldContainer.getEntities()) {
+            if (entity.getAcceleration().x == 0) {
+                entity.getVelocity().x *= entity.getBody().getFriction();
 
-        if (player.getAcceleration().x == 0) {
-            player.getVelocity().x *= DAMPING;
-
-            if (Math.abs(player.getVelocity().x) < MIN_WALKING_SPEED) {
-                player.setVelocityX(0f);
-            }
-        }
-
-        if (player.getAcceleration().y == 0) {
-            player.getVelocity().y *= DAMPING;
-
-            if (Math.abs(player.getVelocity().y) < MIN_WALKING_SPEED) {
-                player.setVelocityY(0f);
+                if (Math.abs(entity.getVelocity().x) < MIN_WALKING_SPEED) {
+                    entity.setVelocityX(0f);
+                }
             }
 
-        }
+            if (entity.getAcceleration().y == 0) {
+                entity.getVelocity().y *= entity.getBody().getFriction();
 
-        if (player.getVelocity().x > MAX_VELOCITY) {
-            player.setVelocityX(MAX_VELOCITY);
-        }
-        if (player.getVelocity().x < -MAX_VELOCITY) {
-            player.setVelocityX(-MAX_VELOCITY);
-        }
-        if (player.getVelocity().y > MAX_VELOCITY) {
-            player.setVelocityY(MAX_VELOCITY);
-        }
+                if (Math.abs(entity.getVelocity().y) < MIN_WALKING_SPEED) {
+                    entity.setVelocityY(0f);
+                }
 
-        if (player.getVelocity().y < -MAX_VELOCITY) {
-            player.setVelocityY(-MAX_VELOCITY);
-        }
+            }
 
-        // IF PLAYER FALLS OUT OF BOUNDS, HE IS PUT BACK TO THE START
-        if (!level.checkBounds((int) player.getPosition().x, (int) player.getPosition().y)) {
-            player.setPosition(new Vector2(5f, 12f));
-            player.setBounds(player.getPosition().x, player.getPosition().y);
-        }
+            if (entity.getVelocity().x > MAX_VELOCITY) {
+                entity.setVelocityX(MAX_VELOCITY);
+            }
+            if (entity.getVelocity().x < -MAX_VELOCITY) {
+                entity.setVelocityX(-MAX_VELOCITY);
+            }
+            if (entity.getVelocity().y > MAX_VELOCITY) {
+                entity.setVelocityY(MAX_VELOCITY);
+            }
 
+            if (entity.getVelocity().y < -MAX_VELOCITY) {
+                entity.setVelocityY(-MAX_VELOCITY);
+            }
+
+            // IF PLAYER FALLS OUT OF BOUNDS, HE IS PUT BACK TO THE START
+            if (!level.checkBounds((int) player.getPosition().x, (int) player.getPosition().y)) {
+                player.setPosition(new Vector2(5f, 12f));
+                player.setBounds(player.getPosition().x, player.getPosition().y);
+            }
+
+
+        }
 
     }
-
 }

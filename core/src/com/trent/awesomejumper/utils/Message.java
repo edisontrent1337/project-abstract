@@ -20,7 +20,7 @@ public class Message<E> {
     private float timeStamp, duration;
 
     private final float DEFAULT_DURATION = 1.00f;
-    private final Color DEFALUT_COLOR = new Color(1,1,1,1);
+    private final Color DEFAULT_COLOR = new Color(1,1,1,1);
 
 
 
@@ -30,7 +30,7 @@ public class Message<E> {
         this.message = message;
         this.timeStamp = timeStamp;
         this.duration = DEFAULT_DURATION;
-        this.color = DEFALUT_COLOR;
+        this.color = DEFAULT_COLOR;
     }
 
 

@@ -52,64 +52,65 @@ public class CollisionController {
     // ---------------------------------------------------------------------------------------------
 
     /**
-     * Detects and resolves any occurring collisions between the player and other objects in the world.
+     * Detects and resolves any occurring collisions between entities and other objects in the world.
+     * Entity/World collision is fully supported.
+     * Entity/Entity collision is a work in progress.
      * @param delta time which has passed since the last update frame
      */
-    // TODO: add param entity for entity world collision support for all entities.
-    public void collisionDetection(float delta) {
+    public void collisionDetection(Entity entity, float delta) {
 
         // reset resolutionVector to (0f,0f)
         resolutionVector.x = 0f;
         resolutionVector.y = 0f;
-        player.getVelocity().scl(delta);
+        entity.getVelocity().scl(delta);
+        entity.getBody().setCollidedWithWorld(false);
 
         // -----------------------------------------------------------------------------------------
         // VERTICAL COLLISION DETECTION
         // -----------------------------------------------------------------------------------------
 
-        cdStartX = (int) (player.getBounds().getPosition().x);
-        cdEndX = (int)  (player.getBounds().getPosition().x + player.getBounds().getWidth());
+        cdStartX = (int) (entity.getBounds().getPositionAndOffset().x);
+        cdEndX = (int)  (entity.getBounds().getPositionAndOffset().x + entity.getBounds().getWidth());
 
         /**
          * The players velocity is added here to cover tiles which might be in the range of the players
          * intended movement.
          */
-        if(player.getVelocity().y <= 0)
-            cdStartY = cdEndY = (int) Math.floor(player.getBounds().getPosition().y);
+        if(entity.getVelocity().y <= 0)
+            cdStartY = cdEndY = (int) Math.floor(entity.getBounds().getPositionAndOffset().y);
         else
-            cdStartY = cdEndY = (int) Math.floor(player.getBounds().getPosition().y + player.getBounds().getHeight());
+            cdStartY = cdEndY = (int) Math.floor(entity.getBounds().getPositionAndOffset().y + entity.getBounds().getHeight());
 
-        // Create array of tiles surrounding the player which are covered by the collision detection
+        // Create array of tiles surrounding the entity which are covered by the collision detection
         worldContainer.createCollisionTiles(cdStartX, cdStartY, cdEndX, cdEndY);
 
         for(Tile tile: worldContainer.getCollisionTiles()) {
 
-            //CollisionBox playerCollisionBox = player.getBounds();
-            for(CollisionBox playerCollisionBox: player.getBodyHitboxes()) {
-                CollisionBox tileBox = tile.getCollisionBox();
+            CollisionBox entityCollisionBox = entity.getBounds();
+            CollisionBox tileBox = tile.getCollisionBox();
 
                 /**
-                 * If a collision occurs between a solid world tile and the player the corresponding player's
-                 * velocity component will be reset to 0 and the resolutionVector is added to the player's
+                 * If a collision occurs between a solid world tile and the entity the corresponding entities
+                 * velocity component will be reset to 0 and the resolutionVector is added to the entities
                  * position to resolve the conflict.
                  */
-                if (checkCollision(tileBox, playerCollisionBox) & !tile.isPassable()) {
-
+                if (checkCollision(tileBox, entityCollisionBox) &! tile.isPassable()) {
+                    entity.getBody().setCollidedWithWorld(true);
+                    entity.getBody().getImpulses().clear();
                     if (resolutionVector.x != 0f)
-                        player.setVelocityX(0f);
+                        entity.setVelocityX(0f);
 
                     if (resolutionVector.y != 0f)
-                        player.setVelocityY(0f);
+                        entity.setVelocityY(0f);
 
-                    Gdx.app.log("RESVECTOR", resolutionVector.toString());
-                    player.getPosition().add(resolutionVector);
-                    player.getVelocity().scl(1 / delta);
+                    entity.getPosition().add(resolutionVector);
+                    entity.getVelocity().scl(1 / delta);
                     return;
 
                 }
 
-            }
         }
+
 
         /**
          * If no collision was found regarding the y axis, the process is repeated for the x axis
@@ -125,17 +126,17 @@ public class CollisionController {
         // HORIZONTAL COLLISION DETECTION
         // -----------------------------------------------------------------------------------------
 
-        cdStartY = (int) (player.getBounds().getPosition().y);
-        cdEndY = (int) (player.getBounds().getPosition().y + player.getBounds().getHeight());
+        cdStartY = (int) (entity.getBounds().getPositionAndOffset().y);
+        cdEndY = (int) (entity.getBounds().getPositionAndOffset().y + entity.getBounds().getHeight());
 
         /**
          * The players velocity is added here to cover tiles which might be in the range of the players
          * intended movement.
          */
-        if (player.getVelocity().x <= 0) {
-            cdStartX = cdEndX = (int) Math.floor(player.getBounds().getPosition().x);
+        if (entity.getVelocity().x <= 0) {
+            cdStartX = cdEndX = (int) Math.floor(entity.getBounds().getPositionAndOffset().x);
         } else {
-            cdStartX = cdEndX = (int) Math.floor(player.getBounds().getPosition().x + player.getBounds().getWidth());
+            cdStartX = cdEndX = (int) Math.floor(entity.getBounds().getPositionAndOffset().x + entity.getBounds().getWidth());
         }
 
         // Create array of tiles surrounding the player which are covered by the collision detection
@@ -143,71 +144,92 @@ public class CollisionController {
 
         for(Tile tile: worldContainer.getCollisionTiles()) {
 
-            //CollisionBox playerCollisionBox = player.getBounds();
-            for(CollisionBox playerCollisionBox: player.getBodyHitboxes()) {
-                CollisionBox tileBox = tile.getCollisionBox();
+            CollisionBox entityCollisionBox = entity.getBounds();
+            CollisionBox tileBox = tile.getCollisionBox();
 
-                /**
-                 * If a collision occurs between a solid world tile and the player the corresponding player's
-                 * velocity component will be reset to 0 and the resolutionVector is added to the player's
-                 * position to resolve the conflict.
-                 */
-                if (checkCollision(tileBox, playerCollisionBox) & !tile.isPassable()) {
+            /**
+             * If a collision occurs between a solid world tile and the entity the corresponding entities
+             * velocity component will be reset to 0 and the resolutionVector is added to the entities
+             * position to resolve the conflict.
+             */
+                if (checkCollision(tileBox, entityCollisionBox) & !tile.isPassable()) {
+                    entity.getBody().setCollidedWithWorld(true);
+                    entity.getBody().getImpulses().clear();
 
                     if (resolutionVector.x != 0f)
-                        player.setVelocityX(0f);
+                        entity.setVelocityX(0f);
 
                     if (resolutionVector.y != 0f)
-                        player.setVelocityY(0f);
-                    Gdx.app.log("RESVECTOR", resolutionVector.toString());
-                    player.getPosition().add(resolutionVector);
-                    player.getVelocity().scl(1 / delta);
+                        entity.setVelocityY(0f);
+
+                    entity.getPosition().add(resolutionVector);
+                    entity.getVelocity().scl(1 / delta);
                     return;
 
                 }
-            }
-
         }
 
 
-        // Entity entity collision
+        // -----------------------------------------------------------------------------------------
+        // ENTITY ENTITY COLLISION DETECTION
+        // -----------------------------------------------------------------------------------------
 
-        //TODO: stop both entities and add half of the resolution vector to each entity.
-        // TODO: Maybe it it necessary to have two resolution vector variables, one for each entity.
-        for(Entity e: worldContainer.getEntities()) {
-            if(e.equals(player))
+
+
+
+        for(Entity other: worldContainer.getEntities()) {
+            if(other.equals(entity))
                 continue;
-            CollisionBox playerCollisionBox = player.getBounds();
-            CollisionBox b = e.getBounds();
+            CollisionBox playerCollisionBox = entity.getBounds();
+            CollisionBox b = other.getBounds();
 
             if(checkCollision(b, playerCollisionBox)) {
                 //TODO: Edit damage font to look thicker and add a white border (optional)
-                int dmg = (int)(Math.random() * 17) + 13;
-                if(player.getHealth().takeDamage(dmg))
-                    player.getGraphics().addMessageToCategory("HEALTH", new Message("-" + Integer.toString(dmg), player.time, 2.00f, Color.RED));
-                if(resolutionVector.x != 0f)
-                    player.setVelocityX(0f);
+                if(entity.equals(player)) {
+                    int dmg = (int) (Math.random() * 17) + 13;
+                    if (player.getHealth().takeDamage(dmg))
+                        player.getGraphics().addMessageToCategory("HEALTH", new Message("-" + Integer.toString(dmg), player.time, 2.00f, Color.RED));
+                }
 
-                if(resolutionVector.y != 0f)
-                    player.setVelocityY(0f);
+                Vector2 deltaVelocity = subVec(entity.getVelocity().cpy().scl(1 / delta), other.getVelocity());
+                float entityMass = entity.getBody().getMass();
+                float otherMass = other.getBody().getMass();
+                float massSum = entityMass + otherMass;
 
-                player.getPosition().add(resolutionVector);
-                player.getVelocity().scl(1/delta);
+
+                    if (!entity.getBody().isCollidedWithWorld()) {
+                        entity.getBody().addImpulse(deltaVelocity.cpy().scl(otherMass / massSum));
+                    }
+                    if (!other.getBody().isCollidedWithWorld()) {
+                        other.getPosition().add(resolutionVector.cpy().scl(-1f));
+                        other.getBody().addImpulse(deltaVelocity.cpy().scl(-entityMass / massSum));
+                    }
+                else {
+                        if(resolutionVector.x != 0f)
+                        entity.setVelocityX(0f);
+                        if(resolutionVector.y != 0f)
+                        entity.setVelocityY(0f);
+                        if(other.getBody().isCollidedWithWorld())
+                        entity.getBody().setCollidedWithWorld(true);
+                        entity.getPosition().add(resolutionVector);
+                        other.getBody().addImpulse(deltaVelocity.cpy().scl(-entityMass / massSum));
+                    }
+
+                entity.getVelocity().scl(1/delta);
                 return;
 
             }
 
         }
 
-
         /**
          * If we made it this far, no collision has occurred and the player's velocity can remain
          * as is and is scaled back to its normal value.
          */
-
-        player.getVelocity().scl(1/delta);
-
+        entity.getVelocity().scl(1 / delta);
     }
+
+
 
 
     /**
@@ -243,8 +265,9 @@ public class CollisionController {
              * Early exit #1: When there is no overlap between both projections, the separating axis
              * theorem states that there is no way a collision can still occur.
              */
-            if(!overlaps(projectionA,projectionB))
+            if(!overlaps(projectionA,projectionB)) {
                 return false;
+            }
 
             else {
 
@@ -255,8 +278,6 @@ public class CollisionController {
                  * real collision is occurring.
                  */
                 if(overlap == 0f) {
-                    Gdx.app.log("PROJA_A", projectionA.toString());
-                    Gdx.app.log("PROJB_A", projectionA.toString());
                     return false;
                 }
 
@@ -270,8 +291,6 @@ public class CollisionController {
                     minOverlap = overlap;
                     resolutionVector = new Vector2(normalA);
                     Vector2 difference = subVec(bBox.getPosition(), aBox.getPosition());
-                    Gdx.app.log("DIFF VECA", difference.toString());
-                    Gdx.app.log("NORMAL VECA", normalA.toString());
 
                     /**
                      * The orientation of the resolution vector is checked. If the dot product
@@ -307,8 +326,9 @@ public class CollisionController {
              * Early exit #1: When there is no overlap between both projections, the separating axis
              * theorem states that there is no way a collision can still occur.
              */
-            if(!overlaps(projectionA,projectionB))
+            if(!overlaps(projectionA,projectionB)) {
                 return false;
+            }
 
             else {
 
@@ -355,10 +375,6 @@ public class CollisionController {
 
         return true;
     }
-
-
-
-
 
 
 }

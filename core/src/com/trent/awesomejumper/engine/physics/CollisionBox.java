@@ -182,8 +182,6 @@ public class CollisionBox {
 
         // DRAW OUTER BOUNDING BOX
         renderer.set(ShapeRenderer.ShapeType.Line);
-        renderer.setColor(Color.BLUE);
-        renderer.rect(position.x, position.y, width, height);
 
         renderer.setAutoShapeType(true);
 
@@ -235,7 +233,6 @@ public class CollisionBox {
     public void update(Vector2 newPosition) {
 
         position.set(newPosition);
-
         /**
          * Iterate over all vertices, set their base position to position and add the "path" created
          * by all edges combined to the new position of the vertex.
@@ -256,6 +253,10 @@ public class CollisionBox {
 
     public Vector2 getPosition() {
         return position;
+    }
+
+    public Vector2 getPositionAndOffset() {
+        return new Vector2(position.x + offset.x, position.y + offset.y);
     }
 
     public void setPosition(float x, float y) {

@@ -10,6 +10,7 @@ public class DesktopLauncher {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.width = 1280;
 		config.height = 720;
+		Entity.entityCount = 0;
 		new LwjglApplication(new AwesomeJumperMain(), config);
 	}
 }
