@@ -15,12 +15,9 @@ import com.trent.awesomejumper.tiles.Tile;
 import com.trent.awesomejumper.utils.Message;
 
 
-import static com.trent.awesomejumper.utils.Utilities.dPro;
-import static com.trent.awesomejumper.utils.Utilities.getOverlap;
-import static com.trent.awesomejumper.utils.Utilities.getProjection;
-import static com.trent.awesomejumper.utils.Utilities.overlaps;
-import static com.trent.awesomejumper.utils.Utilities.subVec;
 
+import static com.trent.awesomejumper.utils.Utilities.*;
+import static com.trent.awesomejumper.utils.PhysicalConstants.*;
 /**
  * Created by Sinthu on 04.11.2015.
  */
@@ -34,6 +31,8 @@ public class CollisionController {
     // Interval variables for determining collision candidates
     private int cdStartX, cdEndX;   // x axis
     private int cdStartY, cdEndY;   // y axis
+
+
 
 
     // CONSTRUCTOR
@@ -96,7 +95,10 @@ public class CollisionController {
                  */
                 if (checkCollision(tileBox, entityCollisionBox) &! tile.isPassable()) {
                     entity.getBody().setCollidedWithWorld(true);
-                    entity.getBody().getImpulses().clear();
+                    if(!entity.equals(player)) {
+                        entity.getBody().getImpulses().clear();
+                        entity.getBody().addImpulse(createReflectionImpulse(entity, entity.getVelocity().cpy().scl(1 / delta), resolutionVector.cpy().nor()));
+                    }
                     if (resolutionVector.x != 0f)
                         entity.setVelocityX(0f);
 
@@ -152,10 +154,12 @@ public class CollisionController {
              * velocity component will be reset to 0 and the resolutionVector is added to the entities
              * position to resolve the conflict.
              */
-                if (checkCollision(tileBox, entityCollisionBox) & !tile.isPassable()) {
-                    entity.getBody().setCollidedWithWorld(true);
-                    entity.getBody().getImpulses().clear();
-
+            if (checkCollision(tileBox, entityCollisionBox) & !tile.isPassable()) {
+                entity.getBody().setCollidedWithWorld(true);
+                    if(!entity.equals(player)) {
+                        entity.getBody().getImpulses().clear();
+                        entity.getBody().addImpulse(createReflectionImpulse(entity, entity.getVelocity().cpy().scl(1 / delta), resolutionVector.cpy().nor()));
+                    }
                     if (resolutionVector.x != 0f)
                         entity.setVelocityX(0f);
 
@@ -196,7 +200,26 @@ public class CollisionController {
                  * The masses are added up and used as a scale for the impulse that is added to resolve
                  * the collision.
                  */
-                Vector2 deltaVelocity = subVec(entity.getVelocity().cpy().scl(1 / delta), other.getVelocity());
+
+                /**
+                 * IDEA: look at the resolution vector. If f.e. y component is not 0, the collision normal
+                 * seems to be x,y : (0,1). Maybe flipping the sign of the velocity of the entities will do the trick.
+                 */
+                Vector2 deltaVelocity = subVec(other.getVelocity(),entity.getVelocity().cpy().scl(1/delta));
+                Vector2 collisionNormal = resolutionVector.cpy().nor();
+                Gdx.app.log("","----------------------------------------------");
+                Gdx.app.log("REFLECTION ENTER/VEL", collisionNormal.toString() + deltaVelocity.toString());
+
+                Vector2 vNorm = collisionNormal.cpy().scl(dPro(deltaVelocity, collisionNormal));
+                Vector2 vTang = subVec(vNorm, deltaVelocity).scl(-FRICTIONAL_COEFFICIENT);
+
+                Vector2 newVelocityEntity =vTang.cpy().add(vNorm.cpy().scl(-(1 - entity.getBody().getElasticity())));
+                Vector2 newVelocityOther = vTang.cpy().add(vNorm.cpy().scl(-(1 - other.getBody().getElasticity())));
+
+
+                Gdx.app.log("NEWVELENTITY", newVelocityEntity.toString());
+                Gdx.app.log("NEWVELOTHER", newVelocityOther.toString());
+                Gdx.app.log("", "----------------------------------------------");
                 float entityMass = entity.getBody().getMass();
                 float otherMass = other.getBody().getMass();
                 float massSum = entityMass + otherMass;
@@ -205,8 +228,8 @@ public class CollisionController {
                  * If the current entity did not collide with the world earlier, it can receive an
                  * impulse.
                  */
-                if (!entity.getBody().isCollidedWithWorld()) {
-                    entity.getBody().addImpulse(deltaVelocity.cpy().scl(otherMass / massSum));
+                if (!entity.getBody().isCollidedWithWorld())  {
+                    entity.getBody().addImpulse(newVelocityEntity.cpy().scl(otherMass / massSum));
                 }
 
                 /**
@@ -215,8 +238,8 @@ public class CollisionController {
                  */
 
                 if (!other.getBody().isCollidedWithWorld()) {
-                    other.getPosition().add(resolutionVector.cpy().scl(-1f));
-                    other.getBody().addImpulse(deltaVelocity.cpy().scl(-entityMass / massSum));
+                        other.getPosition().add(resolutionVector.cpy().scl(-1f));
+                        other.getBody().addImpulse(newVelocityOther.cpy().scl(-entityMass / massSum));
                 }
                 /**
                  * If the opponent did collide with the world, we need to stop our movement.
@@ -231,7 +254,7 @@ public class CollisionController {
                         if(other.getBody().isCollidedWithWorld())
                         entity.getBody().setCollidedWithWorld(true);
                         entity.getPosition().add(resolutionVector);
-                        other.getBody().addImpulse(deltaVelocity.cpy().scl(-entityMass / massSum));
+                        //other.getBody().addImpulse(deltaVelocity.cpy().scl(-entityMass / massSum));
                     }
 
                 entity.getVelocity().scl(1/delta);
@@ -395,5 +418,19 @@ public class CollisionController {
         return true;
     }
 
+
+
+    public Vector2 createReflectionImpulse(Entity e, Vector2 velocity, Vector2 collisionNormal) {
+
+        Gdx.app.log("REFLECTION ENTER/VEL", collisionNormal.toString() + velocity.toString());
+        Vector2 vNorm = collisionNormal.cpy().scl(dPro(velocity, collisionNormal));
+        Vector2 vTang = subVec(velocity, vNorm).scl(-FRICTIONAL_COEFFICIENT);
+
+
+        Vector2 reflection = vTang.cpy().add(vNorm.cpy().scl(-(1 - e.getBody().getElasticity())));
+
+        Gdx.app.log("REFLECTION", reflection.toString());
+        return reflection;
+    }
 
 }

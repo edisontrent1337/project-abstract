@@ -148,7 +148,7 @@ public class RenderingEngine {
          * Iterate over all entities and manipulate their graphics component.
          */
         //TODO: change way animations are created and stored in graphics component. (use features of TextureAtlas!)
-        // e.g.: Animation animation = new Animation(0.45f,allTextures.createSprites("dds"));
+        // Animation animation = new Animation(0.45f,allTextures.createSprites("dds"));
         for(Entity e : worldContainer.getEntities()) {
             if(e.hasGraphics) {
                 Graphics g = e.getGraphics();
@@ -181,6 +181,25 @@ public class RenderingEngine {
         farSkyTexture = allTextures.findRegion("farclouds-01");
         nearSkyTexture = allTextures.findRegion("nearclouds-01");
         sunTexture = allTextures.findRegion("sun-01");
+    }
+
+
+    //TESTING
+
+    public void initGraphics(Entity e) {
+        TextureAtlas allTextures = game.getAssetManager().get(("img/textures.pack"), TextureAtlas.class);
+        if(e.hasGraphics) {
+            Graphics g = e.getGraphics();
+            g.setIdleFrames(allTextures.findRegion(g.getTextureRegName() + "1"));
+
+            if(g.FRAMES > 1) { // if there is more than one frame, create animations
+                for (int i = 0; i < g.FRAMES; i++) {
+                    g.addKeyFrame(allTextures.findRegion(g.getTextureRegName() + (i + 2)));
+                }
+                g.createWalkAnimations();
+            }
+        }
+
     }
 
     // RENDERING

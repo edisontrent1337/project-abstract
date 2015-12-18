@@ -6,10 +6,15 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.controller.RenderingEngine;
 import com.trent.awesomejumper.controller.WorldController;
+import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.WorldContainer;
+import com.trent.awesomejumper.models.testing.Chest;
+
+import java.util.Random;
 
 /**
  * Created by Sinthu on 12.06.2015.
@@ -102,6 +107,11 @@ public class GameScreen implements Screen, InputProcessor{
             game.setDebugMode(!game.onDebugMode());
         }
 
+        if(keycode == Keys.U) {
+            Entity e = new Chest(new Vector2(new Random().nextInt(5) + 5, new Random().nextInt(5) + 5));
+            renderingEngine.initGraphics(e);
+                    worldContainer.getEntities().add(e);
+        }
 
         return false;
     }

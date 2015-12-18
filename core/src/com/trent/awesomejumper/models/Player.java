@@ -41,9 +41,10 @@ public class Player extends Entity {
 
         body.setPosition(position);
         // TODO: Implement method that calculates smallest bounding box around skeleton
-        body.setBounds(new CollisionBox(position, 0.5f, (float)20/32));
-        body.setMass(2f);
-        body.setFriction(0.55f);
+        body.setBounds(new CollisionBox(position, 0.5f, (float) 20 / 32));
+        body.setMass(10f);
+        body.setFriction(0.66f);
+        body.setElasticity(0f);
         body.getBounds().setOffset(0.2f,0f);
         headHitboxSize = 0.2f;
         armHitBoxSize = 0.2f;

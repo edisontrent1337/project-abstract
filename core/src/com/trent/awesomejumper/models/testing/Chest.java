@@ -26,12 +26,13 @@ public class Chest extends Entity {
         graphics.putMessageCategory("HEALTH");
         this.health = new Health(this, 250);
 
-        body.setPosition(position);
-        body.setMass(0.7f);
-        body.setFriction(0.9675f);
+        this.body.setPosition(position);
+        this.body.setMass(0.4f);
+        this.body.setFriction(0.9457f);
+        this.body.setElasticity(0.45f);
         CollisionBox bounds = new CollisionBox(position, 0.75f, 0.4375f);
         bounds.setOffset(0.125f,0f);
-        body.setBounds(bounds);
+        this.body.setBounds(bounds);
         state = State.IDLE;
     }
 

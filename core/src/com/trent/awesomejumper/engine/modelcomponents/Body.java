@@ -19,6 +19,19 @@ public class Body extends ModelComponent{
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
 
+    public enum Elasticity {
+        NO_BOUNCE(0.0f),
+        HALF_BOUNCE(0.5f),
+        FULL_BOUNCE(1.0f);
+
+        private float e;
+
+        Elasticity(float e) {
+            this.e = e;
+        }
+
+
+    }
 
     // Movement
     private Vector2 position;
@@ -31,15 +44,16 @@ public class Body extends ModelComponent{
 
     private float mass;
     private float friction;
+
+
+
+    private float elasticity;
     // Hitboxes
     // TODO: Either address this array with an enum to get Head, Arm, Leg etc... or
     // TODO: use a HashMap where the key represents the kind of hitbox.
     // TODO: Replace current state of bounds by calculating a minimal bounding box that contains the location of all hitboxes in the
     // skeleton. The bounds are used for World / Entity collision, the skeleton for entity/bullet
     // collision.
-    // TODO: Add a hasCollidedWithWorld flag which is set to true each time the entity has collided
-    // TODO: with the level. If this flag is set to true, no new impulses from the entity / entity
-    // TODO: collision detection should be added
     Array<CollisionBox> hitboxSkeleton = new Array<>();
 
     LinkedList<Vector2> impulses;
@@ -168,7 +182,7 @@ public class Body extends ModelComponent{
         this.bounds = bounds;
     }
     public void setBounds(float x, float y) {
-        bounds.setPosition(x,y);
+        bounds.setPosition(x, y);
     }
 
     // Hitboxes
@@ -201,6 +215,14 @@ public class Body extends ModelComponent{
     }
     public float getFriction() {
         return friction;
+    }
+
+    public float getElasticity() {
+        return elasticity;
+    }
+
+    public void setElasticity(float elasticity) {
+        this.elasticity = elasticity;
     }
 
     // ---------------------------------------------------------------------------------------------

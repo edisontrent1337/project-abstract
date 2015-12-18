@@ -78,6 +78,7 @@ public class WorldController {
         keyMap.put(Keys.DOWN, true);
     }
 
+
     public void leftReleased() {
         keyMap.put(Keys.LEFT, false);
     }

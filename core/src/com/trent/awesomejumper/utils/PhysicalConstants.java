@@ -18,5 +18,7 @@ public final class PhysicalConstants {
 
     public static final float STANDARD_MAX_WALKING_VELOCITY = 5f;
 
+    public static final float FRICTIONAL_COEFFICIENT = 0.13f;
+
 
 }

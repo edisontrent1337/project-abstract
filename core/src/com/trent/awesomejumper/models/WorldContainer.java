@@ -51,12 +51,13 @@ public class WorldContainer {
         entities = new HashSet<>();
         entitiesToBeDrawn = new ArrayList<>();
         entities.add(player);
-        //entities.add(chest);
-        for(int x = 1; x < 12; x++) {
-            for(int y = 4; y < 17; y++) {
+        entities.add(chest);
+        chest.getBody().setAcceleration(1,1);
+        /*for(int x = 1; x < 12; x++) {
+            for(int y = 5; y < 12; y++) {
                 entities.add(new Chest(new Vector2((float)x/1.2f,(float)y/1.2f)));
             }
-        }
+        }*/
        /* entities.add(new Chest(new Vector2(4,7)));
         entities.add(new Chest(new Vector2(4,8)));
         entities.add(new Chest(new Vector2(4,9)));
@@ -124,7 +125,6 @@ public class WorldContainer {
             }
         }
 
-        Gdx.app.log("ETBR", Integer.toString(entitiesToBeDrawn.size()));
         return tilesToBeDrawn;
 
     }
