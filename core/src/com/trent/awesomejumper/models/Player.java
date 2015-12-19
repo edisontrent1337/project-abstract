@@ -8,6 +8,7 @@ import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.Body;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.engine.modelcomponents.Health;
+import com.trent.awesomejumper.engine.modelcomponents.PopUpFeed;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
 
 /**
@@ -35,8 +36,8 @@ public class Player extends Entity {
     public Player(Vector2 position) {
 
         body = new Body(this, WIDTH, HEIGHT);
-        graphics = new Graphics(this,PLAYER_RUN_FRAME_DURATION, "player-white-0",5,SPRITE_WIDTH,SPRITE_HEIGHT);
-        graphics.putMessageCategory("HEALTH");
+        graphics = new Graphics(this,PLAYER_RUN_FRAME_DURATION, "player",SPRITE_WIDTH,SPRITE_HEIGHT);
+        popUpFeed = new PopUpFeed(this);
         health = new Health(this, 2000);
 
         body.setPosition(position);

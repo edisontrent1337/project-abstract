@@ -33,10 +33,17 @@ public class Message<E> {
         this.color = DEFAULT_COLOR;
     }
 
+    public Message(String message, float timeStamp, float duration) {
+        this.message = message;
+        this.timeStamp = timeStamp;
+        this.duration = duration;
+        this.color = DEFAULT_COLOR;
+    }
 
     public Message(String message, float timeStamp, float duration, Color color) {
         this(message,null,timeStamp,duration,color);
     }
+
 
 
     public Message(String message, TextureRegion texture, float timeStamp, float duration, Color color) {

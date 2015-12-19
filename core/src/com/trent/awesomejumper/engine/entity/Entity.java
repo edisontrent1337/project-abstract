@@ -8,8 +8,12 @@ import com.badlogic.gdx.utils.Array;
 import com.trent.awesomejumper.engine.modelcomponents.Body;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.engine.modelcomponents.Health;
+import com.trent.awesomejumper.engine.modelcomponents.ModelComponent;
+import com.trent.awesomejumper.engine.modelcomponents.PopUpFeed;
 import com.trent.awesomejumper.engine.modelcomponents.Weapon;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
+
+import java.util.HashMap;
 
 /**
  * Created by Sinthu on 12.06.2015.
@@ -19,13 +23,28 @@ public class Entity implements EntityInterface {
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
 
+    public enum ComponentIndex {
+        BODY(0),
+        GRAPHICS(1),
+        HEALTH(2);
+
+        private int value;
+
+        ComponentIndex(int value) {
+            this.value = value;
+        }
+    }
+
     public static int entityCount = 0;
     public boolean hasBody = false, hasGraphics = false, hasHealth = false, hasWeapon = false;
     protected Body body;
     protected Graphics graphics;
     protected Health health;
     protected Weapon weapon;
+    protected PopUpFeed popUpFeed;
 
+    // TODO: Idea on how to eliminate all getters for components.
+    protected HashMap<ComponentIndex,ModelComponent> modelComponents;
 
 
     public enum State {
@@ -212,7 +231,15 @@ public class Entity implements EntityInterface {
 
     }
 
+    @Override
+    public PopUpFeed getPopUpFeed() {
+        return popUpFeed;
+    }
 
+    @Override
+    public void setPopUpFeed(PopUpFeed popUpFeed) {
+        this.popUpFeed = popUpFeed;
+    }
 
 
 }

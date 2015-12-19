@@ -7,12 +7,14 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.engine.entity.Entity;
@@ -23,6 +25,8 @@ import com.trent.awesomejumper.models.WorldContainer;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
 import com.trent.awesomejumper.tiles.Tile;
 import com.trent.awesomejumper.utils.Interval;
+
+import java.util.HashMap;
 
 import static com.trent.awesomejumper.utils.Utilities.formVec;
 
@@ -54,6 +58,8 @@ public class RenderingEngine {
      */
     public static float ppuX, ppuY;
 
+    // TEXTURE ATLASES
+    static TextureAtlas allTextures;
 
     // TEXTURES: TILES
     private TextureRegion brownNormal, greyNormal, brownShadow, iceNormal;
@@ -71,13 +77,15 @@ public class RenderingEngine {
     // DEBUG & STRINGS
     private String acc, vel, ste, pos, res, cps;
     private float zoom, dmp, grv;
-    private boolean debug = false;
     ShapeRenderer debugRenderer = new ShapeRenderer();
 
 
     // SPRITE BATCHES
     private SpriteBatch sb, uiBatch;
 
+    // FLY WEIGHT HASH MAP
+
+    private HashMap<String,Graphics> graphicComponents;
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
@@ -93,10 +101,9 @@ public class RenderingEngine {
 
         this.ppuX = Gdx.graphics.getWidth() / CAMERA_WIDTH;
         this.ppuY = Gdx.graphics.getHeight() / CAMERA_HEIGHT;
-        Gdx.app.log("ds", Float.toHexString(ppuX) + Float.toString(ppuY));
 
+        this.allTextures = new TextureAtlas();
 
-        // TESTING FOR SAT
 
 
         /** CAMERA SETUP: MAIN VIEW
@@ -143,26 +150,16 @@ public class RenderingEngine {
         // TEXTURE ATLAS
         // -----------------------------------------------------------------------------------------
 
-        TextureAtlas allTextures = game.getAssetManager().get(("img/textures.pack"), TextureAtlas.class);
+        allTextures = game.getAssetManager().get(("img/textures.pack"), TextureAtlas.class);
         /**
          * Iterate over all entities and manipulate their graphics component.
          */
         //TODO: change way animations are created and stored in graphics component. (use features of TextureAtlas!)
         // Animation animation = new Animation(0.45f,allTextures.createSprites("dds"));
         for(Entity e : worldContainer.getEntities()) {
-            if(e.hasGraphics) {
-                Graphics g = e.getGraphics();
-                g.setIdleFrames(allTextures.findRegion(g.getTextureRegName() + "1"));
-
-                if(g.FRAMES > 1) { // if there is more than one frame, create animations
-                    for (int i = 0; i < g.FRAMES; i++) {
-                        g.addKeyFrame(allTextures.findRegion(g.getTextureRegName() + (i + 2)));
-                    }
-                    g.createWalkAnimations();
-                }
-            }
-
+            initGraphics(e);
         }
+
 
 
         // TILE TEXTURES
@@ -187,18 +184,18 @@ public class RenderingEngine {
     //TESTING
 
     public void initGraphics(Entity e) {
-        TextureAtlas allTextures = game.getAssetManager().get(("img/textures.pack"), TextureAtlas.class);
+
         if(e.hasGraphics) {
             Graphics g = e.getGraphics();
-            g.setIdleFrames(allTextures.findRegion(g.getTextureRegName() + "1"));
+            Array<TextureAtlas.AtlasRegion> regions = allTextures.findRegions(g.getTextureRegName());
+            g.setIdleFrames(regions.first());
 
-            if(g.FRAMES > 1) { // if there is more than one frame, create animations
-                for (int i = 0; i < g.FRAMES; i++) {
-                    g.addKeyFrame(allTextures.findRegion(g.getTextureRegName() + (i + 2)));
-                }
-                g.createWalkAnimations();
+            for(int i = 1; i < regions.size; i++) {
+                g.addKeyFrame(regions.get(i));
             }
+            g.createWalkAnimations();
         }
+
 
     }
 
@@ -241,25 +238,23 @@ public class RenderingEngine {
 
     /**
      * Moves the camera smoothly behind the player and stops it at the edges of the level
-     * @param x player's x position
-     * @param y player's y position
+     * @param playerX player's x position
+     * @param playerY player's y position
      */
-    private void moveCamera(float x, float y) {
+    private void moveCamera(float playerX, float playerY) {
 
         float tempX = cam.position.x;
         float tempY = cam.position.y;
-        float xLerp;
-        float yLerp;
 
-        xLerp = (x - tempX) * LERP_FACTOR;
+        float xLerp = (playerX - tempX) * LERP_FACTOR;
         tempX += xLerp;
 
-        yLerp =  (y - tempY) * LERP_FACTOR;
+        float yLerp =  (playerY - tempY) * LERP_FACTOR;
         tempY += yLerp;
 
 
         float updatedX, updatedY;
-        if(x - cam.position.x >= 0f) {
+        if(playerX - cam.position.x >= 0f) {
             updatedX = ((int) (Math.floor(tempX * ppuX))) / ppuX;
         }
         else {
@@ -267,7 +262,7 @@ public class RenderingEngine {
 
         }
 
-        if(y - cam.position.y >= 0f) {
+        if(playerY - cam.position.y >= 0f) {
             updatedY = ((int) (Math.floor(tempY * ppuY))) / ppuY;
         }
         else {
@@ -294,7 +289,7 @@ public class RenderingEngine {
     public void drawPlayer() {
         for(Entity e : worldContainer.getEntitiesToBeRendered(CAMERA_WIDTH, CAMERA_HEIGHT)) {
             e.render(sb);
-            e.getGraphics().renderMessages(sb, messageFont);
+            e.getPopUpFeed().render(sb, messageFont);
         }
 
     }

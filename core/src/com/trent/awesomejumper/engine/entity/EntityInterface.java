@@ -27,6 +27,9 @@ public interface EntityInterface {
     Weapon getWeapon();
     void setWeapon(Weapon weapon);
 
+    PopUpFeed getPopUpFeed();
+    void setPopUpFeed(PopUpFeed feed);
+
 
 
 

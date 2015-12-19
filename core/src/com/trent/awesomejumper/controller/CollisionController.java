@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.trent.awesomejumper.engine.entity.Entity;
+import com.trent.awesomejumper.engine.modelcomponents.PopUpFeed;
 import com.trent.awesomejumper.models.Level;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.WorldContainer;
@@ -189,62 +190,63 @@ public class CollisionController {
 
             if(checkCollision(b, playerCollisionBox)) {
                 //TODO: Edit damage font to look thicker and add a white border (optional)
-                    int dmg = (int) (Math.random() * 17) + 13;
-                    if (entity.getHealth().takeDamage(dmg))
-                        entity.getGraphics().addMessageToCategory("HEALTH", new Message("-" + Integer.toString(dmg), entity.time, 2.00f, Color.RED));
+                    int dmg = (int) (Math.random() * 170) + 130;
+                    if(entity.hasHealth) {
+                        if (entity.getHealth().takeDamage(dmg)) {
+                            if(dmg > 250)
+                            entity.getPopUpFeed().addMessageToCategory(PopUpFeed.PopUpCategories.CRIT, new Message("-" + Integer.toString(dmg), entity.time, 2.00f));
+                            else
+                            entity.getPopUpFeed().addMessageToCategory(PopUpFeed.PopUpCategories.DMG, new Message("-" + Integer.toString(dmg), entity.time, 2.00f));
+
+                            other.getPopUpFeed().addMessageToCategory(PopUpFeed.PopUpCategories.HEAL, new Message("+" + Integer.toString(dmg), other.time, 4.00f));
+                            other.getPopUpFeed().addMessageToCategory(PopUpFeed.PopUpCategories.LVL_UP, new Message("LEVEL UP! " + Integer.toString(dmg), other.time, 2.00f));
+                        }
+                    }
 
 
                 /**
-                 * Relative velocity between both participants of the ongoing collision (scaled back to original
-                 * value)
-                 * The masses are added up and used as a scale for the impulse that is added to resolve
-                 * the collision.
-                 */
-
-                /**
-                 * IDEA: look at the resolution vector. If f.e. y component is not 0, the collision normal
-                 * seems to be x,y : (0,1). Maybe flipping the sign of the velocity of the entities will do the trick.
+                 * deltaVelocity - Relative velocity between both participants of the collision.
+                 * collisionNormal - normal to the collision plane
+                 * vNorm - relative velocity projected onto the collisionNormal
+                 * vTang - sub vector of normal and relative velocity = tangential component
                  */
                 Vector2 deltaVelocity = subVec(other.getVelocity(),entity.getVelocity().cpy().scl(1/delta));
                 Vector2 collisionNormal = resolutionVector.cpy().nor();
-                Gdx.app.log("","----------------------------------------------");
-                Gdx.app.log("REFLECTION ENTER/VEL", collisionNormal.toString() + deltaVelocity.toString());
-
                 Vector2 vNorm = collisionNormal.cpy().scl(dPro(deltaVelocity, collisionNormal));
                 Vector2 vTang = subVec(vNorm, deltaVelocity).scl(-FRICTIONAL_COEFFICIENT);
+                /**
+                 * Calculate impulses to be added to each entity. Adding tangential and normal
+                 * components to form one impulse vector. The magnitude in direction of the collision
+                 * normal is negatively! scaled with the elasticity of the entity to push both entities
+                 * away from each other.
+                 */
+                Vector2 impulseEntity =vTang.cpy().add(vNorm.cpy().scl(-(1 - entity.getBody().getElasticity())));
+                Vector2 impulseOther = vTang.cpy().add(vNorm.cpy().scl(-(1 - other.getBody().getElasticity())));
 
-                Vector2 newVelocityEntity =vTang.cpy().add(vNorm.cpy().scl(-(1 - entity.getBody().getElasticity())));
-                Vector2 newVelocityOther = vTang.cpy().add(vNorm.cpy().scl(-(1 - other.getBody().getElasticity())));
-
-
-                Gdx.app.log("NEWVELENTITY", newVelocityEntity.toString());
-                Gdx.app.log("NEWVELOTHER", newVelocityOther.toString());
-                Gdx.app.log("", "----------------------------------------------");
                 float entityMass = entity.getBody().getMass();
                 float otherMass = other.getBody().getMass();
                 float massSum = entityMass + otherMass;
 
                 /**
-                 * If the current entity did not collide with the world earlier, it can receive an
-                 * impulse.
+                 * If the current entity did not collide with the world earlier, it can receive the
+                 * impulse calculated above.
                  */
                 if (!entity.getBody().isCollidedWithWorld())  {
-                    entity.getBody().addImpulse(newVelocityEntity.cpy().scl(otherMass / massSum));
+                    entity.getBody().addImpulse(impulseEntity.cpy().scl(otherMass / massSum));
                 }
 
                 /**
                  * If the opponent entity (other) did not collide with the world earlier, it can
-                 * receive an impulse. Also, the opposing entity is pushed backwards.
+                 * receive the impulse. Also, the opposing entity is pushed backwards.
                  */
 
                 if (!other.getBody().isCollidedWithWorld()) {
                         other.getPosition().add(resolutionVector.cpy().scl(-1f));
-                        other.getBody().addImpulse(newVelocityOther.cpy().scl(-entityMass / massSum));
+                        other.getBody().addImpulse(impulseOther.cpy().scl(-entityMass / massSum));
                 }
                 /**
                  * If the opponent did collide with the world, we need to stop our movement.
                  * The resolution vector is added to our position so the collision can be resolved.
-                 * The opponent still gets the impulse to avoid entities being "glued" to the wall.
                  */
                 else {
                         if(resolutionVector.x != 0f)
@@ -254,7 +256,6 @@ public class CollisionController {
                         if(other.getBody().isCollidedWithWorld())
                         entity.getBody().setCollidedWithWorld(true);
                         entity.getPosition().add(resolutionVector);
-                        //other.getBody().addImpulse(deltaVelocity.cpy().scl(-entityMass / massSum));
                     }
 
                 entity.getVelocity().scl(1/delta);
@@ -265,7 +266,7 @@ public class CollisionController {
         }
 
         /**
-         * If we made it this far, no collision has occurred and the player's velocity can remain
+         * If we made it this far, no collision has occurred and the entities velocity can remain
          * as is and is scaled back to its normal value.
          */
         entity.getVelocity().scl(1 / delta);
