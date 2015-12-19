@@ -1,4 +1,4 @@
-package com.trent.awesomejumper.utils;
+package com.trent.awesomejumper.engine.modelcomponents.popups;
 
 
 import com.badlogic.gdx.graphics.Color;

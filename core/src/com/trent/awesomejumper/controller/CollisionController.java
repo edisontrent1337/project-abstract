@@ -2,18 +2,17 @@ package com.trent.awesomejumper.controller;
 
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.trent.awesomejumper.engine.entity.Entity;
-import com.trent.awesomejumper.engine.modelcomponents.PopUpFeed;
+import com.trent.awesomejumper.engine.modelcomponents.popups.PopUpFeed;
 import com.trent.awesomejumper.models.Level;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.WorldContainer;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
 import com.trent.awesomejumper.utils.Interval;
 import com.trent.awesomejumper.tiles.Tile;
-import com.trent.awesomejumper.utils.Message;
+import com.trent.awesomejumper.engine.modelcomponents.popups.Message;
 
 
 
@@ -194,7 +193,7 @@ public class CollisionController {
                     if(entity.hasHealth) {
                         if (entity.getHealth().takeDamage(dmg)) {
                             if(dmg > 250)
-                            entity.getPopUpFeed().addMessageToCategory(PopUpFeed.PopUpCategories.CRIT, new Message("-" + Integer.toString(dmg), entity.time, 2.00f));
+                            entity.getPopUpFeed().addMessageToCategory(PopUpFeed.PopUpCategories.CRT, new Message("-" + Integer.toString(dmg), entity.time, 2.00f));
                             else
                             entity.getPopUpFeed().addMessageToCategory(PopUpFeed.PopUpCategories.DMG, new Message("-" + Integer.toString(dmg), entity.time, 2.00f));
 

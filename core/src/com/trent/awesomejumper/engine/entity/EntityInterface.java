@@ -27,8 +27,8 @@ public interface EntityInterface {
     Weapon getWeapon();
     void setWeapon(Weapon weapon);
 
-    PopUpFeed getPopUpFeed();
-    void setPopUpFeed(PopUpFeed feed);
+    com.trent.awesomejumper.engine.modelcomponents.popups.PopUpFeed getPopUpFeed();
+    void setPopUpFeed(com.trent.awesomejumper.engine.modelcomponents.popups.PopUpFeed feed);
 
 
 

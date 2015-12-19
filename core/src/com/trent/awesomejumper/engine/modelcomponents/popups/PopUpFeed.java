@@ -1,11 +1,11 @@
-package com.trent.awesomejumper.engine.modelcomponents;
+package com.trent.awesomejumper.engine.modelcomponents.popups;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.trent.awesomejumper.controller.RenderingEngine;
 import com.trent.awesomejumper.engine.entity.Entity;
-import com.trent.awesomejumper.utils.Message;
+import com.trent.awesomejumper.engine.modelcomponents.ModelComponent;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,7 +26,7 @@ public class PopUpFeed extends ModelComponent {
 
     private static Color HEAL = new Color(0.6784f,1f,0.1843f,1);
     private static Color DMG = new Color(0.9098f,0.0745f,0.1137f,1);
-    private static Color CRIT = new Color(0.9098f,0.2666f,0.0745f, 1f);
+    private static Color CRT = new Color(0.9098f,0.2666f,0.0745f, 1f);
     private static Color LVL_UP = new Color(0.9098f,0.9098f,0.0745f,1);
     private static Color MISC = Color.WHITE;
 
@@ -34,7 +34,7 @@ public class PopUpFeed extends ModelComponent {
     public enum PopUpCategories {
         DMG,     // Damage
         HEAL,       // Heal
-        CRIT,   // Critical Hit
+        CRT,   // Critical Hit
         LVL_UP,     // Level Up
         MISC        // Miscellaneous
 
@@ -48,7 +48,7 @@ public class PopUpFeed extends ModelComponent {
         this.messages = new HashMap<>();
         putMessageCategory(PopUpCategories.DMG);
         putMessageCategory(PopUpCategories.HEAL);
-        putMessageCategory(PopUpCategories.CRIT);
+        putMessageCategory(PopUpCategories.CRT);
         putMessageCategory(PopUpCategories.LVL_UP);
         putMessageCategory(PopUpCategories.MISC);
     }
@@ -92,10 +92,10 @@ public class PopUpFeed extends ModelComponent {
                     case HEAL:
                         font.setColor(HEAL.r, HEAL.g, HEAL.b, 1-progress);
                         break;
-                    case CRIT:
-                        font.setColor(CRIT.r + (float)Math.cos(entity.time*5*progress),
-                                      CRIT.g + (float)Math.sin(entity.time*5*progress),
-                                      CRIT.b + (float)Math.tan(entity.time*5*progress),
+                    case CRT:
+                        font.setColor(CRT.r + (float)Math.cos(entity.time*5*progress)*0.75f,
+                                      CRT.g + (float)Math.sin(entity.time*5*progress)*0.75f,
+                                      CRT.b + (float)Math.tan(entity.time*5*progress)*0.75f,
                                       1-progress);
 
                         break;
