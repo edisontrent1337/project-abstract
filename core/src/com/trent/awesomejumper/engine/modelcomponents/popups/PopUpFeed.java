@@ -92,6 +92,7 @@ public class PopUpFeed extends ModelComponent {
                     case HEAL:
                         font.setColor(HEAL.r, HEAL.g, HEAL.b, 1-progress);
                         break;
+                    // TODO: introduce constants
                     case CRT:
                         font.setColor(CRT.r + (float)Math.cos(entity.time*5*progress)*0.75f,
                                       CRT.g + (float)Math.sin(entity.time*5*progress)*0.75f,

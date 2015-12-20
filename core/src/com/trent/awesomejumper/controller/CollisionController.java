@@ -188,7 +188,6 @@ public class CollisionController {
             CollisionBox b = other.getBounds();
 
             if(checkCollision(b, playerCollisionBox)) {
-                //TODO: Edit damage font to look thicker and add a white border (optional)
                     int dmg = (int) (Math.random() * 170) + 130;
                     if(entity.hasHealth) {
                         if (entity.getHealth().takeDamage(dmg)) {
