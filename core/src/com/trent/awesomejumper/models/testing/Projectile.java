@@ -27,7 +27,7 @@ public class Projectile extends Entity {
     private final float SPRITE_WIDTH = 0.5f;
     private final float SPRITE_HEIGHT = 0.5f;
     private final float FRAME_DURATION = 0.066f;
-    private final float MAX_SPEED = 24f;
+    private final float MAX_SPEED = 36f;
 
     //TESTING
     private final int baseDamage = 90;

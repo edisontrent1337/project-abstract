@@ -373,7 +373,6 @@ public class CollisionController {
                         resolutionVector.y = -resolutionVector.y;
                     }
 
-
                 }
 
             }
@@ -477,18 +476,21 @@ public class CollisionController {
             // Iterate over all collision boxes of the entity skeleton
 
             Entity entity = (Entity)object;
-            for (CollisionBox b : entity.getBodyHitboxes()) {
+            for (CollisionBox entityHitbox : entity.getBodyHitboxes()) {
+                Gdx.app.log("NEW HITBOX", "BEGIN");
                 for (int i = 0; i < CONTINUOS_ITERATIONS; i++) {
                     CollisionBox next = new CollisionBox(projectile.getPosition(), projectile.getWidth(), projectile.getHeight());
                     Vector2 nextPosition = new Vector2(
                             next.getPosition().x + ((i * projectile.getVelocity().x) / CONTINUOS_ITERATIONS),
                             next.getPosition().y + ((i * projectile.getVelocity().y) / CONTINUOS_ITERATIONS)
                     );
+                    Gdx.app.log("ITERATION ", Integer.toString(i));
                     next.setPosition(nextPosition);
-                    if (checkCollision(next, b)) {
+                    if (checkCollision(next, entityHitbox)) {
                         projectile.setVelocity(0f, 0f);
-                        entity.getHealth().takeDamage(projectile.dealDamage(b));
+                        entity.getHealth().takeDamage(projectile.dealDamage(entityHitbox));
                         projectile.destroy();
+                        Gdx.app.log("COLLISION HAPPENED AT ", Integer.toString(i));
                         return true;
                     }
                 }

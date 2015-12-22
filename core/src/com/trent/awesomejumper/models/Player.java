@@ -90,11 +90,11 @@ public class Player extends Entity {
          * Add all body parts to the skeleton.
          */
 
+        body.add(head);
         body.add(rightArm);
         body.add(leftArm);
         body.add(rightFoot);
         body.add(leftFoot);
-        body.add(head);
 
         //TODO: After the skeleton is completed, the bounding box has to be calculated.
 
