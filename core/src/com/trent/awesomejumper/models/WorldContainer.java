@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.TreeSet;
 
 /**
@@ -52,37 +53,11 @@ public class WorldContainer {
         entitiesToBeDrawn = new ArrayList<>();
         entities.add(player);
         entities.add(chest);
-        chest.getBody().setAcceleration(1,1);
         /*for(int x = 1; x < 12; x++) {
             for(int y = 5; y < 12; y++) {
                 entities.add(new Chest(new Vector2((float)x/1.2f,(float)y/1.2f)));
             }
         }*/
-       /* entities.add(new Chest(new Vector2(4,7)));
-        entities.add(new Chest(new Vector2(4,8)));
-        entities.add(new Chest(new Vector2(4,9)));
-        entities.add(new Chest(new Vector2(4,10)));
-        entities.add(new Chest(new Vector2(5,7)));
-        entities.add(new Chest(new Vector2(5,8)));
-        entities.add(new Chest(new Vector2(5,9)));
-        entities.add(new Chest(new Vector2(5,10)));
-        entities.add(new Chest(new Vector2(6,7)));
-        entities.add(new Chest(new Vector2(6,8)));
-        entities.add(new Chest(new Vector2(6,9)));
-        entities.add(new Chest(new Vector2(6,10)));
-        entities.add(new Chest(new Vector2(7,7)));
-        entities.add(new Chest(new Vector2(7,8)));
-        entities.add(new Chest(new Vector2(7,9)));
-        entities.add(new Chest(new Vector2(7,10)));
-        entities.add(new Chest(new Vector2(8,7)));
-        entities.add(new Chest(new Vector2(8,8)));
-        entities.add(new Chest(new Vector2(8,9)));
-        entities.add(new Chest(new Vector2(8,10)));
-        entities.add(new Chest(new Vector2(9,7)));
-        entities.add(new Chest(new Vector2(9,8)));
-        entities.add(new Chest(new Vector2(9,9)));
-        entities.add(new Chest(new Vector2(9,10)));*/
-
     }
 
 
@@ -202,6 +177,75 @@ public class WorldContainer {
                         collisionTiles.add(level.getTile(x, y));
                     }
                 }
+            }
+        }
+
+    }
+
+    /**
+     * Updates the list of entities close to the specified entity e.
+     * The neighbourhood list is used by the collision controller to solve entity/entity collision
+     * @param e entity
+     * @return  modified HashSet with neighbours
+     */
+
+    public HashSet<Entity> updatedEntityNeighbourHood(Entity e) {
+
+        HashSet<Entity> entityNeighbourhood = e.getBody().getEntityNeighbourHood();
+        int rangeStartX = (int) e.getPosition().x - 2;
+        int rangeEndX = (int) e.getPosition().x + 2;
+        int rangeStartY = (int) e.getPosition().y - 2;
+        int rangeEndY = (int) e.getPosition().y + 2;
+
+        if(rangeStartX < 0)
+            rangeStartX = 0;
+        if(rangeStartY < 0)
+            rangeEndX = 0;
+        if(rangeEndX > level.getLevelWidth())
+            rangeEndX = level.getLevelWidth();
+        if(rangeEndY > level.getLevelHeight())
+            rangeEndY = level.getLevelHeight();
+
+        for(Entity other: entities) {
+            if(other.equals(e))
+                continue;
+            if(other.getPosition().x >= rangeStartX &&
+                    other.getPosition().x < rangeEndX &&
+                    other.getPosition().y >= rangeStartY &&
+                    other.getPosition().y < rangeEndY) {
+                if(!entityNeighbourhood.contains(other))
+                    entityNeighbourhood.add(other);
+            }
+            else {
+                entityNeighbourhood.remove(other);
+                }
+
+
+        }
+        return entityNeighbourhood;
+    }
+
+
+
+    public void garbageRemoval() {
+
+        for(Iterator<Entity> it = entities.iterator(); it.hasNext();) {
+            if(!it.next().isAlive()) {
+                it.remove();
+            }
+        }
+
+        for(Iterator<Entity> it = entitiesToBeDrawn.iterator(); it.hasNext();) {
+            if(!it.next().isAlive()) {
+                it.remove();
+            }
+        }
+
+        for(Entity e: entities) {
+            for(Iterator<Entity> it = e.getBody().getEntityNeighbourHood().iterator(); it.hasNext();) {
+                if(!it.next().isAlive())
+                    it.remove();
+
             }
         }
 

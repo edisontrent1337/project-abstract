@@ -154,8 +154,7 @@ public class RenderingEngine {
         /**
          * Iterate over all entities and manipulate their graphics component.
          */
-        //TODO: change way animations are created and stored in graphics component. (use features of TextureAtlas!)
-        // Animation animation = new Animation(0.45f,allTextures.createSprites("dds"));
+
         for(Entity e : worldContainer.getEntities()) {
             initGraphics(e);
         }
@@ -289,6 +288,7 @@ public class RenderingEngine {
     public void drawPlayer() {
         for(Entity e : worldContainer.getEntitiesToBeRendered(CAMERA_WIDTH, CAMERA_HEIGHT)) {
             e.render(sb);
+            if(e.hasPopUps)
             e.getPopUpFeed().render(sb, messageFont);
         }
 
@@ -443,10 +443,10 @@ public class RenderingEngine {
         debugRenderer.setColor(0, 1, 0, 1);
         // PLAYER HITBOXES
 
-        debugRenderer.rect(player.getPosition().x + player.getVelocity().cpy().scl(player.getPlayerDelta()).x,
+       /* debugRenderer.rect(player.getPosition().x + player.getVelocity().cpy().scl(player.getPlayerDelta()).x,
                            player.getPosition().y + player.getVelocity().cpy().scl(player.getPlayerDelta()).y,
                            player.getBodyHitboxes().get(0).getWidth(),
-                           player.getBodyHitboxes().get(0).getHeight());
+                           player.getBodyHitboxes().get(0).getHeight());*/
 
 
 

@@ -20,8 +20,6 @@ public class Graphics extends ModelComponent{
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
     public final int ANIMATIONS = 2; // supports 2 different animations at the moment
-    public final int FRAMES = 0;     // 5 frames per animation
-
     private final float FRAME_DURATION; // frame duration for animations
     private String textureRegName;      // prefix of the name of textures
     private TextureRegion idleFrameR, idleFrameL, currentFrame;
@@ -31,7 +29,7 @@ public class Graphics extends ModelComponent{
     private Array<Animation> animations;
 
 
-    private float width, height;
+    private float width, height, alpha;
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
@@ -53,7 +51,7 @@ public class Graphics extends ModelComponent{
         this.height = height;
 
         FRAME_DURATION = frameDuration;
-
+        alpha = 1f;
         // Enable graphics component
         entity.hasGraphics = true;
     }
@@ -100,6 +98,7 @@ public class Graphics extends ModelComponent{
                 break;
         }
 
+        spriteBatch.setColor(spriteBatch.getColor().r, spriteBatch.getColor().g, spriteBatch.getColor().b, alpha);
         spriteBatch.draw(currentFrame, entity.getPosition().x, entity.getPosition().y, width, height);
 
     }
@@ -134,6 +133,18 @@ public class Graphics extends ModelComponent{
 
     public Array<Animation> getAnimations() {
         return animations;
+    }
+
+    public void setTextureRegName(String textureRegName) {
+        this.textureRegName = textureRegName;
+    }
+
+    public void setAlpha(float alpha) {
+        this.alpha = alpha;
+    }
+
+    public float getAlpha() {
+        return alpha;
     }
 
 

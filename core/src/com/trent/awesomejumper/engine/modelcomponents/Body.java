@@ -7,12 +7,14 @@ import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 /**
  * Created by Sinthu on 09.12.2015.
  * Body component implementation. Holds information about position, acceleration, velocity and
  * dimensions of entities. Also holds the hitbox skeleton used to calculate damage.
+ * Also holds information about the neighbourhood of the entity that holds this very body.
  */
 public class Body extends ModelComponent{
 
@@ -37,6 +39,7 @@ public class Body extends ModelComponent{
     private Vector2 position;
     private Vector2 velocity;
     private Vector2 acceleration;
+    private Vector2 center;
 
     private CollisionBox bounds;
 
@@ -44,35 +47,38 @@ public class Body extends ModelComponent{
 
     private float mass;
     private float friction;
-
-
-
     private float elasticity;
+    private float maxVelocity;
+
+
     // Hitboxes
     // TODO: Either address this array with an enum to get Head, Arm, Leg etc... or
     // TODO: use a HashMap where the key represents the kind of hitbox.
     // TODO: Replace current state of bounds by calculating a minimal bounding box that contains the location of all hitboxes in the
     // skeleton. The bounds are used for World / Entity collision, the skeleton for entity/bullet
     // collision.
-    Array<CollisionBox> hitboxSkeleton = new Array<>();
-
-    LinkedList<Vector2> impulses;
-
+    private Array<CollisionBox> hitboxSkeleton = new Array<>();
+    private LinkedList<Vector2> impulses;
+    private HashSet<Entity> entityNeighbourHood = new HashSet<>();
     HashMap<String, CollisionBox> skeleton = new HashMap<>();
 
 
+
+    /**
+     * Constructor for entities which lack collision capabilities. No mass, friction or elasticity
+     * is needed here.
+     */
     public Body(Entity entity, float width, float height) {
-        this(entity,width,height,0f,0f);
+        this(entity,width,height,0f,0f,0f,0f);
     }
 
-    public Body(Entity entity, float width, float height, float mass, float friction) {
+    public Body(Entity entity, float width, float height, float mass, float friction, float elasticity, float maxVelocity) {
         /**
          * Initialises all members with default values.
          * The constructor of the entity or the specific subclass then applies a more useful
          * start configuration to all values.
          */
         this.entity = entity;
-        entity.hasBody = true;
         this.position = new Vector2(0f,0f);
         this.velocity = new Vector2(0f,0f);
         this.acceleration = new Vector2(0f,0f);
@@ -80,12 +86,17 @@ public class Body extends ModelComponent{
         this.impulses = new LinkedList<>();
         this.mass = mass;
         this.friction = friction;
+        this.elasticity = elasticity;
+        this.maxVelocity = maxVelocity;
+        this.center = new Vector2(position.x + width / 2f, position.y + height / 2f);
         hitboxSkeleton.clear();
+        entity.hasBody = true;
     }
 
 
     public void update(float delta) {
         position.add(velocity.cpy().scl(delta));
+        center.set(position.x + getWidth(), position.y + getHeight());
         // update outer general bounds
         bounds.update(position);
         // update skeleton
@@ -124,6 +135,9 @@ public class Body extends ModelComponent{
     public Vector2 getVelocity() {
         return velocity;
     }
+    public float getMaxVelocity() {
+        return maxVelocity;
+    }
 
     public void setVelocity(Vector2 velocity) {
         this.velocity = velocity;
@@ -138,18 +152,13 @@ public class Body extends ModelComponent{
         velocity.y = y;
     }
 
+    public void setMaxVelocity(float maxVelocity) {
+        this.maxVelocity = maxVelocity;
+    }
+
     // Acceleration
     public Vector2 getAcceleration() {
         return acceleration;
-    }
-    public float getAccelerationX() {
-        return acceleration.x;
-    }
-    public float getAccelerationY() {
-        return acceleration.y;
-    }
-    public void setAcceleration(Vector2 acceleration) {
-        this.acceleration = acceleration;
     }
     public void setAcceleration(float x, float y) {
         acceleration.x = x;
@@ -202,6 +211,7 @@ public class Body extends ModelComponent{
         collidedWithWorld = bool;
     }
 
+    // MASS, FRICTION, ELASTICITY
     public float getMass() {
         return mass;
     }
@@ -225,6 +235,11 @@ public class Body extends ModelComponent{
         this.elasticity = elasticity;
     }
 
+    // ENTITY NEIGHBOURHOOD
+
+    public HashSet<Entity> getEntityNeighbourHood() {
+        return entityNeighbourHood;
+    }
     // ---------------------------------------------------------------------------------------------
     // METHODS AND FUNCTIONS
     // ---------------------------------------------------------------------------------------------
@@ -236,11 +251,12 @@ public class Body extends ModelComponent{
         hitboxSkeleton.add(box);
     }
 
+    /**
+     * Adds ab impulse to the list of impulses.
+     * @param i
+     */
     public void addImpulse(Vector2 i) {
         impulses.add(i);
-    }
-    public void removeImpule() {
-        impulses.removeFirst();
     }
 
 

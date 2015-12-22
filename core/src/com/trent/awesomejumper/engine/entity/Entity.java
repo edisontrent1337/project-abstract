@@ -24,7 +24,9 @@ public class Entity implements EntityInterface {
     public enum ComponentIndex {
         BODY(0),
         GRAPHICS(1),
-        HEALTH(2);
+        HEALTH(2),
+        POP_UPS(3),
+        ;
 
         private int value;
 
@@ -33,8 +35,10 @@ public class Entity implements EntityInterface {
         }
     }
 
+
     public static int entityCount = 0;
-    public boolean hasBody = false, hasGraphics = false, hasHealth = false, hasWeapon = false;
+    public boolean hasBody = false, hasGraphics = false, hasHealth = false, hasWeapon = false,
+    hasPopUps = false;
     protected Body body;
     protected Graphics graphics;
     protected Health health;
@@ -43,6 +47,8 @@ public class Entity implements EntityInterface {
 
     // TODO: Idea on how to eliminate all getters for components.
     protected HashMap<ComponentIndex,ModelComponent> modelComponents;
+
+    private Array<Entity> collisionTargets;
 
 
     public enum State {
@@ -64,10 +70,10 @@ public class Entity implements EntityInterface {
 
     }
 
-    public float hitPoints;
     public State state;
 
     public boolean facingL = false;
+    private boolean alive = true;
 
     public float time;
 
@@ -152,6 +158,9 @@ public class Entity implements EntityInterface {
     public Vector2 getVelocity() {
         return body.getVelocity();
     }
+    public float getMaxVelocity() {
+        return body.getMaxVelocity();
+    }
 
     public void setVelocity(float vx, float vy) {
         body.setVelocity(vx, vy);
@@ -186,7 +195,8 @@ public class Entity implements EntityInterface {
 
     @Override
     public void destroy() {
-
+        alive = false;
+        entityCount--;
     }
 
     @Override
@@ -237,6 +247,11 @@ public class Entity implements EntityInterface {
     @Override
     public void setPopUpFeed(PopUpFeed popUpFeed) {
         this.popUpFeed = popUpFeed;
+    }
+
+    @Override
+    public boolean isAlive() {
+        return alive;
     }
 
 

@@ -33,7 +33,7 @@ public class WorldController {
     private CollisionController collisionController;
 
     // MAXIMUM VELOCITY  & DAMPING DETERMINED BY TILE
-    public float MAX_VELOCITY, DAMPING;
+    public float MAX_VELOCITY;
 
     //KEY MAP
     static Map<Keys, Boolean> keyMap = new HashMap<>();
@@ -101,7 +101,6 @@ public class WorldController {
     // ---------------------------------------------------------------------------------------------
 
     public void update(float delta) {
-        DAMPING = 0.95f;
         MAX_VELOCITY = 5f;
         processUserInput();
 
@@ -114,8 +113,12 @@ public class WorldController {
         //TODO: Cycle: detect collisions, when collisions occur, send signal, and after that update all entities.
 
         for(Entity e: worldContainer.getEntities()) {
-            collisionController.collisionDetection(e, delta);
+            if(!e.isAlive())
+                continue;
+            collisionController.collisionDetection(e,delta);
         }
+
+        worldContainer.garbageRemoval();
 
         for(Entity e: worldContainer.getEntities()) {
             LinkedList<Vector2> impulseList = e.getBody().getImpulses();
@@ -238,18 +241,18 @@ public class WorldController {
 
             }
 
-            if (entity.getVelocity().x > MAX_VELOCITY) {
-                entity.setVelocityX(MAX_VELOCITY);
+            if (entity.getVelocity().x > entity.getMaxVelocity()) {
+                entity.setVelocityX(entity.getMaxVelocity());
             }
-            if (entity.getVelocity().x < -MAX_VELOCITY) {
-                entity.setVelocityX(-MAX_VELOCITY);
+            if (entity.getVelocity().x < -entity.getMaxVelocity()) {
+                entity.setVelocityX(-entity.getMaxVelocity());
             }
-            if (entity.getVelocity().y > MAX_VELOCITY) {
-                entity.setVelocityY(MAX_VELOCITY);
+            if (entity.getVelocity().y > entity.getMaxVelocity()) {
+                entity.setVelocityY(entity.getMaxVelocity());
             }
 
-            if (entity.getVelocity().y < -MAX_VELOCITY) {
-                entity.setVelocityY(-MAX_VELOCITY);
+            if (entity.getVelocity().y < -entity.getMaxVelocity()) {
+                entity.setVelocityY(-entity.getMaxVelocity());
             }
 
             // IF PLAYER FALLS OUT OF BOUNDS, HE IS PUT BACK TO THE START

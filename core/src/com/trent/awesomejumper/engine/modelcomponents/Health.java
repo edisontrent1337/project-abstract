@@ -2,6 +2,8 @@ package com.trent.awesomejumper.engine.modelcomponents;
 
 import com.badlogic.gdx.Gdx;
 import com.trent.awesomejumper.engine.entity.Entity;
+import com.trent.awesomejumper.engine.modelcomponents.popups.Message;
+import com.trent.awesomejumper.engine.modelcomponents.popups.PopUpFeed;
 
 /**
  * Created by Sinthu on 09.12.2015.
@@ -19,9 +21,6 @@ public class Health extends ModelComponent {
     private float tookDamage = 0f;
 
 
-    // TODO: dicussion worthy.
-    private Entity.State state;
-
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
 
@@ -34,7 +33,7 @@ public class Health extends ModelComponent {
         this.entity = entity;
         this.MAX_HP = MAX_HP;
         this.hp = MAX_HP;
-        this.INVINCIBILITY_TIME = 1.00f;
+        this.INVINCIBILITY_TIME = 0.33f;
 
         // enable health for entity
         entity.hasHealth = true;
@@ -50,12 +49,12 @@ public class Health extends ModelComponent {
     }
 
 
-    public boolean takeDamage(float dmg) {
+    public boolean takeDamage(int dmg) {
 
         if(entity.time - tookDamage < INVINCIBILITY_TIME)
             return false;
         hp -= dmg;
-
+        entity.getPopUpFeed().addMessageToCategory(PopUpFeed.PopUpCategories.DMG, new Message("-" + Integer.toString(dmg), entity.time, 2.00f));
         if(hp <= 0) {
             hp = 0;
             entity.setState(Entity.State.DEAD);

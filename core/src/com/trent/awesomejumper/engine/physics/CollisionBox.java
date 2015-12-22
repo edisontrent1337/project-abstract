@@ -6,10 +6,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
-import sun.security.provider.certpath.Vertex;
-
 import static com.trent.awesomejumper.utils.Utilities.getNormal;
-import static com.trent.awesomejumper.utils.Utilities.subVec;
+import static com.trent.awesomejumper.utils.Utilities.sub;
 
     /**
      * min = lower left corner
@@ -64,6 +62,9 @@ public class CollisionBox {
     private final float VHALF = VSIZE / 2;      // half vertex size
     private final float NORMAL_LENGTH = 0.125f;  // length of a normal
 
+    // TESTING
+    private float damageCoefficient;
+
     // CONSTRUCTORS
     // ---------------------------------------------------------------------------------------------
 
@@ -96,9 +97,6 @@ public class CollisionBox {
         vertices.add(max);
         vertices.add(new Vector2(max.x, min.y));
         vertexData.addAll(vertices);
-
-        // EDGES & NORMALS
-        // -----------------------------------------------------------------------------------------
 
         addEdgesAndNormals();
 
@@ -166,7 +164,7 @@ public class CollisionBox {
         this.edges = new Array<>();
         this.normals = new Array<>();
         for (int i = 0; i < vertices.size; i++) {
-            edges.add(subVec(vertices.get(i), vertices.get((i + 1) % vertices.size)));
+            edges.add(sub(vertices.get(i), vertices.get((i + 1) % vertices.size)));
             normals.add(getNormal(edges.get(i)));
         }
 
@@ -272,6 +270,10 @@ public class CollisionBox {
         offset.y = y;
     }
 
+    public void setOffset(Vector2 offset) {
+        this.offset = offset;
+    }
+
     public float getWidth() {
         return width;
     }
@@ -299,5 +301,11 @@ public class CollisionBox {
         return normals;
     }
 
+    public void setDamageCoefficient(float damageCoefficient) {
+        this.damageCoefficient = damageCoefficient;
+    }
+    public float getDamageCoefficient() {
+        return damageCoefficient;
+    }
 
 }

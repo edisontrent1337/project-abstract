@@ -57,7 +57,7 @@ public class Utilities {
      * @param v2 Vector 2
      *
     */
-    public static float dPro(Vector2 v1, Vector2 v2) {
+    public static float dot(Vector2 v1, Vector2 v2) {
         return v1.x * v2.x + v1.y * v2.y;
     }
 
@@ -69,7 +69,7 @@ public class Utilities {
      * @param y2 y component of vector 2
      *
      */
-    public static float dPro(float x1, float y1, float x2, float y2) {
+    public static float dot(float x1, float y1, float x2, float y2) {
         return x1 * x2 + y1 * y2;
     }
 
@@ -80,11 +80,11 @@ public class Utilities {
      * @param axis represents the axis on which the shape will be projected.
      */
     public static Interval getProjection(CollisionBox box, Vector2 axis) {
-        float min = dPro(box.getVertices().get(0), axis);
+        float min = dot(box.getVertices().get(0), axis);
         float max = min;
 
         for (int i = 1; i < box.getVertices().size; i++) {
-            float projection = dPro(box.getVertices().get(i), axis);
+            float projection = dot(box.getVertices().get(i), axis);
             /**
              *  If the calculated projection is bigger or smaller than the min/max,
              *  the new value will be applied.
@@ -129,7 +129,7 @@ public class Utilities {
 
     // DIFFERENTIAL VECTOR
     // ---------------------------------------------------------------------------------------------
-    public static Vector2 subVec(Vector2 start, Vector2 end) {
+    public static Vector2 sub(Vector2 start, Vector2 end) {
         return new Vector2(end.x - start.x, end.y - start.y);
     }
 
@@ -143,9 +143,9 @@ public class Utilities {
     }
 
 
-    public float getAngle(Vector2 v1, Vector2 v2) {
+    public float angle(Vector2 v1, Vector2 v2) {
 
-        return (float)Math.acos(dPro(v1,v2)/ (v1.len()*v2.len()));
+        return (float)Math.acos(dot(v1, v2)/ (v1.len()*v2.len()));
 
     }
 
