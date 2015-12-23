@@ -1,18 +1,15 @@
 package com.trent.awesomejumper.models;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.models.testing.Chest;
 import com.trent.awesomejumper.tiles.Tile;
+import static com.trent.awesomejumper.utils.Utilities.sub;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.TreeSet;
 
 /**
  * Created by Sinthu on 12.06.2015.
@@ -29,7 +26,6 @@ public class WorldContainer {
 
     private HashSet<Entity> entities;
 
-    private Array<Tile> tiles = new Array<>();
     private Player player;
     private Chest chest;
     private Level level;
@@ -41,11 +37,7 @@ public class WorldContainer {
     // ---------------------------------------------------------------------------------------------
 
     public WorldContainer() {
-        createWorld();
 
-    }
-
-    private void createWorld() {
         player = new Player(new Vector2(12.5f, 7f));
         chest = new Chest(new Vector2(5,5));
         level = new Level();
@@ -53,12 +45,9 @@ public class WorldContainer {
         entitiesToBeDrawn = new ArrayList<>();
         entities.add(player);
         entities.add(chest);
-        /*for(int x = 1; x < 12; x++) {
-            for(int y = 5; y < 12; y++) {
-                entities.add(new Chest(new Vector2((float)x/1.2f,(float)y/1.2f)));
-            }
-        }*/
+
     }
+
 
 
     // ---------------------------------------------------------------------------------------------
@@ -105,9 +94,34 @@ public class WorldContainer {
     }
 
     // ---------------------------------------------------------------------------------------------
+    // LIST OF TILES FOR COLLISION DETECTION
+    // ---------------------------------------------------------------------------------------------
+    /**
+     * Fills collisionTiles with all tile objects that are in the specified ranges.
+     * @param sx x starting point
+     * @param sy y starting point
+     * @param ex x endpoint
+     * @param ey y endpoint
+     */
+    public void getCollidableTiles(int sx, int sy, int ex, int ey) {
+        collisionTiles.clear();
+        for (int x = sx; x <= ex; x++) {
+            for (int y = sy; y <= ey; y++) {
+                // CHECK WHETHER TILE IS IN LEVEL BOUNDS
+                if (level.checkBounds(x, y)) {
+                    if(level.getTile(x,y) != null) {
+                        if(!level.getTile(x,y).isPassable())
+                        collisionTiles.add(level.getTile(x, y));
+                    }
+                }
+            }
+        }
+
+    }
+
+    // ---------------------------------------------------------------------------------------------
     // ORDERED LIST OF ENTITIES TO BE DRAWN
     // ---------------------------------------------------------------------------------------------
-
     /**
      * Returns only those entities visible to the players field of view to be rendered.
      * Orders the entities according to their y-position to render them properly on top of
@@ -164,27 +178,13 @@ public class WorldContainer {
 
 
 
-    // LIST OF TILES FOR COLLISION
-
-    public void createCollisionTiles(int sx, int sy, int ex, int ey) {
-        collisionTiles.clear();
-        for (int x = sx; x <= ex; x++) {
-            for (int y = sy; y <= ey; y++) {
-                // CHECK WHETHER TILE IS IN LEVEL BOUNDS
-                if (level.checkBounds(x, y)) {
-                    if(level.getTile(x,y) != null) {
-                        if(!level.getTile(x,y).isPassable())
-                        collisionTiles.add(level.getTile(x, y));
-                    }
-                }
-            }
-        }
-
-    }
-
+    // ---------------------------------------------------------------------------------------------
+    // ENTITY NEIGHBOURHOOD MANAGEMENT
+    // ---------------------------------------------------------------------------------------------
     /**
      * Updates the list of entities close to the specified entity e.
-     * The neighbourhood list is used by the collision controller to solve entity/entity collision
+     * The neighbourhood list describes the perimeter of radius 3 around the entity and is used by
+     * the collision controller to solve entity/entity collision.
      * @param e entity
      * @return  modified HashSet with neighbours
      */
@@ -192,27 +192,12 @@ public class WorldContainer {
     public HashSet<Entity> updatedEntityNeighbourHood(Entity e) {
 
         HashSet<Entity> entityNeighbourhood = e.getBody().getEntityNeighbourHood();
-        int rangeStartX = (int) e.getPosition().x - 2;
-        int rangeEndX = (int) e.getPosition().x + 2;
-        int rangeStartY = (int) e.getPosition().y - 2;
-        int rangeEndY = (int) e.getPosition().y + 2;
-
-        if(rangeStartX < 0)
-            rangeStartX = 0;
-        if(rangeStartY < 0)
-            rangeEndX = 0;
-        if(rangeEndX > level.getLevelWidth())
-            rangeEndX = level.getLevelWidth();
-        if(rangeEndY > level.getLevelHeight())
-            rangeEndY = level.getLevelHeight();
 
         for(Entity other: entities) {
             if(other.equals(e))
                 continue;
-            if(other.getPosition().x >= rangeStartX &&
-                    other.getPosition().x < rangeEndX &&
-                    other.getPosition().y >= rangeStartY &&
-                    other.getPosition().y < rangeEndY) {
+            float dst = sub(e.getPosition(), other.getPosition()).len2(); // distance between entities
+            if(dst <= 3 ) {
                 if(!entityNeighbourhood.contains(other))
                     entityNeighbourhood.add(other);
             }
@@ -222,11 +207,19 @@ public class WorldContainer {
 
 
         }
+        /*if(e.equals(player))
+            Gdx.app.log("MY NEIGHBOURHOOD IS ", Integer.toString(entityNeighbourhood.size()));*/
         return entityNeighbourhood;
     }
 
-
-
+    // ---------------------------------------------------------------------------------------------
+    // REMOVAL OF DEAD ENTITIES
+    // ---------------------------------------------------------------------------------------------
+    /**
+     * Removes all entities which have their alive flag set to false from all relevant collections.
+     * Modifies and cleans the global entity collection, the "toBeDrawn" subset and the
+     * neighbourhood of each entity.
+     */
     public void garbageRemoval() {
 
         for(Iterator<Entity> it = entities.iterator(); it.hasNext();) {

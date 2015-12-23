@@ -68,7 +68,6 @@ public class CollisionBox {
     // CONSTRUCTORS
     // ---------------------------------------------------------------------------------------------
 
-    // TODO: add a constructor with a generic data array. Damage information can then be stored
     // inside collision boxes.
     // TODO: Add a method which creates regular polygonal collision boxes. It could be useful ;)
     // TODO: Implement a collision interface and support <<collision circles>> :D

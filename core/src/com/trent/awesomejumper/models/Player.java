@@ -23,7 +23,7 @@ public class Player extends Entity {
     // TODO: Add JSON support to outsource this information
     private final float WIDTH = 0.5f;
     private final float HEIGHT = 0.625f;
-    private final float MASS = 100f;
+    private final float MASS = 10f;
     private final float FRICTION = 0.66f;
     private final float ELASTICITY = 0f;
     private final float SPRITE_WIDTH = 1f;

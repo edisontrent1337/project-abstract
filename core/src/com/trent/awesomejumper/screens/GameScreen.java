@@ -109,12 +109,15 @@ public class GameScreen implements Screen, InputProcessor{
         }
 
         if(keycode == Keys.U) {
-           // Entity e = new Chest(new Vector2(new Random().nextInt(5) + 5, new Random().nextInt(5) + 5));
+            Entity e = new Chest(new Vector2(new Random().nextInt(5) + 5, new Random().nextInt(5) + 5));
+            renderingEngine.initGraphics(e);
+            worldContainer.getEntities().add(e);
+        }
+        if(keycode == Keys.I) {
             Entity p = new Projectile(new Vector2(5,8));
-            //renderingEngine.initGraphics(e);
             renderingEngine.initGraphics(p);
-           // worldContainer.getEntities().add(e);
             worldContainer.getEntities().add(p);
+
         }
 
         return false;

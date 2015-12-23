@@ -21,19 +21,6 @@ public class Body extends ModelComponent{
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
 
-    public enum Elasticity {
-        NO_BOUNCE(0.0f),
-        HALF_BOUNCE(0.5f),
-        FULL_BOUNCE(1.0f);
-
-        private float e;
-
-        Elasticity(float e) {
-            this.e = e;
-        }
-
-
-    }
 
     // Movement
     private Vector2 position;
@@ -60,7 +47,6 @@ public class Body extends ModelComponent{
     private Array<CollisionBox> hitboxSkeleton = new Array<>();
     private LinkedList<Vector2> impulses;
     private HashSet<Entity> entityNeighbourHood = new HashSet<>();
-    HashMap<String, CollisionBox> skeleton = new HashMap<>();
 
 
 
