@@ -33,9 +33,6 @@ public class CollisionController {
     private int cdStartX, cdEndX;   // x axis
     private int cdStartY, cdEndY;   // y axis
 
-    private final int CONTINUOS_ITERATIONS = 15;
-
-
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
 
@@ -94,7 +91,7 @@ public class CollisionController {
 
             if(entity.getClass() == Projectile.class) {
                 if(projectileCollisionDetection((Projectile)entity, tile, entity.getVelocity()))
-                    continue;
+                    return;
             }
                 /**
                  * If a collision occurs between a solid world tile and the entity the corresponding entities
@@ -160,7 +157,7 @@ public class CollisionController {
 
             if(entity.getClass() == Projectile.class) {
                 if(projectileCollisionDetection((Projectile)entity, tile, entity.getVelocity()))
-                    continue;
+                   return;
             }
             /**
              * If a collision occurs between a solid world tile and the entity the corresponding entities
@@ -186,10 +183,6 @@ public class CollisionController {
 
                 }
         }
-
-
-
-
 
         // -----------------------------------------------------------------------------------------
         // ENTITY ENTITY COLLISION DETECTION
@@ -394,7 +387,6 @@ public class CollisionController {
             }
 
         }
-
 
 
         /**
