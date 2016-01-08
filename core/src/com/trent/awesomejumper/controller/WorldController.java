@@ -18,6 +18,7 @@ import static com.trent.awesomejumper.utils.PhysicalConstants.*;
 /**
  * Created by Sinthu on 12.06.2015.
  */
+// TODO: Outsource input handling to the separate controller "InputHandler"
 public class WorldController {
 
     enum Keys {
@@ -32,8 +33,6 @@ public class WorldController {
     private Level level;
     private CollisionController collisionController;
 
-    // MAXIMUM VELOCITY  & DAMPING DETERMINED BY TILE
-    public float MAX_VELOCITY, DAMPING;
 
     //KEY MAP
     static Map<Keys, Boolean> keyMap = new HashMap<>();
@@ -100,9 +99,18 @@ public class WorldController {
     // UPDATE FUNCTION: INPUT PROCESSING & COLLISION DETECTION
     // ---------------------------------------------------------------------------------------------
 
+    /**
+     * Updates all entities in the world in the following order:
+     * - process user input and apply resulting changes in velocity / firing a weapon
+     * - resolve collisions between only alive entities, kill for example collided projectiles
+     * - remove all dead entities from the game data (garbage collection)
+     * - apply impulses to all entities that are left alive
+     * - limit entity speed
+     * - finally update positional information of all entities
+     * @param delta time between frames
+     */
     public void update(float delta) {
-        DAMPING = 0.95f;
-        MAX_VELOCITY = 5f;
+
         processUserInput();
 
         for(Entity e: worldContainer.getEntities()) {
@@ -111,11 +119,13 @@ public class WorldController {
         }
 
 
-        //TODO: Cycle: detect collisions, when collisions occur, send signal, and after that update all entities.
-
         for(Entity e: worldContainer.getEntities()) {
-            collisionController.collisionDetection(e, delta);
+            if(!e.isAlive())
+                continue;
+            collisionController.collisionDetection(e,delta);
         }
+
+        worldContainer.garbageRemoval();
 
         for(Entity e: worldContainer.getEntities()) {
             LinkedList<Vector2> impulseList = e.getBody().getImpulses();
@@ -125,7 +135,8 @@ public class WorldController {
             }
 
         }
-        manageEntitySpeed();
+
+        manageEntitySpeed(delta);
 
         for(Entity e : worldContainer.getEntities()) {
             e.update(delta);
@@ -219,7 +230,7 @@ public class WorldController {
     }
 
 
-    private void manageEntitySpeed() {
+    private void manageEntitySpeed(float delta) {
         for (Entity entity : worldContainer.getEntities()) {
             if (entity.getAcceleration().x == 0) {
                 entity.getVelocity().x *= entity.getBody().getFriction();
@@ -238,24 +249,24 @@ public class WorldController {
 
             }
 
-            if (entity.getVelocity().x > MAX_VELOCITY) {
-                entity.setVelocityX(MAX_VELOCITY);
+            if (entity.getVelocity().x > entity.getMaxVelocity()) {
+                entity.setVelocityX(entity.getMaxVelocity());
             }
-            if (entity.getVelocity().x < -MAX_VELOCITY) {
-                entity.setVelocityX(-MAX_VELOCITY);
+            if (entity.getVelocity().x < -entity.getMaxVelocity()) {
+                entity.setVelocityX(-entity.getMaxVelocity());
             }
-            if (entity.getVelocity().y > MAX_VELOCITY) {
-                entity.setVelocityY(MAX_VELOCITY);
+            if (entity.getVelocity().y > entity.getMaxVelocity()) {
+                entity.setVelocityY(entity.getMaxVelocity());
             }
 
-            if (entity.getVelocity().y < -MAX_VELOCITY) {
-                entity.setVelocityY(-MAX_VELOCITY);
+            if (entity.getVelocity().y < -entity.getMaxVelocity()) {
+                entity.setVelocityY(-entity.getMaxVelocity());
             }
 
             // IF PLAYER FALLS OUT OF BOUNDS, HE IS PUT BACK TO THE START
-            if (!level.checkBounds((int) player.getPosition().x, (int) player.getPosition().y)) {
-                player.setPosition(new Vector2(5f, 12f));
-                player.setBounds(player.getPosition().x, player.getPosition().y);
+            if (!level.checkBounds((int) entity.getPosition().x, (int) entity.getPosition().y)) {
+                entity.setPosition(new Vector2(5f, 12f));
+                entity.update(delta);
             }
 
 

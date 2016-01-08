@@ -13,6 +13,7 @@ import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.WorldContainer;
 import com.trent.awesomejumper.models.testing.Chest;
+import com.trent.awesomejumper.models.testing.Projectile;
 
 import java.util.Random;
 
@@ -110,7 +111,13 @@ public class GameScreen implements Screen, InputProcessor{
         if(keycode == Keys.U) {
             Entity e = new Chest(new Vector2(new Random().nextInt(5) + 5, new Random().nextInt(5) + 5));
             renderingEngine.initGraphics(e);
-                    worldContainer.getEntities().add(e);
+            worldContainer.getEntities().add(e);
+        }
+        if(keycode == Keys.I) {
+            Entity p = new Projectile(new Vector2(5,8));
+            renderingEngine.initGraphics(p);
+            worldContainer.getEntities().add(p);
+
         }
 
         return false;

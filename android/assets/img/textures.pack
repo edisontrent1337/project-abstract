@@ -178,9 +178,16 @@ snow-01
   orig: 24, 24
   offset: 0, 0
   index: -1
+projectile
+  rotate: false
+  xy: 803, 871
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: 1
 flower-01
   rotate: false
-  xy: 803, 875
+  xy: 837, 909
   size: 12, 12
   orig: 12, 12
   offset: 0, 0

@@ -21,8 +21,10 @@ public class PopUpFeed extends ModelComponent {
 
     private Entity entity;
     private HashMap<PopUpCategories, LinkedList<Message>> messages;
-    private final float MSG_FREQ = 7f;      // frequency with which the message offset is modified
+    private final float MSG_FREQ = 7f;      // default frequency with which the message offset is modified
     private final float MSG_AMP = 0.125f;   // amplitude with which the message offset is modified
+    private final float CRT_AMP = 5f;
+    private final float CRT_FREQ = 0.75f;
 
     private static Color HEAL = new Color(0.6784f,1f,0.1843f,1);
     private static Color DMG = new Color(0.9098f,0.0745f,0.1137f,1);
@@ -47,11 +49,12 @@ public class PopUpFeed extends ModelComponent {
     public PopUpFeed(Entity entity) {
         this.entity = entity;
         this.messages = new HashMap<>();
-        putMessageCategory(PopUpCategories.DMG);
-        putMessageCategory(PopUpCategories.HEAL);
-        putMessageCategory(PopUpCategories.CRT);
-        putMessageCategory(PopUpCategories.LVL_UP);
-        putMessageCategory(PopUpCategories.MISC);
+        this.putMessageCategory(PopUpCategories.DMG);
+        this.putMessageCategory(PopUpCategories.HEAL);
+        this.putMessageCategory(PopUpCategories.CRT);
+        this.putMessageCategory(PopUpCategories.LVL_UP);
+        this.putMessageCategory(PopUpCategories.MISC);
+        entity.hasPopUps = true;
     }
 
 
@@ -85,6 +88,7 @@ public class PopUpFeed extends ModelComponent {
                     continue;
                 }
                 float xOffset = 0f;
+                float yOffset = 2*progress;
                 switch (entry.getKey()) {
                     case DMG:
                         font.setColor(DMG.r, DMG.g, DMG.b, 1 - progress);
@@ -93,13 +97,11 @@ public class PopUpFeed extends ModelComponent {
                     case HEAL:
                         font.setColor(HEAL.r, HEAL.g, HEAL.b, 1-progress);
                         break;
-                    // TODO: introduce constants
                     case CRT:
-                        font.setColor(CRT.r + (float)Math.cos(entity.time*5*progress)*0.75f,
-                                      CRT.g + (float)Math.sin(entity.time*5*progress)*0.75f,
-                                      CRT.b + (float)Math.tan(entity.time*5*progress)*0.75f,
+                        font.setColor(CRT.r + (float)Math.cos(entity.time*CRT_AMP*progress)*CRT_FREQ,
+                                      CRT.g + (float)Math.sin(entity.time*CRT_AMP*progress)*CRT_FREQ,
+                                      CRT.b + (float)Math.tan(entity.time*CRT_AMP*progress)*CRT_FREQ,
                                       1-progress);
-
                         break;
                     case LVL_UP:
                         font.setColor(LVL_UP.r, LVL_UP.g, LVL_UP.b, 1-progress);
@@ -108,11 +110,17 @@ public class PopUpFeed extends ModelComponent {
                         font.getData().setScale(scaleX,scaleY);
                         break;
                     case MISC:
+                        if(message.getColor() != null)
                         font.setColor(message.getColor());
+                        else
+                        font.setColor(MISC);
                         break;
 
                 }
-                font.draw(spriteBatch, message.getMessage(), entity.getPosition().x + entity.getWidth() / 2 + xOffset, entity.getPosition().y + entity.getHeight() + 2 * progress);
+                /**
+                 * Draw message to screen. Always reset the scaling after rendering.
+                 */
+                font.draw(spriteBatch, message.getMessage(), entity.getPosition().x + entity.getWidth() / 2 + xOffset, entity.getPosition().y + entity.getHeight() + yOffset);
                 font.getData().setScale(1f/RenderingEngine.ppuX, 1f/RenderingEngine.ppuY);
 
             }

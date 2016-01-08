@@ -1,17 +1,15 @@
 package com.trent.awesomejumper.models;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.models.testing.Chest;
 import com.trent.awesomejumper.tiles.Tile;
+import static com.trent.awesomejumper.utils.Utilities.sub;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.TreeSet;
+import java.util.Iterator;
 
 /**
  * Created by Sinthu on 12.06.2015.
@@ -28,7 +26,6 @@ public class WorldContainer {
 
     private HashSet<Entity> entities;
 
-    private Array<Tile> tiles = new Array<>();
     private Player player;
     private Chest chest;
     private Level level;
@@ -40,11 +37,7 @@ public class WorldContainer {
     // ---------------------------------------------------------------------------------------------
 
     public WorldContainer() {
-        createWorld();
 
-    }
-
-    private void createWorld() {
         player = new Player(new Vector2(12.5f, 7f));
         chest = new Chest(new Vector2(5,5));
         level = new Level();
@@ -52,38 +45,9 @@ public class WorldContainer {
         entitiesToBeDrawn = new ArrayList<>();
         entities.add(player);
         entities.add(chest);
-        chest.getBody().setAcceleration(1,1);
-        /*for(int x = 1; x < 12; x++) {
-            for(int y = 5; y < 12; y++) {
-                entities.add(new Chest(new Vector2((float)x/1.2f,(float)y/1.2f)));
-            }
-        }*/
-       /* entities.add(new Chest(new Vector2(4,7)));
-        entities.add(new Chest(new Vector2(4,8)));
-        entities.add(new Chest(new Vector2(4,9)));
-        entities.add(new Chest(new Vector2(4,10)));
-        entities.add(new Chest(new Vector2(5,7)));
-        entities.add(new Chest(new Vector2(5,8)));
-        entities.add(new Chest(new Vector2(5,9)));
-        entities.add(new Chest(new Vector2(5,10)));
-        entities.add(new Chest(new Vector2(6,7)));
-        entities.add(new Chest(new Vector2(6,8)));
-        entities.add(new Chest(new Vector2(6,9)));
-        entities.add(new Chest(new Vector2(6,10)));
-        entities.add(new Chest(new Vector2(7,7)));
-        entities.add(new Chest(new Vector2(7,8)));
-        entities.add(new Chest(new Vector2(7,9)));
-        entities.add(new Chest(new Vector2(7,10)));
-        entities.add(new Chest(new Vector2(8,7)));
-        entities.add(new Chest(new Vector2(8,8)));
-        entities.add(new Chest(new Vector2(8,9)));
-        entities.add(new Chest(new Vector2(8,10)));
-        entities.add(new Chest(new Vector2(9,7)));
-        entities.add(new Chest(new Vector2(9,8)));
-        entities.add(new Chest(new Vector2(9,9)));
-        entities.add(new Chest(new Vector2(9,10)));*/
 
     }
+
 
 
     // ---------------------------------------------------------------------------------------------
@@ -130,9 +94,34 @@ public class WorldContainer {
     }
 
     // ---------------------------------------------------------------------------------------------
+    // LIST OF TILES FOR COLLISION DETECTION
+    // ---------------------------------------------------------------------------------------------
+    /**
+     * Fills collisionTiles with all tile objects that are in the specified ranges.
+     * @param sx x starting point
+     * @param sy y starting point
+     * @param ex x endpoint
+     * @param ey y endpoint
+     */
+    public void getCollidableTiles(int sx, int sy, int ex, int ey) {
+        collisionTiles.clear();
+        for (int x = sx; x <= ex; x++) {
+            for (int y = sy; y <= ey; y++) {
+                // CHECK WHETHER TILE IS IN LEVEL BOUNDS
+                if (level.checkBounds(x, y)) {
+                    if(level.getTile(x,y) != null) {
+                        if(!level.getTile(x,y).isPassable())
+                        collisionTiles.add(level.getTile(x, y));
+                    }
+                }
+            }
+        }
+
+    }
+
+    // ---------------------------------------------------------------------------------------------
     // ORDERED LIST OF ENTITIES TO BE DRAWN
     // ---------------------------------------------------------------------------------------------
-
     /**
      * Returns only those entities visible to the players field of view to be rendered.
      * Orders the entities according to their y-position to render them properly on top of
@@ -189,19 +178,67 @@ public class WorldContainer {
 
 
 
-    // LIST OF TILES FOR COLLISION
+    // ---------------------------------------------------------------------------------------------
+    // ENTITY NEIGHBOURHOOD MANAGEMENT
+    // ---------------------------------------------------------------------------------------------
+    /**
+     * Updates the list of entities close to the specified entity e.
+     * The neighbourhood list describes the perimeter of radius 3 around the entity and is used by
+     * the collision controller to solve entity/entity collision.
+     * @param e entity
+     * @return  modified HashSet with neighbours
+     */
 
-    public void createCollisionTiles(int sx, int sy, int ex, int ey) {
-        collisionTiles.clear();
-        for (int x = sx; x <= ex; x++) {
-            for (int y = sy; y <= ey; y++) {
-                // CHECK WHETHER TILE IS IN LEVEL BOUNDS
-                if (level.checkBounds(x, y)) {
-                    if(level.getTile(x,y) != null) {
-                        if(!level.getTile(x,y).isPassable())
-                        collisionTiles.add(level.getTile(x, y));
-                    }
+    public HashSet<Entity> updatedEntityNeighbourHood(Entity e) {
+
+        HashSet<Entity> entityNeighbourhood = e.getBody().getEntityNeighbourHood();
+
+        for(Entity other: entities) {
+            if(other.equals(e))
+                continue;
+            float dst = sub(e.getPosition(), other.getPosition()).len2(); // distance between entities
+            if(dst <= 3 ) {
+                if(!entityNeighbourhood.contains(other))
+                    entityNeighbourhood.add(other);
+            }
+            else {
+                entityNeighbourhood.remove(other);
                 }
+
+
+        }
+        /*if(e.equals(player))
+            Gdx.app.log("MY NEIGHBOURHOOD IS ", Integer.toString(entityNeighbourhood.size()));*/
+        return entityNeighbourhood;
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // REMOVAL OF DEAD ENTITIES
+    // ---------------------------------------------------------------------------------------------
+    /**
+     * Removes all entities which have their alive flag set to false from all relevant collections.
+     * Modifies and cleans the global entity collection, the "toBeDrawn" subset and the
+     * neighbourhood of each entity.
+     */
+    public void garbageRemoval() {
+
+        for(Iterator<Entity> it = entities.iterator(); it.hasNext();) {
+            if(!it.next().isAlive()) {
+                it.remove();
+            }
+        }
+
+        for(Iterator<Entity> it = entitiesToBeDrawn.iterator(); it.hasNext();) {
+            if(!it.next().isAlive()) {
+                it.remove();
+            }
+        }
+
+        for(Entity e: entities) {
+            for(Iterator<Entity> it = e.getBody().getEntityNeighbourHood().iterator(); it.hasNext();) {
+                if(!it.next().isAlive())
+                    it.remove();
+
             }
         }
 
