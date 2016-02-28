@@ -140,19 +140,19 @@ public class Entity implements EntityInterface {
     }
 
     public float getWidth() {
-        return body.getWidth();
+        return body.getWidthX();
     }
 
     public void setWidth(float width) {
-        body.setWidth(width);
+        body.setWidthX(width);
     }
 
     public float getHeight() {
-        return body.getHeight();
+        return body.getWidthY();
     }
 
     public void setHeight(float height) {
-        body.setHeight(height);
+        body.setWidthY(height);
     }
 
     public Vector2 getVelocity() {

@@ -18,22 +18,30 @@ public class Player extends Entity {
 
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
-    private final float headHitboxSize, armHitBoxSize, legHitBoxSize;
+    private final float headSize, legSize, torsoSize;
+
+    // WORLD UNIT: 1 = 1m
+
 
     // TODO: Add JSON support to outsource this information
-    private final float WIDTH = 0.5f;
-    private final float HEIGHT = 0.625f;
+    // 17*22 px outlines, 10px offset to each side
+    private final float GRAPHIC_SCALE = 1.5f;
+    private final float X_OFFSET = 0.32f*GRAPHIC_SCALE;
     private final float MASS = 10f;
     private final float FRICTION = 0.66f;
     private final float ELASTICITY = 0f;
-    private final float SPRITE_WIDTH = 1f;
-    private final float SPRITE_HEIGHT = 1f;
-    private final float FRAME_DURATION = 0.066f;
+    private final float SPRITE_WIDTH = 1f*GRAPHIC_SCALE;  // 48px
+    private final float SPRITE_HEIGHT = 1f*GRAPHIC_SCALE; // 48px
+    private final float FRAME_DURATION = 0.05f;
     private final float MAX_SPEED = 5f;
     private int startHealth  = 2000;
-    private final String SPRITE_PREFIX = "player";
+    private final String SPRITE_PREFIX = "link";
 
-    private CollisionBox head, torso,  rightArm, rightFoot, leftArm, leftFoot;
+    private final float WIDTH_X = 0.375f*GRAPHIC_SCALE;     // width in x direction on the xy plane
+    private final float WIDTH_Y = 0.375f*GRAPHIC_SCALE;     // width in y direction on the xy plane
+    private final float HEIGHT_Z = 1f;                      // height of the entity in z direction
+
+    private CollisionBox head, torso, legs;
 
     private float playerDelta;
 
@@ -41,63 +49,55 @@ public class Player extends Entity {
     // ---------------------------------------------------------------------------------------------
 
     public Player(Vector2 position) {
-        body = new Body(this, WIDTH, HEIGHT); // enable physics
-        graphics = new Graphics(this,FRAME_DURATION,SPRITE_PREFIX,SPRITE_WIDTH,SPRITE_HEIGHT); // enable graphics
-        popUpFeed = new PopUpFeed(this); // enable capability to render popups
-        health = new Health(this, startHealth); // enable health
+        body = new Body(this, WIDTH_X, WIDTH_Y);                                                // enable physics
+        graphics = new Graphics(this,FRAME_DURATION,SPRITE_PREFIX,SPRITE_WIDTH,SPRITE_HEIGHT);  // enable graphics
+        popUpFeed = new PopUpFeed(this);                                                        // enable capability to render popups
+        health = new Health(this, startHealth);                                                 // enable health
 
-        // TODO: Implement method that calculates smallest bounding box around skeleton
-        body.setBounds(new CollisionBox(position, WIDTH, HEIGHT));
+        body.setBounds(new CollisionBox(position, WIDTH_X, WIDTH_Y));
         body.setPosition(position);
-        body.getBounds().setOffset(0.2f, 0f);
+
+        /**
+         * Setting offset to ground bounding box so that it wraps around the texture of the entity
+         * properly. Also initialize the z position to 0 and the height in z direction to 1.
+         */
+        body.getBounds().setOffset(X_OFFSET, 0f);
+        body.setZOffset(0f);
+        body.setHeightZ(HEIGHT_Z);
+
+
         body.setMass(MASS);
         body.setFriction(FRICTION);
         body.setElasticity(ELASTICITY);
         body.setMaxVelocity(MAX_SPEED);
-        headHitboxSize = 0.2f;
-        armHitBoxSize = 0.2f;
-        legHitBoxSize = 0.2f;
 
-       /* rightArm = new CollisionBox(position, armHitBoxSize, armHitBoxSize, CollisionBox.BoxType.TRIANGLE, new float[]{
-                0.0f,0.0f,
-                0.0f,0.2f,
-                0.2f,0.2f,
-        }
-        );*/
-
-        head = new CollisionBox(position,headHitboxSize,headHitboxSize);
-        head.setOffset((WIDTH - headHitboxSize)/2 + 0.2f, HEIGHT - headHitboxSize);
-        head.setDamageCoefficient(1f);
+        headSize = 0.1f*HEIGHT_Z;   // 10% of the z height are occupied by the head
+        torsoSize = 0.4f*HEIGHT_Z;  // 40% of the z height are occupied by the torso
+        legSize = 0.4f*HEIGHT_Z;    // 40% of the z height are occupied by the legs
 
 
-        rightArm = new CollisionBox(position, armHitBoxSize, armHitBoxSize);
-        rightArm.setOffset((WIDTH - armHitBoxSize) / 2 + 0.4f, HEIGHT / 2.8f);
-        rightArm.setDamageCoefficient(0.3f);
+        head = new CollisionBox(position,WIDTH_X,headSize);
+        head.setOffset(X_OFFSET, 0.8f*HEIGHT_Z);
+        head.setDamageCoefficient(5f);
 
-        leftArm = new CollisionBox(position, armHitBoxSize, armHitBoxSize);
-        leftArm.setOffset((WIDTH - armHitBoxSize) / 2, HEIGHT / 2.8f);
-        leftArm.setDamageCoefficient(0.3f);
+        torso = new CollisionBox(position,WIDTH_X,torsoSize);
+        torso.setOffset(X_OFFSET, 0.3f*HEIGHT_Z);
+        torso.setDamageCoefficient(3f);
 
-        rightFoot = new CollisionBox(position, legHitBoxSize, legHitBoxSize + 0.1f);
-        rightFoot.setOffset((WIDTH - legHitBoxSize) / 2 + 0.4f, 0f);
-        rightFoot.setDamageCoefficient(0.2f);
 
-        leftFoot = new CollisionBox(position, legHitBoxSize, legHitBoxSize + 0.1f);
-        leftFoot.setOffset((WIDTH - legHitBoxSize) / 2, 0f);
-        leftFoot.setDamageCoefficient(0.2f);
+        legs = new CollisionBox(position, WIDTH_X,legSize);
+        legs.setOffset(X_OFFSET, 0f);
+        legs.setDamageCoefficient(1f);
+
+
 
         /**
          * Add all body parts to the skeleton.
          */
 
         body.add(head);
-        body.add(rightArm);
-        body.add(leftArm);
-        body.add(rightFoot);
-        body.add(leftFoot);
-
-        //TODO: After the skeleton is completed, the bounding box has to be calculated.
-
+        body.add(torso);
+        body.add(legs);
 
         state = State.IDLE;
     }

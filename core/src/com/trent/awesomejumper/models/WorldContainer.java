@@ -103,7 +103,7 @@ public class WorldContainer {
      * @param ex x endpoint
      * @param ey y endpoint
      */
-    public void getCollidableTiles(int sx, int sy, int ex, int ey) {
+    public void fillCollideableTiles(int sx, int sy, int ex, int ey) {
         collisionTiles.clear();
         for (int x = sx; x <= ex; x++) {
             for (int y = sy; y <= ey; y++) {

@@ -87,7 +87,7 @@ grass-02
   orig: 24, 24
   offset: 0, 0
   index: -1
-player
+link
   rotate: false
   xy: 103, 27
   size: 32, 32
@@ -101,28 +101,28 @@ mushroomRed
   orig: 24, 24
   offset: 0, 0
   index: -1
-player
+link
   rotate: false
   xy: 803, 923
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 2
-player
+link
   rotate: false
   xy: 837, 957
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 3
-player
+link
   rotate: false
   xy: 871, 991
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 4
-player
+link
   rotate: false
   xy: 137, 27
   size: 32, 32
@@ -136,41 +136,41 @@ sign-01
   orig: 24, 24
   offset: 0, 0
   index: -1
-player
+link
   rotate: false
   xy: 803, 889
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 6
-player_jump
+link
   rotate: false
   xy: 837, 923
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
-  index: -1
-shadow-01
+  index: 7
+link
   rotate: false
   xy: 871, 957
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
-  index: -1
-tile
+  index: 8
+link
   rotate: false
   xy: 905, 991
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
-  index: -1
-wood_chest
+  index: 9
+link
   rotate: false
   xy: 171, 27
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
-  index: 1
+  index: 10
 snow-01
   rotate: false
   xy: 157, 1
@@ -178,18 +178,116 @@ snow-01
   orig: 24, 24
   offset: 0, 0
   index: -1
-projectile
+link
   rotate: false
-  xy: 803, 871
-  size: 16, 16
-  orig: 16, 16
+  xy: 803, 855
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 11
+link_shadow
+  rotate: false
+  xy: 837, 889
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+wood_chest_shadow
+  rotate: false
+  xy: 837, 889
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+player
+  rotate: false
+  xy: 871, 923
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 1
+player
+  rotate: false
+  xy: 905, 957
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 2
+player
+  rotate: false
+  xy: 939, 991
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 3
+player
+  rotate: false
+  xy: 205, 27
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 4
+player
+  rotate: false
+  xy: 803, 821
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 5
+player
+  rotate: false
+  xy: 837, 855
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 6
+player_jump
+  rotate: false
+  xy: 871, 889
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+shadow-01
+  rotate: false
+  xy: 905, 923
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+tile
+  rotate: false
+  xy: 939, 957
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+wood_chest
+  rotate: false
+  xy: 973, 991
+  size: 32, 32
+  orig: 32, 32
   offset: 0, 0
   index: 1
 flower-01
   rotate: false
-  xy: 837, 909
+  xy: 183, 13
   size: 12, 12
   orig: 12, 12
+  offset: 0, 0
+  index: -1
+projectile
+  rotate: false
+  xy: 239, 51
+  size: 12, 8
+  orig: 12, 8
+  offset: 0, 0
+  index: 1
+projectile_shadow
+  rotate: false
+  xy: 803, 811
+  size: 12, 8
+  orig: 12, 8
   offset: 0, 0
   index: -1
 

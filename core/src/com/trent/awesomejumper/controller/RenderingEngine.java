@@ -5,9 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -18,13 +16,11 @@ import com.badlogic.gdx.utils.Array;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.engine.entity.Entity;
-import com.trent.awesomejumper.models.Environment;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.SkyBox;
 import com.trent.awesomejumper.models.WorldContainer;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
 import com.trent.awesomejumper.tiles.Tile;
-import com.trent.awesomejumper.utils.Interval;
 
 import java.util.HashMap;
 
@@ -188,6 +184,7 @@ public class RenderingEngine {
             Graphics g = e.getGraphics();
             Array<TextureAtlas.AtlasRegion> regions = allTextures.findRegions(g.getTextureRegName());
             g.setIdleFrames(regions.first());
+            g.setShadow(allTextures.findRegion(g.getTextureRegName() + "_shadow"));
 
             for(int i = 1; i < regions.size; i++) {
                 g.addKeyFrame(regions.get(i));
@@ -212,24 +209,26 @@ public class RenderingEngine {
         moveCamera(player.getPosition().x, player.getPosition().y);
         sb.setProjectionMatrix(cam.combined);
         sb.begin();
-        if(!game.onDebugMode())
-            drawBg();
-
+        drawBg();
         drawTiles();
 
-        if(game.onDebugMode()) {
+        if(game.hitboxesEnabled()) {
                 sb.end();
-                drawDebugInfo();
+                drawHitboxes();
                 sb.begin();
             }
-        if(!game.onDebugMode())
-            drawPlayer();
+
+        if(game.entitiesEnabled()) {
+            drawEntities();
+        }
         sb.end();
 
 
         uiBatch.setProjectionMatrix(uiCam.combined);
         uiBatch.begin();
-        drawInfo();
+        if(game.infoEnabled()) {
+            drawInfo();
+        }
         uiBatch.end();
     }
 
@@ -285,7 +284,7 @@ public class RenderingEngine {
     /**
      * Iterates over all entities in the world and renders them on the screen.
      */
-    public void drawPlayer() {
+    public void drawEntities() {
         for(Entity e : worldContainer.getEntitiesToBeRendered(CAMERA_WIDTH, CAMERA_HEIGHT)) {
             e.render(sb);
             if(e.hasPopUps)
@@ -435,7 +434,7 @@ public class RenderingEngine {
     }
 
 
-    public void drawDebugInfo() {
+    public void drawHitboxes() {
         debugRenderer.setProjectionMatrix(cam.combined);
         debugRenderer.begin(ShapeRenderer.ShapeType.Line);
 
@@ -445,15 +444,21 @@ public class RenderingEngine {
 
        /* debugRenderer.rect(player.getPosition().x + player.getVelocity().cpy().scl(player.getPlayerDelta()).x,
                            player.getPosition().y + player.getVelocity().cpy().scl(player.getPlayerDelta()).y,
-                           player.getBodyHitboxes().get(0).getWidth(),
-                           player.getBodyHitboxes().get(0).getHeight());*/
-
+                           player.getBodyHitboxes().get(0).getWidthX(),
+                           player.getBodyHitboxes().get(0).getWidthY());*/
 
 
         for(Entity e : worldContainer.getEntities()) {
-            for (CollisionBox r : e.getBodyHitboxes()) {
-                r.draw(debugRenderer);
+            /**
+             * Only if the body flag is enabled, body hitboxes will be drawn.
+             */
+            if(game.bodyEnabled()) {
+                for (CollisionBox r : e.getBodyHitboxes()) {
+                    debugRenderer.setColor(Color.YELLOW);
+                    r.draw(debugRenderer);
+                }
             }
+
             e.getBounds().draw(debugRenderer);
             if(e.getBody().isCollidedWithWorld()) {
                 debugRenderer.end();
@@ -472,8 +477,8 @@ public class RenderingEngine {
         /**
          * vertical and horizontal components are separated here to show  which impact is bigger
          */
-        Vector2 playerX = new Vector2(player.getVelocity().x,0f).cpy().scl(player.getPlayerDelta()).scl(250);
-        Vector2 playerY = new Vector2(0f,player.getVelocity().y).cpy().scl(player.getPlayerDelta()).scl(250);
+        Vector2 playerX = new Vector2(player.getVelocity().x,0f).cpy().scl(player.getPlayerDelta()).scl(25);
+        Vector2 playerY = new Vector2(0f,player.getVelocity().y).cpy().scl(player.getPlayerDelta()).scl(25);
 
         debugRenderer.rectLine(player.getPosition(), player.getPosition().cpy().add(playerX), 5 * (1 / ppuX));
         debugRenderer.rectLine(player.getPosition(), player.getPosition().cpy().add(playerY), 5 * (1 / ppuY));

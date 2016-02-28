@@ -23,7 +23,7 @@ public class Chest extends Entity {
     private final float SPRITE_WIDTH = 1f;           // 32 px width
     private final float SPRITE_HEIGHT = 1f;          // 32 px height
     private final float MAX_SPEED = 5f;
-    private final Vector2 OFFSET = new Vector2(0.125f, 0);
+    private final Vector2 OFFSET = new Vector2(0.125f, 0); // 4 px space in chest sprite
 
     private final float FRAME_DURATION = 0.066f;
 

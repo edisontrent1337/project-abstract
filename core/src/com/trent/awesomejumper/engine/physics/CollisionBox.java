@@ -40,10 +40,12 @@ public class CollisionBox {
     // ---------------------------------------------------------------------------------------------
 
     public enum BoxType {
+        REGULAR(0),
         TRIANGLE(3),
         RECTANGLE(4),
         PENTAGON(5),
-        HEXAGON(6);
+        HEXAGON(6),
+        RANDOM(7);
         private final int VERTICES;
         BoxType(int value) {
             this.VERTICES = value;
@@ -99,13 +101,12 @@ public class CollisionBox {
 
         addEdgesAndNormals();
 
-
     }
 
-
+    // CONSTRUCTOR FOR VARIABLE SHAPES DEFINED BY VERTEX DATA
     public CollisionBox(Vector2 position, float width, float height, BoxType type, float[]vertexData) {
         /**
-         * Throw an IllegalArgumentException because the vertex array data is the only critcal
+         * Throw an IllegalArgumentException because the vertex array data is the only critical
          * parameter.
          */
         if(vertexData.length % 2 != 0) {
@@ -179,9 +180,7 @@ public class CollisionBox {
 
         // DRAW OUTER BOUNDING BOX
         renderer.set(ShapeRenderer.ShapeType.Line);
-
         renderer.setAutoShapeType(true);
-
 
         // DRAW NORMALS & EDGES
         renderer.setColor(Color.PINK);
@@ -240,6 +239,9 @@ public class CollisionBox {
             for(int y = 0; y < i; y++) {
                 vertices.get(i).add(edges.get(y));
             }
+            /**
+             * Finally add the global collisionBox offset to each vertex.
+             */
             vertices.get(i).add(offset);
         }
 
@@ -269,9 +271,13 @@ public class CollisionBox {
         offset.y = y;
     }
 
+    public Vector2 getOffset() {
+        return offset;
+    }
     public void setOffset(Vector2 offset) {
         this.offset = offset;
     }
+
 
     public float getWidth() {
         return width;

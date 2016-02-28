@@ -4,8 +4,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.trent.awesomejumper.engine.entity.Entity;
+import com.trent.awesomejumper.utils.PhysicalConstants;
+
+import static com.trent.awesomejumper.utils.Utilities.dot;
 
 /**
  * Created by Sinthu on 09.12.2015.
@@ -19,11 +23,11 @@ public class Graphics extends ModelComponent{
 
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
-    public final int ANIMATIONS = 2; // supports 2 different animations at the moment
+    public final int ANIMATIONS = 4; // supports 3 different animations at the moment
     private final float FRAME_DURATION; // frame duration for animations
     private String textureRegName;      // prefix of the name of textures
-    private TextureRegion idleFrameR, idleFrameL, currentFrame;
-    private Array<TextureRegion> walkLeftFrames, walkRightFrames;
+    private TextureRegion idleFrameR, idleFrameL, idleFrameU, idleFrameD, currentFrame, shadow;
+    private Array<TextureRegion> walkLeftFrames, walkRightFrames, walkUpFrames, walkDownFrames, idleFrames;
 
     private Animation walkLeftAnimation, walkRightAnimation;
     private Array<Animation> animations;
@@ -78,9 +82,17 @@ public class Graphics extends ModelComponent{
      * TODO: add support for idle animations
      */
     public void setIdleFrames(TextureRegion texture) {
-        idleFrameL = texture;
-        idleFrameR = new TextureRegion(idleFrameL);
-        idleFrameR.flip(true, false);
+        idleFrameR = texture;
+        idleFrameL = new TextureRegion(idleFrameR);
+        idleFrameL.flip(true, false);
+    }
+
+
+    /**
+     * Adds shadow texture to the entity.
+     */
+    public void setShadow(TextureRegion shadow) {
+        this.shadow = shadow;
     }
 
     /**
@@ -99,8 +111,16 @@ public class Graphics extends ModelComponent{
         }
 
         spriteBatch.setColor(spriteBatch.getColor().r, spriteBatch.getColor().g, spriteBatch.getColor().b, alpha);
-        spriteBatch.draw(currentFrame, entity.getPosition().x, entity.getPosition().y, width, height);
-
+        //TODO Insert method to draw shadow separated from entities body.
+        //TODO Draw head separately from body and let it rotate towards mouse
+        //TODO Insert a flag that specifies whether or not an entity is rotatable or not
+        float dot = dot(entity.getVelocity().cpy().nor(), new Vector2(1,0));
+        float angle = (float) Math.atan2(entity.getVelocity().y, entity.getVelocity().x)*180/PhysicalConstants.PI;
+        float originX = 0.5f*(width);
+        float originY = 0.5f*(height);
+        spriteBatch.draw(shadow, entity.getPosition().x, entity.getPosition().y,originX,originY, width, height,1,1,angle);
+        Gdx.app.log("DOT/ROTATION",Float.toString(dot) +"/" + Float.toString(angle));
+        spriteBatch.draw(currentFrame,entity.getPosition().x, entity.getPosition().y + entity.getBody().getZOffset(),originX,originY,width,height,1,1,angle);
     }
 
 
@@ -109,10 +129,10 @@ public class Graphics extends ModelComponent{
      * @param frame current frame to be added.
      */
     public void addKeyFrame(TextureRegion frame) {
-        walkLeftFrames.add(frame);
+        walkRightFrames.add(frame);
         try {
-            walkRightFrames.add(new TextureRegion(walkLeftFrames.get(walkLeftFrames.size - 1)));
-            walkRightFrames.get(walkRightFrames.size - 1).flip(true, false);
+            walkLeftFrames.add(new TextureRegion(walkRightFrames.get(walkRightFrames.size - 1)));
+            walkLeftFrames.get(walkLeftFrames.size - 1).flip(true, false);
         }
         catch (IndexOutOfBoundsException e) {
             Gdx.app.log("ERROR","Could not add mirrored frames to walkRightArray.");
@@ -145,6 +165,10 @@ public class Graphics extends ModelComponent{
 
     public float getAlpha() {
         return alpha;
+    }
+
+    public void setNumberOfAnimations(int numberOfAnimations) {
+
     }
 
 

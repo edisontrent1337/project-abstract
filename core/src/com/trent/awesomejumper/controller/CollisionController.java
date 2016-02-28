@@ -14,11 +14,9 @@ import com.trent.awesomejumper.models.testing.Projectile;
 import com.trent.awesomejumper.utils.Interval;
 import com.trent.awesomejumper.tiles.Tile;
 import com.trent.awesomejumper.engine.modelcomponents.popups.Message;
-
-
-
 import static com.trent.awesomejumper.utils.Utilities.*;
 import static com.trent.awesomejumper.utils.PhysicalConstants.*;
+
 /**
  * Created by Sinthu on 04.11.2015.
  */
@@ -81,7 +79,7 @@ public class CollisionController {
             cdStartY = cdEndY = (int) Math.floor(entity.getBounds().getPositionAndOffset().y + entity.getBounds().getHeight() + entity.getVelocity().y);
 
         // Create array of tiles surrounding the entity which are covered by the collision detection
-        worldContainer.getCollidableTiles(cdStartX, cdStartY, cdEndX, cdEndY);
+        worldContainer.fillCollideableTiles(cdStartX, cdStartY, cdEndX, cdEndY);
 
         for(Tile tile : worldContainer.getCollisionTiles()) {
 
@@ -122,7 +120,7 @@ public class CollisionController {
 
         /**
          * If no collision was found regarding the y axis, the process is repeated for the x axis
-         * with different parameters for the getCollidableTiles method.
+         * with different parameters for the fillCollidableTiles method.
          */
 
         // Reset the resolutionVector to (0f,0f)
@@ -148,7 +146,7 @@ public class CollisionController {
         }
 
         // Create array of tiles surrounding the player which are covered by the collision detection
-        worldContainer.getCollidableTiles(cdStartX, cdStartY, cdEndX, cdEndY);
+        worldContainer.fillCollideableTiles(cdStartX, cdStartY, cdEndX, cdEndY);
 
         for(Tile tile : worldContainer.getCollisionTiles()) {
 
@@ -206,7 +204,10 @@ public class CollisionController {
 
             Vector2 entityFrameVelo = entity.getVelocity().cpy();
             Vector2 otherFrameVelo= other.getVelocity().cpy().scl(delta);
-
+            /**
+             * If the other participant is a projectile, a special routine is called to resolve
+             * entity / projectile collision
+             */
             if(other.getClass() == Projectile.class) {
                 if(projectileCollisionDetection((Projectile)other,entity, otherFrameVelo, entityFrameVelo)) {
                     Gdx.app.log("CONTINUE", "OTHER WAS PROJECTILE");
@@ -221,6 +222,15 @@ public class CollisionController {
                 }
             }
 
+            else if(entity.getClass() == Projectile.class && other.getClass() == Projectile.class) {
+                if(checkCollision(otherBox,entityBox)) {
+                    entity.setVelocity(0f,0f);
+                    other.setVelocity(0f,0f);
+                    entity.destroy();
+                    other.destroy();
+                    return;
+                }
+            }
 
 
             else if(checkCollision(otherBox, entityBox)) {
@@ -236,7 +246,7 @@ public class CollisionController {
                         }
                     }
 
-
+                //TODO: make the following lines of code easier by using the function createReflectionImpulse
                 /**
                  * deltaVelocity - Relative velocity between both participants of the collision.
                  * collisionNormal - normal to the collision plane
@@ -245,6 +255,7 @@ public class CollisionController {
                  */
                 Vector2 deltaVelocity = sub(other.getVelocity(), entity.getVelocity().cpy().scl(1 / delta));
                 Vector2 collisionNormal = resolutionVector.cpy().nor();
+                // N*(V dot N)
                 Vector2 vNorm = collisionNormal.cpy().scl(dot(deltaVelocity, collisionNormal));
                 Vector2 vTang = sub(vNorm, deltaVelocity).scl(-FRICTIONAL_COEFFICIENT);
                 /**
@@ -270,7 +281,8 @@ public class CollisionController {
 
                 /**
                  * If the opponent entity (other) did not collide with the world earlier, it can
-                 * receive the impulse. Also, the opposing entity is pushed backwards.
+                 * receive the impulse. Also, the opposing entity is pushed backwards to resolve
+                 * the collision.
                  */
 
                 if (!other.getBody().isCollidedWithWorld()) {
@@ -489,26 +501,45 @@ public class CollisionController {
     private boolean projectileCollisionDetection(Projectile projectile, Entity entity, Vector2 projectileVelocity, Vector2 entityVelocity) {
 
             // Iterate over all collision boxes of the entity skeleton
-            for (CollisionBox entityHitbox : entity.getBodyHitboxes()) {
+           // for (CollisionBox entityHitbox : entity.getBodyHitboxes()) {
 
+                 CollisionBox entityBounds = entity.getBounds();
                 // relative velocity between projectile and entity
                 float relativeVelocity = sub(projectileVelocity,entityVelocity).len();
                 // distance between projectile and current hitbox
-                float dst = sub(projectile.getPosition(), entityHitbox.getPositionAndOffset()).len();
+                float dst = sub(projectile.getPosition(), entityBounds.getPositionAndOffset()).len();
                 // time in frame steps remaining before collision occurs
                 float framesToImpact = dst / relativeVelocity;
                 /**
                  * If the number of frames until the impact occurs is between 0 and 1, the collision
-                 * will happen in the next frame, so it has to be resolved.
+                 * can happen in the next frame, so it has to be resolved by checkCollision
                  */
                 if(framesToImpact > 0 && framesToImpact < 1) {
-                    projectile.setVelocity(0f, 0f);
-                    entity.getHealth().takeDamage(projectile.dealDamage(entityHitbox));
-                    projectile.destroy();
-                    return true;
+                    Gdx.app.log("EVENT", "PROJECTILE HIT REGISTRED");
+                    Gdx.app.log("PROJECTILE POSITION", projectile.getPosition().toString());
+                    Gdx.app.log("HITBOX AND OFFSET", entityBounds.getPositionAndOffset().toString());
+                    Gdx.app.log("RELATIVE VELOCITY", Float.toString(relativeVelocity));
+                    Gdx.app.log("DISTANCE", Float.toString(dst));
+                    Gdx.app.log("FRAMES TO IMPACT", Float.toString(framesToImpact));
+                    /**
+                     * If the bounds/shadows of the projectile and the entity collide,
+                     * another check has to pass: whether or not the projectile is in the correight
+                     * z-height to hit the entity or not.
+                     */
+                    if(checkCollision(projectile.getBounds(), entityBounds)) {                      // shadows collide
+                        for(CollisionBox entityHitBox : entity.getBodyHitboxes()) {                 // all entity hitboxes across the z axis are checked
+                            if(checkCollision(entityHitBox, projectile.getProjectileBox())) {
+                                projectile.setVelocity(0f, 0f);
+                                if(entity.hasHealth)
+                                entity.getHealth().takeDamage(projectile.dealDamage(entityHitBox));
+                                projectile.destroy();
+                                return true;
+                            }
+                        }
+                    }
                 }
 
-            }
+           // }
         return false;
     }
 
@@ -532,12 +563,18 @@ public class CollisionController {
         float framesTillImpact = dst / projectileVelocity.len();
         Gdx.app.log("Time", Float.toString(framesTillImpact));
 
-        if(framesTillImpact > 0 && framesTillImpact < 1) {
+        // FAST BULLET
+        if (framesTillImpact > 0 && framesTillImpact < 1) {
+                projectile.setVelocity(0f, 0f);
+                projectile.destroy();
+                return true;
+        }
+        // SLOW BULLET
+        else if(checkCollision(projectile.getBounds(), tile.getCollisionBox())){
             projectile.setVelocity(0f, 0f);
             projectile.destroy();
             return true;
         }
-
         return false;
     }
 

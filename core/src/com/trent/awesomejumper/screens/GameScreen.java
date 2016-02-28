@@ -105,7 +105,7 @@ public class GameScreen implements Screen, InputProcessor{
         }
 
         if (keycode == Keys.D) {
-            game.setDebugMode(!game.onDebugMode());
+            game.toggleDebugMode();
         }
 
         if(keycode == Keys.U) {
@@ -113,12 +113,35 @@ public class GameScreen implements Screen, InputProcessor{
             renderingEngine.initGraphics(e);
             worldContainer.getEntities().add(e);
         }
-        if(keycode == Keys.I) {
-            Entity p = new Projectile(new Vector2(5,8));
+        if(keycode == Keys.P) {
+            Entity p = new Projectile(new Vector2(5,6),0.7f);
+            Entity q = new Projectile(new Vector2(5,6), 0.7f);
             renderingEngine.initGraphics(p);
+            renderingEngine.initGraphics(q);
             worldContainer.getEntities().add(p);
+            worldContainer.getEntities().add(q);
+
 
         }
+
+
+        /**
+         * DEBUG KEYS
+         */
+
+        if(keycode == Keys.E) {
+            game.toggleEntities();
+        }
+        if(keycode == Keys.H) {
+            game.toggleHitboxes();
+        }
+        if(keycode == Keys.I) {
+            game.toggleInfo();
+        }
+        if(keycode == Keys.B) {
+            game.toggleBody();
+        }
+
 
         return false;
     }
@@ -143,9 +166,7 @@ public class GameScreen implements Screen, InputProcessor{
 
     @Override
     public boolean keyTyped(char character) {
-        if(character == 'D') {
-            game.setDebugMode(!game.onDebugMode());
-        }
+
 
         return false;
     }
