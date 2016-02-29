@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.trent.awesomejumper.controller.RenderingEngine;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.utils.PhysicalConstants;
 
@@ -29,11 +30,12 @@ public class Graphics extends ModelComponent{
     private TextureRegion idleFrameR, idleFrameL, idleFrameU, idleFrameD, currentFrame, shadow;
     private Array<TextureRegion> walkLeftFrames, walkRightFrames, walkUpFrames, walkDownFrames, idleFrames;
 
-    private Animation walkLeftAnimation, walkRightAnimation;
+    private Animation walkLeftAnimation, walkRightAnimation, walkUpAnimation, walkDownAnimation;
     private Array<Animation> animations;
 
 
-    private float width, height, alpha;
+    private float width, height, alpha, originX, originY;
+    private boolean supportsRotation = false;
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
@@ -53,6 +55,8 @@ public class Graphics extends ModelComponent{
         this.walkRightFrames = new Array<>();
         this.width = width;
         this.height = height;
+        this.originX = width / 2f;
+        this.originY = height / 2f;
 
         FRAME_DURATION = frameDuration;
         alpha = 1f;
@@ -76,7 +80,7 @@ public class Graphics extends ModelComponent{
 
 
     /**
-     * Adds idle textures to the entity. The left idle texture is mirrored and used as the right
+     * Adds idle textures to the entity. The right idle texture is mirrored and used as the left
      * idle texture.
      * @param texture Texture gathered from an asset manager
      * TODO: add support for idle animations
@@ -97,9 +101,9 @@ public class Graphics extends ModelComponent{
 
     /**
      * Renders the graphical component of the entity. Manages the current frame to be displayed.
-     * @param spriteBatch sprite batch used to draw textures.
+     * @param sb sprite batch used to draw textures.
      */
-    public void render(SpriteBatch spriteBatch) {
+    public void render(SpriteBatch sb) {
         switch (entity.getState()) {
             case IDLE: currentFrame = entity.facingL ? idleFrameL : idleFrameR;
                 break;
@@ -109,18 +113,24 @@ public class Graphics extends ModelComponent{
             default:
                 break;
         }
+        sb.setColor(sb.getColor().r, sb.getColor().g, sb.getColor().b, alpha);
 
-        spriteBatch.setColor(spriteBatch.getColor().r, spriteBatch.getColor().g, spriteBatch.getColor().b, alpha);
-        //TODO Insert method to draw shadow separated from entities body.
+            float x =(int) Math.floor(entity.getPosition().x * RenderingEngine.ppuX) / RenderingEngine.ppuX;
+            float y =(int) Math.floor(entity.getPosition().y * RenderingEngine.ppuY) / RenderingEngine.ppuY;
+        if(supportsRotation) {
+            float originX = width / 2f;
+            float originY = height / 2f;
+
+
+            sb.draw(shadow, x, y, originX, originY, width, height, 1, 1, entity.getBody().getAngleOfRotation());
+            sb.draw(currentFrame, x, y + entity.getBody().getZOffset(), originX, originY, width, height, 1, 1, entity.getBody().getAngleOfRotation());
+        }
+        else {
+            sb.draw(shadow, x,  y, width, height);
+            sb.draw(currentFrame, x,  y + entity.getBody().getZOffset(), width, height);
+        }
         //TODO Draw head separately from body and let it rotate towards mouse
         //TODO Insert a flag that specifies whether or not an entity is rotatable or not
-        float dot = dot(entity.getVelocity().cpy().nor(), new Vector2(1,0));
-        float angle = (float) Math.atan2(entity.getVelocity().y, entity.getVelocity().x)*180/PhysicalConstants.PI;
-        float originX = 0.5f*(width);
-        float originY = 0.5f*(height);
-        spriteBatch.draw(shadow, entity.getPosition().x, entity.getPosition().y,originX,originY, width, height,1,1,angle);
-        Gdx.app.log("DOT/ROTATION",Float.toString(dot) +"/" + Float.toString(angle));
-        spriteBatch.draw(currentFrame,entity.getPosition().x, entity.getPosition().y + entity.getBody().getZOffset(),originX,originY,width,height,1,1,angle);
     }
 
 
@@ -169,6 +179,10 @@ public class Graphics extends ModelComponent{
 
     public void setNumberOfAnimations(int numberOfAnimations) {
 
+    }
+
+    public void enableRotations() {
+        supportsRotation = true;
     }
 
 

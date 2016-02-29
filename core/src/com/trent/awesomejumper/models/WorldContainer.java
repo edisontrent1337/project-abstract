@@ -1,5 +1,6 @@
 package com.trent.awesomejumper.models;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.models.testing.Chest;
@@ -8,6 +9,7 @@ import static com.trent.awesomejumper.utils.Utilities.sub;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -15,6 +17,7 @@ import java.util.Iterator;
  * Created by Sinthu on 12.06.2015.
  * Holds the player, the level with its environmental items such as random paths of dirt,
  * rocks, flowers etc. and also items, collectables and enemies.
+ * Holds a list of all entities and manages all specific lists of entities needed by the controllers.
  *
  */
 public class WorldContainer {
@@ -25,10 +28,12 @@ public class WorldContainer {
     public static int nodes = 0;
 
     private HashSet<Entity> entities;
+    private HashSet<Entity> projectiles;
 
     private Player player;
     private Chest chest;
     private Level level;
+    //TODO Change these to HashSet
     private ArrayList tilesToBeDrawn, entitiesToBeDrawn;
     private ArrayList<Tile> collisionTiles = new ArrayList<>();
 
@@ -54,7 +59,7 @@ public class WorldContainer {
     // LIST OF TILES TO BE DRAWN
     // ---------------------------------------------------------------------------------------------
 
-    public ArrayList<Tile> getTilesToBeRendered(int camW, int camH) {
+    public ArrayList<Tile> getTilesToBeRendered(float camW, float camH) {
 
         // GET CURRENT FOV COORDINATES AND ONLY RENDER WHAT THE PLAYER SEES
         // BOTTOM LEFT CORNER
@@ -62,12 +67,13 @@ public class WorldContainer {
         int fovStartY = (int)(player.getPosition().y - camH/2 - 1);
 
         // TOP RIGHT CORNER
-        int fovEndX = fovStartX + camW + 3;
-        int fovEndY = fovStartY + camH + 2;
+        int fovEndX = fovStartX + (int) camW + 4;
+        int fovEndY = fovStartY + (int) camH + 4;
 
         // KEEP BOUNDS
         if(fovStartX < 0) fovStartX = 0;
         if(fovStartY < 0) fovStartY = 0;
+
 
         if(fovEndX > level.getLevelWidth())
             fovEndX = level.getLevelWidth();
@@ -130,13 +136,13 @@ public class WorldContainer {
      * @param camH camera height
      * @return ArrayList with entities
      */
-    public ArrayList<Entity> getEntitiesToBeRendered(int camW, int camH) {
+    public ArrayList<Entity> getEntitiesToBeRendered(float camW, float camH) {
         int fovStartX = (int)(player.getPosition().x - camW/2);
         int fovStartY = (int)(player.getPosition().y - camH/2);
 
         // TOP RIGHT CORNER
-        int fovEndX = fovStartX + camW + 1;
-        int fovEndY = fovStartY + camH + 1;
+        int fovEndX = fovStartX + (int)camW + 4;
+        int fovEndY = fovStartY + (int)camH + 4;
 
         // KEEP BOUNDS
         if(fovStartX < 0) fovStartX = 0;
@@ -153,7 +159,7 @@ public class WorldContainer {
                     e.getBody().getPosition().x <= fovEndX &&
                     e.getBody().getPosition().y > fovStartY &&
                     e.getBody().getPosition().y <= fovEndY) {
-                    if(!entitiesToBeDrawn.contains(e))
+                    if(!entitiesToBeDrawn.contains(e) && e.hasGraphics)
                     entitiesToBeDrawn.add(e);
             }
             else {
@@ -207,8 +213,6 @@ public class WorldContainer {
 
 
         }
-        /*if(e.equals(player))
-            Gdx.app.log("MY NEIGHBOURHOOD IS ", Integer.toString(entityNeighbourhood.size()));*/
         return entityNeighbourhood;
     }
 

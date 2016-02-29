@@ -4,12 +4,18 @@ package com.trent.awesomejumper.models;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.trent.awesomejumper.controller.InputHandler;
+import com.trent.awesomejumper.controller.WorldController;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.Body;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.engine.modelcomponents.Health;
+import com.trent.awesomejumper.engine.modelcomponents.Weapon;
 import com.trent.awesomejumper.engine.modelcomponents.popups.PopUpFeed;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
+
+import static com.trent.awesomejumper.utils.Utilities.angle;
+import static com.trent.awesomejumper.utils.Utilities.sub;
 
 /**
  * Created by Sinthu on 12.06.2015.
@@ -54,6 +60,9 @@ public class Player extends Entity {
         popUpFeed = new PopUpFeed(this);                                                        // enable capability to render popups
         health = new Health(this, startHealth);                                                 // enable health
 
+        weapon = new Weapon(this);
+
+
         body.setBounds(new CollisionBox(position, WIDTH_X, WIDTH_Y));
         body.setPosition(position);
 
@@ -65,11 +74,14 @@ public class Player extends Entity {
         body.setZOffset(0f);
         body.setHeightZ(HEIGHT_Z);
 
-
         body.setMass(MASS);
         body.setFriction(FRICTION);
         body.setElasticity(ELASTICITY);
         body.setMaxVelocity(MAX_SPEED);
+
+        body.setOrientation(sub(position, InputHandler.mouse));
+        body.setAngleOfRotation(angle(body.getOrientation()));
+
 
         headSize = 0.1f*HEIGHT_Z;   // 10% of the z height are occupied by the head
         torsoSize = 0.4f*HEIGHT_Z;  // 40% of the z height are occupied by the torso
@@ -77,17 +89,17 @@ public class Player extends Entity {
 
 
         head = new CollisionBox(position,WIDTH_X,headSize);
-        head.setOffset(X_OFFSET, 0.8f*HEIGHT_Z);
-        head.setDamageCoefficient(5f);
+        head.setOffset(X_OFFSET, 0.8f * HEIGHT_Z);
+        head.setDamageCoefficient(1f);
 
         torso = new CollisionBox(position,WIDTH_X,torsoSize);
-        torso.setOffset(X_OFFSET, 0.3f*HEIGHT_Z);
-        torso.setDamageCoefficient(3f);
+        torso.setOffset(X_OFFSET, 0.3f * HEIGHT_Z);
+        torso.setDamageCoefficient(0.4f);
 
 
         legs = new CollisionBox(position, WIDTH_X,legSize);
         legs.setOffset(X_OFFSET, 0f);
-        legs.setDamageCoefficient(1f);
+        legs.setDamageCoefficient(0.2f);
 
 
 
@@ -100,6 +112,8 @@ public class Player extends Entity {
         body.add(legs);
 
         state = State.IDLE;
+
+       // graphics.enableRotations();
     }
 
 
@@ -110,6 +124,10 @@ public class Player extends Entity {
     public void update(float delta) {
         playerDelta = delta;
         super.update(delta);
+        body.setOrientation(sub(getPosition(), InputHandler.mouse));
+        body.setAngleOfRotation(angle(body.getOrientation()));
+
+
 
     }
 

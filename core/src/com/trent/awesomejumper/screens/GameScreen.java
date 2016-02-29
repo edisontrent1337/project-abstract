@@ -6,7 +6,9 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
+import com.trent.awesomejumper.controller.InputHandler;
 import com.trent.awesomejumper.controller.RenderingEngine;
 import com.trent.awesomejumper.controller.WorldController;
 import com.trent.awesomejumper.engine.entity.Entity;
@@ -27,11 +29,14 @@ public class GameScreen implements Screen, InputProcessor{
 
     private WorldContainer worldContainer;
     private WorldController controller;
+    private InputHandler inputHandler;
     private AwesomeJumperMain game;
     private RenderingEngine renderingEngine;
 
     private int WIDTH = Gdx.graphics.getWidth();
     private int HEIGHT = Gdx.graphics.getHeight();
+
+    private OrthographicCamera gameCamera;
 
     // TODO: Add rectangles or even a segmented circle to catch touch events and control the player.
     // TODO: The coordinate system for touch events is flipped on the y axis!
@@ -48,6 +53,8 @@ public class GameScreen implements Screen, InputProcessor{
         worldContainer = new WorldContainer();
         controller = new WorldController(worldContainer);
         renderingEngine = new RenderingEngine(worldContainer, game);
+        inputHandler = new InputHandler(worldContainer.getPlayer());
+        gameCamera = renderingEngine.getGameCamera();
         Gdx.input.setInputProcessor(this);
 
     }
@@ -57,6 +64,7 @@ public class GameScreen implements Screen, InputProcessor{
         Gdx.gl.glClearColor(1f, 247f/255f, 178f/255f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         // TODO: add domain specific methods: input, graphics, network, ai, sound, physics
+        inputHandler.update();
         controller.update(delta);
         renderingEngine.render();
     }
@@ -90,23 +98,21 @@ public class GameScreen implements Screen, InputProcessor{
 
     @Override
     public boolean keyDown(int keycode) {
+
         if (keycode == Keys.LEFT) {
-            controller.leftPressed();
+            inputHandler.leftPressed();
         }
         if (keycode == Keys.RIGHT) {
-            controller.rightPressed();
+            inputHandler.rightPressed();
         }
         if (keycode == Keys.UP) {
-            controller.upPressed();
+            inputHandler.upPressed();
         }
 
         if(keycode == Keys.DOWN) {
-            controller.downPressed();
+            inputHandler.downPressed();
         }
 
-        if (keycode == Keys.D) {
-            game.toggleDebugMode();
-        }
 
         if(keycode == Keys.U) {
             Entity e = new Chest(new Vector2(new Random().nextInt(5) + 5, new Random().nextInt(5) + 5));
@@ -115,11 +121,11 @@ public class GameScreen implements Screen, InputProcessor{
         }
         if(keycode == Keys.P) {
             Entity p = new Projectile(new Vector2(5,6),0.7f);
-            Entity q = new Projectile(new Vector2(5,6), 0.7f);
+            //Entity q = new Projectile(new Vector2(5,6), 0.7f);
             renderingEngine.initGraphics(p);
-            renderingEngine.initGraphics(q);
+            //renderingEngine.initGraphics(q);
             worldContainer.getEntities().add(p);
-            worldContainer.getEntities().add(q);
+            //worldContainer.getEntities().add(q);
 
 
         }
@@ -129,6 +135,9 @@ public class GameScreen implements Screen, InputProcessor{
          * DEBUG KEYS
          */
 
+        if (keycode == Keys.D) {
+            game.toggleDebugMode();
+        }
         if(keycode == Keys.E) {
             game.toggleEntities();
         }
@@ -149,16 +158,16 @@ public class GameScreen implements Screen, InputProcessor{
     @Override
     public boolean keyUp(int keycode) {
         if (keycode == Keys.LEFT) {
-            controller.leftReleased();
+            inputHandler.leftReleased();
         }
         if (keycode == Keys.RIGHT) {
-            controller.rightReleased();
+            inputHandler.rightReleased();
         }
         if (keycode == Keys.UP) {
-            controller.upReleased();
+            inputHandler.upReleased();
         }
         if(keycode == Keys.DOWN) {
-            controller.downReleased();
+            inputHandler.downReleased();
         }
 
         return false;
@@ -173,28 +182,20 @@ public class GameScreen implements Screen, InputProcessor{
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        if(screenX <= 1/8 * WIDTH && screenY > HEIGHT / 5) {
-            controller.leftPressed();
-        }
-        else if(screenX > 1/8 * WIDTH && screenX <= 2/8 * WIDTH && screenY > HEIGHT / 5) {
-            controller.rightPressed();
-        }
-        else if(screenX > 7/8 * WIDTH && screenY > HEIGHT / 5) {
-            controller.upPressed();
+
+
+        //TODO implement a register function for entities to add them to all relevant collections.
+        if(button == Input.Buttons.LEFT) {
+            Projectile p = inputHandler.fire();
+            renderingEngine.initGraphics(p);
+            worldContainer.getEntities().add(p);
         }
 
-        Gdx.app.log("TOUCH EVENT: PRESSED", "COORDINATES:[" + screenX + "|" + screenY + "]" );
         return true;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        if(screenX > 2/8*WIDTH && screenX <=7/8*WIDTH && screenY > HEIGHT / 5) {
-            controller.leftReleased();
-            controller.rightReleased();
-        }
-        controller.upReleased();
-        Gdx.app.log("TOUCH EVENT: RELEASED", "COORDINATES:[" + screenX + "|" + screenY + "]" );
         return true;
     }
 
@@ -205,8 +206,22 @@ public class GameScreen implements Screen, InputProcessor{
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
+
+        /**
+         * Calculating the current mouse position in world units.
+         * Start at the position of the camera, go back half of the viewport width (24) to get
+         * to the starting coordinate of the current viewport. Then add the offset of the mouse in
+         * world units to get the real position of the cursor.
+         *
+         */
+        float x = gameCamera.position.x - gameCamera.viewportWidth/2f + screenX/RenderingEngine.ppuX;
+        float y = gameCamera.position.y - gameCamera.viewportHeight/2f + (Gdx.graphics.getHeight() - screenY)/RenderingEngine.ppuY;
+
+        inputHandler.mouseMoved(x,y);
         return false;
     }
+
+    //TODO: Implement scrolling as a way to change height of shots
 
     @Override
     public boolean scrolled(int amount) {

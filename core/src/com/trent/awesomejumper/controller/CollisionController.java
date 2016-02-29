@@ -18,6 +18,7 @@ import static com.trent.awesomejumper.utils.Utilities.*;
 import static com.trent.awesomejumper.utils.PhysicalConstants.*;
 
 /**
+ * Collision controller. Resolves any relevant physical collisions between all entity types.
  * Created by Sinthu on 04.11.2015.
  */
 public class CollisionController {
@@ -26,6 +27,7 @@ public class CollisionController {
     private Level level;
     private Player player;
     private Vector2 resolutionVector;
+    public static int calledPerFrame = 0;
 
     // Interval variables for determining collision candidates
     private int cdStartX, cdEndX;   // x axis
@@ -86,10 +88,14 @@ public class CollisionController {
             CollisionBox entityCollisionBox = entity.getBounds();
             CollisionBox tileBox = tile.getCollisionBox();
 
-
+            /**
+             * If the entity is a projectile, projectile/world collision has to be resolved.
+             */
             if(entity.getClass() == Projectile.class) {
                 if(projectileCollisionDetection((Projectile)entity, tile, entity.getVelocity()))
-                    return;
+                    return;    // exit collision routine
+                else
+                    continue; // continue with next tile
             }
                 /**
                  * If a collision occurs between a solid world tile and the entity the corresponding entities
@@ -101,7 +107,9 @@ public class CollisionController {
                     entity.getBody().setCollidedWithWorld(true);
                     if(!entity.equals(player)) {
                         entity.getBody().getImpulses().clear();
-                        entity.getBody().addImpulse(createReflectionImpulse(entity, entity.getVelocity().cpy().scl(1 / delta), resolutionVector.cpy().nor()));
+                        entity.getBody().addImpulse(createReflectionImpulse(entity.getVelocity().cpy().scl(1 / delta),
+                                                    resolutionVector.cpy().nor(),
+                                                    entity.getBody().getElasticity()));
                     }
                     if (resolutionVector.x != 0f)
                         entity.setVelocityX(0f);
@@ -120,7 +128,7 @@ public class CollisionController {
 
         /**
          * If no collision was found regarding the y axis, the process is repeated for the x axis
-         * with different parameters for the fillCollidableTiles method.
+         * with different parameters for the fillCollideableTiles method.
          */
 
         // Reset the resolutionVector to (0f,0f)
@@ -153,9 +161,14 @@ public class CollisionController {
             CollisionBox entityCollisionBox = entity.getBounds();
             CollisionBox tileBox = tile.getCollisionBox();
 
+            /**
+             * If the entity is a projectile, projectile/world collision has to be resolved.
+             */
             if(entity.getClass() == Projectile.class) {
                 if(projectileCollisionDetection((Projectile)entity, tile, entity.getVelocity()))
-                   return;
+                   return;     // exit collision routine
+                else
+                    continue; // continue with next tile
             }
             /**
              * If a collision occurs between a solid world tile and the entity the corresponding entities
@@ -167,7 +180,9 @@ public class CollisionController {
                 entity.getBody().setCollidedWithWorld(true);
                     if(!entity.equals(player)) {
                         entity.getBody().getImpulses().clear();
-                        entity.getBody().addImpulse(createReflectionImpulse(entity, entity.getVelocity().cpy().scl(1 / delta), resolutionVector.cpy().nor()));
+                        entity.getBody().addImpulse(createReflectionImpulse(entity.getVelocity().cpy().scl(1 / delta),
+                                                    resolutionVector.cpy().nor(),
+                                                    entity.getBody().getElasticity()));
                     }
                     if (resolutionVector.x != 0f)
                         entity.setVelocityX(0f);
@@ -187,10 +202,11 @@ public class CollisionController {
         // -----------------------------------------------------------------------------------------
         /**
          * Updates exactly now the entity neighbourhood of the specified entity.
+         * This is done to press this algorithm down to 0(m*n) complexity.
          */
         for(Entity other: worldContainer.updatedEntityNeighbourHood(entity)) {
             /**
-             * If the to participants are the same or one of them is declared "dead, move to the next
+             * If the two participants are the same or one of them is declared "dead", move to the next
              * entity in neighbourhood
              */
             if(other.equals(entity) || !other.isAlive())
@@ -210,26 +226,24 @@ public class CollisionController {
              */
             if(other.getClass() == Projectile.class) {
                 if(projectileCollisionDetection((Projectile)other,entity, otherFrameVelo, entityFrameVelo)) {
-                    Gdx.app.log("CONTINUE", "OTHER WAS PROJECTILE");
                     continue;
                     }
             }
 
             else if(entity.getClass() == Projectile.class) {
                 if(projectileCollisionDetection((Projectile)entity, other, entityFrameVelo, otherFrameVelo)) {
-                    Gdx.app.log("RETURN", "ENTITY WAS PROJECTILE");
                     return;
                 }
+                else
+                    continue; // continue with next entity in neighbourhood
             }
 
+            /**
+             * If both participants are projectiles, nothing will happen.
+             * They will pass through each other.
+             */
             else if(entity.getClass() == Projectile.class && other.getClass() == Projectile.class) {
-                if(checkCollision(otherBox,entityBox)) {
-                    entity.setVelocity(0f,0f);
-                    other.setVelocity(0f,0f);
-                    entity.destroy();
-                    other.destroy();
-                    return;
-                }
+                continue;
             }
 
 
@@ -246,26 +260,20 @@ public class CollisionController {
                         }
                     }
 
-                //TODO: make the following lines of code easier by using the function createReflectionImpulse
                 /**
                  * deltaVelocity - Relative velocity between both participants of the collision.
                  * collisionNormal - normal to the collision plane
-                 * vNorm - relative velocity projected onto the collisionNormal
-                 * vTang - sub vector of normal and relative velocity = tangential component
                  */
                 Vector2 deltaVelocity = sub(other.getVelocity(), entity.getVelocity().cpy().scl(1 / delta));
                 Vector2 collisionNormal = resolutionVector.cpy().nor();
-                // N*(V dot N)
-                Vector2 vNorm = collisionNormal.cpy().scl(dot(deltaVelocity, collisionNormal));
-                Vector2 vTang = sub(vNorm, deltaVelocity).scl(-FRICTIONAL_COEFFICIENT);
                 /**
                  * Calculate impulses to be added to each entity. Adding tangential and normal
                  * components to form one impulse vector. The magnitude in direction of the collision
                  * normal is negatively! scaled with the elasticity of the entity to push both entities
                  * away from each other.
                  */
-                Vector2 impulseEntity =vTang.cpy().add(vNorm.cpy().scl(-(1 - entity.getBody().getElasticity())));
-                Vector2 impulseOther = vTang.cpy().add(vNorm.cpy().scl(-(1 - other.getBody().getElasticity())));
+                Vector2 impulseEntity = createReflectionImpulse(deltaVelocity,collisionNormal,entity.getBody().getElasticity());
+                Vector2 impulseOther = createReflectionImpulse(deltaVelocity,collisionNormal,other.getBody().getElasticity());
 
                 float entityMass = entity.getBody().getMass();
                 float otherMass = other.getBody().getMass();
@@ -333,14 +341,15 @@ public class CollisionController {
      */
 
     private boolean checkCollision(CollisionBox aBox, CollisionBox bBox) {
+        calledPerFrame++;
         /**
          * The minimal overlap is initialized with a very large value.
          */
         float minOverlap = 10000f;
 
         // Get normals of each shape
-        Array<Vector2> normalsA = aBox.getNormals(); // WORLD
-        Array<Vector2> normalsB = bBox.getNormals(); // PLAYER
+        Array<Vector2> normalsA = aBox.getNormals();
+        Array<Vector2> normalsB = bBox.getNormals();
 
         /**
          * Calculating the projection of both shapes onto the each of the normals of shape A.
@@ -469,18 +478,19 @@ public class CollisionController {
     // IMPULSE CREATION
     // ---------------------------------------------------------------------------------------------
     /**
-     * Creates an impulse vector with orthogonal orientation towards the incoming velocity.
+     * Creates an impulse vector with orthogonal orientation towards the incoming relativeVelocity.
      * The entities elasticity is used to scale the impulse properly.
-     * @param entity Entity
-     * @param velocity velocity of the entity
-     * @param collisionNormal axis on which the velocity should be mirrored
+     * The FRICTIONAL_COEFFICIENT is a global constant to simulate friction along the impact plane.
+     * @param relativeVelocity relativeVelocity of the entity
+     * @param collisionNormal axis on which the relativeVelocity should be mirrored
+     * @param elasticity elasticity coefficient of the entity
      * @return reflection impulse
      */
-    public Vector2 createReflectionImpulse(Entity entity, Vector2 velocity, Vector2 collisionNormal) {
+    public Vector2 createReflectionImpulse(Vector2 relativeVelocity, Vector2 collisionNormal, float elasticity) {
 
-        Vector2 vNorm = collisionNormal.cpy().scl(dot(velocity, collisionNormal));
-        Vector2 vTang = sub(velocity, vNorm).scl(-FRICTIONAL_COEFFICIENT);
-        Vector2 reflection = vTang.cpy().add(vNorm.cpy().scl(-(1 - entity.getBody().getElasticity())));
+        Vector2 vNorm = collisionNormal.cpy().scl(dot(relativeVelocity, collisionNormal));
+        Vector2 vTang = sub(vNorm, relativeVelocity).scl(-FRICTIONAL_COEFFICIENT);
+        Vector2 reflection = vTang.cpy().add(vNorm.cpy().scl(-(1 - elasticity)));
         return reflection;
     }
 
@@ -500,8 +510,6 @@ public class CollisionController {
      */
     private boolean projectileCollisionDetection(Projectile projectile, Entity entity, Vector2 projectileVelocity, Vector2 entityVelocity) {
 
-            // Iterate over all collision boxes of the entity skeleton
-           // for (CollisionBox entityHitbox : entity.getBodyHitboxes()) {
 
                  CollisionBox entityBounds = entity.getBounds();
                 // relative velocity between projectile and entity
@@ -515,15 +523,9 @@ public class CollisionController {
                  * can happen in the next frame, so it has to be resolved by checkCollision
                  */
                 if(framesToImpact > 0 && framesToImpact < 1) {
-                    Gdx.app.log("EVENT", "PROJECTILE HIT REGISTRED");
-                    Gdx.app.log("PROJECTILE POSITION", projectile.getPosition().toString());
-                    Gdx.app.log("HITBOX AND OFFSET", entityBounds.getPositionAndOffset().toString());
-                    Gdx.app.log("RELATIVE VELOCITY", Float.toString(relativeVelocity));
-                    Gdx.app.log("DISTANCE", Float.toString(dst));
-                    Gdx.app.log("FRAMES TO IMPACT", Float.toString(framesToImpact));
                     /**
                      * If the bounds/shadows of the projectile and the entity collide,
-                     * another check has to pass: whether or not the projectile is in the correight
+                     * another check has to pass: whether or not the projectile is in the correct
                      * z-height to hit the entity or not.
                      */
                     if(checkCollision(projectile.getBounds(), entityBounds)) {                      // shadows collide
@@ -531,7 +533,7 @@ public class CollisionController {
                             if(checkCollision(entityHitBox, projectile.getProjectileBox())) {
                                 projectile.setVelocity(0f, 0f);
                                 if(entity.hasHealth)
-                                entity.getHealth().takeDamage(projectile.dealDamage(entityHitBox));
+                                    entity.getHealth().takeDamage(projectile.dealDamage(entityHitBox));
                                 projectile.destroy();
                                 return true;
                             }
@@ -539,7 +541,6 @@ public class CollisionController {
                     }
                 }
 
-           // }
         return false;
     }
 
@@ -557,11 +558,8 @@ public class CollisionController {
      */
     private boolean projectileCollisionDetection(Projectile projectile, Tile tile, Vector2 projectileVelocity) {
 
-        Gdx.app.log("Velocity", Float.toString(projectileVelocity.len()));
         float dst = sub(projectile.getPosition(), tile.getPosition()).len();
-        Gdx.app.log("Distance", Float.toString(dst));
         float framesTillImpact = dst / projectileVelocity.len();
-        Gdx.app.log("Time", Float.toString(framesTillImpact));
 
         // FAST BULLET
         if (framesTillImpact > 0 && framesTillImpact < 1) {

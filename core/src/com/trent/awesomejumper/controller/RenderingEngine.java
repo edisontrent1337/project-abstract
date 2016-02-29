@@ -43,10 +43,12 @@ public class RenderingEngine {
     private AwesomeJumperMain game;
     private SkyBox farSky01, farSky02, nearSky01, nearSky02;
     public OrthographicCamera cam, uiCam;
-    static final int CAMERA_WIDTH = 32;
-    static final int CAMERA_HEIGHT =18;
+    static final float CAMERA_WIDTH = 32;
+    static final float CAMERA_HEIGHT =18f;
     private final float LERP_FACTOR = 0.075f;
 
+
+    public static Vector2 playerScreenPos = new Vector2(0f,0f);
 
     /**
      * Pixel per unit scale. The screen shows 16 * 9 units, for pixel perfect accuracy we need
@@ -95,8 +97,6 @@ public class RenderingEngine {
         this.nearSky02 = worldContainer.getLevel().getSkyBoxes().get(3);
         this.player = worldContainer.getPlayer();
 
-        this.ppuX = Gdx.graphics.getWidth() / CAMERA_WIDTH;
-        this.ppuY = Gdx.graphics.getHeight() / CAMERA_HEIGHT;
 
         this.allTextures = new TextureAtlas();
 
@@ -106,9 +106,11 @@ public class RenderingEngine {
          * ZOOM = 16.66667 , other options: initialize camera with parameters
          * 16,9 and leave zoom at 1.
           */
-        cam = new OrthographicCamera(32f, 18f);
-        cam.zoom = 0.75f;
+        cam = new OrthographicCamera(CAMERA_WIDTH, CAMERA_HEIGHT);
+        cam.zoom = 1f;
         zoom = cam.zoom;
+        this.ppuX = Gdx.graphics.getWidth() / (CAMERA_WIDTH * zoom);
+        this.ppuY = Gdx.graphics.getHeight() / (CAMERA_HEIGHT * zoom);
         cam.position.set(player.getPosition().x, player.getPosition().y + 2, 0);
         cam.update();
 
@@ -205,7 +207,15 @@ public class RenderingEngine {
          * SPRITEBATCH uiBatch IS USED TO DRAW UI INFORMATION
          */
         uiCam.update();
+        float screenBeginX = player.getPosition().x - CAMERA_WIDTH/2;
+        float screenEndX = screenBeginX + CAMERA_WIDTH;
 
+        float screenBeginY = player.getPosition().y - CAMERA_HEIGHT /2;
+        float screenEndY = screenBeginY + CAMERA_HEIGHT;
+
+        playerScreenPos.x = (((player.getPosition().x - screenBeginX )% CAMERA_WIDTH)*ppuX);
+        playerScreenPos.y = (((player.getPosition().y - screenBeginY )% CAMERA_HEIGHT)*ppuY);
+       // Gdx.app.log("playerscreenPos", playerScreenPos.toString());
         moveCamera(player.getPosition().x, player.getPosition().y);
         sb.setProjectionMatrix(cam.combined);
         sb.begin();
@@ -439,19 +449,12 @@ public class RenderingEngine {
         debugRenderer.begin(ShapeRenderer.ShapeType.Line);
 
 
-        debugRenderer.setColor(0, 1, 0, 1);
-        // PLAYER HITBOXES
-
-       /* debugRenderer.rect(player.getPosition().x + player.getVelocity().cpy().scl(player.getPlayerDelta()).x,
-                           player.getPosition().y + player.getVelocity().cpy().scl(player.getPlayerDelta()).y,
-                           player.getBodyHitboxes().get(0).getWidthX(),
-                           player.getBodyHitboxes().get(0).getWidthY());*/
-
-
         for(Entity e : worldContainer.getEntities()) {
             /**
              * Only if the body flag is enabled, body hitboxes will be drawn.
              */
+            debugRenderer.setColor(1, 0, 0, 1);
+            e.getBounds().draw(debugRenderer);
             if(game.bodyEnabled()) {
                 for (CollisionBox r : e.getBodyHitboxes()) {
                     debugRenderer.setColor(Color.YELLOW);
@@ -459,7 +462,6 @@ public class RenderingEngine {
                 }
             }
 
-            e.getBounds().draw(debugRenderer);
             if(e.getBody().isCollidedWithWorld()) {
                 debugRenderer.end();
                 debugRenderer.begin(ShapeRenderer.ShapeType.Filled);
@@ -497,10 +499,16 @@ public class RenderingEngine {
     public void resize(int w, int h) {
         uiCam = new OrthographicCamera(w,h);
         uiCam.position.set(w/2,h/2,0);
-        ppuX = Gdx.graphics.getWidth() / CAMERA_WIDTH;
-        ppuY = Gdx.graphics.getHeight() / CAMERA_HEIGHT;
-
-        messageFont.getData().setScale(1.2f/ppuX, 1.2f/ppuY);
+        ppuX = Gdx.graphics.getWidth() / (CAMERA_WIDTH*zoom);
+        ppuY = Gdx.graphics.getHeight() / (CAMERA_HEIGHT*zoom);
+        messageFont.getData().setScale(1/ppuX, 1/ppuY);
     }
 
+
+    // GETTER AND SETTER
+    // ---------------------------------------------------------------------------------------------
+
+    public OrthographicCamera getGameCamera() {
+        return cam;
+    }
 }

@@ -177,13 +177,12 @@ public class CollisionBox {
      * @param renderer Instance of the libGdx ShapeRenderer Class used to draw the CollisionBox
      */
     public void draw(ShapeRenderer renderer) {
-
+        Color color = renderer.getColor();
         // DRAW OUTER BOUNDING BOX
         renderer.set(ShapeRenderer.ShapeType.Line);
         renderer.setAutoShapeType(true);
 
         // DRAW NORMALS & EDGES
-        renderer.setColor(Color.PINK);
         for (int i = 0; i < edges.size; i++) {
             // GRAB CURRENT VERTEX, EDGE, NORMAL
             Vector2 edge = edges.get(i);
@@ -191,7 +190,6 @@ public class CollisionBox {
             Vector2 normal = normals.get(i);
 
             // DRAW EDGES
-            renderer.setColor(Color.RED);
             // VERTEX + EDGE INFORMATION
             renderer.line(vertex, vertex.cpy().add(edge));
 
@@ -216,7 +214,7 @@ public class CollisionBox {
         }
 
 
-        renderer.setColor(Color.GREEN);
+        renderer.setColor(color);
     }
 
     // UPDATE POSITION OF BOUNDS AND VERTICES

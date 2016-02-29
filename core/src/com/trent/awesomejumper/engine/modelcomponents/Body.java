@@ -1,12 +1,19 @@
 package com.trent.awesomejumper.engine.modelcomponents;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.trent.awesomejumper.controller.RenderingEngine;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
+import com.trent.awesomejumper.models.Player;
+import com.trent.awesomejumper.models.testing.Projectile;
+import com.trent.awesomejumper.utils.Utilities;
 
 import java.util.HashSet;
 import java.util.LinkedList;
+
+import static com.trent.awesomejumper.utils.Utilities.*;
 
 /**
  * Created by Sinthu on 09.12.2015.
@@ -26,7 +33,10 @@ public class Body extends ModelComponent {
     private float zOffset = 0;       // z position over the floor. By default 0
     private Vector2 velocity;        // velocity on the xy grid
     private Vector2 acceleration;    // acceleration on the xy grid
-    private Vector2 center;
+    private Vector2 center;          // center of the body position
+    private Vector2 reference;       // reference position of an object the entity wants to look at
+    private Vector2 orientation;     // direction in which the entity currently looks
+    private float angleOfRotation;   // angle which belongs towards the orientation for rendering
 
     private CollisionBox bounds;
 
@@ -67,6 +77,8 @@ public class Body extends ModelComponent {
         this.position = new Vector2(0f, 0f);
         this.velocity = new Vector2(0f, 0f);
         this.acceleration = new Vector2(0f, 0f);
+        this.orientation = new Vector2(1f,0f);
+        this.reference = new Vector2(0f,0f);
         this.bounds = new CollisionBox(position, width, height);
         this.impulses = new LinkedList<>();
         this.mass = mass;
@@ -85,6 +97,12 @@ public class Body extends ModelComponent {
         center.set(position.x + getWidthX(), position.y + getWidthY());
         // update ground bounds
         bounds.update(position);
+
+        // update direction of view and angle
+        if(entity.getClass() == Player.class) {
+            Gdx.app.log("ANGLE", Float.toString(angleOfRotation));
+            Gdx.app.log("ORIENTATION", orientation.toString());
+        }
 
         /**
          * Update each CollisionBox inside the hitboxSkeleton
@@ -127,6 +145,29 @@ public class Body extends ModelComponent {
 
     public float getZOffset() {
         return zOffset;
+    }
+
+    public Vector2 getReference() {
+        return reference;
+    }
+
+    public Vector2 getOrientation() {
+        return orientation;
+    }
+    public float getAngleOfRotation() {
+        return angleOfRotation;
+    }
+
+    public void setAngleOfRotation(float angleOfRotation) {
+        this.angleOfRotation = angleOfRotation;
+    }
+
+    public void setReference(Vector2 reference) {
+        this.reference = reference;
+    }
+
+    public void setOrientation(Vector2 orientation) {
+        this.orientation = orientation;
     }
 
     // Velocity

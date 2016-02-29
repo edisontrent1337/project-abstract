@@ -74,6 +74,7 @@ public class Utilities {
     }
 
     // PROJECTION OF A SHAPE ONTO AN AXIS
+    // ---------------------------------------------------------------------------------------------
     /**
      * Returns the projection min and max values of a shape (CollisionBox) onto an axis
      * @param box represents the shape which will be projected.
@@ -143,9 +144,12 @@ public class Utilities {
     }
 
 
-    public float angle(Vector2 v1, Vector2 v2) {
-
-        return (float)Math.acos(dot(v1, v2)/ (v1.len()*v2.len()));
+    public static float angle(Vector2 delta) {
+        float angle = (float)Math.atan2(delta.y, delta.x)*180f/PhysicalConstants.PI;
+        if(angle < 0) {
+            angle = 360f - (-angle);
+        }
+        return angle;
 
     }
 

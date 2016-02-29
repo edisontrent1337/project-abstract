@@ -48,8 +48,6 @@ public class Entity implements EntityInterface {
     // TODO: Idea on how to eliminate all getters for components.
     protected HashMap<ComponentIndex,ModelComponent> modelComponents;
 
-    private Array<Entity> collisionTargets;
-
 
     public enum State {
         IDLE(0),
@@ -57,7 +55,8 @@ public class Entity implements EntityInterface {
         JUMPING(2),
         FALLING(3),
         ATTACKING(4),
-        DEAD(5);
+        HIT(5),
+        DEAD(6);
 
         private final int value;
         State(int value) {
@@ -231,7 +230,7 @@ public class Entity implements EntityInterface {
 
     @Override
     public Weapon getWeapon() {
-        return null;
+        return weapon;
     }
 
     @Override
@@ -252,6 +251,11 @@ public class Entity implements EntityInterface {
     @Override
     public boolean isAlive() {
         return alive;
+    }
+
+    @Override
+    public void registerEntity() {
+
     }
 
 

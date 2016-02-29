@@ -2,6 +2,7 @@ package com.trent.awesomejumper.engine.entity;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.trent.awesomejumper.engine.modelcomponents.*;
+import com.trent.awesomejumper.engine.modelcomponents.popups.PopUpFeed;
 
 /**
  * Created by Sinthu on 09.12.2015.
@@ -15,6 +16,7 @@ public interface EntityInterface {
     void update(float delta);
     void render(SpriteBatch spriteBatch);
     void destroy();
+    void registerEntity();
     boolean isAlive();
 
     Body getBody();
@@ -29,8 +31,9 @@ public interface EntityInterface {
     Weapon getWeapon();
     void setWeapon(Weapon weapon);
 
-    com.trent.awesomejumper.engine.modelcomponents.popups.PopUpFeed getPopUpFeed();
-    void setPopUpFeed(com.trent.awesomejumper.engine.modelcomponents.popups.PopUpFeed feed);
+
+    PopUpFeed getPopUpFeed();
+    void setPopUpFeed(PopUpFeed feed);
 
 
 

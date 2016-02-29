@@ -1,5 +1,6 @@
 package com.trent.awesomejumper.controller;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.entity.Entity.State;
@@ -21,9 +22,7 @@ import static com.trent.awesomejumper.utils.PhysicalConstants.*;
 // TODO: Outsource input handling to the separate controller "InputHandler"
 public class WorldController {
 
-    enum Keys {
-        UP, DOWN, LEFT, RIGHT, D, G, H
-    }
+
 
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
@@ -33,19 +32,6 @@ public class WorldController {
     private Level level;
     private CollisionController collisionController;
 
-
-    //KEY MAP
-    static Map<Keys, Boolean> keyMap = new HashMap<>();
-
-    static {
-        keyMap.put(Keys.LEFT, false);
-        keyMap.put(Keys.DOWN, false);
-        keyMap.put(Keys.RIGHT, false);
-        keyMap.put(Keys.UP, false);
-        keyMap.put(Keys.D, false);
-        keyMap.put(Keys.G, false);
-        keyMap.put(Keys.H, false);
-    }
 
 
     // CONSTRUCTOR
@@ -58,50 +44,15 @@ public class WorldController {
         this.collisionController = new CollisionController(worldContainer);
     }
 
-    // BUTTON PRESSING METHODS
-    // ---------------------------------------------------------------------------------------------
-
-    public void leftPressed() {
-        keyMap.put(Keys.LEFT, true);
-    }
-
-    public void upPressed() {
-        keyMap.put(Keys.UP, true);
-    }
-
-    public void rightPressed() {
-        keyMap.put(Keys.RIGHT, true);
-    }
-
-    public void downPressed() {
-        keyMap.put(Keys.DOWN, true);
-    }
-
-
-    public void leftReleased() {
-        keyMap.put(Keys.LEFT, false);
-    }
-
-    public void upReleased() {
-        keyMap.put(Keys.UP, false);
-    }
-
-    public void rightReleased() {
-        keyMap.put(Keys.RIGHT, false);
-    }
-
-    public void downReleased() {
-        keyMap.put(Keys.DOWN, false);
-    }
 
 
 
-    // UPDATE FUNCTION: INPUT PROCESSING & COLLISION DETECTION
+
+    // UPDATE FUNCTION: COLLISION DETECTION
     // ---------------------------------------------------------------------------------------------
 
     /**
      * Updates all entities in the world in the following order:
-     * - process user input and apply resulting changes in velocity / firing a weapon
      * - resolve collisions between only alive entities, kill for example collided projectiles
      * - remove all dead entities from the game data (garbage collection)
      * - apply impulses to all entities that are left alive
@@ -111,7 +62,6 @@ public class WorldController {
      */
     public void update(float delta) {
 
-        processUserInput();
 
         for(Entity e: worldContainer.getEntities()) {
             e.getAcceleration().scl(delta);
@@ -142,92 +92,16 @@ public class WorldController {
             e.update(delta);
         }
 
+
         /**
          * TODO: FOG IMPLEMENTATION WITH THE OLD SKYBOXES
          */
         for (SkyBox s : level.getSkyBoxes()) {
             s.update(delta);
         }
-
+        collisionController.calledPerFrame = 0;
     }
 
-
-    // PROCESS USER INPUT
-    // ---------------------------------------------------------------------------------------------
-
-    private void processUserInput() {
-        // WALKING UP
-
-        if (keyMap.get(Keys.UP) &!(keyMap.get(Keys.DOWN) || keyMap.get(Keys.RIGHT) || keyMap.get(Keys.LEFT))) {
-            player.setState(State.WALKING);
-            player.setAccelY(ACCELERATION);
-            player.setAccelX(0f);
-        }
-        // WALKING DOWN
-        else if (keyMap.get(Keys.DOWN) &!(keyMap.get(Keys.UP) || keyMap.get(Keys.RIGHT) || keyMap.get(Keys.LEFT))) {
-            player.setState(State.WALKING);
-            player.setAccelY(-ACCELERATION);
-            player.setAccelX(0f);
-        }
-
-        // WALKING RIGHT
-        else if (keyMap.get(Keys.RIGHT) &!(keyMap.get(Keys.LEFT) || keyMap.get(Keys.UP) || keyMap.get(Keys.DOWN))) {
-            player.setFacingL(false);
-            player.setState(State.WALKING);
-            player.setAccelX(ACCELERATION);
-            player.setAccelY(0f);
-        }
-
-        // WALKING LEFT
-        else if (keyMap.get(Keys.LEFT) &!(keyMap.get(Keys.RIGHT) || keyMap.get(Keys.UP) || keyMap.get(Keys.DOWN))) {
-            player.setFacingL(true);
-            player.setState(State.WALKING);
-            player.setAccelX(-ACCELERATION);
-            player.setAccelY(0f);
-
-        }
-
-        // WALKING UP RIGHT
-        else if (keyMap.get(Keys.UP) && keyMap.get(Keys.RIGHT) & !(keyMap.get(Keys.DOWN) || keyMap.get(Keys.LEFT))) {
-            player.setFacingL(false);
-            player.setState(State.WALKING);
-            player.setAccelX(ACCELERATION);
-            player.setAccelY(ACCELERATION);
-        }
-
-        // WALKING UP LEFT
-        else if (keyMap.get(Keys.UP) && keyMap.get(Keys.LEFT) & !(keyMap.get(Keys.DOWN) || keyMap.get(Keys.RIGHT))) {
-            player.setFacingL(true);
-            player.setState(State.WALKING);
-            player.setAccelX(-ACCELERATION);
-            player.setAccelY(ACCELERATION);
-        }
-
-        // WALKING DOWN RIGHT
-        else if (keyMap.get(Keys.DOWN) && keyMap.get(Keys.RIGHT) & !(keyMap.get(Keys.UP) || keyMap.get(Keys.LEFT))) {
-            player.setFacingL(false);
-            player.setState(State.WALKING);
-            player.setAccelX(ACCELERATION);
-            player.setAccelY(-ACCELERATION);
-        }
-
-        // WALKING DOWN LEFT
-        else if (keyMap.get(Keys.DOWN) && keyMap.get(Keys.LEFT) & !(keyMap.get(Keys.UP) || keyMap.get(Keys.RIGHT))) {
-            player.setFacingL(true);
-            player.setState(State.WALKING);
-            player.setAccelX(-ACCELERATION);
-            player.setAccelY(-ACCELERATION);
-        }
-
-
-        // IDLE
-        else {
-            player.setState(State.IDLE);
-            player.setAccelX(0f);
-            player.setAccelY(0f);
-        }
-
-    }
 
 
     private void manageEntitySpeed(float delta) {
@@ -263,7 +137,7 @@ public class WorldController {
                 entity.setVelocityY(-entity.getMaxVelocity());
             }
 
-            // IF PLAYER FALLS OUT OF BOUNDS, HE IS PUT BACK TO THE START
+            // IF ENTITY FALLS OUT OF BOUNDS, IT IS PUT BACK TO THE START
             if (!level.checkBounds((int) entity.getPosition().x, (int) entity.getPosition().y)) {
                 entity.setPosition(new Vector2(5f, 12f));
                 entity.update(delta);
