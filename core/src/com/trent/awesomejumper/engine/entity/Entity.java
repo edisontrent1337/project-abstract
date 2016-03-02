@@ -3,15 +3,18 @@ package com.trent.awesomejumper.engine.entity;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.trent.awesomejumper.controller.EntityManager;
 import com.trent.awesomejumper.engine.modelcomponents.Body;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.engine.modelcomponents.Health;
 import com.trent.awesomejumper.engine.modelcomponents.ModelComponent;
+import com.trent.awesomejumper.engine.modelcomponents.WeaponComponent;
+import com.trent.awesomejumper.engine.modelcomponents.WeaponSlots;
 import com.trent.awesomejumper.engine.modelcomponents.popups.PopUpFeed;
-import com.trent.awesomejumper.engine.modelcomponents.Weapon;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
 
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by Sinthu on 12.06.2015.
@@ -20,6 +23,10 @@ public class Entity implements EntityInterface {
 
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
+
+    private static AtomicInteger idCounter = new AtomicInteger();
+
+    private final int ID;
 
     public enum ComponentIndex {
         BODY(0),
@@ -37,13 +44,15 @@ public class Entity implements EntityInterface {
 
 
     public static int entityCount = 0;
-    public boolean hasBody = false, hasGraphics = false, hasHealth = false, hasWeapon = false,
-    hasPopUps = false;
+    public boolean hasBody = false, hasGraphics = false, hasHealth = false, hasWeaponSlot = false,
+    hasPopUps = false, hasWeaponComponent = false;
     protected Body body;
     protected Graphics graphics;
     protected Health health;
-    protected Weapon weapon;
+    protected WeaponSlots weaponSlots;
+    protected WeaponComponent weaponComponent;
     protected PopUpFeed popUpFeed;
+
 
     // TODO: Idea on how to eliminate all getters for components.
     protected HashMap<ComponentIndex,ModelComponent> modelComponents;
@@ -77,10 +86,11 @@ public class Entity implements EntityInterface {
     public float time;
 
     // CONSTRUCTOR
-    // ---------------------------------b------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------------
 
     public Entity(){
         entityCount++;
+        ID = createID();
     }
 
 
@@ -178,25 +188,21 @@ public class Entity implements EntityInterface {
     }
 
 
-
-    @Override
-    public void update(float delta) {
-        time += delta;
-        if(hasBody)
-            body.update(delta);
-    }
-
-    @Override
-    public void render(SpriteBatch spriteBatch) {
-        if(hasGraphics)
-            graphics.render(spriteBatch);
-    }
+    // LIFE AND DEATH
+    // ---------------------------------------------------------------------------------------------
 
     @Override
     public void destroy() {
         alive = false;
         entityCount--;
     }
+    @Override
+    public boolean isAlive() {
+        return alive;
+    }
+
+    // BODY
+    // ---------------------------------------------------------------------------------------------
 
     @Override
     public Body getBody() {
@@ -209,6 +215,16 @@ public class Entity implements EntityInterface {
     }
 
     @Override
+    public void update(float delta) {
+        time += delta;
+        if(hasBody)
+            body.update(delta);
+    }
+
+    // GRAPHICS
+    // ---------------------------------------------------------------------------------------------
+
+    @Override
     public Graphics getGraphics() {
         return graphics;
     }
@@ -217,6 +233,15 @@ public class Entity implements EntityInterface {
     public void setGraphics(Graphics graphics) {
 
     }
+
+    @Override
+    public void render(SpriteBatch spriteBatch) {
+        if(hasGraphics)
+            graphics.render(spriteBatch);
+    }
+
+    // HEALTH
+    // ---------------------------------------------------------------------------------------------
 
     @Override
     public Health getHealth() {
@@ -228,15 +253,27 @@ public class Entity implements EntityInterface {
 
     }
 
+    // WEAPON INVENTORY
+    // ---------------------------------------------------------------------------------------------
+
     @Override
-    public Weapon getWeapon() {
-        return weapon;
+    public WeaponSlots getWeaponSlots() {
+        return weaponSlots;
     }
 
     @Override
-    public void setWeapon(Weapon weapon) {
+    public void setWeaponSlots(WeaponSlots weaponSlots) {
 
     }
+
+    @Override
+    public void updateWeaponPositions() {
+        if(hasWeaponSlot)
+            weaponSlots.updateWeaponPositions();
+    }
+
+    // POP UP RENDERING
+    // ---------------------------------------------------------------------------------------------
 
     @Override
     public PopUpFeed getPopUpFeed() {
@@ -248,15 +285,25 @@ public class Entity implements EntityInterface {
         this.popUpFeed = popUpFeed;
     }
 
-    @Override
-    public boolean isAlive() {
-        return alive;
-    }
 
+    // REGISTER ENTITY IN GAME SYSTEM AT RUNTIME
+    // ---------------------------------------------------------------------------------------------
+
+    /**
+     * Adds this entity to all relevant collections and loads textures for it. This method shall be
+     * called whenever new entities are created at runtime.
+     */
     @Override
     public void registerEntity() {
-
+        EntityManager.getInstance().registerEntity(this);
     }
 
+    private int createID() {
+        return idCounter.incrementAndGet();
+    }
+
+    public int getID() {
+        return ID;
+    }
 
 }

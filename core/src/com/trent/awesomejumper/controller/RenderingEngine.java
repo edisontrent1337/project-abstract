@@ -18,7 +18,6 @@ import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.SkyBox;
-import com.trent.awesomejumper.models.WorldContainer;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
 import com.trent.awesomejumper.tiles.Tile;
 
@@ -36,8 +35,8 @@ public class RenderingEngine {
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
 
+    private static RenderingEngine instance = null;
     private WorldContainer worldContainer;
-
 
     private Player player;
     private AwesomeJumperMain game;
@@ -125,6 +124,19 @@ public class RenderingEngine {
         loadTextures();
     }
 
+   /* public static RenderingEngine getInstance() {
+        if(instance == null) {
+            throw new NullPointerException("Rendering engine was not initialized.");
+        }
+        return instance;
+    }
+
+    public static RenderingEngine createRenderingEngine(WorldContainer worldContainer, AwesomeJumperMain game) {
+        if(instance == null) {
+            instance = new RenderingEngine(worldContainer, game);
+        }
+        return instance;
+    }*/
 
     // LOAD TEXTURES
     // ---------------------------------------------------------------------------------------------

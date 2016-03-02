@@ -1,16 +1,14 @@
 package com.trent.awesomejumper.models;
 
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.controller.InputHandler;
-import com.trent.awesomejumper.controller.WorldController;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.Body;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.engine.modelcomponents.Health;
-import com.trent.awesomejumper.engine.modelcomponents.Weapon;
+import com.trent.awesomejumper.engine.modelcomponents.WeaponSlots;
 import com.trent.awesomejumper.engine.modelcomponents.popups.PopUpFeed;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
 
@@ -60,7 +58,7 @@ public class Player extends Entity {
         popUpFeed = new PopUpFeed(this);                                                        // enable capability to render popups
         health = new Health(this, startHealth);                                                 // enable health
 
-        weapon = new Weapon(this);
+        weaponSlots = new WeaponSlots(this);
 
 
         body.setBounds(new CollisionBox(position, WIDTH_X, WIDTH_Y));
@@ -113,7 +111,6 @@ public class Player extends Entity {
 
         state = State.IDLE;
 
-       // graphics.enableRotations();
     }
 
 
@@ -124,9 +121,9 @@ public class Player extends Entity {
     public void update(float delta) {
         playerDelta = delta;
         super.update(delta);
+        body.setReference(InputHandler.mouse);
         body.setOrientation(sub(getPosition(), InputHandler.mouse));
         body.setAngleOfRotation(angle(body.getOrientation()));
-
 
 
     }
@@ -134,6 +131,11 @@ public class Player extends Entity {
     @Override
     public void render(SpriteBatch spriteBatch) {
         super.render(spriteBatch);
+    }
+
+    @Override
+    public void updateWeaponPositions() {
+        super.updateWeaponPositions();
     }
 
     public float getPlayerDelta() {

@@ -36,6 +36,8 @@ public class Graphics extends ModelComponent{
 
     private float width, height, alpha, originX, originY;
     private boolean supportsRotation = false;
+    boolean flipX = false;
+    boolean flipped = false;
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
@@ -122,8 +124,15 @@ public class Graphics extends ModelComponent{
             float originY = height / 2f;
 
 
-            sb.draw(shadow, x, y, originX, originY, width, height, 1, 1, entity.getBody().getAngleOfRotation());
-            sb.draw(currentFrame, x, y + entity.getBody().getZOffset(), originX, originY, width, height, 1, 1, entity.getBody().getAngleOfRotation());
+            float angle = entity.getBody().getAngleOfRotation();
+            //TODO fix rotations
+
+
+                sb.draw(shadow, x, y, originX, originY, width, height, 1, 1, entity.getBody().getAngleOfRotation());
+                sb.draw(currentFrame, x, y + entity.getBody().getZOffset(), originX, originY, width, height, 1, 1, entity.getBody().getAngleOfRotation());
+
+
+
         }
         else {
             sb.draw(shadow, x,  y, width, height);

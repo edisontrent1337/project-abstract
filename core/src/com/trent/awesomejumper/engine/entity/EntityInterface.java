@@ -28,9 +28,9 @@ public interface EntityInterface {
     Health getHealth();
     void setHealth(Health health);
 
-    Weapon getWeapon();
-    void setWeapon(Weapon weapon);
-
+    WeaponSlots getWeaponSlots();
+    void setWeaponSlots(WeaponSlots weaponSlots);
+    void updateWeaponPositions();
 
     PopUpFeed getPopUpFeed();
     void setPopUpFeed(PopUpFeed feed);

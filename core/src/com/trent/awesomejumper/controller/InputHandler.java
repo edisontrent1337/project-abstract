@@ -3,7 +3,6 @@ package com.trent.awesomejumper.controller;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.models.Player;
-import com.trent.awesomejumper.models.testing.Projectile;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -83,8 +82,8 @@ public class InputHandler {
         keyMap.put(Keys.DOWN, false);
     }
 
-    public Projectile fire() {
-       return player.getWeapon().fire();
+    public void fire() {
+       player.getWeaponSlots().fire(true,true);
     }
 
     public void mouseMoved(float x, float y) {

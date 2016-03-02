@@ -30,7 +30,7 @@ public class Chest extends Entity {
     public Chest(Vector2 position) {
 
         body = new Body(this, WIDTH,HEIGHT);
-        graphics = new Graphics(this, 0f,"fiveseven", SPRITE_WIDTH,SPRITE_HEIGHT);
+        graphics = new Graphics(this, 0f,"wood_chest", SPRITE_WIDTH,SPRITE_HEIGHT);
         popUpFeed = new PopUpFeed(this);
         body.setPosition(position);
         body.setMass(MASS);

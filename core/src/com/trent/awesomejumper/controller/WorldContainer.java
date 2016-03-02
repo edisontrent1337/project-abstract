@@ -1,15 +1,18 @@
-package com.trent.awesomejumper.models;
+package com.trent.awesomejumper.controller;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.entity.Entity;
+import com.trent.awesomejumper.exceptions.InvalidWeaponSlotException;
+import com.trent.awesomejumper.models.Level;
+import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.testing.Chest;
+import com.trent.awesomejumper.models.weapons.Pistol;
 import com.trent.awesomejumper.tiles.Tile;
 import static com.trent.awesomejumper.utils.Utilities.sub;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -32,6 +35,7 @@ public class WorldContainer {
 
     private Player player;
     private Chest chest;
+    private Pistol pistol, pistol2;
     private Level level;
     //TODO Change these to HashSet
     private ArrayList tilesToBeDrawn, entitiesToBeDrawn;
@@ -42,16 +46,28 @@ public class WorldContainer {
     // ---------------------------------------------------------------------------------------------
 
     public WorldContainer() {
-
-        player = new Player(new Vector2(12.5f, 7f));
-        chest = new Chest(new Vector2(5,5));
-        level = new Level();
         entities = new HashSet<>();
         entitiesToBeDrawn = new ArrayList<>();
-        entities.add(player);
-        entities.add(chest);
-
+        player = new Player(new Vector2(12.5f, 7f));
+        chest = new Chest(new Vector2(5,5));
+        pistol = new Pistol(new Vector2(6f,7f));
+        pistol2 = new Pistol(new Vector2(5f, 6f));
+        level = new Level();
+        registerEntity(player);
+        registerEntity(chest);
+        registerEntity(pistol);
+        registerEntity(pistol2);
+        try {
+            player.getWeaponSlots().equipWeapon(pistol, 1);
+            player.getWeaponSlots().equipWeapon(pistol2,2);
+        }
+        catch (InvalidWeaponSlotException e){
+            Gdx.app.log("ERROR",e.getMessage());
+        }
     }
+
+
+
 
 
 
@@ -246,6 +262,15 @@ public class WorldContainer {
             }
         }
 
+    }
+
+
+
+    // REGISTER ENTITIES
+    // ---------------------------------------------------------------------------------------------
+
+    public void registerEntity(Entity entity) {
+        entities.add(entity);
     }
 
     // GETTER & SETTER

@@ -6,11 +6,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.Body;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
-import com.trent.awesomejumper.engine.modelcomponents.Weapon;
 import com.trent.awesomejumper.engine.modelcomponents.popups.PopUpFeed;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
-
-import java.util.Random;
 
 
 /**
@@ -33,7 +30,6 @@ public class Projectile extends Entity {
     private final int baseDamage = 90;
     private CollisionBox projectileBox;
 
-    private Weapon weapon;
 
     private Entity owner;
 
@@ -67,7 +63,6 @@ public class Projectile extends Entity {
 
 
         graphics.enableRotations();
-
     }
 
     @Override
@@ -81,7 +76,7 @@ public class Projectile extends Entity {
     public void update(float delta) {
 
         super.update(delta);
-        //TODO : use the reference from the weapon owner... something like calling inside weapon
+        //TODO : use the reference from the weaponSlots owner... something like calling inside weaponSlots
         // projectile = new Projectile, projectile.getBody().setReference()....
     }
 

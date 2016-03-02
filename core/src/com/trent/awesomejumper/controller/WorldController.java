@@ -1,18 +1,13 @@
 package com.trent.awesomejumper.controller;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.entity.Entity;
-import com.trent.awesomejumper.engine.entity.Entity.State;
 import com.trent.awesomejumper.models.Level;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.SkyBox;
-import com.trent.awesomejumper.models.WorldContainer;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Map;
 
 import static com.trent.awesomejumper.utils.PhysicalConstants.*;
 
@@ -90,6 +85,7 @@ public class WorldController {
 
         for(Entity e : worldContainer.getEntities()) {
             e.update(delta);
+            e.updateWeaponPositions();
         }
 
 

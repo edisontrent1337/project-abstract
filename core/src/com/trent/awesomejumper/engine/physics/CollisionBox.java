@@ -160,6 +160,9 @@ public class CollisionBox {
     // METHODS & FUNCTIONS
     // ---------------------------------------------------------------------------------------------
 
+    /**
+     * Adds edges and normals to the corresponding collections.
+     */
     private void addEdgesAndNormals() {
         this.edges = new Array<>();
         this.normals = new Array<>();

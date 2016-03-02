@@ -8,12 +8,13 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
+import com.trent.awesomejumper.controller.EntityManager;
+import com.trent.awesomejumper.controller.WorldContainer;
 import com.trent.awesomejumper.controller.InputHandler;
 import com.trent.awesomejumper.controller.RenderingEngine;
 import com.trent.awesomejumper.controller.WorldController;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
-import com.trent.awesomejumper.models.WorldContainer;
 import com.trent.awesomejumper.models.testing.Chest;
 import com.trent.awesomejumper.models.testing.Projectile;
 
@@ -32,6 +33,7 @@ public class GameScreen implements Screen, InputProcessor{
     private InputHandler inputHandler;
     private AwesomeJumperMain game;
     private RenderingEngine renderingEngine;
+    private EntityManager entityManager;
 
     private int WIDTH = Gdx.graphics.getWidth();
     private int HEIGHT = Gdx.graphics.getHeight();
@@ -51,8 +53,9 @@ public class GameScreen implements Screen, InputProcessor{
     @Override
     public void show() {
         worldContainer = new WorldContainer();
+        renderingEngine = new RenderingEngine(worldContainer,game);
+        entityManager = EntityManager.createEntityManager(worldContainer,renderingEngine);
         controller = new WorldController(worldContainer);
-        renderingEngine = new RenderingEngine(worldContainer, game);
         inputHandler = new InputHandler(worldContainer.getPlayer());
         gameCamera = renderingEngine.getGameCamera();
         Gdx.input.setInputProcessor(this);
@@ -116,15 +119,17 @@ public class GameScreen implements Screen, InputProcessor{
 
         if(keycode == Keys.U) {
             Entity e = new Chest(new Vector2(new Random().nextInt(5) + 5, new Random().nextInt(5) + 5));
-            renderingEngine.initGraphics(e);
-            worldContainer.getEntities().add(e);
+            e.registerEntity();
+            //renderingEngine.initGraphics(e);
+            //worldContainer.getEntities().add(e);
         }
         if(keycode == Keys.P) {
             Entity p = new Projectile(new Vector2(5,6),0.7f);
+            p.registerEntity();
             //Entity q = new Projectile(new Vector2(5,6), 0.7f);
-            renderingEngine.initGraphics(p);
+            //renderingEngine.initGraphics(p);
             //renderingEngine.initGraphics(q);
-            worldContainer.getEntities().add(p);
+            //worldContainer.getEntities().add(p);
             //worldContainer.getEntities().add(q);
 
 
@@ -186,9 +191,7 @@ public class GameScreen implements Screen, InputProcessor{
 
         //TODO implement a register function for entities to add them to all relevant collections.
         if(button == Input.Buttons.LEFT) {
-            Projectile p = inputHandler.fire();
-            renderingEngine.initGraphics(p);
-            worldContainer.getEntities().add(p);
+            inputHandler.fire();
         }
 
         return true;

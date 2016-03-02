@@ -1,14 +1,12 @@
 package com.trent.awesomejumper.controller;
 
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.popups.PopUpFeed;
 import com.trent.awesomejumper.models.Level;
 import com.trent.awesomejumper.models.Player;
-import com.trent.awesomejumper.models.WorldContainer;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
 import com.trent.awesomejumper.models.testing.Projectile;
 import com.trent.awesomejumper.utils.Interval;
@@ -249,7 +247,7 @@ public class CollisionController {
 
             else if(checkCollision(otherBox, entityBox)) {
 
-                    if(entity.hasHealth) {
+                   /* if(entity.hasHealth) {
                         if (entity.getHealth().takeDamage(dmg)) {
                             if(dmg > 250)
                             entity.getPopUpFeed().addMessageToCategory(PopUpFeed.PopUpCategories.CRT, new Message("-" + Integer.toString(dmg), entity.time, 2.00f));
@@ -258,7 +256,7 @@ public class CollisionController {
                             other.getPopUpFeed().addMessageToCategory(PopUpFeed.PopUpCategories.HEAL, new Message("+" + Integer.toString(dmg), other.time, 4.00f));
                             other.getPopUpFeed().addMessageToCategory(PopUpFeed.PopUpCategories.LVL_UP, new Message("LEVEL UP! " + Integer.toString(dmg), other.time, 2.00f));
                         }
-                    }
+                    }*/
 
                 /**
                  * deltaVelocity - Relative velocity between both participants of the collision.

@@ -8,6 +8,7 @@ import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.testing.Projectile;
+import com.trent.awesomejumper.models.weapons.Pistol;
 import com.trent.awesomejumper.utils.Utilities;
 
 import java.util.HashSet;
@@ -99,7 +100,7 @@ public class Body extends ModelComponent {
         bounds.update(position);
 
         // update direction of view and angle
-        if(entity.getClass() == Player.class) {
+        if(entity.getClass() == Pistol.class) {
             Gdx.app.log("ANGLE", Float.toString(angleOfRotation));
             Gdx.app.log("ORIENTATION", orientation.toString());
         }
@@ -139,6 +140,11 @@ public class Body extends ModelComponent {
         position.y = y;
     }
 
+    public void setPosition(float x, float y) {
+        position.x = x;
+        position.y = y;
+    }
+
     public void setZOffset(float zOffset) {
         this.zOffset = zOffset;
     }
@@ -159,6 +165,7 @@ public class Body extends ModelComponent {
     }
 
     public void setAngleOfRotation(float angleOfRotation) {
+
         this.angleOfRotation = angleOfRotation;
     }
 
