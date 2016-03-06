@@ -1,5 +1,7 @@
 package com.trent.awesomejumper.controller;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.models.Player;
@@ -9,7 +11,7 @@ import java.util.Map;
 
 import static com.trent.awesomejumper.utils.PhysicalConstants.ACCELERATION;
 
-/**
+/** //TODO DOCUMENTARY
  * Created by Sinthu on 08.12.2015.
  */
 public class InputHandler {
@@ -33,16 +35,18 @@ public class InputHandler {
     }
 
 
-   public static Vector2 mouse = new Vector2(0f, 0f);
+    public static Vector2 mouse = new Vector2(0f, 0f);
+    private OrthographicCamera camera;
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
 
-    public InputHandler(Player player) {
+    public InputHandler(Player player, OrthographicCamera camera) {
 
         this.player = player;
+        this.camera = camera;
         this.mouse = new Vector2(0f, 0f);
-        player.getBody().setReference(mouse);
+        player.getBody().setAimReference(mouse);
     }
 
 
@@ -83,21 +87,33 @@ public class InputHandler {
     }
 
     public void fire() {
-       player.getWeaponSlots().fire(true,true);
+       player.getWeaponInventory().fire(true,true);
     }
 
-    public void mouseMoved(float x, float y) {
-
-        mouse.x = x;
-        mouse.y = y;
-
+    //TESTING
+    public void dropWeapon(int slot) {
+        player.getWeaponInventory().dropWeapon(slot);
     }
+
+
 
 
     // UPDATE FUNCTION: INPUT PROCESSING
     // -------------------------------------------------------------------------------------------
 
     public void update() {
+
+        /**
+         * Updating mouse position for aiming
+         * Calculating the current mouse position in world units.
+         * Start at the position of the camera, go back half of the viewport width (24) to get
+         * to the starting coordinate of the current viewport. Then add the offset of the mouse in
+         * world units to get the real position of the cursor.
+         *
+         */
+
+        mouse.x = camera.position.x - camera.viewportWidth/2f + Gdx.input.getX()/RenderingEngine.ppuX;
+        mouse.y = camera.position.y - camera.viewportHeight/2f + (Gdx.graphics.getHeight() - Gdx.input.getY())/RenderingEngine.ppuY;
 
 
         // WALKING UP

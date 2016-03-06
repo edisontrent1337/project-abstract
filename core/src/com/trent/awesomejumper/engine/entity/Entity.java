@@ -9,7 +9,7 @@ import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.engine.modelcomponents.Health;
 import com.trent.awesomejumper.engine.modelcomponents.ModelComponent;
 import com.trent.awesomejumper.engine.modelcomponents.WeaponComponent;
-import com.trent.awesomejumper.engine.modelcomponents.WeaponSlots;
+import com.trent.awesomejumper.engine.modelcomponents.WeaponInventory;
 import com.trent.awesomejumper.engine.modelcomponents.popups.PopUpFeed;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
 
@@ -44,15 +44,16 @@ public class Entity implements EntityInterface {
 
 
     public static int entityCount = 0;
-    public boolean hasBody = false, hasGraphics = false, hasHealth = false, hasWeaponSlot = false,
+    public boolean hasBody = false, hasGraphics = false, hasHealth = false, hasWeaponInventory = false,
     hasPopUps = false, hasWeaponComponent = false;
     protected Body body;
     protected Graphics graphics;
     protected Health health;
-    protected WeaponSlots weaponSlots;
+    protected WeaponInventory weaponInventory;
     protected WeaponComponent weaponComponent;
     protected PopUpFeed popUpFeed;
 
+    private Entity owner;
 
     // TODO: Idea on how to eliminate all getters for components.
     protected HashMap<ComponentIndex,ModelComponent> modelComponents;
@@ -257,19 +258,19 @@ public class Entity implements EntityInterface {
     // ---------------------------------------------------------------------------------------------
 
     @Override
-    public WeaponSlots getWeaponSlots() {
-        return weaponSlots;
+    public WeaponInventory getWeaponInventory() {
+        return weaponInventory;
     }
 
     @Override
-    public void setWeaponSlots(WeaponSlots weaponSlots) {
+    public void setWeaponInventory(WeaponInventory weaponInventory) {
 
     }
 
     @Override
     public void updateWeaponPositions() {
-        if(hasWeaponSlot)
-            weaponSlots.updateWeaponPositions();
+        if(hasWeaponInventory)
+            weaponInventory.updateWeaponPositions();
     }
 
     // POP UP RENDERING
@@ -296,6 +297,13 @@ public class Entity implements EntityInterface {
     @Override
     public void registerEntity() {
         EntityManager.getInstance().registerEntity(this);
+    }
+
+    // REGISTER ENTITY IN GAME SYSTEM AS DROP
+    // ---------------------------------------------------------------------------------------------
+
+    public void dropToWorld() {
+        EntityManager.getInstance().registerPickUp(this);
     }
 
     private int createID() {

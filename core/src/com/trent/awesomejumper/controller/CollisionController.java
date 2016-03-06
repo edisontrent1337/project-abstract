@@ -207,7 +207,7 @@ public class CollisionController {
              * If the two participants are the same or one of them is declared "dead", move to the next
              * entity in neighbourhood
              */
-            if(other.equals(entity) || !other.isAlive())
+            if(other.equals(entity) || !other.isAlive() || !other.getBody().isCollisionDetectionEnabled())
                 continue;
 
             CollisionBox entityBox = entity.getBounds();
@@ -561,7 +561,7 @@ public class CollisionController {
 
         // FAST BULLET
         if (framesTillImpact > 0 && framesTillImpact < 1) {
-                projectile.setVelocity(0f, 0f);
+               projectile.setVelocity(0f, 0f);
                 projectile.destroy();
                 return true;
         }
@@ -574,5 +574,7 @@ public class CollisionController {
         return false;
     }
 
+
+   // public static void
 
 }

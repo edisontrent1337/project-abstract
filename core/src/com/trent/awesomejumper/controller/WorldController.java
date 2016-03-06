@@ -65,7 +65,7 @@ public class WorldController {
 
 
         for(Entity e: worldContainer.getEntities()) {
-            if(!e.isAlive())
+            if(!e.isAlive() || !e.getBody().isCollisionDetectionEnabled())
                 continue;
             collisionController.collisionDetection(e,delta);
         }

@@ -8,7 +8,7 @@ import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.Body;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.engine.modelcomponents.Health;
-import com.trent.awesomejumper.engine.modelcomponents.WeaponSlots;
+import com.trent.awesomejumper.engine.modelcomponents.WeaponInventory;
 import com.trent.awesomejumper.engine.modelcomponents.popups.PopUpFeed;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
 
@@ -58,7 +58,7 @@ public class Player extends Entity {
         popUpFeed = new PopUpFeed(this);                                                        // enable capability to render popups
         health = new Health(this, startHealth);                                                 // enable health
 
-        weaponSlots = new WeaponSlots(this);
+        weaponInventory = new WeaponInventory(this, 2);
 
 
         body.setBounds(new CollisionBox(position, WIDTH_X, WIDTH_Y));
@@ -77,7 +77,7 @@ public class Player extends Entity {
         body.setElasticity(ELASTICITY);
         body.setMaxVelocity(MAX_SPEED);
 
-        body.setOrientation(sub(position, InputHandler.mouse));
+        body.setOrientation(sub(getBounds().getPositionAndOffset(), InputHandler.mouse));
         body.setAngleOfRotation(angle(body.getOrientation()));
 
 
@@ -121,8 +121,8 @@ public class Player extends Entity {
     public void update(float delta) {
         playerDelta = delta;
         super.update(delta);
-        body.setReference(InputHandler.mouse);
-        body.setOrientation(sub(getPosition(), InputHandler.mouse));
+        body.setAimReference(InputHandler.mouse);
+        body.setOrientation(sub(body.getCenter(), InputHandler.mouse));
         body.setAngleOfRotation(angle(body.getOrientation()));
 
 

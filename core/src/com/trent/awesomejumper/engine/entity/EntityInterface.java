@@ -17,6 +17,7 @@ public interface EntityInterface {
     void render(SpriteBatch spriteBatch);
     void destroy();
     void registerEntity();
+    void dropToWorld();
     boolean isAlive();
 
     Body getBody();
@@ -28,8 +29,8 @@ public interface EntityInterface {
     Health getHealth();
     void setHealth(Health health);
 
-    WeaponSlots getWeaponSlots();
-    void setWeaponSlots(WeaponSlots weaponSlots);
+    WeaponInventory getWeaponInventory();
+    void setWeaponInventory(WeaponInventory weaponInventory);
     void updateWeaponPositions();
 
     PopUpFeed getPopUpFeed();

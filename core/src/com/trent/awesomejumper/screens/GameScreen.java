@@ -38,7 +38,6 @@ public class GameScreen implements Screen, InputProcessor{
     private int WIDTH = Gdx.graphics.getWidth();
     private int HEIGHT = Gdx.graphics.getHeight();
 
-    private OrthographicCamera gameCamera;
 
     // TODO: Add rectangles or even a segmented circle to catch touch events and control the player.
     // TODO: The coordinate system for touch events is flipped on the y axis!
@@ -56,8 +55,7 @@ public class GameScreen implements Screen, InputProcessor{
         renderingEngine = new RenderingEngine(worldContainer,game);
         entityManager = EntityManager.createEntityManager(worldContainer,renderingEngine);
         controller = new WorldController(worldContainer);
-        inputHandler = new InputHandler(worldContainer.getPlayer());
-        gameCamera = renderingEngine.getGameCamera();
+        inputHandler = new InputHandler(worldContainer.getPlayer(), renderingEngine.getGameCamera());
         Gdx.input.setInputProcessor(this);
 
     }
@@ -126,12 +124,6 @@ public class GameScreen implements Screen, InputProcessor{
         if(keycode == Keys.P) {
             Entity p = new Projectile(new Vector2(5,6),0.7f);
             p.registerEntity();
-            //Entity q = new Projectile(new Vector2(5,6), 0.7f);
-            //renderingEngine.initGraphics(p);
-            //renderingEngine.initGraphics(q);
-            //worldContainer.getEntities().add(p);
-            //worldContainer.getEntities().add(q);
-
 
         }
 
@@ -156,6 +148,10 @@ public class GameScreen implements Screen, InputProcessor{
             game.toggleBody();
         }
 
+        if(keycode == Keys.L) {
+            inputHandler.dropWeapon(1);
+            inputHandler.dropWeapon(2);
+        }
 
         return false;
     }
@@ -217,10 +213,10 @@ public class GameScreen implements Screen, InputProcessor{
          * world units to get the real position of the cursor.
          *
          */
-        float x = gameCamera.position.x - gameCamera.viewportWidth/2f + screenX/RenderingEngine.ppuX;
+        /*float x = gameCamera.position.x - gameCamera.viewportWidth/2f + screenX/RenderingEngine.ppuX;
         float y = gameCamera.position.y - gameCamera.viewportHeight/2f + (Gdx.graphics.getHeight() - screenY)/RenderingEngine.ppuY;
 
-        inputHandler.mouseMoved(x,y);
+        inputHandler.mouseMoved(x,y);*/
         return false;
     }
 
@@ -230,4 +226,13 @@ public class GameScreen implements Screen, InputProcessor{
     public boolean scrolled(int amount) {
         return false;
     }
+
+
+    /*public void updateMouse() {
+        float x = gameCamera.position.x - gameCamera.viewportWidth/2f + Gdx.input.getX()/RenderingEngine.ppuX;
+        float y = gameCamera.position.y - gameCamera.viewportHeight/2f + (Gdx.graphics.getHeight() - Gdx.input.getY())/RenderingEngine.ppuY;
+
+        inputHandler.mouseMoved(x,y);
+    }*/
+
 }

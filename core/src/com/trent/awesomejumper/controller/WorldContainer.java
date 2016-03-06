@@ -32,6 +32,7 @@ public class WorldContainer {
 
     private HashSet<Entity> entities;
     private HashSet<Entity> projectiles;
+    private HashSet<Entity> pickups;
 
     private Player player;
     private Chest chest;
@@ -47,6 +48,7 @@ public class WorldContainer {
 
     public WorldContainer() {
         entities = new HashSet<>();
+        pickups = new HashSet<>();
         entitiesToBeDrawn = new ArrayList<>();
         player = new Player(new Vector2(12.5f, 7f));
         chest = new Chest(new Vector2(5,5));
@@ -58,8 +60,8 @@ public class WorldContainer {
         registerEntity(pistol);
         registerEntity(pistol2);
         try {
-            player.getWeaponSlots().equipWeapon(pistol, 1);
-            player.getWeaponSlots().equipWeapon(pistol2,2);
+            player.getWeaponInventory().equipWeapon(pistol, 1);
+            player.getWeaponInventory().equipWeapon(pistol2,2);
         }
         catch (InvalidWeaponSlotException e){
             Gdx.app.log("ERROR",e.getMessage());
@@ -133,7 +135,7 @@ public class WorldContainer {
                 if (level.checkBounds(x, y)) {
                     if(level.getTile(x,y) != null) {
                         if(!level.getTile(x,y).isPassable())
-                        collisionTiles.add(level.getTile(x, y));
+                            collisionTiles.add(level.getTile(x, y));
                     }
                 }
             }
@@ -175,7 +177,7 @@ public class WorldContainer {
                     e.getBody().getPosition().x <= fovEndX &&
                     e.getBody().getPosition().y > fovStartY &&
                     e.getBody().getPosition().y <= fovEndY) {
-                    if(!entitiesToBeDrawn.contains(e) && e.hasGraphics)
+                if(!entitiesToBeDrawn.contains(e) && e.hasGraphics)
                     entitiesToBeDrawn.add(e);
             }
             else {
@@ -225,7 +227,7 @@ public class WorldContainer {
             }
             else {
                 entityNeighbourhood.remove(other);
-                }
+            }
 
 
         }
@@ -265,7 +267,7 @@ public class WorldContainer {
     }
 
 
-
+    // ---------------------------------------------------------------------------------------------
     // REGISTER ENTITIES
     // ---------------------------------------------------------------------------------------------
 
@@ -273,6 +275,71 @@ public class WorldContainer {
         entities.add(entity);
     }
 
+
+    // ---------------------------------------------------------------------------------------------
+    // PLACE ENTITY IN WORLD
+    // ---------------------------------------------------------------------------------------------
+
+
+    //TODO: EDIT THIS. The direction towards the entity that drops the other entity must be included
+    public boolean placeEntity(Entity entity) {
+        pickups.add(entity);
+        // TODO: move this method to collision controller and iterate over pickup collection
+        // TODO: implement something like: entity.getOwner to reference the entity that drops the other
+        // TODO: implement random drop position in a circle around owner, radius must be bigger than hypotenuse of hitbox of owner
+        /*entity.setPosition(player.getPosition().cpy());
+        entity.getBody().enableCollisionDetection();
+        return true;*/
+        int startX = (int) entity.getBounds().getPositionAndOffset().x;
+        int endX = (int) (startX + entity.getBounds().getWidth()) + 2;
+        int startY = (int) entity.getBounds().getPositionAndOffset().y;
+        int endY = (int) (startY + entity.getBounds().getHeight()) + 2;
+        Gdx.app.log("SX, EX, SY, EY", startX +";" + endX + ";" + startY +";" + endY);
+        Gdx.app.log("BOUNDSOFFSET", entity.getBounds().getPositionAndOffset().toString());
+        if(level.getTile(startX,startY) != null) {
+            if(level.getTile(startX, startY).isPassable()) {
+                Gdx.app.log("EARLY: OBJECT POSITION:", entity.getBounds().getPositionAndOffset().toString());
+                entity.getBody().enableCollisionDetection();
+                return true;
+            }
+            if(player.getPosition().x - entity.getPosition().x < 0) {
+                startX--;
+                endX--;
+            }
+            else {
+                startX++;
+                endX++;
+            }
+
+            if(player.getPosition().y - entity.getPosition().y < 0) {
+                startY--;
+                endY--;
+            }
+
+            else {
+                startY++;
+                endY++;
+            }
+        }
+        for(int x = startX; x < endX; x++) {
+            for(int y = startY; y < endY; y++) {
+                if(level.checkBounds(x,y) && level.getTile(x,y) != null) {
+                    if(level.getTile(x,y).isPassable()) {
+                        Gdx.app.log("LATE: OBJECT POSITION:", entity.getBounds().getPositionAndOffset().toString());
+                        Gdx.app.log("NEW: OBJECT POSITION:", new Vector2(x,y).toString());
+                        entity.setVelocity(0f, 0f);
+                        entity.setPosition(new Vector2(x, y));
+                        entity.getBody().enableCollisionDetection();
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    // ---------------------------------------------------------------------------------------------
     // GETTER & SETTER
     // ---------------------------------------------------------------------------------------------
 

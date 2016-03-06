@@ -5,10 +5,17 @@ import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.models.testing.Projectile;
 
 /** // TODO DOCUMENTATION, IMPLEMENT RELOAD TIME
+ * Weapon component class. Defines the behaviour and attributes of weapons in the game.
+ * Every Weapon entity which wants to be able to fire must have a weapon component.
+ * Holds information and manages the following stuff:
+ * Ammo, number of clips, clip size, recover time, reload time, recoil
+ * Functions like fire(), reload(), drop()
  * Created by Sinthu on 01.03.2016.
  */
 public class WeaponComponent extends ModelComponent {
 
+
+    // TODO: implement recoil with a vertex shader.
     private int ammo;
     private int clipSize;
     private int clips;
@@ -43,9 +50,8 @@ public class WeaponComponent extends ModelComponent {
                 return;
                 currentClip--;
                 ammo--;
-                Projectile projectile = new Projectile(entity.getPosition().cpy(), 0.7f);
-                direction.nor().scl(speed);
-                projectile.getBody().setVelocity(direction);
+                Projectile projectile = new Projectile(entity.getBody().getCenter().cpy(), entity.getHeight());
+                projectile.getBody().setVelocity(direction.cpy().nor().scl(speed));
                 projectile.getBody().setAngleOfRotation(entity.getBody().getAngleOfRotation());
                 projectile.registerEntity();
                 timeFired = entity.time;

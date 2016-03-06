@@ -46,6 +46,10 @@ public class EntityManager {
         renderingEngine.initGraphics(entity);
     }
 
+    public void registerPickUp(Entity entity) {
+        worldContainer.placeEntity(entity);
+    }
+
     // TODO: Implement this.
     public Entity getEntityByID() {
         return null;

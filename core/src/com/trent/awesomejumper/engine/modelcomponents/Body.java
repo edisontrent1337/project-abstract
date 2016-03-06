@@ -3,18 +3,12 @@ package com.trent.awesomejumper.engine.modelcomponents;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.trent.awesomejumper.controller.RenderingEngine;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
-import com.trent.awesomejumper.models.Player;
-import com.trent.awesomejumper.models.testing.Projectile;
 import com.trent.awesomejumper.models.weapons.Pistol;
-import com.trent.awesomejumper.utils.Utilities;
 
 import java.util.HashSet;
 import java.util.LinkedList;
-
-import static com.trent.awesomejumper.utils.Utilities.*;
 
 /**
  * Created by Sinthu on 09.12.2015.
@@ -35,13 +29,15 @@ public class Body extends ModelComponent {
     private Vector2 velocity;        // velocity on the xy grid
     private Vector2 acceleration;    // acceleration on the xy grid
     private Vector2 center;          // center of the body position
-    private Vector2 reference;       // reference position of an object the entity wants to look at
+    private Vector2 aimReference;    // reference position of the object the entity wants to look at
     private Vector2 orientation;     // direction in which the entity currently looks
     private float angleOfRotation;   // angle which belongs towards the orientation for rendering
 
     private CollisionBox bounds;
 
     private boolean collidedWithWorld;
+
+    private boolean collisionDetectionEnabled;
 
     // Physical parameters
     private float mass;
@@ -71,7 +67,7 @@ public class Body extends ModelComponent {
     public Body(Entity entity, float width, float height, float mass, float friction, float elasticity, float maxVelocity) {
         /**
          * Initialises all members with default values.
-         * The constructor of the entity or the specific subclass then applies a more useful
+         * The constructor of the entity or the specific subclass should apply a more useful
          * start configuration to all values.
          */
         this.entity = entity;
@@ -79,7 +75,8 @@ public class Body extends ModelComponent {
         this.velocity = new Vector2(0f, 0f);
         this.acceleration = new Vector2(0f, 0f);
         this.orientation = new Vector2(1f,0f);
-        this.reference = new Vector2(0f,0f);
+        this.aimReference = new Vector2(0f,0f);
+        this.collisionDetectionEnabled = true;
         this.bounds = new CollisionBox(position, width, height);
         this.impulses = new LinkedList<>();
         this.mass = mass;
@@ -95,15 +92,12 @@ public class Body extends ModelComponent {
 
     public void update(float delta) {
         position.add(velocity.cpy().scl(delta));
-        center.set(position.x + getWidthX(), position.y + getWidthY());
-        // update ground bounds
+        /**
+         * If collision detection on this body is enabled, the bounds collision box will be updated
+         */
         bounds.update(position);
+        center.set(bounds.getPositionAndOffset().x + getHalfDimensions().x, bounds.getPositionAndOffset().y + getHalfDimensions().y);
 
-        // update direction of view and angle
-        if(entity.getClass() == Pistol.class) {
-            Gdx.app.log("ANGLE", Float.toString(angleOfRotation));
-            Gdx.app.log("ORIENTATION", orientation.toString());
-        }
 
         /**
          * Update each CollisionBox inside the hitboxSkeleton
@@ -153,8 +147,8 @@ public class Body extends ModelComponent {
         return zOffset;
     }
 
-    public Vector2 getReference() {
-        return reference;
+    public Vector2 getAimReference() {
+        return aimReference;
     }
 
     public Vector2 getOrientation() {
@@ -169,8 +163,16 @@ public class Body extends ModelComponent {
         this.angleOfRotation = angleOfRotation;
     }
 
-    public void setReference(Vector2 reference) {
-        this.reference = reference;
+    public Vector2 getCenter() {
+        return center;
+    }
+
+    public Vector2 getHalfDimensions() {
+        return new Vector2(bounds.getWidth()/2f, bounds.getHeight()/2f);
+    }
+
+    public void setAimReference(Vector2 aimReference) {
+        this.aimReference = aimReference;
     }
 
     public void setOrientation(Vector2 orientation) {
@@ -304,6 +306,12 @@ public class Body extends ModelComponent {
         this.elasticity = elasticity;
     }
 
+    // COLLISION DETECTION
+
+    public boolean isCollisionDetectionEnabled() {
+        return collisionDetectionEnabled;
+    }
+
     // ENTITY NEIGHBOURHOOD
 
     public HashSet<Entity> getEntityNeighbourHood() {
@@ -329,6 +337,21 @@ public class Body extends ModelComponent {
      */
     public void addImpulse(Vector2 i) {
         impulses.add(i);
+    }
+
+
+    /**
+     * Enables collision detection
+     */
+    public void enableCollisionDetection() {
+        collisionDetectionEnabled = true;
+    }
+
+    /**
+     * Disables collision detection
+     */
+    public void disableCollisionDetection() {
+        collisionDetectionEnabled = false;
     }
 
 

@@ -41,7 +41,6 @@ public class Graphics extends ModelComponent{
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
-    // TODO: Idea: Use textureRegionName to identify different graphic components.
     // TODO: textureRegionName can be used to address already created components in a HashMap of flyweights.
     //
     public Graphics(Entity entity,float frameDuration, String textureRegionName, float width, float height) {
@@ -85,7 +84,7 @@ public class Graphics extends ModelComponent{
      * Adds idle textures to the entity. The right idle texture is mirrored and used as the left
      * idle texture.
      * @param texture Texture gathered from an asset manager
-     * TODO: add support for idle animations
+     * TODO: add idle animations
      */
     public void setIdleFrames(TextureRegion texture) {
         idleFrameR = texture;
@@ -117,16 +116,22 @@ public class Graphics extends ModelComponent{
         }
         sb.setColor(sb.getColor().r, sb.getColor().g, sb.getColor().b, alpha);
 
-            float x =(int) Math.floor(entity.getPosition().x * RenderingEngine.ppuX) / RenderingEngine.ppuX;
-            float y =(int) Math.floor(entity.getPosition().y * RenderingEngine.ppuY) / RenderingEngine.ppuY;
+        float x =(int) Math.floor(entity.getPosition().x * RenderingEngine.ppuX) / RenderingEngine.ppuX;
+        float y =(int) Math.floor(entity.getPosition().y * RenderingEngine.ppuY) / RenderingEngine.ppuY;
+
         if(supportsRotation) {
             float originX = width / 2f;
             float originY = height / 2f;
 
 
             float angle = entity.getBody().getAngleOfRotation();
-            //TODO fix rotations
-
+            Gdx.app.log("ROTATION", Float.toString(angle));
+            if(angle > 90 && angle < 270 &! currentFrame.isFlipY()) {
+                currentFrame.flip(false,true);
+            }
+           else if(((angle >= 270 && angle < 360) || (angle >= 0 && angle < 90)) && currentFrame.isFlipY()) {
+                currentFrame.flip(false,true);
+            }
 
                 sb.draw(shadow, x, y, originX, originY, width, height, 1, 1, entity.getBody().getAngleOfRotation());
                 sb.draw(currentFrame, x, y + entity.getBody().getZOffset(), originX, originY, width, height, 1, 1, entity.getBody().getAngleOfRotation());

@@ -76,8 +76,6 @@ public class Projectile extends Entity {
     public void update(float delta) {
 
         super.update(delta);
-        //TODO : use the reference from the weaponSlots owner... something like calling inside weaponSlots
-        // projectile = new Projectile, projectile.getBody().setReference()....
     }
 
     public int dealDamage(CollisionBox collisionBox) {

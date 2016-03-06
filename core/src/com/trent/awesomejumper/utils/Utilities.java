@@ -154,6 +154,14 @@ public class Utilities {
     }
 
 
+    // CHECK WHETHER AN OBJECT IS NULL
+    // ---------------------------------------------------------------------------------------------
+
+    public static void checkNotNull(String message, Object object) {
+        if(object == null)
+            throw new NullPointerException(message);
+    }
+
 
 
 }
