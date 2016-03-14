@@ -24,7 +24,7 @@ public class Projectile extends Entity {
     private final float SPRITE_WIDTH = 0.1875f*0.8f;
     private final float SPRITE_HEIGHT = 0.09375f*0.8f;
     private final float FRAME_DURATION = 0.066f;
-    private final float MAX_SPEED = 18f;
+    private final float MAX_SPEED = 128f; // fastest projectile ingame
 
     //TESTING
     private final int baseDamage = 90;
@@ -53,9 +53,6 @@ public class Projectile extends Entity {
         body.setFriction(FRICTION);
         body.setElasticity(ELASTICITY);
         body.setMaxVelocity(MAX_SPEED);
-        float speedX = (float) (-2 + Math.random()*(2));
-        float speedY = (float) (-2 + Math.random()*(2));
-        body.setVelocity(speedX,speedY);
         state = State.IDLE;
 
 
@@ -83,7 +80,7 @@ public class Projectile extends Entity {
     }
 
     public int getRandomDamage() {
-        float coeff = 0.95f + (float)(Math.random() * 0.1f);
+        float coeff = 0.90f + (float)(Math.random() * 0.2f);
         Gdx.app.log("Coefficient", Float.toString(coeff));
         return (int) (coeff * baseDamage);
     }

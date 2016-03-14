@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
+import com.trent.awesomejumper.models.testing.Projectile;
 import com.trent.awesomejumper.models.weapons.Pistol;
 
 import java.util.HashSet;
@@ -91,6 +92,10 @@ public class Body extends ModelComponent {
 
 
     public void update(float delta) {
+
+        if(entity.getClass() == Projectile.class) {
+            Gdx.app.log("PROJECTILE VELO", velocity.cpy().toString());
+        }
         position.add(velocity.cpy().scl(delta));
         /**
          * If collision detection on this body is enabled, the bounds collision box will be updated

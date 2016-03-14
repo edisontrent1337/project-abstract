@@ -80,7 +80,6 @@ public class Player extends Entity {
         body.setOrientation(sub(getBounds().getPositionAndOffset(), InputHandler.mouse));
         body.setAngleOfRotation(angle(body.getOrientation()));
 
-
         headSize = 0.1f*HEIGHT_Z;   // 10% of the z height are occupied by the head
         torsoSize = 0.4f*HEIGHT_Z;  // 40% of the z height are occupied by the torso
         legSize = 0.4f*HEIGHT_Z;    // 40% of the z height are occupied by the legs
@@ -122,7 +121,7 @@ public class Player extends Entity {
         playerDelta = delta;
         super.update(delta);
         body.setAimReference(InputHandler.mouse);
-        body.setOrientation(sub(body.getCenter(), InputHandler.mouse));
+        body.setOrientation(sub(body.getCenter(),body.getAimReference()));
         body.setAngleOfRotation(angle(body.getOrientation()));
 
 

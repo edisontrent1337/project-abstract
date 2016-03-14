@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.exceptions.InvalidWeaponSlotException;
 import com.trent.awesomejumper.models.weapons.Weapon;
+import com.trent.awesomejumper.utils.PhysicalConstants;
 
 import static com.trent.awesomejumper.utils.Utilities.angle;
 import static com.trent.awesomejumper.utils.Utilities.checkNotNull;
@@ -68,11 +69,11 @@ public class WeaponInventory extends ModelComponent {
 
         if(slot1 && primaryEquipped) {
             checkNotNull("Weaponslot 1 is empty. weapon is null", weaponPrimary);
-            weaponPrimary.getWeaponComponent().fire(weaponPrimary.getBody().getOrientation());
+            weaponPrimary.getWeaponComponent().fire();
         }
         if(slot2 && secondaryEquipped) {
             checkNotNull("Weaponslot 2 is empty. weapon is null", weaponSecondary);
-            weaponSecondary.getWeaponComponent().fire(weaponSecondary.getBody().getOrientation());
+            weaponSecondary.getWeaponComponent().fire();
         }
 
     }
@@ -92,7 +93,7 @@ public class WeaponInventory extends ModelComponent {
 
         if(slot == 1) {
             weaponPrimary = (Weapon) weapon;
-            weaponPrimary.getBody().setPosition(entity.getPosition().cpy().x, entity.getPosition().y);
+            weaponPrimary.getBody().setPosition(entity.getPosition().cpy());
             weaponPrimary.getBody().disableCollisionDetection();
             primaryEquipped = true;
         }
@@ -126,18 +127,17 @@ public class WeaponInventory extends ModelComponent {
     public void updateWeaponPositions() {
         if(primaryEquipped) {
             weaponPrimary.getBody().setPosition(entity.getBody().getCenter().cpy().sub(weaponPrimary.getBody().getHalfDimensions()));
-            //weaponPrimary.getBody().setOrientation(sub(weaponPrimary.getPosition(),entity.getBody().getAimReference()));
+            weaponPrimary.getBody().setAimReference(entity.getBody().getAimReference());
             weaponPrimary.getBody().setOrientation(entity.getBody().getOrientation());
             weaponPrimary.getBody().setAngleOfRotation(angle(weaponPrimary.getBody().getOrientation()));
             Vector2 circle = entity.getBody().getOrientation().cpy();
             if(circle.len2() > 0.75f)
                 circle.nor().scl(0.75f);
-            //Gdx.app.log("CIRCLE VEC", circle.toString());
             weaponPrimary.getBody().getPosition().add(circle);
         }
         if(secondaryEquipped) {
             weaponSecondary.getBody().setPosition(entity.getBody().getCenter().cpy().sub(weaponSecondary.getBody().getHalfDimensions()));
-            //weaponSecondary.getBody().setOrientation(sub(weaponSecondary.getPosition(),entity.getBody().getAimReference()));
+            weaponPrimary.getBody().setAimReference(entity.getBody().getAimReference());
             weaponSecondary.getBody().setOrientation(entity.getBody().getOrientation());
             weaponSecondary.getBody().setAngleOfRotation(angle(weaponSecondary.getBody().getOrientation()));
             Vector2 circle = new Vector2(getNormal(entity.getBody().getOrientation()));

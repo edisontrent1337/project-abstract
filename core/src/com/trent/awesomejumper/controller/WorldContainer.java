@@ -33,6 +33,7 @@ public class WorldContainer {
     private HashSet<Entity> entities;
     private HashSet<Entity> projectiles;
     private HashSet<Entity> pickups;
+    private HashSet<Entity> enemies;
 
     private Player player;
     private Chest chest;

@@ -35,7 +35,7 @@ public class Graphics extends ModelComponent{
 
 
     private float width, height, alpha, originX, originY;
-    private boolean supportsRotation = false;
+    private boolean supportsRotation = false, supportsShadowRotation = true;
     boolean flipX = false;
     boolean flipped = false;
 
@@ -122,10 +122,8 @@ public class Graphics extends ModelComponent{
         if(supportsRotation) {
             float originX = width / 2f;
             float originY = height / 2f;
-
-
             float angle = entity.getBody().getAngleOfRotation();
-            Gdx.app.log("ROTATION", Float.toString(angle));
+
             if(angle > 90 && angle < 270 &! currentFrame.isFlipY()) {
                 currentFrame.flip(false,true);
             }
@@ -133,7 +131,10 @@ public class Graphics extends ModelComponent{
                 currentFrame.flip(false,true);
             }
 
-                sb.draw(shadow, x, y, originX, originY, width, height, 1, 1, entity.getBody().getAngleOfRotation());
+                if(supportsShadowRotation)
+                    sb.draw(shadow, x, y, originX, originY, width, height, 1, 1, entity.getBody().getAngleOfRotation());
+                else
+                    sb.draw(shadow, x, y, originX, originY, width, height, 1, 1, 0);
                 sb.draw(currentFrame, x, y + entity.getBody().getZOffset(), originX, originY, width, height, 1, 1, entity.getBody().getAngleOfRotation());
 
 
@@ -199,7 +200,9 @@ public class Graphics extends ModelComponent{
         supportsRotation = true;
     }
 
-
+    public void disableShadowRotations() {
+        supportsShadowRotation = false;
+    }
 
 
 

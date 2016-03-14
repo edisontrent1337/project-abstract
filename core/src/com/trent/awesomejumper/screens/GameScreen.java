@@ -35,12 +35,6 @@ public class GameScreen implements Screen, InputProcessor{
     private RenderingEngine renderingEngine;
     private EntityManager entityManager;
 
-    private int WIDTH = Gdx.graphics.getWidth();
-    private int HEIGHT = Gdx.graphics.getHeight();
-
-
-    // TODO: Add rectangles or even a segmented circle to catch touch events and control the player.
-    // TODO: The coordinate system for touch events is flipped on the y axis!
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
@@ -72,8 +66,6 @@ public class GameScreen implements Screen, InputProcessor{
 
     @Override
     public void resize(int width, int height) {
-        this.WIDTH = width;
-        this.HEIGHT = height;
         renderingEngine.resize(width,height);
     }
 
@@ -185,9 +177,16 @@ public class GameScreen implements Screen, InputProcessor{
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 
 
-        //TODO implement a register function for entities to add them to all relevant collections.
         if(button == Input.Buttons.LEFT) {
+            Gdx.app.log("PLAYER:","");
+            Gdx.app.log("MOUSE:", inputHandler.mouse.toString());
+            Gdx.app.log("POSICENTER:", worldContainer.getPlayer().getBody().getCenter().toString());
+            Gdx.app.log("ORIENTATION:", worldContainer.getPlayer().getBody().getOrientation().toString());
+            Gdx.app.log("ANGLE;", Float.toString(worldContainer.getPlayer().getBody().getAngleOfRotation()));
+            Gdx.app.log("SPEED", worldContainer.getPlayer().getBody().getOrientation().cpy().nor().scl(60).toString());
+            Gdx.app.log("-----------------------------------------------------","");
             inputHandler.fire();
+
         }
 
         return true;
@@ -206,17 +205,6 @@ public class GameScreen implements Screen, InputProcessor{
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
 
-        /**
-         * Calculating the current mouse position in world units.
-         * Start at the position of the camera, go back half of the viewport width (24) to get
-         * to the starting coordinate of the current viewport. Then add the offset of the mouse in
-         * world units to get the real position of the cursor.
-         *
-         */
-        /*float x = gameCamera.position.x - gameCamera.viewportWidth/2f + screenX/RenderingEngine.ppuX;
-        float y = gameCamera.position.y - gameCamera.viewportHeight/2f + (Gdx.graphics.getHeight() - screenY)/RenderingEngine.ppuY;
-
-        inputHandler.mouseMoved(x,y);*/
         return false;
     }
 
@@ -227,12 +215,5 @@ public class GameScreen implements Screen, InputProcessor{
         return false;
     }
 
-
-    /*public void updateMouse() {
-        float x = gameCamera.position.x - gameCamera.viewportWidth/2f + Gdx.input.getX()/RenderingEngine.ppuX;
-        float y = gameCamera.position.y - gameCamera.viewportHeight/2f + (Gdx.graphics.getHeight() - Gdx.input.getY())/RenderingEngine.ppuY;
-
-        inputHandler.mouseMoved(x,y);
-    }*/
 
 }

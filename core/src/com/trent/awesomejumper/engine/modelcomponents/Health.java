@@ -69,4 +69,8 @@ public class Health extends ModelComponent {
     }
 
 
+
+    // GETTER & SETTER
+
+
 }

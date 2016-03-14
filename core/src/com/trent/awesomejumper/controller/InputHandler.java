@@ -11,7 +11,8 @@ import java.util.Map;
 
 import static com.trent.awesomejumper.utils.PhysicalConstants.ACCELERATION;
 
-/** //TODO DOCUMENTARY
+/**
+ * InputHandler class. Handles player input regarding the GameScreen.
  * Created by Sinthu on 08.12.2015.
  */
 public class InputHandler {

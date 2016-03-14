@@ -8,7 +8,7 @@ import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.engine.modelcomponents.WeaponComponent;
 
 /**
- *
+ * TODO: implement range
  * Pistol entity class. Has a body and a sprite component to represent pistol as pickup or as an
  * equipped weapon inventory item.
  * Created by Sinthu on 01.03.2016.
@@ -21,13 +21,13 @@ public class Pistol extends Weapon {
     private final float MASS = 0.150f;
     private final float FRICTION = 0.945f;
     private final float ELASTICITY = 0.45f;
-    private final float SPRITE_WIDTH = 0.75f;           // 32 px width
-    private final float SPRITE_HEIGHT = 0.75f;          // 32 px height
+    private final float SPRITE_WIDTH = 0.75f;           // 24 px width
+    private final float SPRITE_HEIGHT = 0.75f;          // 24 px height
     private final float MAX_SPEED = 5f;
 
     private final int AMMO = 100;
     private final int CLIPS = 4;
-    private final float PROJECTILE_SPEED = 20f;
+    private final float PROJECTILE_SPEED = 32f;
 
 
     public Pistol(Vector2 position) {
@@ -45,6 +45,7 @@ public class Pistol extends Weapon {
         weaponComponent.setProjectileSpeed(PROJECTILE_SPEED);
 
         graphics.enableRotations();
+        graphics.disableShadowRotations();
         state = State.IDLE;
     }
 

@@ -1,8 +1,12 @@
 package com.trent.awesomejumper.engine.modelcomponents;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.models.testing.Projectile;
+import com.trent.awesomejumper.utils.PhysicalConstants;
+
+import static com.trent.awesomejumper.utils.Utilities.angle;
 
 /** // TODO DOCUMENTATION, IMPLEMENT RELOAD TIME
  * Weapon component class. Defines the behaviour and attributes of weapons in the game.
@@ -31,14 +35,14 @@ public class WeaponComponent extends ModelComponent {
         this.clipSize = 25;
         this.clips = 4;
         this.currentClip = 25;
-        this.recoverTime = 0.15f; // 400 RPM
+        this.recoverTime = 0.2f; // 400 RPM
 
         entity.hasWeaponComponent = true;
     }
 
 
-
-    public void fire(Vector2 direction) {
+    // TODO: Fix high speed bullets
+    public void fire() {
         if(ammo != 0) {
             if(currentClip == 0)
                 reload();
@@ -48,13 +52,24 @@ public class WeaponComponent extends ModelComponent {
             //TODO implement camera shaking when shooting
             if(entity.time - timeFired < recoverTime)
                 return;
-                currentClip--;
-                ammo--;
-                Projectile projectile = new Projectile(entity.getBody().getCenter().cpy(), entity.getHeight());
-                projectile.getBody().setVelocity(direction.cpy().nor().scl(speed));
-                projectile.getBody().setAngleOfRotation(entity.getBody().getAngleOfRotation());
-                projectile.registerEntity();
-                timeFired = entity.time;
+
+            currentClip--;
+            ammo--;
+            Projectile projectile = new Projectile(entity.getBody().getCenter().cpy(), entity.getHeight());
+            projectile.getBody().setVelocity(entity.getBody().getOrientation().cpy().nor().scl(speed));
+            projectile.getBody().setAngleOfRotation(entity.getBody().getAngleOfRotation());
+            projectile.registerEntity();
+            timeFired = entity.time;
+
+
+            /*Gdx.app.log("WEAPON:","");
+            Gdx.app.log("MOUSE:", entity.getBody().getAimReference().toString());
+            Gdx.app.log("POSICENTER:", entity.getBody().getCenter().toString());
+            Gdx.app.log("ORIENTATION:", entity.getBody().getOrientation().toString());
+            Gdx.app.log("ANGLE;", Float.toString(entity.getBody().getAngleOfRotation()));
+            Gdx.app.log("SPEED",projectile.getVelocity().toString());
+            Gdx.app.log("-----------------------------------------------------","");*/
+
 
 
         }

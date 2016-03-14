@@ -10,6 +10,13 @@ import com.trent.awesomejumper.engine.entity.Entity;
  */
 public class EntityManager {
 
+
+    public enum EntityType {
+        PICKUP,
+        PROJECTILE,
+        ENEMY;
+    }
+
     public static EntityManager instance = null;
 
     // MEMBERS & INSTANCES
@@ -48,6 +55,24 @@ public class EntityManager {
 
     public void registerPickUp(Entity entity) {
         worldContainer.placeEntity(entity);
+    }
+
+
+    public void registerEntity(Entity entity, EntityType type) {
+
+        switch (type) {
+            case PICKUP:
+                break;
+            case PROJECTILE:
+                break;
+            case ENEMY:
+                break;
+            default:
+                break;
+        }
+
+        renderingEngine.initGraphics(entity);
+
     }
 
     // TODO: Implement this.

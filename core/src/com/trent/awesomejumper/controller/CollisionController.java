@@ -525,18 +525,28 @@ public class CollisionController {
                      * If the bounds/shadows of the projectile and the entity collide,
                      * another check has to pass: whether or not the projectile is in the correct
                      * z-height to hit the entity or not.
+                     * TODO: z component should only be cosmetic as it hinders gameplay. maybe scrap idea of hitbox skeleton.
                      */
                     if(checkCollision(projectile.getBounds(), entityBounds)) {                      // shadows collide
-                        for(CollisionBox entityHitBox : entity.getBodyHitboxes()) {                 // all entity hitboxes across the z axis are checked
-                            if(checkCollision(entityHitBox, projectile.getProjectileBox())) {
+                       // for(CollisionBox entityHitBox : entity.getBodyHitboxes()) {                 // all entity hitboxes across the z axis are checked
+                            //if(checkCollision(entityHitBox, projectile.getProjectileBox())) {
                                 projectile.setVelocity(0f, 0f);
                                 if(entity.hasHealth)
-                                    entity.getHealth().takeDamage(projectile.dealDamage(entityHitBox));
+                                    entity.getHealth().takeDamage(projectile.dealDamage(entityBounds));
                                 projectile.destroy();
                                 return true;
                             }
-                        }
-                    }
+                       // }
+                    //}
+                }
+
+                else if(checkCollision(projectile.getBounds(), entityBounds)) {
+
+                    projectile.setVelocity(0f, 0f);
+                    if(entity.hasHealth)
+                        entity.getHealth().takeDamage(projectile.dealDamage(entityBounds));
+                    projectile.destroy();
+                    return true;
                 }
 
         return false;
@@ -575,6 +585,5 @@ public class CollisionController {
     }
 
 
-   // public static void
 
 }
