@@ -28,6 +28,8 @@ public class Pistol extends Weapon {
     private final int AMMO = 100;
     private final int CLIPS = 4;
     private final float PROJECTILE_SPEED = 32f;
+    private final float RECOVER_TIME = 0.15f; // 400 RPM
+    private final float RELOAD_TIME = 3.05f;
 
 
     public Pistol(Vector2 position) {
@@ -43,6 +45,7 @@ public class Pistol extends Weapon {
 
         weaponComponent.setAmmoAndClips(AMMO, CLIPS);
         weaponComponent.setProjectileSpeed(PROJECTILE_SPEED);
+        weaponComponent.setWeaoponTimings(RECOVER_TIME, RELOAD_TIME);
 
         graphics.enableRotations();
         graphics.disableShadowRotations();

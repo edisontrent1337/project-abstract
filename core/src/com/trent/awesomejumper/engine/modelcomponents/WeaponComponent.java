@@ -31,12 +31,6 @@ public class WeaponComponent extends ModelComponent {
 
     public WeaponComponent(Entity weapon) {
         this.entity = weapon;
-        this.ammo = 100;
-        this.clipSize = 25;
-        this.clips = 4;
-        this.currentClip = 25;
-        this.recoverTime = 0.2f; // 400 RPM
-
         entity.hasWeaponComponent = true;
     }
 
@@ -105,12 +99,14 @@ public class WeaponComponent extends ModelComponent {
         this.clips = ammo / clipSize;
     }
 
-    public void setRecoverTime(float recoverTime) {
+    public void setWeaoponTimings(float recoverTime, float reloadTime) {
         this.recoverTime = recoverTime;
+        this.reloadTIme = reloadTime;
     }
 
     public void setProjectileSpeed(float speed) {
         this.speed = speed;
     }
+
 
 }

@@ -163,5 +163,10 @@ public class Utilities {
     }
 
 
+    // PYTHAGORAS FOR TWO VALUES
+
+    public static float pythagoras(float a, float b) {
+        return (float) Math.sqrt(a*a + b*b);
+    }
 
 }

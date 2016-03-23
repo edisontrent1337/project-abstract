@@ -85,9 +85,10 @@ public class Entity implements EntityInterface {
     private boolean alive = true;
 
     public float time;
+    public float dropTime;
 
     // CONSTRUCTOR
-    // ----------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------
 
     public Entity(){
         entityCount++;

@@ -9,6 +9,8 @@ import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.testing.Chest;
 import com.trent.awesomejumper.models.weapons.Pistol;
 import com.trent.awesomejumper.tiles.Tile;
+
+import static com.trent.awesomejumper.utils.Utilities.pythagoras;
 import static com.trent.awesomejumper.utils.Utilities.sub;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -284,14 +286,27 @@ public class WorldContainer {
 
     //TODO: EDIT THIS. The direction towards the entity that drops the other entity must be included
     public boolean placeEntity(Entity entity) {
+
+
+        Vector2 center = player.getBody().getCenter().cpy();
+        float radius = pythagoras(player.getWidth(), player.getHeight()) + 0.5f;
+        float dropAngle = (float) Math.random()*360f;
+        Gdx.app.log("ANGLE", Float.toString(dropAngle));
+        Vector2 dropPosition = new Vector2((float)Math.cos(dropAngle), (float)Math.sin(dropAngle)).nor().scl(radius).add(center);
+
+        Gdx.app.log("CIRCLE AROUND PLAYER", "CENTER:" + center.toString() + ", RADIUS:" + Float.toString(radius) + "DROPPOSITION: " +  dropPosition.toString());
+
+        entity.setPosition(dropPosition);
+
         pickups.add(entity);
+        return true;
         // TODO: move this method to collision controller and iterate over pickup collection
         // TODO: implement something like: entity.getOwner to reference the entity that drops the other
         // TODO: implement random drop position in a circle around owner, radius must be bigger than hypotenuse of hitbox of owner
         /*entity.setPosition(player.getPosition().cpy());
         entity.getBody().enableCollisionDetection();
         return true;*/
-        int startX = (int) entity.getBounds().getPositionAndOffset().x;
+        /*int startX = (int) entity.getBounds().getPositionAndOffset().x;
         int endX = (int) (startX + entity.getBounds().getWidth()) + 2;
         int startY = (int) entity.getBounds().getPositionAndOffset().y;
         int endY = (int) (startY + entity.getBounds().getHeight()) + 2;
@@ -335,9 +350,9 @@ public class WorldContainer {
                     }
                 }
             }
-        }
+        }*/
 
-        return false;
+       // return false;
     }
 
     // ---------------------------------------------------------------------------------------------

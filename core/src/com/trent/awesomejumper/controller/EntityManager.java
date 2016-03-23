@@ -54,6 +54,7 @@ public class EntityManager {
     }
 
     public void registerPickUp(Entity entity) {
+
         worldContainer.placeEntity(entity);
     }
 
