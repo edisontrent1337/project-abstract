@@ -11,6 +11,18 @@ public interface EntityInterface {
 
 
     /**
+     * Tyoes of entities. This enum is used to distinguish between different entities to sort them
+     * in their respective collection. EntityManager relies on it.
+     */
+    enum Type {
+        PICKUP,
+        WEAPON,
+        PROJECTILE,
+        ENEMY
+    }
+
+
+    /**
      * Actions an entity can perform.
      */
     void update(float delta);

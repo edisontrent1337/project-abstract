@@ -1,16 +1,15 @@
 package com.trent.awesomejumper.engine.modelcomponents;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
+import com.trent.awesomejumper.controller.EntityManager;
 import com.trent.awesomejumper.engine.entity.Entity;
+import com.trent.awesomejumper.engine.entity.EntityInterface;
 import com.trent.awesomejumper.exceptions.InvalidWeaponSlotException;
 import com.trent.awesomejumper.models.weapons.Weapon;
-import com.trent.awesomejumper.utils.PhysicalConstants;
 
 import static com.trent.awesomejumper.utils.Utilities.angle;
 import static com.trent.awesomejumper.utils.Utilities.checkNotNull;
 import static com.trent.awesomejumper.utils.Utilities.getNormal;
-import static com.trent.awesomejumper.utils.Utilities.sub;
 
 /**
  * WeaponSlot component for all entities that can carry weapons. Entities that want to attack in any
@@ -86,24 +85,26 @@ public class WeaponInventory extends ModelComponent {
             weaponSecondary.getWeaponComponent().reload();
     }
 
-    public void equipWeapon(Entity weapon, int slot) throws InvalidWeaponSlotException {
+    public boolean equipWeapon(Entity weapon, int slot) throws InvalidWeaponSlotException {
         if(slot > 2 || slot < 1) {
             throw new InvalidWeaponSlotException("The weapon slot" + slot + "is invalid.");
         }
 
-        if(slot == 1) {
+        if(slot == 1 &! primaryEquipped) {
             weaponPrimary = (Weapon) weapon;
             weaponPrimary.getBody().setPosition(entity.getPosition().cpy());
             weaponPrimary.getBody().disableCollisionDetection();
             primaryEquipped = true;
+            return true;
         }
-        else {
+        else if(slot == 2 &! secondaryEquipped){
             weaponSecondary = (Weapon) weapon;
             weaponSecondary.setPosition(entity.getPosition().cpy());
             weaponSecondary.getBody().disableCollisionDetection();
             secondaryEquipped = true;
+            return true;
         }
-
+        return false;
 
     }
 
@@ -159,18 +160,11 @@ public class WeaponInventory extends ModelComponent {
 
         if(slot == 1 && primaryEquipped) {
             primaryEquipped = false;
-            weaponPrimary.dropToWorld();
-            weaponPrimary.getBody().enableCollisionDetection();
-            weaponPrimary.getBody().setAngleOfRotation(0);
-            weaponPrimary.getBody().setAimReference(new Vector2(0f, 0f));
-
+            EntityManager.getInstance().registerEntity(weaponPrimary, EntityInterface.Type.WEAPON);
         }
         if(slot == 2 && secondaryEquipped) {
             secondaryEquipped = false;
-            weaponSecondary.dropToWorld();
-            weaponSecondary.getBody().enableCollisionDetection();
-            weaponSecondary.getBody().setAngleOfRotation(0);
-            weaponSecondary.getBody().setAimReference(new Vector2(0f, 0f));
+            EntityManager.getInstance().registerEntity(weaponSecondary, EntityInterface.Type.WEAPON);
         }
 
         return false;

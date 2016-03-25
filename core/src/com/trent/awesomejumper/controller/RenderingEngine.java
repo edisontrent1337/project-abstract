@@ -206,7 +206,6 @@ public class RenderingEngine {
             g.createWalkAnimations();
         }
 
-
     }
 
     // RENDERING

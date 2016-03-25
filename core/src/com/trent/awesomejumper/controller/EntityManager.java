@@ -1,6 +1,8 @@
 package com.trent.awesomejumper.controller;
 
+import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.entity.Entity;
+import com.trent.awesomejumper.engine.entity.EntityInterface;
 
 /**
  * Manages the registration of entities at runtime. Adds entities to specified collections of
@@ -11,11 +13,6 @@ import com.trent.awesomejumper.engine.entity.Entity;
 public class EntityManager {
 
 
-    public enum EntityType {
-        PICKUP,
-        PROJECTILE,
-        ENEMY;
-    }
 
     public static EntityManager instance = null;
 
@@ -59,20 +56,40 @@ public class EntityManager {
     }
 
 
-    public void registerEntity(Entity entity, EntityType type) {
+    public void registerEntity(Entity entity, EntityInterface.Type type) {
 
+        /**
+         * Add the entity to the main entity collection that holds all entities.
+         */
+        worldContainer.registerEntity(entity);
+
+        /**
+         * Add the entity to different sub collections which are used for specific collision
+         * events such as collecting pickups or equipping weapons.
+         */
         switch (type) {
             case PICKUP:
+                worldContainer.getPickups().add(entity);
+                worldContainer.placeEntity(entity);
+                renderingEngine.initGraphics(entity);
                 break;
             case PROJECTILE:
+                worldContainer.getProjectiles().add(entity);
+                renderingEngine.initGraphics(entity);
                 break;
             case ENEMY:
+                break;
+            case WEAPON:
+                worldContainer.getWeaponDrops().add(entity);
+                worldContainer.placeEntity(entity);
+                entity.getBody().enableCollisionDetection();
+                entity.getBody().setAngleOfRotation(0f);
+                entity.getBody().setAimReference(new Vector2(0f,0f));
                 break;
             default:
                 break;
         }
 
-        renderingEngine.initGraphics(entity);
 
     }
 

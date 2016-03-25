@@ -81,6 +81,11 @@ public class WorldController {
 
         }
 
+
+       /* for(Entity e : worldContainer.getWeaponDrops()) {
+
+        }*/
+
         manageEntitySpeed(delta);
 
         for(Entity e : worldContainer.getEntities()) {

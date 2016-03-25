@@ -36,6 +36,7 @@ public class WorldContainer {
     private HashSet<Entity> projectiles;
     private HashSet<Entity> pickups;
     private HashSet<Entity> enemies;
+    private HashSet<Entity> weaponDrops;
 
     private Player player;
     private Chest chest;
@@ -52,7 +53,9 @@ public class WorldContainer {
     public WorldContainer() {
         entities = new HashSet<>();
         pickups = new HashSet<>();
+        weaponDrops = new HashSet<>();
         entitiesToBeDrawn = new ArrayList<>();
+        projectiles = new HashSet<>();
         player = new Player(new Vector2(12.5f, 7f));
         chest = new Chest(new Vector2(5,5));
         pistol = new Pistol(new Vector2(6f,7f));
@@ -375,4 +378,14 @@ public class WorldContainer {
         return entities;
     }
 
+    public HashSet<Entity> getWeaponDrops() {
+        return weaponDrops;
+    }
+
+    public HashSet<Entity> getPickups() {
+        return pickups;
+    }
+    public HashSet<Entity> getProjectiles() {
+        return projectiles;
+    }
 }

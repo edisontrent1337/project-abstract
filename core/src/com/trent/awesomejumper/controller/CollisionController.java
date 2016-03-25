@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.popups.PopUpFeed;
+import com.trent.awesomejumper.exceptions.InvalidWeaponSlotException;
 import com.trent.awesomejumper.models.Level;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
@@ -210,6 +211,7 @@ public class CollisionController {
             if(other.equals(entity) || !other.isAlive() || !other.getBody().isCollisionDetectionEnabled())
                 continue;
 
+
             CollisionBox entityBox = entity.getBounds();
             CollisionBox otherBox = other.getBounds();
 
@@ -218,6 +220,34 @@ public class CollisionController {
 
             Vector2 entityFrameVelo = entity.getVelocity().cpy();
             Vector2 otherFrameVelo= other.getVelocity().cpy().scl(delta);
+
+
+            /**
+             * Weapon/pickup collision detection
+             */
+            if(entity.equals(player)) {
+                //TODO: pickup item code goes here.
+
+                // If other entity is a weapon, the weapon will get equipped.
+                if(worldContainer.getWeaponDrops().contains(other)) {
+                    if(checkCollision(entityBox,otherBox)) {
+                        try {
+                            if(entity.getWeaponInventory().equipWeapon(other, 1))
+                                worldContainer.getWeaponDrops().remove(other);
+                        }
+                        catch (InvalidWeaponSlotException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+                // If other entity is a pickup, the pickup will be consumed.
+                if(worldContainer.getPickups().contains(other)) {
+
+                }
+
+
+            }
             /**
              * If the other participant is a projectile, a special routine is called to resolve
              * entity / projectile collision
@@ -583,6 +613,16 @@ public class CollisionController {
         }
         return false;
     }
+
+
+
+
+
+    // ---------------------------------------------------------------------------------------------
+    // PLAYER / PICKUP COLLISION
+    // ---------------------------------------------------------------------------------------------
+
+
 
 
 
