@@ -14,7 +14,6 @@ import static com.trent.awesomejumper.utils.PhysicalConstants.*;
 /**
  * Created by Sinthu on 12.06.2015.
  */
-// TODO: Outsource input handling to the separate controller "InputHandler"
 public class WorldController {
 
 

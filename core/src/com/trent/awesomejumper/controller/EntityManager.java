@@ -90,9 +90,5 @@ public class EntityManager {
 
     }
 
-    // TODO: Implement this.
-    public Entity getEntityByID() {
-        return null;
-    }
 
 }

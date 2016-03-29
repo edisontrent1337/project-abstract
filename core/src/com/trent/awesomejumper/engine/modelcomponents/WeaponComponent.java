@@ -4,7 +4,6 @@ import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.models.testing.Projectile;
 
 /**
- * // TODO DOCUMENTATION, IMPLEMENT RELOAD TIME
  * Weapon component class. Defines the behaviour and attributes of weapons in the game.
  * Every Weapon entity which wants to be able to fire must have a weapon component.
  * Holds information and manages the following stuff:

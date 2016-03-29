@@ -56,14 +56,6 @@ public class Entity implements EntityInterface {
 
     protected Entity owner;
 
-    // TODO: Idea on how to eliminate all getters for components.
-    protected HashMap<ComponentIndex,ModelComponent> modelComponents;
-
-
-
-    // TESTING
-
-
 
     protected Type type;
 

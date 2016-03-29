@@ -41,7 +41,6 @@ public class Graphics extends ModelComponent{
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
-    // TODO: textureRegionName can be used to address already created components in a HashMap of flyweights.
     //
     public Graphics(Entity entity,float frameDuration, String textureRegionName, float width, float height) {
         /**
@@ -145,7 +144,6 @@ public class Graphics extends ModelComponent{
             sb.draw(currentFrame, x,  y + entity.getBody().getZOffset(), width, height);
         }
         //TODO Draw head separately from body and let it rotate towards mouse
-        //TODO Insert a flag that specifies whether or not an entity is rotatable or not
     }
 
 

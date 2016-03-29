@@ -202,7 +202,6 @@ public class RenderingEngine {
 
     // RENDERING
     // ---------------------------------------------------------------------------------------------
-    // TODO: outsource all user interface related code to a separate class UserInterface
     public void render() {
 
         /**
