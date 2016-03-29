@@ -38,14 +38,16 @@ public class Chest extends Entity {
         body.setFriction(FRICTION);
         body.setElasticity(ELASTICITY);
         body.setBounds(new CollisionBox(position, WIDTH, HEIGHT));
-        //body.getBounds().setOffset(OFFSET);
+        body.getBounds().setOffset(OFFSET);
         body.getBounds().setDamageCoefficient(0.5f);
         body.setMaxVelocity(MAX_SPEED);
         CollisionBox box = new CollisionBox(position.cpy(), WIDTH, HEIGHT);
-        //box.setOffset(OFFSET);
+        box.setOffset(OFFSET);
         box.setDamageCoefficient(0.5f);
         body.add(box);
         state = State.IDLE;
+        type = Type.REGULAR_ENTITY;
+        setOwner(this);
     }
 
     @Override

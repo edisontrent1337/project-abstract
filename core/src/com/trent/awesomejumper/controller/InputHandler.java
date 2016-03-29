@@ -20,7 +20,7 @@ public class InputHandler {
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
     enum Keys {
-        UP, DOWN, LEFT, RIGHT, MOUSE1, MOUSE2
+        UP, DOWN, LEFT, RIGHT, MOUSE1, MOUSE2, R
     }
 
     private Player player;
@@ -33,6 +33,7 @@ public class InputHandler {
         keyMap.put(Keys.RIGHT, false);
         keyMap.put(Keys.MOUSE1, false);
         keyMap.put(Keys.MOUSE2, false);
+        keyMap.put(Keys.R, false);
     }
 
 
@@ -97,6 +98,9 @@ public class InputHandler {
     }
 
 
+    public void reload() {
+        player.getWeaponInventory().reload();
+    }
 
 
     // UPDATE FUNCTION: INPUT PROCESSING

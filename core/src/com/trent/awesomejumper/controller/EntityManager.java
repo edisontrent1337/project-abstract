@@ -13,7 +13,6 @@ import com.trent.awesomejumper.engine.entity.EntityInterface;
 public class EntityManager {
 
 
-
     public static EntityManager instance = null;
 
     // MEMBERS & INSTANCES
@@ -28,7 +27,7 @@ public class EntityManager {
     }
 
     public static EntityManager getInstance() {
-        if(instance != null)
+        if (instance != null)
             return instance;
         else {
             throw new NullPointerException("EntityManager was not initialized.");
@@ -36,7 +35,7 @@ public class EntityManager {
     }
 
     public static EntityManager createEntityManager(WorldContainer worldContainer, RenderingEngine renderingEngine) {
-        instance = new EntityManager(worldContainer,renderingEngine);
+        instance = new EntityManager(worldContainer, renderingEngine);
         return instance;
     }
 
@@ -45,46 +44,44 @@ public class EntityManager {
     // ---------------------------------------------------------------------------------------------
 
 
-    public void registerEntity(Entity entity) {
-        worldContainer.registerEntity(entity);
-        renderingEngine.initGraphics(entity);
-    }
-
     public void registerPickUp(Entity entity) {
 
         worldContainer.placeEntity(entity);
     }
 
-
-    public void registerEntity(Entity entity, EntityInterface.Type type) {
+    /**
+     * Adds the entity to all relevant collections. Decides with the help of the entities type
+     * to which collections the entity should be added.
+     * @param entity
+     */
+    public void registerEntity(Entity entity) {
 
         /**
          * Add the entity to the main entity collection that holds all entities.
          */
         worldContainer.registerEntity(entity);
+        renderingEngine.initGraphics(entity);
 
         /**
          * Add the entity to different sub collections which are used for specific collision
          * events such as collecting pickups or equipping weapons.
          */
-        switch (type) {
-            case PICKUP:
+        switch (entity.getType()) {
+            case PICKUP_ENTITY:
                 worldContainer.getPickups().add(entity);
                 worldContainer.placeEntity(entity);
-                renderingEngine.initGraphics(entity);
+                entity.getBody().reset();
                 break;
-            case PROJECTILE:
+            case PROJECTILE_ENTITY:
                 worldContainer.getProjectiles().add(entity);
                 renderingEngine.initGraphics(entity);
                 break;
-            case ENEMY:
+            case REGULAR_ENTITY:
                 break;
-            case WEAPON:
+            case DROPPED_WEAPON_ENTITY:
                 worldContainer.getWeaponDrops().add(entity);
                 worldContainer.placeEntity(entity);
-                entity.getBody().enableCollisionDetection();
-                entity.getBody().setAngleOfRotation(0f);
-                entity.getBody().setAimReference(new Vector2(0f,0f));
+                entity.getBody().reset();
                 break;
             default:
                 break;

@@ -37,6 +37,7 @@ public class RenderingEngine {
 
     private static RenderingEngine instance = null;
     private WorldContainer worldContainer;
+    private HUDRenderer hudRenderer;
 
     private Player player;
     private AwesomeJumperMain game;
@@ -45,9 +46,6 @@ public class RenderingEngine {
     static final float CAMERA_WIDTH = 32;
     static final float CAMERA_HEIGHT =18f;
     private final float LERP_FACTOR = 0.075f;
-
-
-    public static Vector2 playerScreenPos = new Vector2(0f,0f);
 
     /**
      * Pixel per unit scale. The screen shows 16 * 9 units, for pixel perfect accuracy we need
@@ -96,6 +94,7 @@ public class RenderingEngine {
         this.nearSky02 = worldContainer.getLevel().getSkyBoxes().get(3);
         this.player = worldContainer.getPlayer();
 
+        this.hudRenderer = new HUDRenderer(player);
 
         this.allTextures = new TextureAtlas();
 
@@ -124,19 +123,6 @@ public class RenderingEngine {
         loadTextures();
     }
 
-   /* public static RenderingEngine getInstance() {
-        if(instance == null) {
-            throw new NullPointerException("Rendering engine was not initialized.");
-        }
-        return instance;
-    }
-
-    public static RenderingEngine createRenderingEngine(WorldContainer worldContainer, AwesomeJumperMain game) {
-        if(instance == null) {
-            instance = new RenderingEngine(worldContainer, game);
-        }
-        return instance;
-    }*/
 
     // LOAD TEXTURES
     // ---------------------------------------------------------------------------------------------
@@ -146,6 +132,9 @@ public class RenderingEngine {
      * Also loads world tile textures.
      */
     public void loadTextures() {
+
+        // HUD
+        hudRenderer.loadTextures();
         //FONTS
         consoleFont = new BitmapFont(Gdx.files.internal("fonts/munro_regular_14.fnt"),Gdx.files.internal("fonts/munro_regular_14_0.png"),false);
         consoleFont.setColor(Color.WHITE);
@@ -189,9 +178,12 @@ public class RenderingEngine {
         sunTexture = allTextures.findRegion("sun-01");
     }
 
-
-    //TESTING
-
+    /**
+     * Initializes the graphics component of the entity e.
+     * Loads animations, idle frames and other sprites and bundles them into a graphic
+     * component.
+     * @param e
+     */
     public void initGraphics(Entity e) {
 
         if(e.hasGraphics) {
@@ -217,22 +209,14 @@ public class RenderingEngine {
          * SPRITEBATCH sb IS USED TO DRAW EVERYTHING TO THE SCREEN
          * SPRITEBATCH uiBatch IS USED TO DRAW UI INFORMATION
          */
+
+
         uiCam.update();
-        float screenBeginX = player.getPosition().x - CAMERA_WIDTH/2;
-        float screenEndX = screenBeginX + CAMERA_WIDTH;
-
-        float screenBeginY = player.getPosition().y - CAMERA_HEIGHT /2;
-        float screenEndY = screenBeginY + CAMERA_HEIGHT;
-
-        playerScreenPos.x = (((player.getPosition().x - screenBeginX )% CAMERA_WIDTH)*ppuX);
-        playerScreenPos.y = (((player.getPosition().y - screenBeginY )% CAMERA_HEIGHT)*ppuY);
-       // Gdx.app.log("playerscreenPos", playerScreenPos.toString());
         moveCamera(player.getPosition().x, player.getPosition().y);
         sb.setProjectionMatrix(cam.combined);
         sb.begin();
         drawBg();
         drawTiles();
-
         if(game.hitboxesEnabled()) {
                 sb.end();
                 drawHitboxes();
@@ -243,14 +227,13 @@ public class RenderingEngine {
             drawEntities();
         }
         sb.end();
-
-
         uiBatch.setProjectionMatrix(uiCam.combined);
         uiBatch.begin();
         if(game.infoEnabled()) {
             drawInfo();
         }
         uiBatch.end();
+        hudRenderer.render();
     }
 
     // CAMERA MOVEMENT
@@ -341,37 +324,20 @@ public class RenderingEngine {
 
                 }
 
-                // ENVIRONMENT, GRASS ETC
-
-               /* for(Environment environment : worldContainer.getLevel().getEnvironment()) {
-                    if(environment.getType().equals(Environment.EnvironmentType.GRASS)) {
-                        sb.draw(grass01, environment.getPosition().x, environment.getPosition().y, Environment.SIZE * 2, Environment.SIZE * 2);
-                    }
-                }*/
             }
-
-
 
             if (game.onDebugMode()) {
                 sb.end();
                 debugRenderer.setProjectionMatrix(cam.combined);
-                //moveCamera(player.getPositionX(),player.getPositionY());
                 debugRenderer.begin(ShapeRenderer.ShapeType.Line);
                 if(!newTile.isPassable())
                 newTile.getCollisionBox().draw(debugRenderer);
-               // debugRenderer.setColor(Color.GREEN);
-               // debugRenderer.rect(position.x, position.y, Tile.SIZE, Tile.SIZE);
                 debugRenderer.end();
                 sb.begin();
             }
-
-
-
         }
 
     }
-
-
 
     // DRAW BACKGROUND
     // ---------------------------------------------------------------------------------------------
@@ -513,6 +479,7 @@ public class RenderingEngine {
         ppuX = Gdx.graphics.getWidth() / (CAMERA_WIDTH*zoom);
         ppuY = Gdx.graphics.getHeight() / (CAMERA_HEIGHT*zoom);
         messageFont.getData().setScale(1/ppuX, 1/ppuY);
+        hudRenderer.resize(w,h);
     }
 
 

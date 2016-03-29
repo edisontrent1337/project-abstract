@@ -1,11 +1,10 @@
 package com.trent.awesomejumper.engine.modelcomponents;
 
-import com.trent.awesomejumper.controller.EntityManager;
 import com.trent.awesomejumper.engine.entity.Entity;
-import com.trent.awesomejumper.engine.entity.EntityInterface;
 import com.trent.awesomejumper.models.testing.Projectile;
 
-/** // TODO DOCUMENTATION, IMPLEMENT RELOAD TIME
+/**
+ * // TODO DOCUMENTATION, IMPLEMENT RELOAD TIME
  * Weapon component class. Defines the behaviour and attributes of weapons in the game.
  * Every Weapon entity which wants to be able to fire must have a weapon component.
  * Holds information and manages the following stuff:
@@ -21,76 +20,88 @@ public class WeaponComponent extends ModelComponent {
     private int clipSize;
     private int clips;
     private int currentClip;
-    private float recoverTime, reloadTIme;
+    private float recoverTime, reloadTime;
     private float speed;
     private float timeFired = 0f;
+    private float timeReloaded = 0f;
 
 
-    public WeaponComponent(Entity weapon) {
+
+    private String weaopnName;
+    private String weaponDesc;
+
+    public WeaponComponent(Entity weapon, String weaponName) {
         this.entity = weapon;
+        this.weaopnName = weaponName;
         entity.hasWeaponComponent = true;
     }
 
-
-    // TODO: Fix high speed bullets
     public void fire() {
-        if(ammo != 0) {
-            if(currentClip == 0)
-                reload();
+        if (entity.time - timeFired < recoverTime)
+            return;
+        if(entity.time - timeReloaded < reloadTime)
+            return;
 
-
+        if (currentClip != 0) {
 
             //TODO implement camera shaking when shooting
-            if(entity.time - timeFired < recoverTime)
-                return;
 
             currentClip--;
-            ammo--;
             Projectile projectile = new Projectile(entity.getBody().getCenter().cpy(), entity.getHeight());
             projectile.getBody().setVelocity(entity.getBody().getOrientation().cpy().nor().scl(speed));
             projectile.getBody().setAngleOfRotation(entity.getBody().getAngleOfRotation());
-            //projectile.registerEntity();
-            EntityManager.getInstance().registerEntity(projectile, EntityInterface.Type.PROJECTILE);
+            projectile.register();
+            projectile.setOwner(entity.getOwner().getOwner());
             timeFired = entity.time;
+        }
 
+        if (currentClip == 0) {
+            reload();
         }
     }
 
     public void reload() {
-        if(ammo !=0 && clips != 0) {
 
-            clips--;
-            if(ammo > clipSize) {
-                currentClip += clipSize;
-                ammo -= clipSize;
-                clips --;
-            }
-            else {
-                currentClip+= ammo;
-                ammo = 0;
-                clips = 0;
-            }
+        if (ammo != 0) {
+            int diff = Math.min(clipSize - currentClip, ammo);
+            currentClip += diff;
+            ammo -= diff;
+            timeReloaded = entity.time;
         }
+
     }
 
+    // ---------------------------------------------------------------------------------------------
+    // GETTER AND SETTER
+    // ---------------------------------------------------------------------------------------------
 
     public void setAmmoAndClips(int ammo, int CLIP_SIZE) {
-        if(ammo % CLIP_SIZE != 0) {
+        if (ammo % CLIP_SIZE != 0) {
             throw new IllegalArgumentException("Ammo is not a multiple of clipsize");
         }
-        this.ammo = ammo;
+        this.ammo = ammo - CLIP_SIZE;
         this.clipSize = CLIP_SIZE;
         this.clips = ammo / clipSize;
+        this.currentClip = CLIP_SIZE;
     }
 
     public void setWeaoponTimings(float recoverTime, float reloadTime) {
         this.recoverTime = recoverTime;
-        this.reloadTIme = reloadTime;
+        this.reloadTime = reloadTime;
     }
 
     public void setProjectileSpeed(float speed) {
         this.speed = speed;
     }
 
+    public String getWeaopnName() {
+        return weaopnName;
+    }
+
+    public String getWeaponStatus() {
+        String ammoString = Integer.toString(ammo);
+        String currentClipString = Integer.toString(currentClip);
+        return currentClipString + "/" + ammoString;
+    }
 
 }

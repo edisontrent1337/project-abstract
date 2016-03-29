@@ -41,8 +41,6 @@ public class Projectile extends Entity {
         body.setBounds(new CollisionBox(position, WIDTH_X, WIDTH_Y));
         body.setPosition(position);
 
-
-
         projectileBox = new CollisionBox(position,WIDTH_X,WIDTH_Y);
         projectileBox.setOffset(0, z);
         body.setZOffset(z);
@@ -54,8 +52,8 @@ public class Projectile extends Entity {
         body.setElasticity(ELASTICITY);
         body.setMaxVelocity(MAX_SPEED);
         state = State.IDLE;
-
-
+        type = Type.PROJECTILE_ENTITY;
+        setOwner(this);
         body.add(projectileBox);
 
 

@@ -14,6 +14,7 @@ import com.trent.awesomejumper.engine.modelcomponents.popups.PopUpFeed;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -53,11 +54,18 @@ public class Entity implements EntityInterface {
     protected WeaponComponent weaponComponent;
     protected PopUpFeed popUpFeed;
 
-    private Entity owner;
+    protected Entity owner;
 
     // TODO: Idea on how to eliminate all getters for components.
     protected HashMap<ComponentIndex,ModelComponent> modelComponents;
 
+
+
+    // TESTING
+
+
+
+    protected Type type;
 
     public enum State {
         IDLE(0),
@@ -296,16 +304,13 @@ public class Entity implements EntityInterface {
      * called whenever new entities are created at runtime.
      */
     @Override
-    public void registerEntity() {
+    public void register() {
         EntityManager.getInstance().registerEntity(this);
     }
 
     // REGISTER ENTITY IN GAME SYSTEM AS DROP
     // ---------------------------------------------------------------------------------------------
 
-    public void dropToWorld() {
-        EntityManager.getInstance().registerPickUp(this);
-    }
 
     private int createID() {
         return idCounter.incrementAndGet();
@@ -313,6 +318,21 @@ public class Entity implements EntityInterface {
 
     public int getID() {
         return ID;
+    }
+
+
+    // TYPE OF ENTITY
+    // ---------------------------------------------------------------------------------------------
+    public Type getType() {
+        return type;
+    }
+
+    public void setOwner(Entity owner) {
+        this.owner = owner;
+    }
+
+    public Entity getOwner() {
+        return owner;
     }
 
 }

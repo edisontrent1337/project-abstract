@@ -109,7 +109,8 @@ public class Player extends Entity {
         body.add(legs);
 
         state = State.IDLE;
-
+        type = Type.REGULAR_ENTITY;
+        setOwner(this);
     }
 
 

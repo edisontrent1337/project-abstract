@@ -1,6 +1,5 @@
 package com.trent.awesomejumper.engine.modelcomponents;
 
-import com.badlogic.gdx.Gdx;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.popups.Message;
 import com.trent.awesomejumper.engine.modelcomponents.popups.PopUpFeed;
@@ -12,8 +11,8 @@ public class Health extends ModelComponent {
 
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
-    private float hp;
-    private final float MAX_HP;
+    private int hp;
+    private int maxHp;
     private float def;
     private float regeneration;
 
@@ -24,15 +23,15 @@ public class Health extends ModelComponent {
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
 
-    public Health(Entity entity, float MAX_HP) {
+    public Health(Entity entity, int maxHp) {
         /**
          * Initialises all members with default values.
          * The constructor of the entity or the specific subclass then applies a more useful
          * start configuration to all values.
          */
         this.entity = entity;
-        this.MAX_HP = MAX_HP;
-        this.hp = MAX_HP;
+        this.maxHp = maxHp;
+        this.hp = maxHp;
         this.INVINCIBILITY_TIME = 0.33f;
 
         // enable health for entity
@@ -44,8 +43,8 @@ public class Health extends ModelComponent {
     public void heal(float heal) {
         hp += heal;
 
-        if(hp > MAX_HP)
-            hp = MAX_HP;
+        if(hp > maxHp)
+            hp = maxHp;
     }
 
 
@@ -64,13 +63,19 @@ public class Health extends ModelComponent {
     return true;
     }
 
+    // ---------------------------------------------------------------------------------------------
+    // GETTER & SETTER
+    // ---------------------------------------------------------------------------------------------
+
     public float getHp() {
         return hp;
+
     }
 
-
-
-    // GETTER & SETTER
+    @Override
+    public String toString() {
+        return Integer.toString(hp) + "/" + Integer.toString(maxHp);
+    }
 
 
 }

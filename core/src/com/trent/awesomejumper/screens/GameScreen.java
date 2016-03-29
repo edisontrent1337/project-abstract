@@ -6,7 +6,6 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.controller.EntityManager;
 import com.trent.awesomejumper.controller.WorldContainer;
@@ -16,7 +15,6 @@ import com.trent.awesomejumper.controller.WorldController;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.testing.Chest;
-import com.trent.awesomejumper.models.testing.Projectile;
 
 import java.util.Random;
 
@@ -92,39 +90,31 @@ public class GameScreen implements Screen, InputProcessor{
     @Override
     public boolean keyDown(int keycode) {
 
-        if (keycode == Keys.LEFT) {
+        if (keycode == Keys.A) {
             inputHandler.leftPressed();
         }
-        if (keycode == Keys.RIGHT) {
+        if (keycode == Keys.D) {
             inputHandler.rightPressed();
         }
-        if (keycode == Keys.UP) {
+        if (keycode == Keys.W) {
             inputHandler.upPressed();
         }
 
-        if(keycode == Keys.DOWN) {
+        if(keycode == Keys.S) {
             inputHandler.downPressed();
         }
 
 
         if(keycode == Keys.U) {
             Entity e = new Chest(new Vector2(new Random().nextInt(5) + 5, new Random().nextInt(5) + 5));
-            e.registerEntity();
-            //renderingEngine.initGraphics(e);
-            //worldContainer.getEntities().add(e);
+            e.register();
         }
-        if(keycode == Keys.P) {
-            Entity p = new Projectile(new Vector2(5,6),0.7f);
-            p.registerEntity();
-
-        }
-
 
         /**
          * DEBUG KEYS
          */
 
-        if (keycode == Keys.D) {
+        if (keycode == Keys.T) {
             game.toggleDebugMode();
         }
         if(keycode == Keys.E) {
@@ -140,9 +130,13 @@ public class GameScreen implements Screen, InputProcessor{
             game.toggleBody();
         }
 
-        if(keycode == Keys.L) {
+        if(keycode == Keys.Q) {
             inputHandler.dropWeapon(1);
             inputHandler.dropWeapon(2);
+        }
+
+        if(keycode == Keys.R) {
+            inputHandler.reload();
         }
 
         return false;
@@ -150,16 +144,16 @@ public class GameScreen implements Screen, InputProcessor{
 
     @Override
     public boolean keyUp(int keycode) {
-        if (keycode == Keys.LEFT) {
+        if (keycode == Keys.A) {
             inputHandler.leftReleased();
         }
-        if (keycode == Keys.RIGHT) {
+        if (keycode == Keys.D) {
             inputHandler.rightReleased();
         }
-        if (keycode == Keys.UP) {
+        if (keycode == Keys.W) {
             inputHandler.upReleased();
         }
-        if(keycode == Keys.DOWN) {
+        if(keycode == Keys.S) {
             inputHandler.downReleased();
         }
 

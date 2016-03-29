@@ -21,13 +21,13 @@ public class PopUpFeed extends ModelComponent {
 
     private Entity entity;
     private HashMap<PopUpCategories, LinkedList<Message>> messages;
-    private final float MSG_FREQ = 7f;      // default frequency with which the message offset is modified
+    private final float MSG_FREQ = 12f;      // default frequency with which the message offset is modified
     private final float MSG_AMP = 0.125f;   // amplitude with which the message offset is modified
     private final float CRT_AMP = 5f;
     private final float CRT_FREQ = 0.75f;
 
     private static Color HEAL = new Color(0.6784f,1f,0.1843f,1);
-    private static Color DMG = new Color(0.9098f,0.0745f,0.1137f,1);
+    private static Color DMG = new Color(1f,0.0745f,0.1137f,1);
     private static Color CRT = new Color(0.9098f,0.2666f,0.0745f, 1f);
     private static Color LVL_UP = new Color(0.9098f,0.9098f,0.0745f,1);
     private static Color MISC = Color.WHITE;
@@ -83,12 +83,12 @@ public class PopUpFeed extends ModelComponent {
                  * from the message list.
                  */
 
-                if(progress == 1) {
+                if(progress >= 1) {
                     it.remove();
                     continue;
                 }
                 float xOffset = 0f;
-                float yOffset = 2*progress;
+                float yOffset = 3*progress;
                 switch (entry.getKey()) {
                     case DMG:
                         font.setColor(DMG.r, DMG.g, DMG.b, 1 - progress);
@@ -110,10 +110,7 @@ public class PopUpFeed extends ModelComponent {
                         font.getData().setScale(scaleX,scaleY);
                         break;
                     case MISC:
-                        if(message.getColor() != null)
-                        font.setColor(message.getColor());
-                        else
-                        font.setColor(MISC);
+                        font.setColor(MISC.r, MISC.g, MISC.b, 1-progress);
                         break;
 
                 }

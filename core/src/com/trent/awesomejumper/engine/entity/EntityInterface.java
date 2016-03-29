@@ -11,14 +11,23 @@ public interface EntityInterface {
 
 
     /**
-     * Tyoes of entities. This enum is used to distinguish between different entities to sort them
-     * in their respective collection. EntityManager relies on it.
+     * General category of entities.
+     * This enum is used by the CollisionController
      */
     enum Type {
-        PICKUP,
-        WEAPON,
-        PROJECTILE,
-        ENEMY
+        REGULAR_ENTITY(0),
+        PICKUP_ENTITY(1),
+        DROPPED_WEAPON_ENTITY(2),
+        PROJECTILE_ENTITY(3);
+
+
+        private final int value;
+        Type(int value) {
+            this.value = value;
+        }
+        public int getValue() {
+            return value;
+        }
     }
 
 
@@ -28,8 +37,7 @@ public interface EntityInterface {
     void update(float delta);
     void render(SpriteBatch spriteBatch);
     void destroy();
-    void registerEntity();
-    void dropToWorld();
+    void register();
     boolean isAlive();
 
     Body getBody();
@@ -48,7 +56,7 @@ public interface EntityInterface {
     PopUpFeed getPopUpFeed();
     void setPopUpFeed(PopUpFeed feed);
 
-
+    Type getType();
 
 
 

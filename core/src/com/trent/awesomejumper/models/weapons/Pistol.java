@@ -26,30 +26,31 @@ public class Pistol extends Weapon {
     private final float MAX_SPEED = 5f;
 
     private final int AMMO = 100;
-    private final int CLIPS = 4;
+    private final int CLIP_SIZE = 25;
     private final float PROJECTILE_SPEED = 32f;
-    private final float RECOVER_TIME = 0.15f; // 400 RPM
-    private final float RELOAD_TIME = 3.05f;
+    private final float RECOVER_TIME = 0.2f; // 400 RPM
+    private final float RELOAD_TIME = 2.25f;
 
 
     public Pistol(Vector2 position) {
         this.body = new Body(this, WIDTH, HEIGHT);
         this.graphics = new Graphics(this, 0f, "fiveseven", SPRITE_WIDTH, SPRITE_HEIGHT);
-        this.weaponComponent = new WeaponComponent(this);
+        this.weaponComponent = new WeaponComponent(this, "FIVE-SEVEN");
 
         body.setMass(MASS);
         body.setFriction(FRICTION);
         body.setElasticity(ELASTICITY);
         body.setPosition(position);
         body.setMaxVelocity(MAX_SPEED);
-
-        weaponComponent.setAmmoAndClips(AMMO, CLIPS);
+        weaponComponent.setAmmoAndClips(AMMO, CLIP_SIZE);
         weaponComponent.setProjectileSpeed(PROJECTILE_SPEED);
         weaponComponent.setWeaoponTimings(RECOVER_TIME, RELOAD_TIME);
 
         graphics.enableRotations();
         graphics.disableShadowRotations();
         state = State.IDLE;
+        type = Type.DROPPED_WEAPON_ENTITY;
+        setOwner(this);
     }
 
 

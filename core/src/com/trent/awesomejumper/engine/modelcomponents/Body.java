@@ -360,6 +360,16 @@ public class Body extends ModelComponent {
     }
 
 
+    /**
+     * Resets the bodies aim reference and rotation.
+     * Also reenables collisiondetection
+     */
+    public void reset() {
+        enableCollisionDetection();
+        setAimReference(new Vector2(0f,0f));
+        setAngleOfRotation(0);
+    }
+
 }
 
 

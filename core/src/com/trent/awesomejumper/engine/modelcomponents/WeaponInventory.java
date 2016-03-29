@@ -1,9 +1,9 @@
 package com.trent.awesomejumper.engine.modelcomponents;
 
 import com.badlogic.gdx.math.Vector2;
-import com.trent.awesomejumper.controller.EntityManager;
 import com.trent.awesomejumper.engine.entity.Entity;
-import com.trent.awesomejumper.engine.entity.EntityInterface;
+import com.trent.awesomejumper.engine.modelcomponents.popups.Message;
+import com.trent.awesomejumper.engine.modelcomponents.popups.PopUpFeed;
 import com.trent.awesomejumper.exceptions.InvalidWeaponSlotException;
 import com.trent.awesomejumper.models.weapons.Weapon;
 
@@ -35,14 +35,7 @@ public class WeaponInventory extends ModelComponent {
     private Weapon weaponSecondary;     // secondary wapon equipped on this slot
     private int numberOfSlots;            // number of weapon slots this inventory has
 
-    private final float PRIMARY_XOFFSET = - 0.5f;
-    private final float SECONDARY_XOFFSET =  1.5f;
-
-
-
-
     private boolean primaryEquipped = false, secondaryEquipped = false;
-
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
@@ -77,7 +70,6 @@ public class WeaponInventory extends ModelComponent {
 
     }
 
-    //TODO implement this
     public void reload() {
         if(primaryEquipped)
             weaponPrimary.getWeaponComponent().reload();
@@ -95,14 +87,20 @@ public class WeaponInventory extends ModelComponent {
             weaponPrimary.getBody().setPosition(entity.getPosition().cpy());
             weaponPrimary.getBody().disableCollisionDetection();
             primaryEquipped = true;
-            return true;
+            entity.getPopUpFeed().addMessageToCategory(PopUpFeed.PopUpCategories.MISC,
+                    new Message("NEW WEAPON: " + weaponPrimary.getWeaponComponent().getWeaopnName(), entity.time, 2.00f));
+            weaponPrimary.setOwner(entity);
+            return primaryEquipped;
         }
         else if(slot == 2 &! secondaryEquipped){
             weaponSecondary = (Weapon) weapon;
             weaponSecondary.setPosition(entity.getPosition().cpy());
             weaponSecondary.getBody().disableCollisionDetection();
             secondaryEquipped = true;
-            return true;
+            entity.getPopUpFeed().addMessageToCategory(PopUpFeed.PopUpCategories.MISC,
+                    new Message("NEW WEAPON: " + weaponPrimary.getWeaponComponent().getWeaopnName(), entity.time, 2.00f));
+            weaponSecondary.setOwner(entity);
+            return secondaryEquipped;
         }
         return false;
 
@@ -148,7 +146,6 @@ public class WeaponInventory extends ModelComponent {
         }
     }
 
-    //TODO implement this.
 
     /**
      * Drops the weapon equipped in the specified slot back to the world as a pickup.
@@ -160,11 +157,15 @@ public class WeaponInventory extends ModelComponent {
 
         if(slot == 1 && primaryEquipped) {
             primaryEquipped = false;
-            EntityManager.getInstance().registerEntity(weaponPrimary, EntityInterface.Type.WEAPON);
+            weaponPrimary.register();
+            weaponPrimary.setOwner(weaponPrimary);
+            return true;
         }
-        if(slot == 2 && secondaryEquipped) {
+        else if(slot == 2 && secondaryEquipped) {
             secondaryEquipped = false;
-            EntityManager.getInstance().registerEntity(weaponSecondary, EntityInterface.Type.WEAPON);
+            weaponSecondary.register();
+            weaponSecondary.setOwner(weaponSecondary);
+            return true;
         }
 
         return false;
