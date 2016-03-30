@@ -65,13 +65,7 @@ public class WorldContainer {
         registerEntity(chest);
         registerEntity(pistol);
         registerEntity(pistol2);
-        try {
-            player.getWeaponInventory().equipWeapon(pistol, 1);
-            player.getWeaponInventory().equipWeapon(pistol2,2);
-        }
-        catch (InvalidWeaponSlotException e){
-            Gdx.app.log("ERROR",e.getMessage());
-        }
+
     }
 
 

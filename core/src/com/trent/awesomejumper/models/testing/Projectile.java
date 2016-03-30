@@ -79,7 +79,7 @@ public class Projectile extends Entity {
 
     public int getRandomDamage() {
         float coeff = 0.90f + (float)(Math.random() * 0.2f);
-        Gdx.app.log("Coefficient", Float.toString(coeff));
+        //Gdx.app.log("Coefficient", Float.toString(coeff));
         return (int) (coeff * baseDamage);
     }
 

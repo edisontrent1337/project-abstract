@@ -48,8 +48,6 @@ public class Body extends ModelComponent {
 
 
     // Hitboxes
-    // TODO: Either address this array with an enum to get Head, Arm, Leg etc... or
-    // TODO: use a HashMap where the key represents the kind of hitbox.
     private Array<CollisionBox> hitboxSkeleton = new Array<>();
     private LinkedList<Vector2> impulses;
     private HashSet<Entity> entityNeighbourHood = new HashSet<>();
@@ -93,9 +91,6 @@ public class Body extends ModelComponent {
 
     public void update(float delta) {
 
-        if(entity.getClass() == Projectile.class) {
-            Gdx.app.log("PROJECTILE VELO", velocity.cpy().toString());
-        }
         position.add(velocity.cpy().scl(delta));
         /**
          * If collision detection on this body is enabled, the bounds collision box will be updated
@@ -368,6 +363,8 @@ public class Body extends ModelComponent {
         enableCollisionDetection();
         setAimReference(new Vector2(0f,0f));
         setAngleOfRotation(0);
+        setVelocity(0,0);
+        setAcceleration(0,0);
     }
 
 }

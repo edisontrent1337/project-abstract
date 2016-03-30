@@ -1,5 +1,7 @@
 package com.trent.awesomejumper.engine.modelcomponents;
 
+import com.trent.awesomejumper.controller.PopUpManager;
+import com.trent.awesomejumper.controller.RenderingEngine;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.popups.Message;
 import com.trent.awesomejumper.engine.modelcomponents.popups.PopUpFeed;
@@ -53,10 +55,15 @@ public class Health extends ModelComponent {
         if(entity.time - tookDamage < INVINCIBILITY_TIME)
             return false;
         hp -= dmg;
-        entity.getPopUpFeed().addMessageToCategory(PopUpFeed.PopUpCategories.DMG, new Message("-" + Integer.toString(dmg), entity.time, 2.00f));
+        float time = entity.time;
+        Message message = new Message("-" + Integer.toString(dmg),entity.getPosition().cpy(), time, 2.00f);
+        //entity.getPopUpFeed().addMessageToCategory(PopUpFeed.PopUpCategories.DMG,message);
+        RenderingEngine.getInstance().addPopUpMsg(PopUpManager.PopUpCategories.DMG, message);
         if(hp <= 0) {
             hp = 0;
             entity.setState(Entity.State.DEAD);
+            entity.destroy();
+            return true;
         }
         tookDamage = entity.time;
 

@@ -26,6 +26,8 @@ public class WorldController {
     private Level level;
     private CollisionController collisionController;
 
+    public static float worldTime = 0f;
+
 
 
     // CONSTRUCTOR
@@ -56,6 +58,7 @@ public class WorldController {
      */
     public void update(float delta) {
 
+        worldTime += delta;
 
         for(Entity e: worldContainer.getEntities()) {
             e.getAcceleration().scl(delta);

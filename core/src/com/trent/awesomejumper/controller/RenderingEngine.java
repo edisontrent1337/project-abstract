@@ -1,6 +1,7 @@
 package com.trent.awesomejumper.controller;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -14,6 +15,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
+import com.trent.awesomejumper.engine.modelcomponents.popups.Message;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.models.Player;
@@ -38,6 +40,8 @@ public class RenderingEngine {
     private static RenderingEngine instance = null;
     private WorldContainer worldContainer;
     private HUDRenderer hudRenderer;
+    private PopUpManager popUpManager;
+    private AssetManager assetManager;
 
     private Player player;
     private AwesomeJumperMain game;
@@ -76,16 +80,29 @@ public class RenderingEngine {
 
 
     // SPRITE BATCHES
-    private SpriteBatch sb, uiBatch;
+    private SpriteBatch sb, debugBatch;
 
     // FLY WEIGHT HASH MAP
 
     private HashMap<String,Graphics> graphicComponents;
 
+
+
+    public static RenderingEngine createRenderingEngine(WorldContainer worldContainer, AwesomeJumperMain game) {
+        if(RenderingEngine.instance == null) {
+            RenderingEngine.instance = new RenderingEngine(worldContainer, game);
+        }
+        return RenderingEngine.instance;
+    }
+
+
+    public static RenderingEngine getInstance() {
+        return RenderingEngine.instance;
+    }
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
 
-    public RenderingEngine(WorldContainer worldContainer, AwesomeJumperMain game) {
+    private RenderingEngine(WorldContainer worldContainer, AwesomeJumperMain game) {
         this.worldContainer = worldContainer;
         this.game = game;
         this.farSky01 = worldContainer.getLevel().getSkyBoxes().get(0);
@@ -95,6 +112,7 @@ public class RenderingEngine {
         this.player = worldContainer.getPlayer();
 
         this.hudRenderer = new HUDRenderer(player);
+        this.popUpManager = new PopUpManager();
 
         this.allTextures = new TextureAtlas();
 
@@ -119,7 +137,7 @@ public class RenderingEngine {
 
         // SPRITEBATCHES
         sb = new SpriteBatch();
-        uiBatch = new SpriteBatch();
+        debugBatch = new SpriteBatch();
         loadTextures();
     }
 
@@ -206,7 +224,7 @@ public class RenderingEngine {
 
         /**
          * SPRITEBATCH sb IS USED TO DRAW EVERYTHING TO THE SCREEN
-         * SPRITEBATCH uiBatch IS USED TO DRAW UI INFORMATION
+         * SPRITEBATCH debugBatch IS USED TO DRAW UI INFORMATION
          */
 
 
@@ -224,14 +242,15 @@ public class RenderingEngine {
 
         if(game.entitiesEnabled()) {
             drawEntities();
+            drawPopUps();
         }
         sb.end();
-        uiBatch.setProjectionMatrix(uiCam.combined);
-        uiBatch.begin();
+        debugBatch.setProjectionMatrix(uiCam.combined);
+        debugBatch.begin();
         if(game.infoEnabled()) {
             drawInfo();
         }
-        uiBatch.end();
+        debugBatch.end();
         hudRenderer.render();
     }
 
@@ -294,6 +313,10 @@ public class RenderingEngine {
             e.getPopUpFeed().render(sb, messageFont);
         }
 
+    }
+
+    public void drawPopUps() {
+        popUpManager.render(sb, messageFont);
     }
 
     // DRAW TILES
@@ -408,15 +431,15 @@ public class RenderingEngine {
         pos = "POS: " + player.getPosition();
         cps = "CAM: " + formVec(cam.position.x, cam.position.y);
         res = Gdx.graphics.getWidth() + "*" + Gdx.graphics.getHeight() + ", ZOOM: " + zoom + ", FPS :" + Gdx.graphics.getFramesPerSecond();
-        consoleFont.draw(uiBatch, acc, 14, 40);
-        consoleFont.draw(uiBatch, vel, 14, 66);
+        consoleFont.draw(debugBatch, acc, 14, 40);
+        consoleFont.draw(debugBatch, vel, 14, 66);
         consoleFont.setColor(Color.BLUE);
-        consoleFont.draw(uiBatch, ste, 14, 94);
-        consoleFont.draw(uiBatch, pos, 14, 120);
-        consoleFont.draw(uiBatch, res, 14, 148);
-        consoleFont.draw(uiBatch, cps, 14, 174);
-        consoleFont.draw(uiBatch, "Entities,Drawn :" + Integer.toString(Entity.entityCount) + " , " + Integer.toString(WorldContainer.nodes), 14, 202);
-        consoleFont.draw(uiBatch, Float.toString(player.getHealth().getHp()), 14, Gdx.graphics.getHeight() - 30);
+        consoleFont.draw(debugBatch, ste, 14, 94);
+        consoleFont.draw(debugBatch, pos, 14, 120);
+        consoleFont.draw(debugBatch, res, 14, 148);
+        consoleFont.draw(debugBatch, cps, 14, 174);
+        consoleFont.draw(debugBatch, "Entities,Drawn :" + Integer.toString(Entity.entityCount) + " , " + Integer.toString(WorldContainer.nodes), 14, 202);
+        consoleFont.draw(debugBatch, Float.toString(player.getHealth().getHp()), 14, Gdx.graphics.getHeight() - 30);
     }
 
 
@@ -482,10 +505,20 @@ public class RenderingEngine {
     }
 
 
+    // ---------------------------------------------------------------------------------------------
+    // POP UP MANAGEMENT
+    // ---------------------------------------------------------------------------------------------
+
+    public void addPopUpMsg(PopUpManager.PopUpCategories category, Message message) {
+        popUpManager.addMessageToCategory(category, message);
+    }
+
+
     // GETTER AND SETTER
     // ---------------------------------------------------------------------------------------------
 
     public OrthographicCamera getGameCamera() {
         return cam;
     }
+
 }

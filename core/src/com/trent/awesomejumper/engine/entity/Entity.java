@@ -93,6 +93,7 @@ public class Entity implements EntityInterface {
     public Entity(){
         entityCount++;
         ID = createID();
+        owner = this;
     }
 
 

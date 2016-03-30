@@ -50,7 +50,6 @@ public class Pistol extends Weapon {
         graphics.disableShadowRotations();
         state = State.IDLE;
         type = Type.DROPPED_WEAPON_ENTITY;
-        setOwner(this);
     }
 
 

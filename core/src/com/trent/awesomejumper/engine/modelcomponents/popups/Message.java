@@ -3,6 +3,7 @@ package com.trent.awesomejumper.engine.modelcomponents.popups;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 /**
@@ -22,32 +23,37 @@ public class Message<E> {
     private final float DEFAULT_DURATION = 1.00f;
     private final Color DEFAULT_COLOR = new Color(1,1,1,1);
 
+    private Vector2 position;
+
 
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
-    public Message(String message, float timeStamp) {
+    public Message(String message, Vector2 position, float timeStamp) {
         this.message = message;
+        this.position = position;
         this.timeStamp = timeStamp;
         this.duration = DEFAULT_DURATION;
         this.color = DEFAULT_COLOR;
     }
 
-    public Message(String message, float timeStamp, float duration) {
+    public Message(String message, Vector2 position, float timeStamp, float duration) {
         this.message = message;
+        this.position = position;
         this.timeStamp = timeStamp;
         this.duration = duration;
         this.color = DEFAULT_COLOR;
     }
 
-    public Message(String message, float timeStamp, float duration, Color color) {
-        this(message,null,timeStamp,duration,color);
+    public Message(String message, Vector2 position, float timeStamp, float duration, Color color) {
+        this(message,position,null,timeStamp,duration,color);
     }
 
 
 
-    public Message(String message, TextureRegion texture, float timeStamp, float duration, Color color) {
+    public Message(String message,Vector2 position, TextureRegion texture, float timeStamp, float duration, Color color) {
         this.message = message;
+        this.position = position;
         this.texture = texture;
         this.timeStamp = timeStamp;
         this.duration = duration;
@@ -102,6 +108,10 @@ public class Message<E> {
 
     public void setDuration(float duration) {
         this.duration = duration;
+    }
+
+    public Vector2 getPosition() {
+        return position;
     }
 
 }

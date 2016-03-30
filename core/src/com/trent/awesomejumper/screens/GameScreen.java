@@ -44,8 +44,8 @@ public class GameScreen implements Screen, InputProcessor{
     @Override
     public void show() {
         worldContainer = new WorldContainer();
-        renderingEngine = new RenderingEngine(worldContainer,game);
-        entityManager = EntityManager.createEntityManager(worldContainer,renderingEngine);
+        renderingEngine = RenderingEngine.createRenderingEngine(worldContainer, game);
+        entityManager = EntityManager.createEntityManager(worldContainer, renderingEngine);
         controller = new WorldController(worldContainer);
         inputHandler = new InputHandler(worldContainer.getPlayer(), renderingEngine.getGameCamera());
         Gdx.input.setInputProcessor(this);
@@ -54,7 +54,7 @@ public class GameScreen implements Screen, InputProcessor{
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(1f, 247f/255f, 178f/255f, 1);
+        Gdx.gl.glClearColor(1f, 247f / 255f, 178f / 255f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         // TODO: add domain specific methods: input, graphics, network, ai, sound, physics
         inputHandler.update();
@@ -172,13 +172,13 @@ public class GameScreen implements Screen, InputProcessor{
 
 
         if(button == Input.Buttons.LEFT) {
-            Gdx.app.log("PLAYER:","");
+           /* Gdx.app.log("PLAYER:","");
             Gdx.app.log("MOUSE:", inputHandler.mouse.toString());
             Gdx.app.log("POSICENTER:", worldContainer.getPlayer().getBody().getCenter().toString());
             Gdx.app.log("ORIENTATION:", worldContainer.getPlayer().getBody().getOrientation().toString());
             Gdx.app.log("ANGLE;", Float.toString(worldContainer.getPlayer().getBody().getAngleOfRotation()));
             Gdx.app.log("SPEED", worldContainer.getPlayer().getBody().getOrientation().cpy().nor().scl(60).toString());
-            Gdx.app.log("-----------------------------------------------------","");
+            Gdx.app.log("-----------------------------------------------------","");*/
             inputHandler.fire();
 
         }

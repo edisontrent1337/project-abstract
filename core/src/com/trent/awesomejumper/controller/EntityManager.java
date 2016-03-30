@@ -27,16 +27,17 @@ public class EntityManager {
     }
 
     public static EntityManager getInstance() {
-        if (instance != null)
-            return instance;
+        if (EntityManager.instance != null)
+            return EntityManager.instance;
         else {
             throw new NullPointerException("EntityManager was not initialized.");
         }
     }
 
     public static EntityManager createEntityManager(WorldContainer worldContainer, RenderingEngine renderingEngine) {
-        instance = new EntityManager(worldContainer, renderingEngine);
-        return instance;
+        if(EntityManager.instance == null)
+            EntityManager.instance = new EntityManager(worldContainer, renderingEngine);
+        return EntityManager.instance;
     }
 
 
