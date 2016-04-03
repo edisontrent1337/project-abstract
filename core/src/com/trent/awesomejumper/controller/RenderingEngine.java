@@ -24,6 +24,7 @@ import com.trent.awesomejumper.engine.physics.CollisionBox;
 import com.trent.awesomejumper.tiles.Tile;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 import static com.trent.awesomejumper.utils.Utilities.formVec;
 
@@ -37,7 +38,6 @@ public class RenderingEngine {
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
 
-    private static RenderingEngine instance = null;
     private WorldContainer worldContainer;
     private HUDRenderer hudRenderer;
     private PopUpManager popUpManager;
@@ -78,31 +78,13 @@ public class RenderingEngine {
     private float zoom, dmp, grv;
     ShapeRenderer debugRenderer = new ShapeRenderer();
 
-
     // SPRITE BATCHES
     private SpriteBatch sb, debugBatch;
 
-    // FLY WEIGHT HASH MAP
-
-    private HashMap<String,Graphics> graphicComponents;
-
-
-
-    public static RenderingEngine createRenderingEngine(WorldContainer worldContainer, AwesomeJumperMain game) {
-        if(RenderingEngine.instance == null) {
-            RenderingEngine.instance = new RenderingEngine(worldContainer, game);
-        }
-        return RenderingEngine.instance;
-    }
-
-
-    public static RenderingEngine getInstance() {
-        return RenderingEngine.instance;
-    }
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
 
-    private RenderingEngine(WorldContainer worldContainer, AwesomeJumperMain game) {
+    public RenderingEngine(WorldContainer worldContainer, AwesomeJumperMain game) {
         this.worldContainer = worldContainer;
         this.game = game;
         this.farSky01 = worldContainer.getLevel().getSkyBoxes().get(0);
@@ -112,11 +94,9 @@ public class RenderingEngine {
         this.player = worldContainer.getPlayer();
 
         this.hudRenderer = new HUDRenderer(player);
-        this.popUpManager = new PopUpManager();
+        this.popUpManager = PopUpManager.createPopUpManager();
 
         this.allTextures = new TextureAtlas();
-
-
 
         /** CAMERA SETUP: MAIN VIEW
          * ZOOM = 16.66667 , other options: initialize camera with parameters
@@ -139,6 +119,7 @@ public class RenderingEngine {
         sb = new SpriteBatch();
         debugBatch = new SpriteBatch();
         loadTextures();
+
     }
 
 
@@ -175,7 +156,6 @@ public class RenderingEngine {
         for(Entity e : worldContainer.getEntities()) {
             initGraphics(e);
         }
-
 
 
         // TILE TEXTURES
@@ -309,12 +289,15 @@ public class RenderingEngine {
     public void drawEntities() {
         for(Entity e : worldContainer.getEntitiesToBeRendered(CAMERA_WIDTH, CAMERA_HEIGHT)) {
             e.render(sb);
-            if(e.hasPopUps)
-            e.getPopUpFeed().render(sb, messageFont);
+           // if(e.hasPopUps);
+               // popUpManager.update(e);
         }
 
     }
 
+    /**
+     * Draws popups from game events (Picking up items/weapons, dealing damage, healing)
+     */
     public void drawPopUps() {
         popUpManager.render(sb, messageFont);
     }
@@ -323,7 +306,7 @@ public class RenderingEngine {
     // ---------------------------------------------------------------------------------------------
 
     private void drawTiles() {
-        for(Tile newTile : worldContainer.getTilesToBeRendered(CAMERA_WIDTH,CAMERA_HEIGHT)) {
+        for(Tile newTile : worldContainer.getTilesToBeRendered(CAMERA_WIDTH, CAMERA_HEIGHT)) {
             int type = newTile.getType();
             Vector2 position = newTile.getPosition();
             if(!game.onDebugMode()) {
@@ -512,6 +495,14 @@ public class RenderingEngine {
     public void addPopUpMsg(PopUpManager.PopUpCategories category, Message message) {
         popUpManager.addMessageToCategory(category, message);
     }
+
+
+
+
+
+
+
+
 
 
     // GETTER AND SETTER

@@ -3,6 +3,7 @@ package com.trent.awesomejumper.engine.modelcomponents.popups;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.trent.awesomejumper.controller.PopUpManager;
 import com.trent.awesomejumper.controller.RenderingEngine;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.ModelComponent;
@@ -20,7 +21,7 @@ import java.util.Map;
 public class PopUpFeed extends ModelComponent {
 
     private Entity entity;
-    private HashMap<PopUpCategories, LinkedList<Message>> messages;
+    private HashMap<PopUpManager.PopUpCategories, LinkedList<Message>> messages;
     private final float MSG_FREQ = 12f;      // default frequency with which the message offset is modified
     private final float MSG_AMP = 0.125f;   // amplitude with which the message offset is modified
     private final float CRT_AMP = 5f;
@@ -33,7 +34,7 @@ public class PopUpFeed extends ModelComponent {
     private static Color MISC = Color.WHITE;
 
 
-    public enum PopUpCategories {
+    /*public enum PopUpCategories {
         DMG,     // Damage
         HEAL,       // Heal
         CRT,   // Critical Hit
@@ -41,7 +42,7 @@ public class PopUpFeed extends ModelComponent {
         MISC        // Miscellaneous
 
 
-    }
+    }*/
     
 
     // CONSTRUCTOR
@@ -49,11 +50,11 @@ public class PopUpFeed extends ModelComponent {
     public PopUpFeed(Entity entity) {
         this.entity = entity;
         this.messages = new HashMap<>();
-        this.putMessageCategory(PopUpCategories.DMG);
-        this.putMessageCategory(PopUpCategories.HEAL);
-        this.putMessageCategory(PopUpCategories.CRT);
-        this.putMessageCategory(PopUpCategories.LVL_UP);
-        this.putMessageCategory(PopUpCategories.MISC);
+        this.putMessageCategory(PopUpManager.PopUpCategories.DMG);
+        this.putMessageCategory(PopUpManager.PopUpCategories.HEAL);
+        this.putMessageCategory(PopUpManager.PopUpCategories.CRT);
+        this.putMessageCategory(PopUpManager.PopUpCategories.LVL_UP);
+        this.putMessageCategory(PopUpManager.PopUpCategories.MISC);
         entity.hasPopUps = true;
     }
 
@@ -72,7 +73,7 @@ public class PopUpFeed extends ModelComponent {
         /**
          * Iterate over the entrySet of the message HashMap and render each message by category.
          */
-        for (Map.Entry<PopUpCategories, LinkedList<Message>> entry : messages.entrySet()) {
+        for (Map.Entry<PopUpManager.PopUpCategories, LinkedList<Message>> entry : messages.entrySet()) {
             LinkedList<Message> messageList = entry.getValue();
 
             for (Iterator<Message> it = messageList.iterator(); it.hasNext(); ) {
@@ -134,7 +135,7 @@ public class PopUpFeed extends ModelComponent {
      * Adds a new category and an empty message queue to the message hash map.
      * @param category category
      */
-    public void putMessageCategory(PopUpCategories category) {
+    public void putMessageCategory(PopUpManager.PopUpCategories category) {
         if(messages.containsKey(category))
             return;
         messages.put(category, new LinkedList<Message>());
@@ -145,7 +146,7 @@ public class PopUpFeed extends ModelComponent {
      * @param category category
      * @param messageList message queue
      */
-    public void putMessageList(PopUpCategories category, LinkedList<Message>messageList) {
+    public void putMessageList(PopUpManager.PopUpCategories category, LinkedList<Message>messageList) {
         if(messages.containsKey(category)) {
             return;
         }
@@ -158,7 +159,7 @@ public class PopUpFeed extends ModelComponent {
      * @param category category
      * @param message message
      */
-    public void addMessageToCategory(PopUpCategories category, Message message) {
+    public void addMessageToCategory(PopUpManager.PopUpCategories category, Message message) {
         if(!messages.containsKey(category))
             return;
         messages.get(category).add(message);
@@ -169,7 +170,7 @@ public class PopUpFeed extends ModelComponent {
      * @param category category
      * @param messageList message queue
      */
-    public void addMessageListToCategory(PopUpCategories category, LinkedList<Message> messageList) {
+    public void addMessageListToCategory(PopUpManager.PopUpCategories category, LinkedList<Message> messageList) {
         if(!messages.containsKey(category))
             return;
         messages.get(category).addAll(messageList);
@@ -178,10 +179,15 @@ public class PopUpFeed extends ModelComponent {
      * Removes the last message from the message queue of the corresponding category.
      * @param category category String
      */
-    public void removeMessageFromCategory(PopUpCategories category) {
+    public void removeMessageFromCategory(PopUpManager.PopUpCategories category) {
         if(!messages.containsKey(category))
             return;
         messages.get(category).removeFirst();
 
     }
+
+    public HashMap<PopUpManager.PopUpCategories, LinkedList<Message>> getMap() {
+        return messages;
+    }
+
 }

@@ -18,7 +18,7 @@ public class Chest extends Entity {
     private final float WIDTH = 0.75f;               //  24 pixel
     private final float HEIGHT = 0.4375f;            //  19 Pixel - 5 Pixel "behind space
     private final float MASS = 0.4f;
-    private final float FRICTION = 0.945f;
+    private final float FRICTION = 0.895f;
     private final float ELASTICITY = 0.45f;
     private final float SPRITE_WIDTH = 1f;           // 32 px width
     private final float SPRITE_HEIGHT = 1f;          // 32 px height
@@ -32,7 +32,6 @@ public class Chest extends Entity {
         body = new Body(this, WIDTH,HEIGHT);
         graphics = new Graphics(this, 0f,"wood_chest", SPRITE_WIDTH,SPRITE_HEIGHT);
         health = new Health(this, 100);
-        popUpFeed = new PopUpFeed(this);
         body.setPosition(position);
         body.setMass(MASS);
         body.setFriction(FRICTION);

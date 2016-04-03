@@ -44,7 +44,7 @@ public class Pistol extends Weapon {
         body.setMaxVelocity(MAX_SPEED);
         weaponComponent.setAmmoAndClips(AMMO, CLIP_SIZE);
         weaponComponent.setProjectileSpeed(PROJECTILE_SPEED);
-        weaponComponent.setWeaoponTimings(RECOVER_TIME, RELOAD_TIME);
+        weaponComponent.setWeaponTimings(RECOVER_TIME, RELOAD_TIME);
 
         graphics.enableRotations();
         graphics.disableShadowRotations();

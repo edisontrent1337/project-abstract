@@ -7,14 +7,10 @@ import com.trent.awesomejumper.controller.EntityManager;
 import com.trent.awesomejumper.engine.modelcomponents.Body;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.engine.modelcomponents.Health;
-import com.trent.awesomejumper.engine.modelcomponents.ModelComponent;
 import com.trent.awesomejumper.engine.modelcomponents.WeaponComponent;
 import com.trent.awesomejumper.engine.modelcomponents.WeaponInventory;
 import com.trent.awesomejumper.engine.modelcomponents.popups.PopUpFeed;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
-
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**

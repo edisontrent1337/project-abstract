@@ -2,6 +2,7 @@ package com.trent.awesomejumper.engine.modelcomponents;
 
 import com.trent.awesomejumper.controller.PopUpManager;
 import com.trent.awesomejumper.controller.RenderingEngine;
+import com.trent.awesomejumper.controller.WorldController;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.popups.Message;
 import com.trent.awesomejumper.engine.modelcomponents.popups.PopUpFeed;
@@ -55,10 +56,11 @@ public class Health extends ModelComponent {
         if(entity.time - tookDamage < INVINCIBILITY_TIME)
             return false;
         hp -= dmg;
-        float time = entity.time;
-        Message message = new Message("-" + Integer.toString(dmg),entity.getPosition().cpy(), time, 2.00f);
-        //entity.getPopUpFeed().addMessageToCategory(PopUpFeed.PopUpCategories.DMG,message);
-        RenderingEngine.getInstance().addPopUpMsg(PopUpManager.PopUpCategories.DMG, message);
+        Message message = new Message(Integer.toString(dmg),entity.getPosition(), WorldController.worldTime, 2.00f);
+        /**
+         * Access popup manager globally to add damage popup.
+         */
+        PopUpManager.getInstance().addMessageToCategory(PopUpManager.PopUpCategories.DMG, message);
         if(hp <= 0) {
             hp = 0;
             entity.setState(Entity.State.DEAD);

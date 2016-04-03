@@ -21,28 +21,29 @@ public class EntityManager {
     private WorldContainer worldContainer;
     private RenderingEngine renderingEngine;
 
-    private EntityManager(WorldContainer worldContainer, RenderingEngine renderingEngine) {
-        this.renderingEngine = renderingEngine;
-        this.worldContainer = worldContainer;
+    private EntityManager() {
+
     }
 
     public static EntityManager getInstance() {
-        if (EntityManager.instance != null)
-            return EntityManager.instance;
-        else {
-            throw new NullPointerException("EntityManager was not initialized.");
-        }
+        return EntityManager.instance;
     }
 
-    public static EntityManager createEntityManager(WorldContainer worldContainer, RenderingEngine renderingEngine) {
+    public static synchronized EntityManager createEntityManager() {
         if(EntityManager.instance == null)
-            EntityManager.instance = new EntityManager(worldContainer, renderingEngine);
-        return EntityManager.instance;
+            EntityManager.instance = new EntityManager();
+
+        return instance;
     }
 
 
     // METHODS & FUNCTIONS
     // ---------------------------------------------------------------------------------------------
+
+    public void setControllers(WorldContainer worldContainer, RenderingEngine renderingEngine) {
+        this.worldContainer = worldContainer;
+        this.renderingEngine = renderingEngine;
+    }
 
 
     public void registerPickUp(Entity entity) {

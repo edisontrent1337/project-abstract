@@ -38,14 +38,15 @@ public class GameScreen implements Screen, InputProcessor{
     // ---------------------------------------------------------------------------------------------
     public GameScreen (AwesomeJumperMain game) {
         this.game = game;
+        entityManager = EntityManager.createEntityManager();
     }
 
 
     @Override
     public void show() {
         worldContainer = new WorldContainer();
-        renderingEngine = RenderingEngine.createRenderingEngine(worldContainer, game);
-        entityManager = EntityManager.createEntityManager(worldContainer, renderingEngine);
+        renderingEngine = new RenderingEngine(worldContainer, game);
+        entityManager.setControllers(worldContainer,renderingEngine);
         controller = new WorldController(worldContainer);
         inputHandler = new InputHandler(worldContainer.getPlayer(), renderingEngine.getGameCamera());
         Gdx.input.setInputProcessor(this);

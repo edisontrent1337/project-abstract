@@ -3,6 +3,7 @@ package com.trent.awesomejumper.engine.modelcomponents;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.controller.PopUpManager;
 import com.trent.awesomejumper.controller.RenderingEngine;
+import com.trent.awesomejumper.controller.WorldController;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.popups.Message;
 import com.trent.awesomejumper.engine.modelcomponents.popups.PopUpFeed;
@@ -14,9 +15,10 @@ import static com.trent.awesomejumper.utils.Utilities.checkNotNull;
 import static com.trent.awesomejumper.utils.Utilities.getNormal;
 
 /**
- * WeaponSlot component for all entities that can carry weapons. Entities that want to attack in any
+ * Weapon inventory component for all entities that can carry weapons. Entities that want to attack in any
  * form need an instance of this ModelComponent.
  * Holds a reference to all weapon entities that are held by the owner of this weapon inventory.
+ * Currently designed to manage 2 weapon slots.
  * Created by Sinthu on 09.12.2015.
  */
 public class WeaponInventory extends ModelComponent {
@@ -53,6 +55,7 @@ public class WeaponInventory extends ModelComponent {
         entity.hasWeaponInventory = true;
     }
 
+    // ---------------------------------------------------------------------------------------------
     // METHODS & FUNCTIONS
     // ---------------------------------------------------------------------------------------------
 
@@ -80,22 +83,27 @@ public class WeaponInventory extends ModelComponent {
             weaponSecondary.getWeaponComponent().reload();
     }
 
+    /**
+     * Executed when a weapon is picked up.
+     * @param weapon Weapon entity to be equipped
+     * @param slot  Weapon slot the weapon is applied to
+     * @return true, if weapon was equipped successfully
+     * @throws InvalidWeaponSlotException
+     */
     public boolean equipWeapon(Entity weapon, int slot) throws InvalidWeaponSlotException {
         if (slot > 2 || slot < 1) {
             throw new InvalidWeaponSlotException("The weapon slot" + slot + "is invalid.");
         }
 
-        float time = entity.time;
+        float time = WorldController.worldTime;
 
         if (slot == 1 & !primaryEquipped) {
             weaponPrimary = (Weapon) weapon;
             weaponPrimary.getBody().setPosition(entity.getPosition().cpy());
             weaponPrimary.getBody().disableCollisionDetection();
             primaryEquipped = true;
-            /*entity.getPopUpFeed().addMessageToCategory(PopUpFeed.PopUpCategories.MISC,
-                    new Message("NEW WEAPON: " + weaponPrimary.getWeaponComponent().getWeaopnName(), entity.getPosition(), entity.time, 2.00f));*/
-            Message equip = new Message("NEW WEAPON" + weaponPrimary.getWeaponComponent().getWeaopnName(), entity.getPosition().cpy(), time, 2.00f);
-            RenderingEngine.getInstance().addPopUpMsg(PopUpManager.PopUpCategories.MISC, equip);
+            Message equip = new Message(weaponPrimary.getWeaponComponent().getWeaponName(), entity.getPosition().cpy(), time, 2.00f);
+            PopUpManager.getInstance().addMessageToCategory(PopUpManager.PopUpCategories.MISC, equip);
             weaponPrimary.setOwner(entity);
             return primaryEquipped;
         } else if (slot == 2 & !secondaryEquipped) {
@@ -103,10 +111,8 @@ public class WeaponInventory extends ModelComponent {
             weaponSecondary.setPosition(entity.getPosition().cpy());
             weaponSecondary.getBody().disableCollisionDetection();
             secondaryEquipped = true;
-            /*entity.getPopUpFeed().addMessageToCategory(PopUpFeed.PopUpCategories.MISC,
-                    new Message("NEW WEAPON: " + weaponPrimary.getWeaponComponent().getWeaopnName(), entity.getPosition(), entity.time, 2.00f));*/
-            Message equip = new Message("NEW WEAPON" + weaponSecondary.getWeaponComponent().getWeaopnName(), entity.getPosition().cpy(), time, 2.00f);
-            RenderingEngine.getInstance().addPopUpMsg(PopUpManager.PopUpCategories.MISC, equip);
+            Message equip = new Message(weaponSecondary.getWeaponComponent().getWeaponName(), entity.getPosition().cpy(), time, 2.00f);
+            PopUpManager.getInstance().addMessageToCategory(PopUpManager.PopUpCategories.MISC, equip);
             weaponSecondary.setOwner(entity);
             return secondaryEquipped;
         }

@@ -95,7 +95,7 @@ public class CollisionController {
              * If the entity is a projectile, projectile/world collision has to be resolved.
              */
             if (entity.getClass() == Projectile.class) {
-                if (projectileCollisionDetection((Projectile) entity, tile, entity.getVelocity()))
+                if (projectileCollisionDetection((Projectile) entity, tile))
                     return;    // exit collision routine
                 else
                     continue; // continue with next tile
@@ -168,7 +168,7 @@ public class CollisionController {
              * If the entity is a projectile, projectile/world collision has to be resolved.
              */
             if (entity.getClass() == Projectile.class) {
-                if (projectileCollisionDetection((Projectile) entity, tile, entity.getVelocity()))
+                if (projectileCollisionDetection((Projectile) entity, tile))
                     return;     // exit collision routine
                 else
                     continue; // continue with next tile
@@ -256,12 +256,12 @@ public class CollisionController {
              * entity / projectile collision
              */
             if (other.getClass() == Projectile.class) {
-                if (projectileCollisionDetection((Projectile) other, entity, otherFrameVelo, entityFrameVelo)) {
+                if (projectileCollisionDetection((Projectile) other, entity, otherFrameVelo, entityFrameVelo, delta)) {
                     continue;
                 }
             }
             else if (entity.getClass() == Projectile.class) {
-                if (projectileCollisionDetection((Projectile) entity, other, entityFrameVelo, otherFrameVelo)) {
+                if (projectileCollisionDetection((Projectile) entity, other, entityFrameVelo, otherFrameVelo, delta)) {
                     return;
                 } else
                     continue; // continue with next entity in neighbourhood
@@ -525,7 +525,7 @@ public class CollisionController {
      * @param entityVelocity     positional change of entity per delta time unit
      * @return true, if a collision occurred, false otherwise.
      */
-    private boolean projectileCollisionDetection(Projectile projectile, Entity entity, Vector2 projectileVelocity, Vector2 entityVelocity) {
+    private boolean projectileCollisionDetection(Projectile projectile, Entity entity, Vector2 projectileVelocity, Vector2 entityVelocity, float delta) {
 
         CollisionBox entityBounds = entity.getBounds();
         // relative velocity between projectile and entity
@@ -534,6 +534,16 @@ public class CollisionController {
         float dst = sub(projectile.getPosition(), entityBounds.getPositionAndOffset()).len();
         // time in frame steps remaining before collision occurs
         float framesToImpact = dst / relativeVelocity;
+
+        Vector2 deltaVelocity = sub(projectileVelocity, entityVelocity);
+        Vector2 collisionNormal = resolutionVector.cpy().nor();
+        float force = projectile.getBody().getMass()*projectileVelocity.cpy().scl(1/delta).len()*(1/entity.getBody().getMass());
+
+        Vector2 impulse = createReflectionImpulse(deltaVelocity,collisionNormal,entity.getBody().getElasticity());
+        impulse.scl(force*force);
+
+
+
         /**
          * If the number of frames until the impact occurs is between 0 and 1, the collision
          * can happen in the next frame, so it has to be resolved by checkCollision
@@ -549,8 +559,10 @@ public class CollisionController {
                 // for(CollisionBox entityHitBox : entity.getBodyHitboxes()) {                 // all entity hitboxes across the z axis are checked
                 //if(checkCollision(entityHitBox, projectile.getProjectileBox())) {
                 projectile.setVelocity(0f, 0f);
-                if (entity.hasHealth)
+                if (entity.hasHealth) {
                     entity.getHealth().takeDamage(projectile.dealDamage(entityBounds));
+                    entity.getBody().addImpulse(impulse);
+                }
                 projectile.destroy();
                 return true;
             }
@@ -559,8 +571,11 @@ public class CollisionController {
         } else if (checkCollision(projectile.getBounds(), entityBounds)) {
 
             projectile.setVelocity(0f, 0f);
-            if (entity.hasHealth)
+            if (entity.hasHealth) {
                 entity.getHealth().takeDamage(projectile.dealDamage(entityBounds));
+
+                entity.getBody().addImpulse(impulse);
+            }
             projectile.destroy();
             return true;
         }
@@ -578,13 +593,12 @@ public class CollisionController {
      *
      * @param projectile         Projectile entity
      * @param tile               Tile to be hit
-     * @param projectileVelocity positional change of projectile per delta time unit
      * @return true, if a collision occurred, false otherwise.
      */
-    private boolean projectileCollisionDetection(Projectile projectile, Tile tile, Vector2 projectileVelocity) {
+    private boolean projectileCollisionDetection(Projectile projectile, Tile tile) {
 
         float dst = sub(projectile.getPosition(), tile.getPosition()).len();
-        float framesTillImpact = dst / projectileVelocity.len();
+        float framesTillImpact = dst / projectile.getVelocity().len();
 
         // FAST BULLET
         if (framesTillImpact > 0 && framesTillImpact < 1) {

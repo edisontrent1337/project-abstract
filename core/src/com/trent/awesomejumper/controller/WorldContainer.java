@@ -32,18 +32,19 @@ public class WorldContainer {
 
     public static int nodes = 0;
 
-    private HashSet<Entity> entities;
-    private HashSet<Entity> projectiles;
-    private HashSet<Entity> pickups;
-    private HashSet<Entity> enemies;
-    private HashSet<Entity> weaponDrops;
+    private HashSet<Entity> entities = new HashSet<>();
+    private HashSet<Entity> projectiles = new HashSet<>();
+    private HashSet<Entity> pickups = new HashSet<>();
+    private HashSet<Entity> enemies = new HashSet<>();
+    private HashSet<Entity> weaponDrops = new HashSet<>();
 
     private Player player;
     private Chest chest;
     private Pistol pistol, pistol2;
     private Level level;
     //TODO Change these to HashSet
-    private ArrayList tilesToBeDrawn, entitiesToBeDrawn;
+    private ArrayList tilesToBeDrawn = new ArrayList();
+    private ArrayList entitiesToBeDrawn = new ArrayList<>();
     private ArrayList<Tile> collisionTiles = new ArrayList<>();
 
 
@@ -56,6 +57,8 @@ public class WorldContainer {
         weaponDrops = new HashSet<>();
         entitiesToBeDrawn = new ArrayList<>();
         projectiles = new HashSet<>();
+
+
         player = new Player(new Vector2(12.5f, 7f));
         chest = new Chest(new Vector2(5,5));
         pistol = new Pistol(new Vector2(6f,7f));
@@ -65,7 +68,6 @@ public class WorldContainer {
         registerEntity(chest);
         registerEntity(pistol);
         registerEntity(pistol2);
-
     }
 
 
@@ -351,6 +353,9 @@ public class WorldContainer {
 
        // return false;
     }
+
+
+
 
     // ---------------------------------------------------------------------------------------------
     // GETTER & SETTER

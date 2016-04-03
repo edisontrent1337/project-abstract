@@ -60,7 +60,7 @@ public class HUDRenderer {
         }
 
         else {
-            hudFont.draw(hudBatch, primaryWeapon.getWeaponComponent().getWeaopnName(), Gdx.graphics.getWidth() - 200, 50);
+            hudFont.draw(hudBatch, primaryWeapon.getWeaponComponent().getWeaponName(), Gdx.graphics.getWidth() - 200, 50);
             hudFont.draw(hudBatch, primaryWeapon.getWeaponComponent().getWeaponStatus(), Gdx.graphics.getWidth() - 100, 50);
 
         }
@@ -70,7 +70,7 @@ public class HUDRenderer {
         }
 
         else {
-            hudFont.draw(hudBatch, secondaryWeapon.getWeaponComponent().getWeaopnName(), Gdx.graphics.getWidth() - 200, 25);
+            hudFont.draw(hudBatch, secondaryWeapon.getWeaponComponent().getWeaponName(), Gdx.graphics.getWidth() - 200, 25);
             hudFont.draw(hudBatch, secondaryWeapon.getWeaponComponent().getWeaponStatus(), Gdx.graphics.getWidth() - 100, 25);
 
         }

@@ -25,13 +25,13 @@ public class Projectile extends Entity {
     private final float SPRITE_HEIGHT = 0.09375f*0.8f;
     private final float FRAME_DURATION = 0.066f;
     private final float MAX_SPEED = 128f; // fastest projectile ingame
+    private final float TORQUE = 50f;
 
     //TESTING
     private final int baseDamage = 90;
     private CollisionBox projectileBox;
 
 
-    private Entity owner;
 
     public Projectile(Vector2 position, float z) {
         this.body = new Body(this, WIDTH_X, WIDTH_Y);

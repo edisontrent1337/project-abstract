@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.popups.Message;
 
 import java.util.HashMap;
@@ -12,16 +13,22 @@ import java.util.LinkedList;
 import java.util.Map;
 
 /**
+ * Manager class responsible for holding information about small messages ("popups") which have to be rendered.
+ * Holds a queue of messages to be rendered. Decides, how to render messages depending on their category.
+ * Does not depend on entity or event that creates the popup.
+ * Better implementation than the previous popup component as the popup rendering was tied to the
+ * existence of the entity.
  * Created by Sinthu on 30.03.2016.
  */
 public class PopUpManager {
-
 
     private HashMap<PopUpCategories, LinkedList<Message>> messages;
     private final float MSG_FREQ = 12f;      // default frequency with which the message offset is modified
     private final float MSG_AMP = 0.125f;   // amplitude with which the message offset is modified
     private final float CRT_AMP = 5f;
     private final float CRT_FREQ = 0.75f;
+
+    private static PopUpManager instance = null;
 
     private static Color HEAL = new Color(0.6784f,1f,0.1843f,1);
     private static Color DMG = new Color(1f,0.0745f,0.1137f,1);
@@ -36,14 +43,23 @@ public class PopUpManager {
         CRT,   // Critical Hit
         LVL_UP,     // Level Up
         MISC        // Miscellaneous
+    }
 
 
+    public static PopUpManager getInstance() {
+        return instance;
+    }
+
+    public static synchronized PopUpManager createPopUpManager() {
+        if(instance == null)
+            instance = new PopUpManager();
+        return instance;
     }
 
 
     private float time = 0f;
 
-    public PopUpManager() {
+    private PopUpManager() {
         this.messages = new HashMap<>();
         messages.put(PopUpCategories.DMG, new LinkedList<Message>());
         messages.put(PopUpCategories.HEAL, new LinkedList<Message>());
@@ -54,10 +70,9 @@ public class PopUpManager {
 
 
 
-    public void render(SpriteBatch spriteBatch, BitmapFont font) {
-        time += WorldController.worldTime;
-       // Gdx.app.log("TIME", Float.toString(time));
 
+
+    public void render(SpriteBatch spriteBatch, BitmapFont font) {
         if (messages.isEmpty())
             return;
         /**
@@ -65,6 +80,7 @@ public class PopUpManager {
          */
         for (Map.Entry<PopUpCategories, LinkedList<Message>> entry : messages.entrySet()) {
             LinkedList<Message> messageList = entry.getValue();
+            time = WorldController.worldTime;
 
             for (Iterator<Message> it = messageList.iterator(); it.hasNext(); ) {
                 Message message = it.next(); // get the current message
@@ -83,7 +99,7 @@ public class PopUpManager {
                 switch (entry.getKey()) {
                     case DMG:
                         font.setColor(DMG.r, DMG.g, DMG.b, 1 - progress);
-                        xOffset = (float) Math.cos((time - message.getTimeStamp()) * MSG_FREQ) * MSG_AMP;
+                        xOffset = (float) Math.cos((time- message.getTimeStamp()) * MSG_FREQ) * MSG_AMP;
                         break;
                     case HEAL:
                         font.setColor(HEAL.r, HEAL.g, HEAL.b, 1-progress);
@@ -131,6 +147,7 @@ public class PopUpManager {
             return;
         messages.get(category).add(message);
     }
+
 
 
 

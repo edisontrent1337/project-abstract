@@ -1,5 +1,6 @@
 package com.trent.awesomejumper.engine.modelcomponents;
 
+import com.trent.awesomejumper.controller.EntityManager;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.models.testing.Projectile;
 
@@ -26,15 +27,23 @@ public class WeaponComponent extends ModelComponent {
 
 
 
-    private String weaopnName;
+    private String weaponName;
     private String weaponDesc;
 
     public WeaponComponent(Entity weapon, String weaponName) {
         this.entity = weapon;
-        this.weaopnName = weaponName;
+        this.weaponName = weaponName;
         entity.hasWeaponComponent = true;
     }
 
+    // METHODS & FUNCTIONS
+    // ---------------------------------------------------------------------------------------------
+
+    /**
+     * Called when weapon is fired. Creates a projectile.
+     * Direction, speed and orientation are set depending on the owner of the weapon that
+     * fires the projectile.
+     */
     public void fire() {
         if (entity.time - timeFired < recoverTime)
             return;
@@ -84,7 +93,7 @@ public class WeaponComponent extends ModelComponent {
         this.currentClip = CLIP_SIZE;
     }
 
-    public void setWeaoponTimings(float recoverTime, float reloadTime) {
+    public void setWeaponTimings(float recoverTime, float reloadTime) {
         this.recoverTime = recoverTime;
         this.reloadTime = reloadTime;
     }
@@ -93,8 +102,8 @@ public class WeaponComponent extends ModelComponent {
         this.speed = speed;
     }
 
-    public String getWeaopnName() {
-        return weaopnName;
+    public String getWeaponName() {
+        return weaponName;
     }
 
     public String getWeaponStatus() {

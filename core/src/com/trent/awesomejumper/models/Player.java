@@ -55,7 +55,6 @@ public class Player extends Entity {
     public Player(Vector2 position) {
         body = new Body(this, WIDTH_X, WIDTH_Y);                                                // enable physics
         graphics = new Graphics(this,FRAME_DURATION,SPRITE_PREFIX,SPRITE_WIDTH,SPRITE_HEIGHT);  // enable graphics
-        popUpFeed = new PopUpFeed(this);                                                        // enable capability to render popups
         health = new Health(this, startHealth);                                                 // enable health
 
         weaponInventory = new WeaponInventory(this, 2);
