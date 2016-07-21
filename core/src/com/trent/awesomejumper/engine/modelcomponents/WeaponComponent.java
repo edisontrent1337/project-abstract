@@ -25,8 +25,6 @@ public class WeaponComponent extends ModelComponent {
     private float timeFired = 0f;
     private float timeReloaded = 0f;
 
-
-
     private String weaponName;
     private String weaponDesc;
 
@@ -111,5 +109,7 @@ public class WeaponComponent extends ModelComponent {
         String currentClipString = Integer.toString(currentClip);
         return currentClipString + "/" + ammoString;
     }
+
+
 
 }

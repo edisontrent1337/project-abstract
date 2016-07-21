@@ -1,5 +1,6 @@
 package com.trent.awesomejumper.engine.entity;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -81,7 +82,7 @@ public class Entity implements EntityInterface {
     private boolean alive = true;
 
     public float time;
-    public float dropTime;
+    public float registerTime;
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
@@ -216,6 +217,7 @@ public class Entity implements EntityInterface {
     @Override
     public void update(float delta) {
         time += delta;
+
         if(hasBody)
             body.update(delta);
     }
@@ -294,6 +296,7 @@ public class Entity implements EntityInterface {
      */
     @Override
     public void register() {
+
         EntityManager.getInstance().registerEntity(this);
     }
 

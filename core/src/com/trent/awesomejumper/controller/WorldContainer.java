@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.exceptions.InvalidWeaponSlotException;
+import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.Level;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.testing.Chest;
@@ -274,7 +275,13 @@ public class WorldContainer {
     // ---------------------------------------------------------------------------------------------
 
     public void registerEntity(Entity entity) {
+
         entities.add(entity);
+        entity.registerTime = entity.time;
+        if(AwesomeJumperMain.onDebugMode()) {
+            Gdx.app.log("Registrated entity at", Float.toString(entity.registerTime));
+            Gdx.app.log("Entity registrated", String.format("%04d",(entity.getID())));
+        }
     }
 
 
@@ -283,78 +290,19 @@ public class WorldContainer {
     // ---------------------------------------------------------------------------------------------
 
 
-    //TODO: EDIT THIS. The direction towards the entity that drops the other entity must be included
-    public boolean placeEntity(Entity entity) {
-
-
-        Vector2 center = player.getBody().getCenter().cpy();
-        float radius = pythagoras(player.getWidth(), player.getHeight()) + 0.5f;
-        float dropAngle = (float) Math.random()*360f;
-        Gdx.app.log("ANGLE", Float.toString(dropAngle));
-        Vector2 dropPosition = new Vector2((float)Math.cos(dropAngle), (float)Math.sin(dropAngle)).nor().scl(radius).add(center);
-
-        Gdx.app.log("CIRCLE AROUND PLAYER", "CENTER:" + center.toString() + ", RADIUS:" + Float.toString(radius) + "DROPPOSITION: " +  dropPosition.toString());
-
-        entity.setPosition(dropPosition);
-
+    /**
+     * Places an entity on the specified position in the world.
+     * @param entity entity to be placed
+     * @param position position where entity should be dropped.
+     * @return
+     */
+    public boolean placeEntity(Entity entity, Vector2 position) {
+        Gdx.app.log("Weapon pos before drop", entity.getPosition().toString());
+        entity.setPosition(position.cpy());
+        Gdx.app.log("Weapon pos after drop", entity.getPosition().toString());
         pickups.add(entity);
-        return true;
-        // TODO: move this method to collision controller and iterate over pickup collection
-        // TODO: implement something like: entity.getOwner to reference the entity that drops the other
-        // TODO: implement random drop position in a circle around owner, radius must be bigger than hypotenuse of hitbox of owner
-        /*entity.setPosition(player.getPosition().cpy());
-        entity.getBody().enableCollisionDetection();
-        return true;*/
-        /*int startX = (int) entity.getBounds().getPositionAndOffset().x;
-        int endX = (int) (startX + entity.getBounds().getWidth()) + 2;
-        int startY = (int) entity.getBounds().getPositionAndOffset().y;
-        int endY = (int) (startY + entity.getBounds().getHeight()) + 2;
-        Gdx.app.log("SX, EX, SY, EY", startX +";" + endX + ";" + startY +";" + endY);
-        Gdx.app.log("BOUNDSOFFSET", entity.getBounds().getPositionAndOffset().toString());
-        if(level.getTile(startX,startY) != null) {
-            if(level.getTile(startX, startY).isPassable()) {
-                Gdx.app.log("EARLY: OBJECT POSITION:", entity.getBounds().getPositionAndOffset().toString());
-                entity.getBody().enableCollisionDetection();
-                return true;
-            }
-            if(player.getPosition().x - entity.getPosition().x < 0) {
-                startX--;
-                endX--;
-            }
-            else {
-                startX++;
-                endX++;
-            }
-
-            if(player.getPosition().y - entity.getPosition().y < 0) {
-                startY--;
-                endY--;
-            }
-
-            else {
-                startY++;
-                endY++;
-            }
-        }
-        for(int x = startX; x < endX; x++) {
-            for(int y = startY; y < endY; y++) {
-                if(level.checkBounds(x,y) && level.getTile(x,y) != null) {
-                    if(level.getTile(x,y).isPassable()) {
-                        Gdx.app.log("LATE: OBJECT POSITION:", entity.getBounds().getPositionAndOffset().toString());
-                        Gdx.app.log("NEW: OBJECT POSITION:", new Vector2(x,y).toString());
-                        entity.setVelocity(0f, 0f);
-                        entity.setPosition(new Vector2(x, y));
-                        entity.getBody().enableCollisionDetection();
-                        return true;
-                    }
-                }
-            }
-        }*/
-
-       // return false;
+        return false;
     }
-
-
 
 
     // ---------------------------------------------------------------------------------------------

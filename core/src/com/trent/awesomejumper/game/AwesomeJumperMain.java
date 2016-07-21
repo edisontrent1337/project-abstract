@@ -6,7 +6,7 @@ import com.trent.awesomejumper.screens.SplashScreen;
 
 public class AwesomeJumperMain extends Game {
 
-    private boolean debugMode = false;
+    private static boolean debugMode = false;
     private boolean drawEntities = true;
     private boolean drawHitboxes = false;
     private boolean drawInfo = false;
@@ -26,7 +26,7 @@ public class AwesomeJumperMain extends Game {
         this.debugMode = !debugMode;
     }
 
-    public boolean onDebugMode() {
+    public static boolean onDebugMode() {
         return debugMode;
     }
 

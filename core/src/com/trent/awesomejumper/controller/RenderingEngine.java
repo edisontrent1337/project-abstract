@@ -23,9 +23,6 @@ import com.trent.awesomejumper.models.SkyBox;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
 import com.trent.awesomejumper.tiles.Tile;
 
-import java.util.HashMap;
-import java.util.HashSet;
-
 import static com.trent.awesomejumper.utils.Utilities.formVec;
 
 /**
@@ -74,8 +71,19 @@ public class RenderingEngine {
     private BitmapFont consoleFont, uiFont, messageFont;
 
     // DEBUG & STRINGS
-    private String acc, vel, ste, pos, res, cps;
-    private float zoom, dmp, grv;
+
+    static final int DE_ACCELERATION = 0;
+    static final int DE_VELOCITY = 1;
+    static final int DE_STATE = 2;
+    static final int DE_POSITION = 3;
+    static final int DE_POSITION_OFFSET = 4;
+    static final int DE_CAMERA_POSITION = 5;
+    static final int DE_ENTITIES = 6;
+    static final int DE_RESOLUTION = 7;
+
+    public static Array<String> debugStrings;
+    private float zoom;
+    private final int CONSOLE_LINE_HEIGHT = 32;
     ShapeRenderer debugRenderer = new ShapeRenderer();
 
     // SPRITE BATCHES
@@ -92,11 +100,14 @@ public class RenderingEngine {
         this.nearSky01 = worldContainer.getLevel().getSkyBoxes().get(2);
         this.nearSky02 = worldContainer.getLevel().getSkyBoxes().get(3);
         this.player = worldContainer.getPlayer();
-
         this.hudRenderer = new HUDRenderer(player);
         this.popUpManager = PopUpManager.createPopUpManager();
-
         this.allTextures = new TextureAtlas();
+        this.debugStrings = new Array<>(8);
+        for(int i = 0; i < 8; i++) {
+            debugStrings.add(new String(""));
+        }
+
 
         /** CAMERA SETUP: MAIN VIEW
          * ZOOM = 16.66667 , other options: initialize camera with parameters
@@ -119,6 +130,7 @@ public class RenderingEngine {
         sb = new SpriteBatch();
         debugBatch = new SpriteBatch();
         loadTextures();
+
 
     }
 
@@ -408,21 +420,18 @@ public class RenderingEngine {
     // ---------------------------------------------------------------------------------------------
 
     public void drawInfo() {
-        acc = "ACC: " +  player.getAcceleration();
-        vel = "VEL: " +  player.getVelocity();
-        ste = "STATE: " + player.getState().toString();
-        pos = "POS: " + player.getPosition();
-        cps = "CAM: " + formVec(cam.position.x, cam.position.y);
-        res = Gdx.graphics.getWidth() + "*" + Gdx.graphics.getHeight() + ", ZOOM: " + zoom + ", FPS :" + Gdx.graphics.getFramesPerSecond();
-        consoleFont.draw(debugBatch, acc, 14, 40);
-        consoleFont.draw(debugBatch, vel, 14, 66);
+        debugStrings.set(DE_ACCELERATION,"ACC: " +  player.getAcceleration() );
+        debugStrings.set(DE_VELOCITY, "VEL: " +  player.getVelocity());
+        debugStrings.set(DE_STATE, "STATE: " + player.getState().toString());
+        debugStrings.set(DE_POSITION, "POS: " + player.getPosition());
+        debugStrings.set(DE_POSITION_OFFSET, "PAO: " + player.getBody().getBounds().getPositionAndOffset());
+        debugStrings.set(DE_CAMERA_POSITION, "CAM: " + formVec(cam.position.x, cam.position.y));
+        debugStrings.set(DE_ENTITIES,"Entities,Drawn :" + Integer.toString(Entity.entityCount) + " , " + Integer.toString(WorldContainer.nodes));
+        debugStrings.set(DE_RESOLUTION, Gdx.graphics.getWidth() + "*" + Gdx.graphics.getHeight() + ", ZOOM: " + zoom + ", FPS :" + Gdx.graphics.getFramesPerSecond());
         consoleFont.setColor(Color.BLUE);
-        consoleFont.draw(debugBatch, ste, 14, 94);
-        consoleFont.draw(debugBatch, pos, 14, 120);
-        consoleFont.draw(debugBatch, res, 14, 148);
-        consoleFont.draw(debugBatch, cps, 14, 174);
-        consoleFont.draw(debugBatch, "Entities,Drawn :" + Integer.toString(Entity.entityCount) + " , " + Integer.toString(WorldContainer.nodes), 14, 202);
-        consoleFont.draw(debugBatch, Float.toString(player.getHealth().getHp()), 14, Gdx.graphics.getHeight() - 30);
+        for(int i = 0; i < debugStrings.size; i++) {
+            consoleFont.draw(debugBatch, debugStrings.get(i), 14, CONSOLE_LINE_HEIGHT *i);
+        }
     }
 
 

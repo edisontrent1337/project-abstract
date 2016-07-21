@@ -1,5 +1,6 @@
 package com.trent.awesomejumper.controller;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.entity.EntityInterface;
@@ -7,7 +8,8 @@ import com.trent.awesomejumper.engine.entity.EntityInterface;
 /**
  * Manages the registration of entities at runtime. Adds entities to specified collections of
  * worldContainer and loads its textures with renderingEngine.
- * Implemented as singleton.
+ * Implemented as singleton. Can be seen as the interface that connects loading graphics of
+ * entities and placing them in the world.
  * Created by Sinthu on 01.03.2016.
  */
 public class EntityManager {
@@ -46,11 +48,6 @@ public class EntityManager {
     }
 
 
-    public void registerPickUp(Entity entity) {
-
-        worldContainer.placeEntity(entity);
-    }
-
     /**
      * Adds the entity to all relevant collections. Decides with the help of the entities type
      * to which collections the entity should be added.
@@ -82,7 +79,8 @@ public class EntityManager {
                 break;
             case DROPPED_WEAPON_ENTITY:
                 worldContainer.getWeaponDrops().add(entity);
-                worldContainer.placeEntity(entity);
+                Gdx.app.log("Owner", entity.getOwner().getGraphics().getTextureRegName());
+                worldContainer.placeEntity(entity,entity.getOwner().getBounds().getPositionAndOffset());
                 entity.getBody().reset();
                 break;
             default:

@@ -215,8 +215,8 @@ public class CollisionController {
 
         for (Entity other : worldContainer.updatedEntityNeighbourHood(entity)) {
             /**
-             * If the two participants are the same or one of them is declared "dead", move to the next
-             * entity in neighbourhood
+             * If the two participants are the same, one of them is part of the other such as equipped weapons etc.
+             * or one of them is declared "dead", move to the next entity in neighbourhood
              */
             if (other.equals(entity) || !other.isAlive() || !other.getBody().isCollisionDetectionEnabled() || other.getOwner().equals(entity) || entity.getOwner().equals(other))
                 continue;
@@ -233,6 +233,8 @@ public class CollisionController {
             if (entity.equals(player)) {
                 switch (other.getType()) {
                     case DROPPED_WEAPON_ENTITY:
+                        /*if((WorldController.worldTime - other.registerTime) < 2.00f)
+                            break;*/
                         if (checkCollision(entityBox, otherBox)) {
                             try {
                                 if (player.getWeaponInventory().equipWeapon(other, 1)) {
@@ -525,6 +527,7 @@ public class CollisionController {
      * @param entityVelocity     positional change of entity per delta time unit
      * @return true, if a collision occurred, false otherwise.
      */
+    // TODO: make projectile collision only exclusive to living entities.
     private boolean projectileCollisionDetection(Projectile projectile, Entity entity, Vector2 projectileVelocity, Vector2 entityVelocity, float delta) {
 
         CollisionBox entityBounds = entity.getBounds();

@@ -1,5 +1,6 @@
 package com.trent.awesomejumper.engine.modelcomponents;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.controller.PopUpManager;
 import com.trent.awesomejumper.controller.RenderingEngine;
@@ -36,8 +37,8 @@ public class WeaponInventory extends ModelComponent {
         }
     }
 
-    private Weapon weaponPrimary;       // primary wapon equipped on this slot
-    private Weapon weaponSecondary;     // secondary wapon equipped on this slot
+    private Weapon weaponPrimary;       // primary weapon equipped on this slot
+    private Weapon weaponSecondary;     // secondary weapon equipped on this slot
     private int numberOfSlots;            // number of weapon slots this inventory has
 
     private boolean primaryEquipped = false, secondaryEquipped = false;
@@ -105,6 +106,8 @@ public class WeaponInventory extends ModelComponent {
             Message equip = new Message(weaponPrimary.getWeaponComponent().getWeaponName(), entity.getPosition().cpy(), time, 2.00f);
             PopUpManager.getInstance().addMessageToCategory(PopUpManager.PopUpCategories.MISC, equip);
             weaponPrimary.setOwner(entity);
+            weaponPrimary.setEquipped(true);
+            Gdx.app.log("weaponOwner", entity.getGraphics().getTextureRegName());
             return primaryEquipped;
         } else if (slot == 2 & !secondaryEquipped) {
             weaponSecondary = (Weapon) weapon;
@@ -114,6 +117,7 @@ public class WeaponInventory extends ModelComponent {
             Message equip = new Message(weaponSecondary.getWeaponComponent().getWeaponName(), entity.getPosition().cpy(), time, 2.00f);
             PopUpManager.getInstance().addMessageToCategory(PopUpManager.PopUpCategories.MISC, equip);
             weaponSecondary.setOwner(entity);
+            weaponSecondary.setEquipped(true);
             return secondaryEquipped;
         }
         return false;
@@ -150,7 +154,7 @@ public class WeaponInventory extends ModelComponent {
         }
         if (secondaryEquipped) {
             weaponSecondary.getBody().setPosition(entity.getBody().getCenter().cpy().sub(weaponSecondary.getBody().getHalfDimensions()));
-            weaponPrimary.getBody().setAimReference(entity.getBody().getAimReference());
+            weaponSecondary.getBody().setAimReference(entity.getBody().getAimReference());
             weaponSecondary.getBody().setOrientation(entity.getBody().getOrientation());
             weaponSecondary.getBody().setAngleOfRotation(angle(weaponSecondary.getBody().getOrientation()));
             Vector2 circle = new Vector2(getNormal(entity.getBody().getOrientation()));
@@ -172,13 +176,15 @@ public class WeaponInventory extends ModelComponent {
 
         if (slot == 1 && primaryEquipped) {
             primaryEquipped = false;
+            // register() triggers the actual physical placement of the weapon in the world
+            weaponPrimary.setEquipped(false);
             weaponPrimary.register();
-            weaponPrimary.setOwner(weaponPrimary);
             return true;
         } else if (slot == 2 && secondaryEquipped) {
             secondaryEquipped = false;
+            // register() triggers the actual physical placement of the weapon in the world
+            weaponSecondary.setEquipped(false);
             weaponSecondary.register();
-            weaponSecondary.setOwner(weaponSecondary);
             return true;
         }
 

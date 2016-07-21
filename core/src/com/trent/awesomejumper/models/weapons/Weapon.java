@@ -8,6 +8,9 @@ import com.trent.awesomejumper.engine.modelcomponents.WeaponComponent;
  */
 public class Weapon extends Entity {
 
+    private final float EQUIP_TIMEOUT = 1.50f;
+    private boolean equipped = false;
+
     public Weapon() {
 
     }
@@ -15,5 +18,25 @@ public class Weapon extends Entity {
     public WeaponComponent getWeaponComponent() {
         return weaponComponent;
     }
+
+    @Override
+    public void update(float delta) {
+        super.update(delta);
+
+        /**
+         * Resets the owner of this weapon after 1.5 seconds of being unequipped so it can
+         * be grabbed and equipped again.
+         */
+        if(time - registerTime > EQUIP_TIMEOUT && !equipped) {
+            setOwner(this);
+        }
+
+    }
+
+
+    public void setEquipped(boolean equipped) {
+        this.equipped = equipped;
+    }
+
 
 }

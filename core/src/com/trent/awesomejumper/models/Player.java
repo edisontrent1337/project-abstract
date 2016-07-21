@@ -76,7 +76,7 @@ public class Player extends Entity {
         body.setElasticity(ELASTICITY);
         body.setMaxVelocity(MAX_SPEED);
 
-        body.setOrientation(sub(getBounds().getPositionAndOffset(), InputHandler.mouse));
+        body.setOrientation(sub(body.getCenter(), InputHandler.mouse));
         body.setAngleOfRotation(angle(body.getOrientation()));
 
         headSize = 0.1f*HEIGHT_Z;   // 10% of the z height are occupied by the head
