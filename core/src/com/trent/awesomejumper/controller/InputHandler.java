@@ -194,6 +194,11 @@ public class InputHandler {
 
     }
 
+
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
 }
 
 

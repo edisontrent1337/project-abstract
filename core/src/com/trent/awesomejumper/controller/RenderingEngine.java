@@ -95,10 +95,10 @@ public class RenderingEngine {
     public RenderingEngine(WorldContainer worldContainer, AwesomeJumperMain game) {
         this.worldContainer = worldContainer;
         this.game = game;
-        this.farSky01 = worldContainer.getLevel().getSkyBoxes().get(0);
+        /*this.farSky01 = worldContainer.getLevel().getSkyBoxes().get(0);
         this.farSky02 = worldContainer.getLevel().getSkyBoxes().get(1);
         this.nearSky01 = worldContainer.getLevel().getSkyBoxes().get(2);
-        this.nearSky02 = worldContainer.getLevel().getSkyBoxes().get(3);
+        this.nearSky02 = worldContainer.getLevel().getSkyBoxes().get(3);*/
         this.player = worldContainer.getPlayer();
         this.hudRenderer = new HUDRenderer(player);
         this.popUpManager = PopUpManager.createPopUpManager();
@@ -224,7 +224,7 @@ public class RenderingEngine {
         moveCamera(player.getPosition().x, player.getPosition().y);
         sb.setProjectionMatrix(cam.combined);
         sb.begin();
-        drawBg();
+        //drawBg();
         drawTiles();
         if(game.hitboxesEnabled()) {
                 sb.end();
@@ -519,6 +519,10 @@ public class RenderingEngine {
 
     public OrthographicCamera getGameCamera() {
         return cam;
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
     }
 
 }

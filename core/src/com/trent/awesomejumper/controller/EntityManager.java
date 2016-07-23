@@ -57,6 +57,7 @@ public class EntityManager {
 
         /**
          * Add the entity to the main entity collection that holds all entities.
+         * Also load necessary assets.
          */
         worldContainer.registerEntity(entity);
         renderingEngine.initGraphics(entity);
@@ -68,7 +69,7 @@ public class EntityManager {
         switch (entity.getType()) {
             case PICKUP_ENTITY:
                 worldContainer.getPickups().add(entity);
-                worldContainer.placeEntity(entity);
+                worldContainer.placeEntity(entity, entity.getPosition());
                 entity.getBody().reset();
                 break;
             case PROJECTILE_ENTITY:
@@ -90,5 +91,12 @@ public class EntityManager {
 
     }
 
+
+    public void reset() {
+        worldContainer.reset();
+        renderingEngine.loadTextures();
+        renderingEngine.initGraphics(worldContainer.getPlayer());
+        renderingEngine.setPlayer(worldContainer.getPlayer());
+    }
 
 }

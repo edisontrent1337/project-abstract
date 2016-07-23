@@ -22,8 +22,7 @@ public class WorldController {
     // ---------------------------------------------------------------------------------------------
 
     private WorldContainer worldContainer;
-    private Player player;
-    private Level level;
+    private RandomLevelGenerator randomLevelGenerator;
     private CollisionController collisionController;
 
     public static float worldTime = 0f;
@@ -35,8 +34,7 @@ public class WorldController {
 
     public WorldController(WorldContainer worldContainer) {
         this.worldContainer = worldContainer;
-        this.level = worldContainer.getLevel();
-        this.player = worldContainer.getPlayer();
+        this.randomLevelGenerator = worldContainer.getRandomLevelGenerator();
         this.collisionController = new CollisionController(worldContainer);
     }
 
@@ -99,9 +97,9 @@ public class WorldController {
         /**
          * TODO: FOG IMPLEMENTATION WITH THE OLD SKYBOXES
          */
-        for (SkyBox s : level.getSkyBoxes()) {
+        /*for (SkyBox s : level.getSkyBoxes()) {
             s.update(delta);
-        }
+        }*/
         collisionController.calledPerFrame = 0;
     }
 
@@ -141,7 +139,7 @@ public class WorldController {
             }
 
             // IF ENTITY FALLS OUT OF BOUNDS, IT IS PUT BACK TO THE START
-            if (!level.checkBounds((int) entity.getPosition().x, (int) entity.getPosition().y)) {
+            if (!randomLevelGenerator.checkBounds((int) entity.getPosition().x, (int) entity.getPosition().y)) {
                 entity.setPosition(new Vector2(5f, 12f));
                 entity.update(delta);
             }

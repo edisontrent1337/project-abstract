@@ -276,9 +276,100 @@ tile
   orig: 32, 32
   offset: 0, 0
   index: -1
-wood_chest
+wall_bl
   rotate: false
   xy: 803, 787
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+wall_bm
+  rotate: false
+  xy: 239, 27
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+wall_um
+  rotate: false
+  xy: 239, 27
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+wall_br
+  rotate: false
+  xy: 837, 821
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+wall_cbl
+  rotate: false
+  xy: 871, 855
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+wall_cbr
+  rotate: false
+  xy: 905, 889
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+wall_cul
+  rotate: false
+  xy: 939, 923
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+wall_cur
+  rotate: false
+  xy: 973, 957
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+wall_l
+  rotate: false
+  xy: 803, 753
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+wall_m
+  rotate: false
+  xy: 273, 27
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+wall_r
+  rotate: false
+  xy: 837, 787
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+wall_ul
+  rotate: false
+  xy: 871, 821
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+wall_ur
+  rotate: false
+  xy: 905, 855
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+wood_chest
+  rotate: false
+  xy: 939, 889
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -292,14 +383,14 @@ flower-01
   index: -1
 projectile
   rotate: false
-  xy: 239, 51
+  xy: 1007, 1015
   size: 12, 8
   orig: 12, 8
   offset: 0, 0
   index: 1
 projectile_shadow
   rotate: false
-  xy: 837, 845
+  xy: 973, 947
   size: 12, 8
   orig: 12, 8
   offset: 0, 0

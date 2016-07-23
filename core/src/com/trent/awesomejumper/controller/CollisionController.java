@@ -25,7 +25,6 @@ import static com.trent.awesomejumper.utils.PhysicalConstants.*;
 public class CollisionController {
 
     private WorldContainer worldContainer;
-    private Level level;
     private Player player;
     private Vector2 resolutionVector;
     public static int calledPerFrame = 0;
@@ -40,7 +39,6 @@ public class CollisionController {
     public CollisionController(WorldContainer worldContainer) {
         this.worldContainer = worldContainer;
         this.player = worldContainer.getPlayer();
-        this.level = worldContainer.getLevel();
         this.resolutionVector = new Vector2(0f, 0f);
     }
 

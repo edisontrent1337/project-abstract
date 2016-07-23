@@ -105,6 +105,10 @@ public class GameScreen implements Screen, InputProcessor{
             inputHandler.downPressed();
         }
 
+        if(keycode == Keys.R) {
+            entityManager.reset();
+            inputHandler.setPlayer(worldContainer.getPlayer());
+        }
 
         if(keycode == Keys.U) {
             Entity e = new Chest(new Vector2(new Random().nextInt(5) + 5, new Random().nextInt(5) + 5));

@@ -3,6 +3,7 @@ package com.trent.awesomejumper.controller;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.entity.Entity;
+import com.trent.awesomejumper.engine.entity.EntityInterface;
 import com.trent.awesomejumper.exceptions.InvalidWeaponSlotException;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.Level;
@@ -48,6 +49,10 @@ public class WorldContainer {
     private ArrayList entitiesToBeDrawn = new ArrayList<>();
     private ArrayList<Tile> collisionTiles = new ArrayList<>();
 
+    // TESTING
+
+    private RandomLevelGenerator randomLevelGenerator;
+
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
@@ -60,15 +65,29 @@ public class WorldContainer {
         projectiles = new HashSet<>();
 
 
-        player = new Player(new Vector2(12.5f, 7f));
+       /* player = new Player(new Vector2(12.5f, 7f));
         chest = new Chest(new Vector2(5,5));
         pistol = new Pistol(new Vector2(6f,7f));
         pistol2 = new Pistol(new Vector2(5f, 6f));
-        level = new Level();
+        level = new Level();*/
+
+        randomLevelGenerator = new RandomLevelGenerator();
+        randomLevelGenerator.init();
+        randomLevelGenerator.load();
+
+        entities = randomLevelGenerator.getEntities();
+
+        /*for(Entity e: entities) {
+            registerEntity(e);
+        }*/
+
+        player = randomLevelGenerator.getPlayer();
+
         registerEntity(player);
+        /*
         registerEntity(chest);
         registerEntity(pistol);
-        registerEntity(pistol2);
+        registerEntity(pistol2);*/
     }
 
 
@@ -96,11 +115,11 @@ public class WorldContainer {
         if(fovStartY < 0) fovStartY = 0;
 
 
-        if(fovEndX > level.getLevelWidth())
-            fovEndX = level.getLevelWidth();
+        if(fovEndX > randomLevelGenerator.getLevelWidth())
+            fovEndX = randomLevelGenerator.getLevelWidth();
 
-        if(fovEndY > level.getLevelHeight())
-            fovEndY = level.getLevelHeight();
+        if(fovEndY > randomLevelGenerator.getLevelHeight())
+            fovEndY = randomLevelGenerator.getLevelHeight();
 
         tilesToBeDrawn = new ArrayList<>();
         Tile tile;
@@ -108,8 +127,8 @@ public class WorldContainer {
         for(int x = fovStartX; x < fovEndX; x++) {
             for(int y = fovStartY; y < fovEndY; y++) {
 
-                tile = level.getTile(x,y);
-
+               // tile = level.getTile(x,y);
+                tile = randomLevelGenerator.getTile(x,y);
                 if(tile != null)
                     tilesToBeDrawn.add(tile);
 
@@ -135,10 +154,10 @@ public class WorldContainer {
         for (int x = sx; x <= ex; x++) {
             for (int y = sy; y <= ey; y++) {
                 // CHECK WHETHER TILE IS IN LEVEL BOUNDS
-                if (level.checkBounds(x, y)) {
-                    if(level.getTile(x,y) != null) {
-                        if(!level.getTile(x,y).isPassable())
-                            collisionTiles.add(level.getTile(x, y));
+                if (randomLevelGenerator.checkBounds(x, y)) {
+                    if(randomLevelGenerator.getTile(x,y) != null) {
+                        if(!randomLevelGenerator.getTile(x,y).isPassable())
+                            collisionTiles.add(randomLevelGenerator.getTile(x, y));
                     }
                 }
             }
@@ -169,11 +188,11 @@ public class WorldContainer {
         if(fovStartX < 0) fovStartX = 0;
         if(fovStartY < 0) fovStartY = 0;
 
-        if(fovEndX > level.getLevelWidth())
-            fovEndX = level.getLevelWidth();
+        if(fovEndX > randomLevelGenerator.getLevelWidth())
+            fovEndX = randomLevelGenerator.getLevelWidth();
 
-        if(fovEndY > level.getLevelHeight())
-            fovEndY = level.getLevelHeight();
+        if(fovEndY > randomLevelGenerator.getLevelHeight())
+            fovEndY = randomLevelGenerator.getLevelHeight();
 
         for (Entity e : entities) {
             if(e.getBody().getPosition().x > fovStartX &&
@@ -300,10 +319,24 @@ public class WorldContainer {
         Gdx.app.log("Weapon pos before drop", entity.getPosition().toString());
         entity.setPosition(position.cpy());
         Gdx.app.log("Weapon pos after drop", entity.getPosition().toString());
+        //TODO: add here this switch
+        /*switch (Entity.Type) {
+            case DROPPED_WEAPON_ENTITY:
+        }*/
         pickups.add(entity);
         return false;
     }
 
+
+    public void reset() {
+        entities.clear();
+        player.destroy();
+        randomLevelGenerator = new RandomLevelGenerator();
+        randomLevelGenerator.init();
+        randomLevelGenerator.load();
+        player = randomLevelGenerator.getPlayer();
+        registerEntity(player);
+    }
 
     // ---------------------------------------------------------------------------------------------
     // GETTER & SETTER
@@ -335,4 +368,9 @@ public class WorldContainer {
     public HashSet<Entity> getProjectiles() {
         return projectiles;
     }
+
+    public RandomLevelGenerator getRandomLevelGenerator() {
+        return randomLevelGenerator;
+    }
+
 }
