@@ -70,7 +70,7 @@ public class CollisionBox {
     // CONSTRUCTORS
     // ---------------------------------------------------------------------------------------------
 
-    // inside collision boxes.
+    // contains collision boxes.
     // TODO: Add a method which creates regular polygonal collision boxes. It could be useful ;)
     // TODO: Implement a collision interface and support <<collision circles>> :D
 

@@ -24,7 +24,7 @@ public class Body extends ModelComponent {
 
 
     // Movement & Locality
-    private Vector2 position;        // position inside the x/y grid
+    private Vector2 position;        // position contains the x/y grid
     private float heightZ;           // height of entity in z direction
     private float zOffset = 0;       // z position over the floor. By default 0
     private Vector2 velocity;        // velocity on the xy grid
@@ -100,7 +100,7 @@ public class Body extends ModelComponent {
 
 
         /**
-         * Update each CollisionBox inside the hitboxSkeleton
+         * Update each CollisionBox contains the hitboxSkeleton
          */
         for (CollisionBox b : hitboxSkeleton) {
             b.update(position);

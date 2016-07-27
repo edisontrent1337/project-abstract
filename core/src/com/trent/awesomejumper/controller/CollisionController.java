@@ -616,4 +616,9 @@ public class CollisionController {
         return false;
     }
 
+    //TODO: change this.
+    public void setPlayer() {
+        this.player = worldContainer.getPlayer();
+    }
+
 }

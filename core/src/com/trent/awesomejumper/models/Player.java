@@ -37,7 +37,7 @@ public class Player extends Entity {
     private final float SPRITE_WIDTH = 1f*GRAPHIC_SCALE;  // 48px
     private final float SPRITE_HEIGHT = 1f*GRAPHIC_SCALE; // 48px
     private final float FRAME_DURATION = 0.05f;
-    private final float MAX_SPEED = 5f;
+    private final float MAX_SPEED = 7f;
     private int startHealth  = 2000;
     private final String SPRITE_PREFIX = "link";
 

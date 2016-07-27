@@ -99,12 +99,12 @@ public class WorldContainer {
     // LIST OF TILES TO BE DRAWN
     // ---------------------------------------------------------------------------------------------
 
-    public ArrayList<Tile> getTilesToBeRendered(float camW, float camH) {
+    public ArrayList<Tile> getTilesToBeRendered(Vector2 cameraPosition, float camW, float camH) {
 
         // GET CURRENT FOV COORDINATES AND ONLY RENDER WHAT THE PLAYER SEES
         // BOTTOM LEFT CORNER
-        int fovStartX = (int)(player.getPosition().x - camW/2 - 1);
-        int fovStartY = (int)(player.getPosition().y - camH/2 - 1);
+        int fovStartX = (int)(cameraPosition.x - camW/2 - 1);
+        int fovStartY = (int)(cameraPosition.y - camH/2 - 1);
 
         // TOP RIGHT CORNER
         int fovEndX = fovStartX + (int) camW + 4;
@@ -176,9 +176,9 @@ public class WorldContainer {
      * @param camH camera height
      * @return ArrayList with entities
      */
-    public ArrayList<Entity> getEntitiesToBeRendered(float camW, float camH) {
-        int fovStartX = (int)(player.getPosition().x - camW/2);
-        int fovStartY = (int)(player.getPosition().y - camH/2);
+    public ArrayList<Entity> getEntitiesToBeRendered(Vector2 position, float camW, float camH) {
+        int fovStartX = (int)(position.x - camW/2);
+        int fovStartY = (int)(position.y - camH/2);
 
         // TOP RIGHT CORNER
         int fovEndX = fovStartX + (int)camW + 4;
@@ -334,6 +334,7 @@ public class WorldContainer {
         randomLevelGenerator = new RandomLevelGenerator();
         randomLevelGenerator.init();
         randomLevelGenerator.load();
+        // TODO: insert here: entities = randomLevelGenerator.getEntities()
         player = randomLevelGenerator.getPlayer();
         registerEntity(player);
     }
@@ -344,10 +345,6 @@ public class WorldContainer {
 
     public Player getPlayer() {
         return player;
-    }
-
-    public Level getLevel() {
-        return level;
     }
 
     public ArrayList<Tile> getCollisionTiles() {

@@ -40,6 +40,8 @@ public class Tile {
     public float width, height, maxVelocity, maxJumpSpeed, friction;
     public boolean passable, interactable;
 
+    private boolean visited = false;
+
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
 
@@ -128,5 +130,12 @@ public class Tile {
 
     public void action (Player player, float delta) {}
 
+    public void setVisited() {
+        visited = true;
+    }
+
+    public boolean isVisited() {
+        return visited;
+    }
 
 }

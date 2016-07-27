@@ -117,8 +117,8 @@ public class InputHandler {
          *
          */
 
-        mouse.x = camera.position.x - camera.viewportWidth/2f + Gdx.input.getX()/RenderingEngine.ppuX;
-        mouse.y = camera.position.y - camera.viewportHeight/2f + (Gdx.graphics.getHeight() - Gdx.input.getY())/RenderingEngine.ppuY;
+        mouse.x = camera.position.x - (camera.viewportWidth*camera.zoom)/2f + Gdx.input.getX()/RenderingEngine.ppuX;
+        mouse.y = camera.position.y - (camera.viewportHeight*camera.zoom)/2f + (Gdx.graphics.getHeight() - Gdx.input.getY())/RenderingEngine.ppuY;
 
 
         // WALKING UP

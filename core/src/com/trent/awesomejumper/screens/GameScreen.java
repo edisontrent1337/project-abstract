@@ -106,8 +106,10 @@ public class GameScreen implements Screen, InputProcessor{
         }
 
         if(keycode == Keys.R) {
+            //TODO: EDIT THIS!!!!
             entityManager.reset();
             inputHandler.setPlayer(worldContainer.getPlayer());
+            controller.setPlayer();
         }
 
         if(keycode == Keys.U) {
@@ -211,6 +213,7 @@ public class GameScreen implements Screen, InputProcessor{
 
     @Override
     public boolean scrolled(int amount) {
+        renderingEngine.setZoom(amount);
         return false;
     }
 

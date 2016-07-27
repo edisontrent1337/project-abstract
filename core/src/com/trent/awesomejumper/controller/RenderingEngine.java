@@ -80,6 +80,8 @@ public class RenderingEngine {
     static final int DE_CAMERA_POSITION = 5;
     static final int DE_ENTITIES = 6;
     static final int DE_RESOLUTION = 7;
+    static final int DE_CURSOR = 8;
+
 
     public static Array<String> debugStrings;
     private float zoom;
@@ -103,8 +105,8 @@ public class RenderingEngine {
         this.hudRenderer = new HUDRenderer(player);
         this.popUpManager = PopUpManager.createPopUpManager();
         this.allTextures = new TextureAtlas();
-        this.debugStrings = new Array<>(8);
-        for(int i = 0; i < 8; i++) {
+        this.debugStrings = new Array<>(9);
+        for(int i = 0; i < 9; i++) {
             debugStrings.add(new String(""));
         }
 
@@ -299,10 +301,9 @@ public class RenderingEngine {
      * Iterates over all entities in the world and renders them on the screen.
      */
     public void drawEntities() {
-        for(Entity e : worldContainer.getEntitiesToBeRendered(CAMERA_WIDTH, CAMERA_HEIGHT)) {
+        Vector2 cameraPosition = new Vector2(cam.position.x, cam.position.y);
+        for(Entity e : worldContainer.getEntitiesToBeRendered(cameraPosition, CAMERA_WIDTH, CAMERA_HEIGHT)) {
             e.render(sb);
-           // if(e.hasPopUps);
-               // popUpManager.update(e);
         }
 
     }
@@ -318,7 +319,8 @@ public class RenderingEngine {
     // ---------------------------------------------------------------------------------------------
 
     private void drawTiles() {
-        for(Tile newTile : worldContainer.getTilesToBeRendered(CAMERA_WIDTH, CAMERA_HEIGHT)) {
+        Vector2 cameraPosition = new Vector2(cam.position.x, cam.position.y);
+        for(Tile newTile : worldContainer.getTilesToBeRendered(cameraPosition, CAMERA_WIDTH*cam.zoom, CAMERA_HEIGHT*cam.zoom)) {
             int type = newTile.getType();
             Vector2 position = newTile.getPosition();
             if(!game.onDebugMode()) {
@@ -428,6 +430,7 @@ public class RenderingEngine {
         debugStrings.set(DE_CAMERA_POSITION, "CAM: " + formVec(cam.position.x, cam.position.y));
         debugStrings.set(DE_ENTITIES,"Entities,Drawn :" + Integer.toString(Entity.entityCount) + " , " + Integer.toString(WorldContainer.nodes));
         debugStrings.set(DE_RESOLUTION, Gdx.graphics.getWidth() + "*" + Gdx.graphics.getHeight() + ", ZOOM: " + zoom + ", FPS :" + Gdx.graphics.getFramesPerSecond());
+        debugStrings.set(DE_CURSOR, InputHandler.mouse.toString());
         consoleFont.setColor(Color.BLUE);
         for(int i = 0; i < debugStrings.size; i++) {
             consoleFont.draw(debugBatch, debugStrings.get(i), 14, CONSOLE_LINE_HEIGHT *i);
@@ -497,22 +500,6 @@ public class RenderingEngine {
     }
 
 
-    // ---------------------------------------------------------------------------------------------
-    // POP UP MANAGEMENT
-    // ---------------------------------------------------------------------------------------------
-
-    public void addPopUpMsg(PopUpManager.PopUpCategories category, Message message) {
-        popUpManager.addMessageToCategory(category, message);
-    }
-
-
-
-
-
-
-
-
-
 
     // GETTER AND SETTER
     // ---------------------------------------------------------------------------------------------
@@ -523,6 +510,14 @@ public class RenderingEngine {
 
     public void setPlayer(Player player) {
         this.player = player;
+    }
+
+    public void setZoom(float zoom) {
+            float oldZoom = cam.zoom;
+            oldZoom += 0.1d * zoom;
+            cam.zoom = oldZoom;
+            ppuX = Gdx.graphics.getWidth() / (CAMERA_WIDTH*cam.zoom);
+            ppuY = Gdx.graphics.getHeight() / (CAMERA_HEIGHT*cam.zoom);
     }
 
 }

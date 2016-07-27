@@ -13,11 +13,16 @@ public class Interval {
 
     }
 
+
     @Override
     public String toString() {
         return "min:  " + min + " | " + "max: " + max;
     }
 
+
+    public boolean contains(int a) {
+        return a >= min && a <= max;
+    }
 
 
 

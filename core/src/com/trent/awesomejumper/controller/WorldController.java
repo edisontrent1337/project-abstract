@@ -148,4 +148,8 @@ public class WorldController {
         }
 
     }
+
+    public void setPlayer() {
+        collisionController.setPlayer();
+    }
 }
