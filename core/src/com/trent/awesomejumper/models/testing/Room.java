@@ -23,6 +23,8 @@ public class Room {
 
     private Array<Door> doors = new Array<>();
 
+    private Room closestNeighbour = null;
+
     // Minimum distance between two adjacent rooms
     private final int MIN_ROOM_DISTANCE = 3;
 
@@ -69,8 +71,9 @@ public class Room {
         this.ID = idCounter.getAndIncrement();
 
         this.type = Type.SMALL;
-        this.center = new Vector2(xPos + width / 2, yPos + height / 2);
+        this.center = new Vector2(xPos +  width / 2, yPos + height / 2);
         initDoorData();
+        closestNeighbour = this;
     }
 
     public Room() {
@@ -89,6 +92,7 @@ public class Room {
 
         this.center = new Vector2(xPos + width / 2, yPos + height / 2);
         initDoorData();
+        closestNeighbour = this;
 
     }
 
@@ -96,10 +100,10 @@ public class Room {
     // ---------------------------------------------------------------------------------------------
 
     private void initDoorData() {
-        northDoor = new Door(Math.round(center.x), (int) yDimensions.max);
-        eastDoor = new Door((int) xDimensions.max, Math.round(center.y));
-        southDoor = new Door(Math.round(center.x), (int) yDimensions.min);
-        westDoor = new Door((int) xDimensions.min, Math.round(center.y));
+        northDoor = new Door((int)center.x, (int) yDimensions.max, 0);
+        eastDoor = new Door((int) xDimensions.max, (int)center.y, 1);
+        southDoor = new Door((int)center.x, (int) yDimensions.min - 1, 2);
+        westDoor = new Door((int) xDimensions.min - 1, (int)center.y, 3);
 
         doors.add(northDoor);
         doors.add(eastDoor);
@@ -191,13 +195,22 @@ public class Room {
         return doors;
     }
 
+    public void setClosestNeighbour(Room closestNeighbour) {
+        this.closestNeighbour = closestNeighbour;
+    }
+
+    public Room getClosestNeighbour() {
+        return closestNeighbour;
+    }
 
     public class Door {
         int x, y;
+        int direction;
 
-        private Door(int x, int y) {
+        private Door(int x, int y, int direction) {
             this.x = x;
             this.y = y;
+            this.direction = direction;
         }
 
         public int getX() {
@@ -208,6 +221,10 @@ public class Room {
         public int getY() {
             return y;
 
+        }
+
+        public int getDirection() {
+            return direction;
         }
 
         @Override

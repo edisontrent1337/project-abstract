@@ -2,7 +2,6 @@ package com.trent.awesomejumper.controller;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.testing.Room;
@@ -16,10 +15,10 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
 import java.util.Random;
 import java.util.Stack;
+
+import static java.lang.Float.MAX_VALUE;
 
 /**
  * //TODO: DOCUMENTATION
@@ -32,6 +31,15 @@ public class RandomLevelGenerator {
 
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
+
+    private final int NORTH = 0;
+    private final int EAST = 1;
+    private final int SOUTH = 2;
+    private final int WEST = 3;
+
+    private final int COORDINATE_ORDER_MODE = 0;
+    private final int CLOSEST_NEIGHBOUR_MODE = 1;
+
     private Tile[][] levelData;
     private ArrayList<Room> rooms;
     private int levelWidth;
@@ -39,7 +47,7 @@ public class RandomLevelGenerator {
 
     private HashSet<Entity> entities;
     //TODO: use a map to implement functions like getRoomById()....
-    private HashMap<Integer, Room> roomMap;
+    private HashMap<Long, Room> roomMap;
     private Player player;
 
     /**
@@ -91,6 +99,7 @@ public class RandomLevelGenerator {
     public RandomLevelGenerator() {
         Gdx.app.log("LEVEL", "START LOADING LEVEL");
         seed = System.currentTimeMillis();
+        //seed = 1469663651728l;
         random = new Random(seed);
         levelWidth = MIN_LEVEL_WIDTH + random.nextInt((MAX_LEVEL_WIDTH - MIN_LEVEL_WIDTH) / 2) * 2;
         levelHeight = MIN_LEVEL_HEIGHT + random.nextInt((MAX_LEVEL_HEIGHT - MIN_LEVEL_HEIGHT) / 2) * 2;
@@ -135,7 +144,6 @@ public class RandomLevelGenerator {
      */
     public boolean load() {
         int baseRoomSize; // holds the general size of the room. Random rectangularity is added later.
-        int rectangularity;
         /**
          * First phase: generate rooms and store them in an array.
          */
@@ -192,17 +200,16 @@ public class RandomLevelGenerator {
                     fits = false;
                     Gdx.app.log("ROOM OUT OF BOUNDS", room.toString());
                     break;
-                } else {
-                    continue;
                 }
+
             }
 
-            if (!fits) {
-                Gdx.app.log("ROOM DID NOT FIT", room.toString());
-                Gdx.app.log("CONFLICTING WITH", conflictingRoom);
-            } else {
+            if (fits) {
                 rooms.add(room);
                 Gdx.app.log("ROOM GENERATED", room.toString());
+            } else {
+               /* Gdx.app.log("ROOM DID NOT FIT", room.toString());
+                Gdx.app.log("CONFLICTING WITH", conflictingRoom);*/
             }
 
         }
@@ -216,13 +223,15 @@ public class RandomLevelGenerator {
             int startY = r.getyPos();
             int endY = startY + r.getHeight();
 
-            Gdx.app.log("ROOM TO BE FILLED", r.toString());
-            Gdx.app.log("Dimensions(x,y,w,h)", Integer.toString(startX) + "," + Integer.toString(startY) + "," + Integer.toString(endX) + "," + Integer.toString(endY));
+          /*  Gdx.app.log("ROOM TO BE FILLED", r.toString());
+            Gdx.app.log("Dimensions(x,y,w,h)", Integer.toString(startX) + "," + Integer.toString(startY) + "," + Integer.toString(endX) + "," + Integer.toString(endY));*/
 
 
             for (int x = startX; x < endX; x++) {
                 for (int y = startY; y < endY; y++) {
-                    levelData[x][y] = new Tile(new Vector2(x, y), Tile.TileType.BROWN_s, true);
+                    Tile tile = new Tile(new Vector2(x, y), Tile.TileType.BROWN_s, true);
+                    tile.setRoomID(r.getID());
+                    levelData[x][y] = tile;
                 }
             }
 
@@ -250,6 +259,32 @@ public class RandomLevelGenerator {
 
 
         /**
+         * Calculating nearest neighbours
+         */
+
+        for (Room currentRoom : rooms) {
+            float distance = 0;
+            float minimum = 10000000f;
+            for (Room otherRoom : rooms) {
+                if (currentRoom.equals(otherRoom))
+                    continue;
+                distance = currentRoom.getCenter().dst(otherRoom.getCenter());
+                if (distance < minimum & !otherRoom.getClosestNeighbour().equals(currentRoom)) {
+                    currentRoom.setClosestNeighbour(otherRoom);
+                    minimum = distance;
+                }
+            }
+
+            /*Gdx.app.log("ROOM", Long.toString(currentRoom.getID()));
+            Gdx.app.log("NEIGHBOUR" , Long.toString(currentRoom.getClosestNeighbour().getID()));
+            Gdx.app.log("DISTANCE", Float.toString(distance));*/
+            System.out.format("%5d%5d%10f", currentRoom.getID(), currentRoom.getClosestNeighbour().getID(), distance);
+            System.out.println();
+
+        }
+
+
+        /**
          * The rooms are sorted by their coordinates. Lower x and higher y coordinates are located
          * higher in the list. A custom comparator is used.
          */
@@ -260,8 +295,8 @@ public class RandomLevelGenerator {
 
                 int resultX = Float.compare(r1.getxPos(), r2.getxPos());
                 int resultY = Float.compare(r1.getyPos(), r2.getyPos());
-                Gdx.app.log("COMPARE", "START");
-                Gdx.app.log(Float.toString(resultX), Float.toString(resultY));
+               /* Gdx.app.log("COMPARE", "START");
+                Gdx.app.log(Float.toString(resultX), Float.toString(resultY));*/
 
                 /**
                  * The two rooms are at the exact same position.
@@ -287,103 +322,43 @@ public class RandomLevelGenerator {
         });
 
 
+        Gdx.app.log("LEVEL", "STARTING CORRIDOR GENERATION");
+
+        createCorridors(COORDINATE_ORDER_MODE);
+        createCorridors(CLOSEST_NEIGHBOUR_MODE);
         /**
          * After all rooms have been filled and sorted, a random room is selected and the player is placed
          * in there.
          */
-        // placePlayer();
-
-
-        Gdx.app.log("LEVEL", "STARTING PASSAGE WAY GENERATION");
-
-        Stack<Room> roomStack = new Stack<>();
-        LinkedList<Tile> tileQueue = new LinkedList<>();
-
-        roomStack.addAll(rooms);
-
-        //  while(!roomStack.isEmpty()) {
-        Room startRoom = roomStack.pop();
-        placePlayer(startRoom);
-        startRoom.setVisited();
-        markRoomTilesAsVisited(startRoom);
-        Room.Door door = startRoom.getDoors().get(0);
-        Gdx.app.log("START ROOM", startRoom.toString());
-
-
-        Tile startTile = levelData[door.getX()][door.getY()];
-        tileQueue.add(startTile);
-
-        while (!tileQueue.isEmpty()) {
-            startTile = tileQueue.remove();
-            Gdx.app.log("CURRENT TILE", startTile.getPosition().toString());
-            if (startTile.getType() == 3 && !startTile.isVisited()) {
-                Gdx.app.log("FOUND OTHER ROOM", startTile.getPosition().toString());
-                break;
-            }
-
-            int startX = (int) startTile.getPosition().x;
-            int startY = (int) startTile.getPosition().y;
-            int north = startY + 1;
-            int east = startX + 1;
-            int south = startY - 1;
-            int west = startX - 1;
-
-            Tile t;
-            /**
-             * Tile north from start.
-             */
-            if (checkBounds(startX, north)) {
-                t = getTile(startX, north);
-                if (!t.isVisited())
-                    tileQueue.add(t);
-
-            }
-            /**
-             * Tile east from start.
-             */
-            if (checkBounds(east, startY)) {
-                t = getTile(east, startY);
-                if (!t.isVisited())
-                    tileQueue.add(t);
-            }
-
-            /**
-             * Tile south from start.
-             */
-            if (checkBounds(startX, south)) {
-                t = getTile(startX, south);
-                if (!t.isVisited())
-                    tileQueue.add(t);
-            }
-
-            /**
-             * Tile west from start.
-             */
-            if (checkBounds(west, startY)) {
-                t = getTile(west, startY);
-                if (!t.isVisited())
-                    tileQueue.add(t);
-            }
-
-
-            startTile.setVisited();
-        }
-
-        // }
-
-
+        placePlayer();
         return true;
     }
 
 
-    private void placePlayer(Room r) {
-        /*int homeRoomID = randomInRange(0, rooms.size() - 1);
+    private ArrayList<Tile> calculatePath(Tile from, Tile to) {
+        ArrayList<Tile> path = new ArrayList<>();
+        Tile current = from;
+        while (!current.equals(to)) {
+            if (current.getPredecessor() == null)
+                Gdx.app.log("PREDESSESOR", "WAS NULL");
+            current = current.getPredecessor();
+            path.add(current);
+        }
+
+        Collections.reverse(path);
+
+        for (Tile t : path)
+            Gdx.app.log("PATH", t.getPosition().toString());
+
+        return path;
+    }
+
+    private void placePlayer() {
+        int homeRoomID = randomInRange(0, rooms.size() - 1);
         Room home = rooms.get(homeRoomID);
         Gdx.app.log("HOME ROOM", home.toString() + "\n CENTER:" + home.getCenter().toString());
-        player = new Player(home.getCenter());*/
+        player = new Player(home.getCenter());
 
-        Gdx.app.log("HOME ROOM", r.toString() + "\n CENTER:" + r.getCenter().toString());
-        player = new Player(r.getCenter());
         Gdx.app.log("NUMBER OF ROOMS", Integer.toString(rooms.size()));
         Gdx.app.log("-------------------", "-----------------------");
         Gdx.app.log("NUMBER OF SMALL ROOMS", Integer.toString(smallRooms));
@@ -447,12 +422,7 @@ public class RandomLevelGenerator {
      * @return true if contains the bounds, false otherwise.
      */
     public boolean checkBounds(float x, float y) {
-        if (x < 0 || x >= levelWidth || y < 0 || y >= levelHeight) {
-            // Gdx.app.log("ERROR: ", " OBJECT OUT OF BOUNDS");
-            return false;
-        }
-
-        return true;
+        return !(x < 0 || x >= levelWidth || y < 0 || y >= levelHeight);
 
     }
 
@@ -474,7 +444,7 @@ public class RandomLevelGenerator {
     }
 
 
-    private void markRoomTilesAsVisited(Room r) {
+    private void markRoomTilesAsVisited(Room r, boolean visited) {
         int startX = r.getxPos();
         int endX = startX + r.getWidth();
         int startY = r.getyPos();
@@ -482,7 +452,7 @@ public class RandomLevelGenerator {
 
         for (int x = startX; x < endX; x++) {
             for (int y = startY; y < endY; y++) {
-                levelData[x][y].setVisited();
+                levelData[x][y].setVisited(visited);
             }
         }
     }
@@ -491,6 +461,137 @@ public class RandomLevelGenerator {
         r.setVisited();
     }
 
+
+    private void createVerticalCorridor(float yPos1, float yPos2, int x) {
+
+        int start = (int) Math.min(yPos1, yPos2);
+        int end = (int) Math.max(yPos1, yPos2);
+        Gdx.app.log("VERTICAL FROM", Integer.toString(start) + " to " + Integer.toString(end));
+
+        for (int y = start; y <= end; y++) {
+            levelData[x][y] = new Tile(new Vector2(x, y), Tile.TileType.BROWN_s, true);
+        }
+
+    }
+
+    private void createHorizontalCorridor(float xPos1, float xPos2, int y) {
+        int start = (int) Math.min(xPos1, xPos2);
+        int end = (int) Math.max(xPos1, xPos2);
+
+        Gdx.app.log("HORIZONTAL FROM", Integer.toString(start) + " to " + Integer.toString(end));
+
+        for (int x = start; x <= end; x++) {
+            levelData[x][y] = new Tile(new Vector2(x, y), Tile.TileType.BROWN_s, true);
+        }
+    }
+
+
+    private void createCorridors(int mode) {
+
+        for (int i = 0; i < rooms.size(); i++) {
+            Room currentRoom = rooms.get(i);
+            currentRoom.setVisited();
+            markRoomTilesAsVisited(currentRoom, true);
+            Gdx.app.log("START ROOM", currentRoom.toString());
+
+            Vector2 doorAPosition = new Vector2(0, 0);
+            Vector2 doorBPosition = new Vector2(0, 0);
+
+            int doorDirectionA = 0;
+            int doorDirectionB = 0;
+
+            float distance;
+            float minimum = Float.MAX_VALUE;
+            Room next;
+            for (Room.Door d : currentRoom.getDoors()) {
+                if (mode == CLOSEST_NEIGHBOUR_MODE) {
+                    next = currentRoom.getClosestNeighbour();
+                } else {
+                    next = rooms.get((i + 1) % rooms.size());
+                }
+
+                for (Room.Door otherDoor : next.getDoors()) {
+                    Vector2 doorConnection = new Vector2(d.getX() - otherDoor.getX(), d.getY() - otherDoor.getY());
+                    distance = doorConnection.len();
+                    if (distance < minimum) {
+                        minimum = distance;
+                        doorAPosition = new Vector2(d.getX(), d.getY());
+                        doorBPosition = new Vector2(otherDoor.getX(), otherDoor.getY());
+
+                        doorDirectionA = d.getDirection();
+                        doorDirectionB = otherDoor.getDirection();
+                    }
+                }
+
+            }
+
+
+            float xDistance = Math.abs(doorAPosition.x - doorBPosition.x);
+            float yDistance = Math.abs(doorAPosition.y - doorBPosition.y);
+            int xStart, xEnd, yStart, yEnd, xHalf, yHalf;
+
+            if ((doorDirectionA == EAST || doorDirectionA == WEST) && (doorDirectionB == EAST || doorDirectionB == WEST)) {
+                xStart = (int) (Math.min(doorAPosition.x, doorBPosition.x));
+                xHalf = xStart + (int) Math.floor(xDistance / 2);
+                xEnd = (int) Math.max(doorBPosition.x, doorAPosition.x);
+
+
+                if (doorAPosition.x < doorBPosition.x) {
+                    yStart = (int) doorAPosition.y;
+                    yEnd = (int) doorBPosition.y;
+                } else {
+                    yStart = (int) doorBPosition.y;
+                    yEnd = (int) doorAPosition.y;
+                }
+
+
+                System.out.format("\n Start: %3d Mid: %3d End %3d", xStart, xHalf, xEnd);
+
+                createHorizontalCorridor(xStart, xHalf, yStart);
+                createVerticalCorridor(doorAPosition.y, doorBPosition.y, xHalf);
+                createHorizontalCorridor(xHalf, xEnd, yEnd);
+            } else if ((doorDirectionA == NORTH || doorDirectionA == SOUTH) && (doorDirectionB == NORTH || doorDirectionB == SOUTH)) {
+                yStart = (int) Math.min(doorAPosition.y, doorBPosition.y);
+                yHalf = yStart + (int) Math.floor(yDistance / 2);
+                yEnd = (int) Math.max(doorBPosition.y, doorAPosition.y);
+
+                if (doorAPosition.y < doorBPosition.y) {
+                    xStart = (int) doorAPosition.x;
+                    xEnd = (int) doorBPosition.x;
+
+                } else {
+                    xStart = (int) doorBPosition.x;
+                    xEnd = (int) doorAPosition.x;
+
+                }
+
+                System.out.format("\n Start: %3d Mid: %3d End %3d", yStart, yHalf, yEnd);
+
+                createVerticalCorridor(yStart, yHalf, xStart);
+                createHorizontalCorridor(doorAPosition.x, doorBPosition.x, yHalf);
+                createVerticalCorridor(yHalf, yEnd, xEnd);
+            } else if ((doorDirectionA == NORTH || doorDirectionA == SOUTH) && (doorDirectionB == WEST || doorDirectionB == EAST)) {
+                xStart = (int) Math.min(doorBPosition.x, doorAPosition.x);
+                xEnd = (int) Math.max(doorBPosition.x, doorAPosition.x);
+
+                if (doorAPosition.x < doorBPosition.x) {
+                    yStart = (int) doorAPosition.y;
+                    yEnd = (int) doorBPosition.y;
+                } else {
+                    yStart = (int) doorBPosition.y;
+                    yEnd = (int) doorAPosition.y;
+                }
+
+
+                createVerticalCorridor(yStart, yEnd, (int) doorAPosition.x);
+                createHorizontalCorridor(xStart, xEnd, (int) doorBPosition.y);
+
+            }
+
+
+        }
+
+    }
 
     // GETTER & SETTER
     // ---------------------------------------------------------------------------------------------

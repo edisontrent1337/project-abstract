@@ -139,10 +139,10 @@ public class WorldController {
             }
 
             // IF ENTITY FALLS OUT OF BOUNDS, IT IS PUT BACK TO THE START
-            if (!randomLevelGenerator.checkBounds((int) entity.getPosition().x, (int) entity.getPosition().y)) {
+            /*if (!randomLevelGenerator.checkBounds((int) entity.getPosition().x, (int) entity.getPosition().y)) {
                 entity.setPosition(new Vector2(5f, 12f));
                 entity.update(delta);
-            }
+            }*/
 
 
         }

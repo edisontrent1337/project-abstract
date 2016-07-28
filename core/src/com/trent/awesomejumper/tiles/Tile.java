@@ -31,6 +31,7 @@ public class Tile {
     }
 
     public static final float SIZE = 1f;
+    private long roomID = 0;
     Rectangle bounds = new Rectangle();
 
     private CollisionBox collisionBox;
@@ -41,6 +42,7 @@ public class Tile {
     public boolean passable, interactable;
 
     private boolean visited = false;
+    private Tile predecessor = null;
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
@@ -130,12 +132,28 @@ public class Tile {
 
     public void action (Player player, float delta) {}
 
-    public void setVisited() {
-        visited = true;
+    public void setVisited(boolean visited) {
+        this.visited = visited;
     }
 
     public boolean isVisited() {
         return visited;
+    }
+
+    public void setRoomID(long id) {
+        this.roomID = id;
+    }
+
+    public long getRoomID() {
+        return roomID;
+    }
+
+    public void setPredecessor(Tile predecessor) {
+        this.predecessor = predecessor;
+    }
+
+    public Tile getPredecessor() {
+        return predecessor;
     }
 
 }
