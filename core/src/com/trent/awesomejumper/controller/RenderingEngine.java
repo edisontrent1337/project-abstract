@@ -24,7 +24,7 @@ import com.trent.awesomejumper.engine.physics.CollisionBox;
 import com.trent.awesomejumper.tiles.Tile;
 
 import static com.trent.awesomejumper.utils.Utilities.formVec;
-
+import static com.trent.awesomejumper.tiles.Tile.TileType.*;
 /**
  * Created by trent on 12.06.2015.
  * Rendering Engine for AwesomeJumper.
@@ -321,23 +321,23 @@ public class RenderingEngine {
     private void drawTiles() {
         Vector2 cameraPosition = new Vector2(cam.position.x, cam.position.y);
         for(Tile newTile : worldContainer.getTilesToBeRendered(cameraPosition, CAMERA_WIDTH*cam.zoom, CAMERA_HEIGHT*cam.zoom)) {
-            int type = newTile.getType();
+            Tile.TileType type = newTile.getType();
             Vector2 position = newTile.getPosition();
             if(!game.onDebugMode()) {
                 switch (type) {
-                    case 1:
+                    case BROWN:
                         sb.draw(brownNormal, position.x, position.y, Tile.SIZE, Tile.SIZE);
                         break;
-                    case 2:
+                    case STONE:
                         sb.draw(greyNormal, position.x, position.y, Tile.SIZE, Tile.SIZE);
                         break;
-                    case 3:
+                    case BROWN_s:
                         sb.draw(brownShadow, position.x, position.y, Tile.SIZE, Tile.SIZE);
                         break;
-                    case 4:
+                    case ICE:
                         sb.draw(iceNormal, position.x, position.y, Tile.SIZE, Tile.SIZE);
                         break;
-                    case 5:
+                    case TRAMPOLINE:
                         sb.draw(iceNormal, position.x, position.y, Tile.SIZE, Tile.SIZE);
                         break;
 

@@ -3,8 +3,6 @@ package com.trent.awesomejumper.controller;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.entity.Entity;
-import com.trent.awesomejumper.engine.entity.EntityInterface;
-import com.trent.awesomejumper.exceptions.InvalidWeaponSlotException;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.Level;
 import com.trent.awesomejumper.models.Player;
@@ -12,7 +10,6 @@ import com.trent.awesomejumper.models.testing.Chest;
 import com.trent.awesomejumper.models.weapons.Pistol;
 import com.trent.awesomejumper.tiles.Tile;
 
-import static com.trent.awesomejumper.utils.Utilities.pythagoras;
 import static com.trent.awesomejumper.utils.Utilities.sub;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,7 +48,7 @@ public class WorldContainer {
 
     // TESTING
 
-    private RandomLevelGenerator randomLevelGenerator;
+    private com.trent.awesomejumper.controller.levelgeneration.RandomLevelGenerator randomLevelGenerator;
 
 
     // CONSTRUCTOR
@@ -71,7 +68,7 @@ public class WorldContainer {
         pistol2 = new Pistol(new Vector2(5f, 6f));
         level = new Level();*/
 
-        randomLevelGenerator = new RandomLevelGenerator();
+        randomLevelGenerator = new com.trent.awesomejumper.controller.levelgeneration.RandomLevelGenerator();
         randomLevelGenerator.init();
         randomLevelGenerator.load();
 
@@ -331,7 +328,7 @@ public class WorldContainer {
     public void reset() {
         entities.clear();
         player.destroy();
-        randomLevelGenerator = new RandomLevelGenerator();
+        randomLevelGenerator = new com.trent.awesomejumper.controller.levelgeneration.RandomLevelGenerator();
         randomLevelGenerator.init();
         randomLevelGenerator.load();
         // TODO: insert here: entities = randomLevelGenerator.getEntities()
@@ -366,7 +363,7 @@ public class WorldContainer {
         return projectiles;
     }
 
-    public RandomLevelGenerator getRandomLevelGenerator() {
+    public com.trent.awesomejumper.controller.levelgeneration.RandomLevelGenerator getRandomLevelGenerator() {
         return randomLevelGenerator;
     }
 

@@ -2,9 +2,6 @@ package com.trent.awesomejumper.controller;
 
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.entity.Entity;
-import com.trent.awesomejumper.models.Level;
-import com.trent.awesomejumper.models.Player;
-import com.trent.awesomejumper.models.SkyBox;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -22,7 +19,7 @@ public class WorldController {
     // ---------------------------------------------------------------------------------------------
 
     private WorldContainer worldContainer;
-    private RandomLevelGenerator randomLevelGenerator;
+    private com.trent.awesomejumper.controller.levelgeneration.RandomLevelGenerator randomLevelGenerator;
     private CollisionController collisionController;
 
     public static float worldTime = 0f;

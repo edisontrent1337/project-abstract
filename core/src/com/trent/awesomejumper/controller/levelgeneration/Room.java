@@ -1,4 +1,4 @@
-package com.trent.awesomejumper.models.testing;
+package com.trent.awesomejumper.controller.levelgeneration;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -7,6 +7,7 @@ import com.trent.awesomejumper.utils.Utilities;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.*;
 /**
  * Class that holds all information and methods related to in-game rooms.
  * Created by Sinthu on 23.07.2016.
@@ -100,10 +101,10 @@ public class Room {
     // ---------------------------------------------------------------------------------------------
 
     private void initDoorData() {
-        northDoor = new Door((int)center.x, (int) yDimensions.max, 0);
-        eastDoor = new Door((int) xDimensions.max, (int)center.y, 1);
-        southDoor = new Door((int)center.x, (int) yDimensions.min - 1, 2);
-        westDoor = new Door((int) xDimensions.min - 1, (int)center.y, 3);
+        northDoor = new Door((int)center.x, (int) yDimensions.max,NORTH);
+        eastDoor = new Door((int) xDimensions.max, (int)center.y, EAST);
+        southDoor = new Door((int)center.x, (int) yDimensions.min - 1, WEST);
+        westDoor = new Door((int) xDimensions.min - 1, (int)center.y, SOUTH);
 
         doors.add(northDoor);
         doors.add(eastDoor);

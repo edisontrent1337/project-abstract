@@ -12,7 +12,7 @@ import com.trent.awesomejumper.tiles.Tile.TileType;
 import com.trent.awesomejumper.tiles.TrampolineTile;
 
 import java.util.ArrayList;
-
+import static com.trent.awesomejumper.tiles.Tile.TileType.*;
 
 /**
  * Created by Sinthu on 12.06.2015.
@@ -123,7 +123,7 @@ public class Level {
                     Tile leftLayer = tiles[x - 1][y];
                     Tile rightLayer = tiles[x + 1][y];
                     if (underLayer != null && upperLayer == null && !underLayer.isPassable()) {
-                        if (underLayer.getType() != 4) {
+                        if (underLayer.getType() != ICE) {
                             if (leftLayer != null && rightLayer != null) {
                                 environment.add(new Environment(new Vector2(x, y), Environment.EnvironmentType.GRASS));
                                 //environment.add(new Environment(new Vector2(x, y + 1), "grass02"));

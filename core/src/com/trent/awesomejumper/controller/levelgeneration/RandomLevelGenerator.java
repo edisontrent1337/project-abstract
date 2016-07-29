@@ -1,10 +1,10 @@
-package com.trent.awesomejumper.controller;
+package com.trent.awesomejumper.controller.levelgeneration;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.models.Player;
-import com.trent.awesomejumper.models.testing.Room;
 import com.trent.awesomejumper.tiles.DefaultTile;
 import com.trent.awesomejumper.tiles.Tile;
 import com.trent.awesomejumper.utils.Interval;
@@ -14,11 +14,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 import java.util.Stack;
 
-import static java.lang.Float.MAX_VALUE;
+import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.*;
+import static com.trent.awesomejumper.tiles.Tile.TileType.*;
 
 /**
  * //TODO: DOCUMENTATION
@@ -32,10 +35,16 @@ public class RandomLevelGenerator {
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
 
-    private final int NORTH = 0;
-    private final int EAST = 1;
-    private final int SOUTH = 2;
-    private final int WEST = 3;
+   /* public static final int NORTH = 0;
+    public static final int EAST = 1;
+    public static final int SOUTH = 2;
+    public static final int WEST = 3;
+
+    public static final Vector2 N_DIR = new Vector2(0,1);
+    public static final Vector2 E_DIR = new Vector2(1,0);
+    public static final Vector2 S_DIR = new Vector2(0,-1);
+    public static final Vector2 W_DIR = new Vector2(-1,0);*/
+
 
     private final int COORDINATE_ORDER_MODE = 0;
     private final int CLOSEST_NEIGHBOUR_MODE = 1;
@@ -101,8 +110,8 @@ public class RandomLevelGenerator {
         seed = System.currentTimeMillis();
         //seed = 1469663651728l;
         random = new Random(seed);
-        levelWidth = MIN_LEVEL_WIDTH + random.nextInt((MAX_LEVEL_WIDTH - MIN_LEVEL_WIDTH) / 2) * 2;
-        levelHeight = MIN_LEVEL_HEIGHT + random.nextInt((MAX_LEVEL_HEIGHT - MIN_LEVEL_HEIGHT) / 2) * 2;
+        levelWidth = MIN_LEVEL_WIDTH + random.nextInt((MAX_LEVEL_WIDTH - MIN_LEVEL_WIDTH) / 2) * 2 + 1;
+        levelHeight = MIN_LEVEL_HEIGHT + random.nextInt((MAX_LEVEL_HEIGHT - MIN_LEVEL_HEIGHT) / 2) * 2 + 1;
         Gdx.app.log("LEVEL", "SEED: " + Long.toString(seed));
         Gdx.app.log("LEVEL", "DIMENSIONS:" + "w: " + Integer.toString(levelWidth) + " h: "
                 + Integer.toString(levelHeight));
@@ -324,8 +333,22 @@ public class RandomLevelGenerator {
 
         Gdx.app.log("LEVEL", "STARTING CORRIDOR GENERATION");
 
-        createCorridors(COORDINATE_ORDER_MODE);
-        createCorridors(CLOSEST_NEIGHBOUR_MODE);
+
+        for (int x = 1; x < levelWidth; x += 2) {
+            for (int y = 1; y < levelHeight; y += 2) {
+                Vector2 position = new Vector2(x, y);
+                Gdx.app.log("POSTION AT START", position.toString());
+                if (!getTile(position).getType().equals(BROWN)) {
+                    continue;
+                }
+                //generateMaze(position);
+            }
+        }
+
+        generateMaze(new Vector2(3, 3));
+
+        /*createCorridors(COORDINATE_ORDER_MODE);
+        createCorridors(CLOSEST_NEIGHBOUR_MODE);*/
         /**
          * After all rooms have been filled and sorted, a random room is selected and the player is placed
          * in there.
@@ -414,20 +437,103 @@ public class RandomLevelGenerator {
     }
 
 
+    private void generateMaze(Vector2 start) {
+
+        LinkedList<Vector2> cells = new LinkedList<>();
+        setLevelData(new Tile(start.cpy(), Tile.TileType.BROWN_s, true));
+        cells.add(start);
+
+
+        while (!cells.isEmpty()) {
+            Vector2 currentPos = cells.getLast();
+            Gdx.app.log("NEXT CELL", "------------------");
+            Gdx.app.log("CURRENT POS", currentPos.toString());
+            Gdx.app.log("CELLS SIZE", Integer.toString(cells.size()));
+            // Get all the valid neighbour tiles
+            ArrayList<Vector2> adjacentDirections = checkNeighbours(currentPos);
+            Gdx.app.log("ADJACENT SIZE", Integer.toString(adjacentDirections.size()));
+
+            // If there are neighbours, one
+            if (!adjacentDirections.isEmpty()) {
+                Vector2 dir = adjacentDirections.get(random.nextInt(adjacentDirections.size())).cpy();
+                Vector2 adjacentPos = currentPos.cpy().add(dir);
+                Vector2 posAfter = adjacentPos.cpy().add(dir);
+
+                Gdx.app.log("DIRECTION BEFORE SET LEVEL DATA", dir.toString());
+                Gdx.app.log("ADJACENT POS", adjacentPos.toString());
+                Gdx.app.log("POS AFTER", posAfter.toString());
+                setLevelData(new Tile(adjacentPos, Tile.TileType.BROWN_s, true));
+                setLevelData(new Tile(posAfter, Tile.TileType.BROWN_s, true));
+
+                Gdx.app.log("TYPE 1", Integer.toString(getTile(adjacentPos).getType().value));
+                Gdx.app.log("TYPE 2", Integer.toString(getTile(posAfter).getType().value));
+
+                cells.add(new Vector2(posAfter));
+            } else {
+                Gdx.app.log("REMOVED","CELL....");
+                cells.removeLast();
+            }
+
+        }
+
+    }
+
+
     /**
-     * Checks whether the given coordinates x and y are contains the bounds of the level.
+     * Returns a list of directions in which adjacent tiles exist. Checks whether or not a neighbour
+     * is inside the level bounds before adding it to the list.
+     *
+     * @param position position of the tile to be investigated.
+     * @return list of neighbour directions.
+     */
+    private ArrayList<Vector2> checkNeighbours(Vector2 position) {
+
+        ArrayList<Vector2> neighbourDirections = new ArrayList<>();
+        // Checking all 4 cardinal directions
+        for (int i = 0; i < CARDINALS.length; i++) {
+            Vector2 dir = CARDINALS[i];
+            // add the direction to the tiles position to get to the neighbour tile.
+            Vector2 neighbourAddress = position;
+            if (canBeCarved(neighbourAddress, dir)) {
+                // If there exists a adjacent tile, add the direction in which it lies to the array.
+                neighbourDirections.add(dir);
+            }
+        }
+        return neighbourDirections;
+    }
+
+    /**
+     * Checks whether the given coordinates x and y are inside the bounds of the level.
      *
      * @param x
      * @param y
-     * @return true if contains the bounds, false otherwise.
+     * @return true if inside the bounds, false otherwise.
      */
     public boolean checkBounds(float x, float y) {
-        return !(x < 0 || x >= levelWidth || y < 0 || y >= levelHeight);
+        return (x >= 0 && x < levelWidth && y >= 0 && y < levelHeight);
 
     }
 
     public boolean checkBounds(Vector2 test) {
         return checkBounds(test.x, test.y);
+    }
+
+
+    private boolean canBeCarved(Vector2 position, Vector2 direction) {
+        Gdx.app.log("CARVING", "START");
+        Gdx.app.log("POSITION", position.toString());
+        Gdx.app.log("DIRECTION", direction.toString());
+
+        if (!checkBounds(position.cpy().add(direction.cpy().scl(3)))) {
+            Gdx.app.log("EXIT", "FALSE");
+            return false;
+        } else {
+            Gdx.app.log("EXIT", "BROWN");
+            Gdx.app.log("---", Boolean.toString(getTile(position.cpy().add(direction.cpy().scl(2))).getType().equals(BROWN)));
+            Gdx.app.log("---", Integer.toString(getTile(position.cpy().add(direction.cpy().scl(2))).getType().value));
+            return getTile(position.cpy().add(direction.cpy().scl(2))).getType().equals(BROWN);
+        }
+
     }
 
     /**
@@ -469,7 +575,8 @@ public class RandomLevelGenerator {
         Gdx.app.log("VERTICAL FROM", Integer.toString(start) + " to " + Integer.toString(end));
 
         for (int y = start; y <= end; y++) {
-            levelData[x][y] = new Tile(new Vector2(x, y), Tile.TileType.BROWN_s, true);
+            Tile newTile = new Tile(new Vector2(x, y), Tile.TileType.BROWN_s, true);
+            setLevelData(newTile);
         }
 
     }
@@ -481,7 +588,8 @@ public class RandomLevelGenerator {
         Gdx.app.log("HORIZONTAL FROM", Integer.toString(start) + " to " + Integer.toString(end));
 
         for (int x = start; x <= end; x++) {
-            levelData[x][y] = new Tile(new Vector2(x, y), Tile.TileType.BROWN_s, true);
+            Tile newTile = new Tile(new Vector2(x, y), Tile.TileType.BROWN_s, true);
+            setLevelData(newTile);
         }
     }
 
@@ -530,7 +638,7 @@ public class RandomLevelGenerator {
             float yDistance = Math.abs(doorAPosition.y - doorBPosition.y);
             int xStart, xEnd, yStart, yEnd, xHalf, yHalf;
 
-            if ((doorDirectionA == EAST || doorDirectionA == WEST) && (doorDirectionB == EAST || doorDirectionB == WEST)) {
+            if ((doorDirectionA == NORTH || doorDirectionA == WEST) && (doorDirectionB == EAST || doorDirectionB == WEST)) {
                 xStart = (int) (Math.min(doorAPosition.x, doorBPosition.x));
                 xHalf = xStart + (int) Math.floor(xDistance / 2);
                 xEnd = (int) Math.max(doorBPosition.x, doorAPosition.x);
@@ -592,6 +700,30 @@ public class RandomLevelGenerator {
         }
 
     }
+
+
+    /**
+     * Inserts the specified tile into the level data. Checks, whether the tiles coordinates are whole numbers
+     * and inside the level bounds before trying to access the levelData array.
+     *
+     * @param tile tile to be added
+     */
+    private void setLevelData(Tile tile) {
+        Vector2 address = tile.getPosition().cpy();
+        if (address.x != Math.ceil(address.x) || address.y != Math.ceil(address.y)) {
+            Gdx.app.log("ERROR", "COULD NOT INSERT LEVEL DATA AT" + address.toString());
+            Gdx.app.log("ERROR", "THE ADRESS DOES NOT CONSIST OF WHOLE NUMBERS.");
+            return;
+        }
+        int x = (int) address.x;
+        int y = (int) address.y;
+        if (!checkBounds(x, y)) {
+            System.out.format("ERROR: ADDRESS %1d | %1d LAYS OUTSIDE BOUNDS", x, y);
+        } else {
+            levelData[x][y] = tile;
+        }
+    }
+
 
     // GETTER & SETTER
     // ---------------------------------------------------------------------------------------------

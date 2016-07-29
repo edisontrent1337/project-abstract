@@ -24,7 +24,7 @@ public class Tile {
         BROWN_s(3),
         ICE(4),
         TRAMPOLINE(5);
-        private int value;
+        public int value;
         TileType(int value) {
             this.value = value;
         }
@@ -110,8 +110,8 @@ public class Tile {
         return collisionBox;
     }
 
-    public int getType() {
-        return this.type.value;
+    public TileType getType() {
+        return this.type;
     }
 
     public boolean isPassable() {
