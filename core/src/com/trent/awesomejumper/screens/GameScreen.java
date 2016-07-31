@@ -146,6 +146,10 @@ public class GameScreen implements Screen, InputProcessor{
             inputHandler.reload();
         }
 
+        if(keycode == Keys.M) {
+           worldContainer.getRandomLevelGenerator().generateMaze(new Vector2(8,8));
+        }
+
         return false;
     }
 
