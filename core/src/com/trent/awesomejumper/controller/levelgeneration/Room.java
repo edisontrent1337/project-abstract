@@ -27,20 +27,21 @@ public class Room {
     private Room closestNeighbour = null;
 
     // Minimum distance between two adjacent rooms
-    private final int MIN_ROOM_DISTANCE = 3;
+    private final int MIN_ROOM_DISTANCE = 2;
 
     private boolean visited = false;
 
     public enum Type {
-        SMALL(0),
-        MEDIUM(1),
-        BIG(2),
-        GIANT(3);
+        TINY(7),
+        SMALL(10),
+        MEDIUM(13),
+        BIG(16),
+        GIANT(19);
 
-        private int value;
+        public int size;
 
-        Type(int value) {
-            this.value = value;
+        Type(int size) {
+            this.size = size;
         }
 
     }
@@ -71,7 +72,6 @@ public class Room {
         this.yDimensionsAndDistance = new Interval(yDimensions.min - MIN_ROOM_DISTANCE, yDimensions.max + MIN_ROOM_DISTANCE);
         this.ID = idCounter.getAndIncrement();
 
-        this.type = Type.SMALL;
         this.center = new Vector2(xPos +  width / 2, yPos + height / 2);
         initDoorData();
         closestNeighbour = this;
@@ -89,7 +89,6 @@ public class Room {
         this.xDimensionsAndDistance = new Interval(xDimensions.min - MIN_ROOM_DISTANCE, xDimensions.max + MIN_ROOM_DISTANCE);
         this.yDimensionsAndDistance = new Interval(yDimensions.min - MIN_ROOM_DISTANCE, yDimensions.max + MIN_ROOM_DISTANCE);
         this.ID = idCounter.getAndIncrement();
-        this.type = Type.SMALL;
 
         this.center = new Vector2(xPos + width / 2, yPos + height / 2);
         initDoorData();
@@ -129,7 +128,8 @@ public class Room {
         return "ID: " + String.format("%04d", ID) + "\n X: " + Integer.toString(xPos) + " Y: " + Integer.toString(yPos) +
                 "\n W: " + Integer.toString(width) + " H: " + Integer.toString(height) +
                 "\n AREA:" + Integer.toString(width * height) +
-                "\n DOORS:(N|E|S|W)" + northDoor.toString() + eastDoor.toString() + southDoor.toString() + westDoor.toString();
+                "\n DOORS:(N|E|S|W)" + northDoor.toString() + eastDoor.toString() + southDoor.toString() + westDoor.toString() +
+                "\n TYPE:" + Integer.toString(type.size);
     }
 
 
@@ -207,10 +207,12 @@ public class Room {
     public class Door {
         int x, y;
         int direction;
+        Vector2 position;
 
         private Door(int x, int y, int direction) {
             this.x = x;
             this.y = y;
+            position = new Vector2(x,y);
             this.direction = direction;
         }
 
@@ -223,6 +225,7 @@ public class Room {
             return y;
 
         }
+
 
         public int getDirection() {
             return direction;

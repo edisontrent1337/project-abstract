@@ -11,7 +11,7 @@ public class DefaultTile extends Tile{
 
 
     public DefaultTile(Vector2 position) {
-        super(position,TileType.BROWN,1f,1f,0.8f,STANDARD_MAX_WALKING_VELOCITY,7f,false,false);
+        super(position,TileType.WALL,1f,1f,0.8f,STANDARD_MAX_WALKING_VELOCITY,7f,false,false);
     }
 
     @Override

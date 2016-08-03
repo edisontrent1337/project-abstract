@@ -16,12 +16,13 @@ public class Tile {
     /**
      *  Type of a tile. Integer representation (value)
      *  can be used to identify different types of tiles.
+     *  TODO: Add floor types and wall types.
      */
     public enum TileType {
         AIR(0),
-        BROWN(1),
+        WALL(1),
         STONE(2),
-        BROWN_s(3),
+        FLOOR(3),
         ICE(4),
         TRAMPOLINE(5);
         public int value;

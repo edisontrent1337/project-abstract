@@ -9,15 +9,19 @@ import com.trent.awesomejumper.tiles.Tile;
 import com.trent.awesomejumper.utils.Interval;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Random;
 
 import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.*;
 import static com.trent.awesomejumper.tiles.Tile.TileType.*;
+import static com.trent.awesomejumper.controller.levelgeneration.Room.Type.*;
 
 /**
  * //TODO: DOCUMENTATION
@@ -41,8 +45,10 @@ public class RandomLevelGenerator {
 
     private HashSet<Entity> entities;
     //TODO: use a map to implement functions like getRoomById()....
+    //TODO: insert smaller walls inside rooms to make them more random
     private HashMap<Long, Room> roomMap;
     private Player player;
+    private ArrayList<Vector2> roomCorners;
 
     /**
      * Seed for the level. All level generation steps should depend on the seed so a level can be
@@ -65,38 +71,38 @@ public class RandomLevelGenerator {
      */
     private final int MAX_ROOM_RECTANGULARITY = 3;
 
-   /* private final Interval SMALL_DIMS = new Interval(3, 5);
-    private final Interval MEDIUM_DIMS = new Interval(7, 9);
-    private final Interval BIG_DIMS = new Interval(11, 13);
-    private final Interval GIANT_DIMS = new Interval(15, 21);*/
-
-    private final int TINY_DIMS = 4;
-    private final int SMALL_DIMS = 7;
-    private final int MEDIUM_DIMS = 10;
-    private final int BIG_DIMS = 13;
-    private final int GIANT_DIMS = 16;
-
-    /*private final Interval SMALL_PROB = new Interval(0, 4);
-    private final Interval MEDIUM_PROB = new Interval(5, 64);
-    private final Interval BIG_PROB = new Interval(65, 94);
-    private final Interval GIANT_PROB = new Interval(95, 99);*/
-
-    private final Interval SMALL_PROB = new Interval(0, 24);
-    private final Interval MEDIUM_PROB = new Interval(25, 64);
-    private final Interval BIG_PROB = new Interval(65, 89);
-    private final Interval GIANT_PROB = new Interval(90, 99);
+    private final Interval TINY_PROB = new Interval(0, 14); // 15
+    private final Interval SMALL_PROB = new Interval(15, 39); // 25
+    private final Interval MEDIUM_PROB = new Interval(40, 79);  // 40
+    private final Interval BIG_PROB = new Interval(80, 94); // 15
+    private final Interval GIANT_PROB = new Interval(95, 99); // 5
 
     /**
      * Maximum tries for inserting a new room to the existing dungeon.
      */
-    private final int MAX_INSERTION_TRIES = 2048;
+    private final int MAX_INSERTION_TRIES = 32768;
 
-    private final int MIN_BOUNDS_DISTANCE = 8;
+    private final int MIN_BOUNDS_DISTANCE = 11;
 
+    /**
+     * Number of small, medium, big and giant rooms.
+     */
+    private int tinyRooms;
     private int smallRooms;
     private int mediumRooms;
     private int bigRooms;
     private int giantRooms;
+
+    /**
+     * Array that keeps track of the region a tile in the level belongs to.
+     * This is used to ensure connectivity in the dungeon.
+     */
+    private int[][] regions;
+    private int totalRegions = 0;
+    private int start;
+    private int end;
+    private int constant;
+    private boolean xAddressFirst;
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
@@ -104,20 +110,19 @@ public class RandomLevelGenerator {
     public RandomLevelGenerator() {
         Gdx.app.log("LEVEL", "START LOADING LEVEL");
         //seed = System.currentTimeMillis();
-        seed = 1469797614441l;
+        seed = 1470169692227l;
         random = new Random(seed);
-       /* levelWidth = MIN_LEVEL_WIDTH + random.nextInt((MAX_LEVEL_WIDTH - MIN_LEVEL_WIDTH) / 2) * 2 + 1;
-        levelHeight = MIN_LEVEL_HEIGHT + random.nextInt((MAX_LEVEL_HEIGHT - MIN_LEVEL_HEIGHT) / 2) * 2 + 1;*/
-        /*levelWidth = multilpeOfThree(MIN_LEVEL_WIDTH, MAX_LEVEL_WIDTH);
-        levelWidth = multilpeOfThree(MIN_LEVEL_HEIGHT, MAX_LEVEL_HEIGHT);*/
+        levelWidth = MIN_LEVEL_WIDTH + random.nextInt((MAX_LEVEL_WIDTH - MIN_LEVEL_WIDTH) / 2) * 2 + 1;
+        levelHeight = MIN_LEVEL_HEIGHT + random.nextInt((MAX_LEVEL_HEIGHT - MIN_LEVEL_HEIGHT) / 2) * 2 + 1;
+        /*levelWidth = multipleOfThree(MIN_LEVEL_WIDTH, MAX_LEVEL_WIDTH);
+        levelWidth = multipleOfThree(MIN_LEVEL_HEIGHT, MAX_LEVEL_HEIGHT);*/
 
-        levelWidth = 120;
-        levelHeight = 120;
         Gdx.app.log("LEVEL", "SEED: " + Long.toString(seed));
         Gdx.app.log("LEVEL", "DIMENSIONS:" + "w: " + Integer.toString(levelWidth) + " h: "
                 + Integer.toString(levelHeight));
 
-        levelData = new Tile[levelWidth][levelHeight];
+        this.levelData = new Tile[levelWidth][levelHeight];
+        this.regions = new int[levelWidth][levelHeight];
         this.rooms = new ArrayList<>();
         entities = new HashSet<>();
 
@@ -136,6 +141,7 @@ public class RandomLevelGenerator {
         for (int x = 0; x < levelWidth; x++) {
             for (int y = 0; y < levelHeight; y++) {
                 levelData[x][y] = new DefaultTile(new Vector2(x, y));
+                regions[x][y] = -1;
             }
 
         }
@@ -153,12 +159,12 @@ public class RandomLevelGenerator {
      * @return
      */
     public boolean load() {
-        int baseRoomSize; // holds the general size of the room. Random rectangularity is added later.
+        Room.Type baseRoomType; // holds the general size of the room. Random rectangularity is added later.
         int rectangularity;
         /**
          * First phase: generate rooms and store them in an array.
          */
-        Room room = new Room();
+        Room room;
         /**
          * Adding one legit room to the array to start the for-loop below. This do-while loop is
          * executed as long as the created room is not legit / is out of bounds or too close to the bounds.
@@ -168,44 +174,33 @@ public class RandomLevelGenerator {
             /**
              * Getting a basic room size.
              */
-            baseRoomSize = decideRoomSize(room);
-            if (baseRoomSize == -1) {
-                Gdx.app.log("ERROR", "INVALID ROOM SIZE. WAS -1");
-            }
+            baseRoomType = decideRoomType();
 
-
-            /*room = new Room(multilpeOfThree(0, levelWidth),
-                    multilpeOfThree(0, levelHeight),
-                    rndOddInRange(baseRoomSize, baseRoomSize + rndEvenInRange(0, MAX_ROOM_RECTANGULARITY)),
-                    rndOddInRange(baseRoomSize, baseRoomSize + rndEvenInRange(0, MAX_ROOM_RECTANGULARITY)));*/
-            room = new Room(multilpeOfThree(2, levelWidth),
-                    multilpeOfThree(2, levelHeight),
-                    baseRoomSize,
-                    baseRoomSize);
+            room = new Room(multipleOfThree(2, levelWidth),
+                    multipleOfThree(2, levelHeight),
+                    baseRoomType.size,
+                    baseRoomType.size);
+            room.setType(baseRoomType);
         }
         while (tooCloseToBounds(room)); // while too close to the bounds, look for a new room.
 
         rooms.add(room);
 
         boolean fits;
-        String conflictingRoom;
+
 
         /**
-         * This for loop is executed 1024 times, trying to add more rooms to the level.
+         * This for loop is executed 4096 times, trying to add more rooms to the level.
          */
         for (int i = 0; i < MAX_INSERTION_TRIES; i++) {
             fits = true;
-            conflictingRoom = "";
-            baseRoomSize = decideRoomSize(room);
-            /*room = new Room(rndOddInRange(0, levelWidth),
-                    rndOddInRange(0, levelHeight),
-                    rndOddInRange(baseRoomSize, baseRoomSize + rndEvenInRange(0, MAX_ROOM_RECTANGULARITY)),
-                    rndOddInRange(baseRoomSize, baseRoomSize + rndEvenInRange(0, MAX_ROOM_RECTANGULARITY)));*/
-            room = new Room(multilpeOfThree(2, levelWidth),
-                    multilpeOfThree(2, levelHeight),
-                    baseRoomSize,
-                    baseRoomSize);
+            baseRoomType = decideRoomType();
 
+            room = new Room(multipleOfThree(2, levelWidth),
+                    multipleOfThree(2, levelHeight),
+                    baseRoomType.size,
+                    baseRoomType.size);
+            room.setType(baseRoomType);
             /**
              * Checks, whether the new room overlaps with other existing rooms. If this is the case,
              * the new room will be dismissed.
@@ -213,11 +208,10 @@ public class RandomLevelGenerator {
             for (Room insertedRoom : rooms) {
                 if (insertedRoom.overlaps(room)) {
                     fits = false;
-                    conflictingRoom = insertedRoom.toString();
                     break;
                 } else if (tooCloseToBounds(room)) {
                     fits = false;
-                    Gdx.app.log("ROOM OUT OF BOUNDS", room.toString());
+                    //Gdx.app.log("ROOM OUT OF BOUNDS", room.toString());
                     break;
                 }
 
@@ -225,10 +219,9 @@ public class RandomLevelGenerator {
 
             if (fits) {
                 rooms.add(room);
+
+
                 Gdx.app.log("ROOM GENERATED", room.toString());
-            } else {
-               /* Gdx.app.log("ROOM DID NOT FIT", room.toString());
-                Gdx.app.log("CONFLICTING WITH", conflictingRoom);*/
             }
 
         }
@@ -236,11 +229,36 @@ public class RandomLevelGenerator {
         /**
          * Finally filling each room with floor tiles.
          */
+        roomCorners = new ArrayList<>();
+
         for (Room r : rooms) {
             int startX = r.getxPos();
             int endX = startX + r.getWidth();
             int startY = r.getyPos();
             int endY = startY + r.getHeight();
+
+            roomCorners.add(new Vector2(startX - 1, startY));
+            roomCorners.add(new Vector2(startX - 2, startY));
+            roomCorners.add(new Vector2(startX, startY - 1));
+            roomCorners.add(new Vector2(startX, startY - 2));
+
+            roomCorners.add(new Vector2(endX - 1, startY - 1));
+            roomCorners.add(new Vector2(endX - 1, startY - 2));
+            roomCorners.add(new Vector2(endX, startY));
+            roomCorners.add(new Vector2(endX + 1, startY));
+
+            roomCorners.add(new Vector2(startX - 1, endY - 1));
+            roomCorners.add(new Vector2(startX - 2, endY - 1));
+            roomCorners.add(new Vector2(startX, endY));
+            roomCorners.add(new Vector2(startX, endY + 1));
+
+            roomCorners.add(new Vector2(endX - 1, endY));
+            roomCorners.add(new Vector2(endX - 1, endY + 1));
+            roomCorners.add(new Vector2(endX, endY - 1));
+            roomCorners.add(new Vector2(endX + 1, endY - 1));
+
+
+            System.out.format("\n X: %3d %3d Y: %3d %3d", startX, endX, startY, endY);
 
           /*  Gdx.app.log("ROOM TO BE FILLED", r.toString());
             Gdx.app.log("Dimensions(x,y,w,h)", Integer.toString(startX) + "," + Integer.toString(startY) + "," + Integer.toString(endX) + "," + Integer.toString(endY));*/
@@ -248,16 +266,21 @@ public class RandomLevelGenerator {
 
             for (int x = startX; x < endX; x++) {
                 for (int y = startY; y < endY; y++) {
-                    Tile tile = new Tile(new Vector2(x, y), Tile.TileType.BROWN_s, true);
+                    Tile tile = new Tile(new Vector2(x, y), Tile.TileType.FLOOR, true);
                     tile.setRoomID(r.getID());
                     levelData[x][y] = tile;
+                    regions[x][y] = totalRegions;
+
                 }
             }
-
+            totalRegions++;
             /**
              * Counting rooms by type.
              */
             switch (r.getType()) {
+                case TINY:
+                    tinyRooms++;
+                    break;
                 case SMALL:
                     smallRooms++;
                     break;
@@ -276,6 +299,10 @@ public class RandomLevelGenerator {
 
         }
 
+
+        for (Vector2 v : roomCorners) {
+            Gdx.app.log("CORNER", v.toString());
+        }
 
         /**
          * Calculating nearest neighbours
@@ -297,7 +324,7 @@ public class RandomLevelGenerator {
             /*Gdx.app.log("ROOM", Long.toString(currentRoom.getID()));
             Gdx.app.log("NEIGHBOUR" , Long.toString(currentRoom.getClosestNeighbour().getID()));
             Gdx.app.log("DISTANCE", Float.toString(distance));*/
-            System.out.format("%5d%5d%10f", currentRoom.getID(), currentRoom.getClosestNeighbour().getID(), distance);
+            System.out.format("%5d%5d%10f", currentRoom.getType().size, currentRoom.getClosestNeighbour().getID(), distance);
             System.out.println();
 
         }
@@ -344,19 +371,19 @@ public class RandomLevelGenerator {
         Gdx.app.log("LEVEL", "STARTING CORRIDOR GENERATION");
 
 
-        for (int x = 1; x < levelWidth; x += 2) {
-            for (int y = 1; y < levelHeight; y += 2) {
+        for (int x = MIN_BOUNDS_DISTANCE; x < levelWidth - MIN_BOUNDS_DISTANCE; x += 3) {
+            for (int y = MIN_BOUNDS_DISTANCE; y < levelHeight - MIN_BOUNDS_DISTANCE; y += 3) {
                 Vector2 position = new Vector2(x, y);
-                Gdx.app.log("POSTION AT START", position.toString());
-                if (!getTile(position).getType().equals(BROWN)) {
+                if (!getTile(position).getType().equals(WALL)) {
                     continue;
                 }
-                //generateMaze(position);
+                generateMaze(position);
             }
         }
 
-        //generateMaze(new Vector2(3, 3));
-
+        // connectRegions();
+       /*removeExtraDoors();
+        removeDeadEnds();*/
         /*createCorridors(COORDINATE_ORDER_MODE);
         createCorridors(CLOSEST_NEIGHBOUR_MODE);*/
         /**
@@ -368,20 +395,244 @@ public class RandomLevelGenerator {
     }
 
 
-   /* public void startMaze() {
+    public void removeExtraDoors() {
+        for (Room r : rooms) {
+            int startX = r.getxPos() - 1;
+            int startY = r.getyPos() - 1;
+            int endX = startX + r.getWidth() + 2;
+            int endY = startY + r.getHeight() + 2;
+            // north wall
+            decideDoor(r.getDoors().get(NORTH), startX, endX, endY, true);
+            // east wall
+            decideDoor(r.getDoors().get(EAST), startY, endY, endX, false);
+            // south wall
+            decideDoor(r.getDoors().get(SOUTH), startX, endX, startY, true);
+            // west wall
+            decideDoor(r.getDoors().get(WEST), startY, endY, startX, false);
 
-        for (int x = 1; x < levelWidth; x += 2) {
-            for (int y = 1; y < levelHeight; y += 2) {
-                Vector2 position = new Vector2(x, y);
-                Gdx.app.log("POSTION AT START", position.toString());
-                if (!getTile(position).getType().equals(BROWN)) {
-                    continue;
+        }
+    }
+
+    private void decideDoor(Room.Door door, int start, int end, int constant, boolean xAddressFirst) {
+        ArrayList<Vector2> doorList = new ArrayList<>();
+        Vector2 remainingDoor;
+        for (int i = start; i < end; i++) {
+            if (xAddressFirst) {
+                if (getTile(i, constant).getType() == FLOOR) {
+                    doorList.add(new Vector2(i, constant));
                 }
-                //generateMaze(position);
+            } else {
+                if (getTile(constant, i).getType() == FLOOR) {
+                    doorList.add(new Vector2(constant, i));
+                }
             }
         }
 
-    }*/
+        if (doorList.size() < 1)
+            return;
+
+        remainingDoor = doorList.get(0);
+        float min = Float.MAX_VALUE;
+        for (Vector2 d : doorList) {
+            float dst = d.dst(door.position);
+            if (dst < min) {
+                min = dst;
+                remainingDoor = d;
+            }
+
+        }
+
+        //remainingDoor = doorList.get(random.nextInt(doorList.size()));
+
+        for (Vector2 otherDoor : doorList) {
+            if (otherDoor.equals(remainingDoor))
+                continue;
+
+            setLevelData(otherDoor, WALL);
+
+        }
+    }
+
+    public void connectRegions() {
+        /**
+         * Maps a position to a set of integers. The position is mapped to the region numbers of
+         * of the surrounding tiles. If we find 2 or more different region numbers, the
+         * tile on the position is a connector.
+         * TODO: remove duplicates from HashSet. Not two of the same regions should be inside the HashSet <Array<Integer>>
+         */
+
+        Gdx.app.log("EVENT", "CONNECTING REGIONS");
+        HashMap<Vector2, HashMap<Integer, Integer>> connectors = new HashMap<>();
+        //HashMap<Vector2, HashSet<Integer>> connectors = new HashMap();
+
+        for (int x = 0; x < levelWidth; x++) {
+            for (int y = 0; y < levelHeight; y++) {
+
+                /**
+                 * If the current position is one of the rooms corners, it is not considered
+                 * to be a potential connector.
+                 */
+                if (roomCorners.contains(new Vector2(x, y)))
+                    continue;
+                // for (Room r : rooms) {
+                //    for (Room.Door d : r.getDoors()) {
+                // If the current tile is not a wall, it can't be a connector between two regions.
+               /* if (!getTile(x, y).getType().equals(Tile.TileType.WALL))
+                    continue;*/
+                HashMap<Integer, Integer> adjacentRegions = new HashMap<>();
+                // HashSet<Integer> adjacentRegions = new HashSet<>();
+                //Vector2 regionAndDirection = new Vector2(0,0);
+
+                /**
+                 * Check all 4 cardinal neighbours from the current position [x,y]
+                 */
+                for (int i = 0; i < CARDINALS.length; i++) {
+                    Vector2 direction = CARDINALS[i];
+                    Vector2 destination = new Vector2(x, y).add(direction.cpy().scl(2));
+                    //Vector2 destination = d.position.cpy().add(direction.cpy().scl(2));
+                    if (checkBounds(destination)) {
+                        int regionAtDestination = getRegion(destination);
+                        if (regionAtDestination != -1) {
+                            if (!adjacentRegions.values().contains(regionAtDestination))
+                                adjacentRegions.put(i, regionAtDestination);
+                        }
+
+                    }
+
+                }
+
+                if (adjacentRegions.size() < 2)
+                    continue;
+
+                connectors.put(new Vector2(x, y), adjacentRegions);
+                //connectors.put(d.position.cpy(), adjacentRegions);
+
+
+            }
+        }
+
+        for (Vector2 test : connectors.keySet()) {
+            Gdx.app.log("POSITION:" + test.toString(), " DIRECTIONS AROUND:" + connectors.get(test).toString());
+        }
+
+        // Retrieve a list of all potential connectors.
+
+        int[] mergedTo = new int[totalRegions];
+        HashSet<Integer> openRegions = new HashSet<>();
+
+        for (int i = 0; i < totalRegions; i++) {
+            // At the beginning, region i is merged to itself.
+            mergedTo[i] = i;
+            // Also, all regions are open/ can be merged.
+            openRegions.add(i);
+        }
+
+
+        while (openRegions.size() > 1) {
+
+            ArrayList<Vector2> connectorList = new ArrayList<>(connectors.keySet());
+            Vector2 connectorPosition = connectorList.get(random.nextInt(connectorList.size()));
+            // Gdx.app.log("CHOSE FOLLOWING CONNECTOR", connectorPosition.toString());
+            ArrayList<Integer> directionList = new ArrayList<>(connectors.get(connectorPosition).keySet());
+            ArrayList<Integer> regionList = new ArrayList<>(connectors.get(connectorPosition).values());
+            // Gdx.app.log("DIRECTIONS", directionList.toString());
+            // Gdx.app.log("REGIONS", regionList.toString());
+
+            int direction = directionList.get(random.nextInt(directionList.size()));
+
+
+            addJunction(connectorPosition, direction);
+
+            int destination = regionList.get(0);
+            regionList.remove(Integer.valueOf(destination));
+
+            /*Gdx.app.log("DESTINATION", Integer.toString(destination));
+            Gdx.app.log("SOURCES", regionList.toString());*/
+
+            for (int i = 0; i < totalRegions; i++) {
+                if (regionList.contains(mergedTo[i]))
+                    mergedTo[i] = destination;
+
+            }
+
+
+            /*for (int i = 0; i < mergedTo.length; i++) {
+                Gdx.app.log(Integer.toString(i), "MAPPED TO " + Integer.toString(mergedTo[i]));
+            }*/
+
+
+            openRegions.removeAll(regionList);
+
+            Collection<Integer> originalRegions = connectors.get(connectorPosition).values();
+            HashSet<Integer> regionsLeft = new HashSet<>();
+            for (Integer i : originalRegions) {
+                regionsLeft.add(mergedTo[i]);
+            }
+
+            for (Iterator<Map.Entry<Vector2, HashMap<Integer, Integer>>> it = connectors.entrySet().iterator(); it.hasNext(); ) {
+                Map.Entry<Vector2, HashMap<Integer, Integer>> entry = it.next();
+                if (entry.getKey().dst(connectorPosition) < 2) {
+                    it.remove();
+                }
+            }
+
+
+            if (regionsLeft.size() < 2) {
+                connectors.remove(connectorPosition);
+            }
+
+
+        }
+
+
+    }
+
+
+    public void removeDeadEnds() {
+        boolean done = false;
+
+        while (!done) {
+            done = true;
+            for (int x = 0; x < levelWidth; x++) {
+                for (int y = 0; y < levelHeight; y++) {
+                    if (getTile(x, y).getType() == WALL)
+                        continue;
+
+                    int exits = 0;
+                    for (Vector2 c : CARDINALS) {
+                        if (getTile(new Vector2(x, y).add(c)).getType() != WALL)
+                            exits++;
+                    }
+
+                    if (exits != 1)
+                        continue;
+
+                    done = false;
+
+                    setLevelData(new Vector2(x, y), WALL);
+
+
+                }
+            }
+
+
+        }
+
+
+    }
+
+    private void addJunction(Vector2 connector, int direction) {
+
+        if (direction == NORTH || direction == SOUTH) {
+            setLevelData(connector, FLOOR);
+            setLevelData(connector.cpy().add(N_DIR), FLOOR);
+            setLevelData(connector.cpy().add(S_DIR), FLOOR);
+        } else {
+            setLevelData(connector, FLOOR);
+            setLevelData(connector.cpy().add(W_DIR), FLOOR);
+            setLevelData(connector.cpy().add(E_DIR), FLOOR);
+        }
+    }
 
     private ArrayList<Tile> calculatePath(Tile from, Tile to) {
         ArrayList<Tile> path = new ArrayList<>();
@@ -409,10 +660,15 @@ public class RandomLevelGenerator {
 
         Gdx.app.log("NUMBER OF ROOMS", Integer.toString(rooms.size()));
         Gdx.app.log("-------------------", "-----------------------");
+        Gdx.app.log("NUMBER OF TINY ROOMS", Integer.toString(tinyRooms));
         Gdx.app.log("NUMBER OF SMALL ROOMS", Integer.toString(smallRooms));
         Gdx.app.log("NUMBER OF MEDIUM ROOMS", Integer.toString(mediumRooms));
         Gdx.app.log("NUMBER OF BIG ROOMS", Integer.toString(bigRooms));
         Gdx.app.log("NUMBER OF GIANT ROOMS", Integer.toString(giantRooms));
+        Gdx.app.log("-------------------", "-----------------------");
+        Gdx.app.log("NUMBER OF REGIONS", Integer.toString(totalRegions));
+
+
     }
 
 
@@ -448,12 +704,12 @@ public class RandomLevelGenerator {
     }
 
 
-    private int multilpeOfThree(int a, int b) {
+    private int multipleOfThree(int a, int b) {
 
         if (a < b) {
-            return 3 * (a / 3 + random.nextInt(((b - a) / 3) + 1))-1;
+            return 3 * (a / 3 + random.nextInt(((b - a) / 3) + 1)) - 1;
         } else {
-            return 3 * (b / 2 + random.nextInt(((a - b) / 3) + 1))-1;
+            return 3 * (b / 2 + random.nextInt(((a - b) / 3) + 1)) - 1;
         }
 
 
@@ -464,39 +720,38 @@ public class RandomLevelGenerator {
     }
 
 
-    private int decideRoomSize(Room room) {
+    private Room.Type decideRoomType() {
         int probability = random.nextInt(100);
-        if (SMALL_PROB.contains(probability)) {
-            room.setType(Room.Type.SMALL);
-            //return rndOddInRange(SMALL_DIMS.min, SMALL_DIMS.max);
-            return SMALL_DIMS;
+        if (TINY_PROB.contains(probability))
+            return TINY;
+        else if (SMALL_PROB.contains(probability))
+            return SMALL;
 
-        } else if (MEDIUM_PROB.contains(probability)) {
-            room.setType(Room.Type.MEDIUM);
-            //return rndOddInRange(MEDIUM_DIMS.min, MEDIUM_DIMS.max);
-            return MEDIUM_DIMS;
-        } else if (BIG_PROB.contains(probability)) {
-            room.setType(Room.Type.BIG);
-            //return rndOddInRange(BIG_DIMS.min, BIG_DIMS.max);
-            return BIG_DIMS;
-        } else if (GIANT_PROB.contains(probability)) {
-            room.setType(Room.Type.GIANT);
-            //return rndOddInRange(GIANT_DIMS.min, GIANT_DIMS.max);
-            return GIANT_DIMS;
-        }
+        else if (MEDIUM_PROB.contains(probability))
+            return MEDIUM;
+        else if (BIG_PROB.contains(probability))
+            return BIG;
+        else
+            return GIANT;
 
-
-        return -1;
     }
 
 
+    /**
+     * Generates a maze between the rooms using the growing tree algorithm.
+     *
+     * @param start
+     */
     public void generateMaze(Vector2 start) {
 
         LinkedList<Vector2> cells = new LinkedList<>();
-        setLevelData(new Tile(start.cpy(), Tile.TileType.BROWN_s, true));
+        setLevelData(new Tile(start.cpy(), Tile.TileType.FLOOR, true));
         cells.add(start);
 
+        // The maze opens a new region, so the total number of regions is increased.
 
+
+        Vector2 lastDirection = N_DIR;
         while (!cells.isEmpty()) {
             Vector2 currentPos = cells.getLast();
             /*Gdx.app.log("NEXT CELL", "------------------");
@@ -508,17 +763,21 @@ public class RandomLevelGenerator {
 
             // If there are neighbours, one
             if (!adjacentDirections.isEmpty()) {
-                Vector2 dir = adjacentDirections.get(random.nextInt(adjacentDirections.size())).cpy();
+                Vector2 dir;
+                if (adjacentDirections.contains(lastDirection) && random.nextInt(100) > 60)
+                    dir = lastDirection;
+                else
+                    dir = adjacentDirections.get(random.nextInt(adjacentDirections.size())).cpy();
                 Vector2 adjacentPos = currentPos.cpy().add(dir);
                 Vector2 posAfter = adjacentPos.cpy().add(dir);
 
                /* Gdx.app.log("DIRECTION BEFORE SET LEVEL DATA", dir.toString());
                 Gdx.app.log("ADJACENT POS", adjacentPos.toString());
                 Gdx.app.log("POS AFTER", posAfter.toString());*/
-                setLevelData(new Tile(adjacentPos, Tile.TileType.BROWN_s, true));
-                setLevelData(new Tile(posAfter, Tile.TileType.BROWN_s, true));
-                setLevelData(new Tile(posAfter.cpy().add(dir), Tile.TileType.BROWN_s, true));
-                //setLevelData(new Tile(posAfter.cpy().add(dir).cpy().add(dir), Tile.TileType.BROWN_s, true));
+                setLevelData(new Tile(adjacentPos, Tile.TileType.FLOOR, true));
+                setLevelData(new Tile(posAfter, Tile.TileType.FLOOR, true));
+                setLevelData(new Tile(posAfter.cpy().add(dir), Tile.TileType.FLOOR, true));
+                //setLevelData(new Tile(posAfter.cpy().add(dir).cpy().add(dir), Tile.TileType.FLOOR, true));
 
                /* Gdx.app.log("TYPE 1", Integer.toString(getTile(adjacentPos).getType().value));
                 Gdx.app.log("TYPE 2", Integer.toString(getTile(posAfter).getType().value));*/
@@ -526,12 +785,13 @@ public class RandomLevelGenerator {
                 //cells.add(new Vector2(posAfter));
                 cells.add(new Vector2(posAfter.cpy().add(dir)));
                 //cells.add(new Vector2(posAfter.cpy().add(dir).cpy().add(dir)));
+                lastDirection = dir;
             } else {
                 cells.removeLast();
             }
 
         }
-
+        totalRegions++;
     }
 
 
@@ -546,8 +806,7 @@ public class RandomLevelGenerator {
 
         ArrayList<Vector2> neighbourDirections = new ArrayList<>();
         // Checking all 4 cardinal directions
-        for (int i = 0; i < CARDINALS.length; i++) {
-            Vector2 dir = CARDINALS[i];
+        for (Vector2 dir : CARDINALS) {
             // add the direction to the tiles position to get to the neighbour tile.
             Vector2 neighbourAddress = position;
             if (canBeCarved(neighbourAddress, dir)) {
@@ -579,13 +838,13 @@ public class RandomLevelGenerator {
         /*Gdx.app.log("CARVING", "START");
         Gdx.app.log("POSITION", position.toString());
         Gdx.app.log("DIRECTION", direction.toString());*/
-            boolean noRoomsAround = true;
+        boolean noRoomsAround = true;
 
-        if (!checkBounds(position.cpy().add(direction.cpy().scl(4)))) { // 3
+        if (tooCloseToBounds((position.cpy().add(direction.cpy().scl(4))))) { // 3
             //Gdx.app.log("EXIT", "FALSE");
             return false;
         }
-            return getTile(position.cpy().add(direction.cpy().scl(3))).getType().equals(BROWN); // 2
+        return getTile(position.cpy().add(direction.cpy().scl(3))).getType().equals(WALL); // 2
 
     }
 
@@ -602,6 +861,15 @@ public class RandomLevelGenerator {
         return false;
     }
 
+
+    private boolean tooCloseToBounds(Vector2 position) {
+        if (position.x - MIN_BOUNDS_DISTANCE < 0 || position.x + MIN_BOUNDS_DISTANCE > levelWidth
+                || position.y - MIN_BOUNDS_DISTANCE < 0 || position.y + MIN_BOUNDS_DISTANCE > levelHeight) {
+            return true;
+        }
+        return false;
+
+    }
 
     private void markRoomTilesAsVisited(Room r, boolean visited) {
         int startX = r.getxPos();
@@ -628,7 +896,7 @@ public class RandomLevelGenerator {
         Gdx.app.log("VERTICAL FROM", Integer.toString(start) + " to " + Integer.toString(end));
 
         for (int y = start; y <= end; y++) {
-            Tile newTile = new Tile(new Vector2(x, y), Tile.TileType.BROWN_s, true);
+            Tile newTile = new Tile(new Vector2(x, y), Tile.TileType.FLOOR, true);
             setLevelData(newTile);
         }
 
@@ -641,7 +909,7 @@ public class RandomLevelGenerator {
         Gdx.app.log("HORIZONTAL FROM", Integer.toString(start) + " to " + Integer.toString(end));
 
         for (int x = start; x <= end; x++) {
-            Tile newTile = new Tile(new Vector2(x, y), Tile.TileType.BROWN_s, true);
+            Tile newTile = new Tile(new Vector2(x, y), Tile.TileType.FLOOR, true);
             setLevelData(newTile);
         }
     }
@@ -758,6 +1026,7 @@ public class RandomLevelGenerator {
     /**
      * Inserts the specified tile into the level data. Checks, whether the tiles coordinates are whole numbers
      * and inside the level bounds before trying to access the levelData array.
+     * Also maps a region number to the specified tile.
      *
      * @param tile tile to be added
      */
@@ -773,10 +1042,31 @@ public class RandomLevelGenerator {
         if (!checkBounds(x, y)) {
             System.out.format("ERROR: ADDRESS %1d | %1d LAYS OUTSIDE BOUNDS", x, y);
         } else {
+            /**
+             * Set level data and set region id.
+             */
             levelData[x][y] = tile;
+            regions[x][y] = totalRegions;
         }
     }
 
+
+    private void setLevelData(Vector2 position, Tile.TileType type) {
+        Tile t;
+        switch (type) {
+            case WALL:
+                t = new DefaultTile(position);
+                setLevelData(t);
+                break;
+            case FLOOR:
+                t = new Tile(position, Tile.TileType.FLOOR, true);
+                setLevelData(t);
+                break;
+            default:
+                break;
+
+        }
+    }
 
     // GETTER & SETTER
     // ---------------------------------------------------------------------------------------------
@@ -803,6 +1093,20 @@ public class RandomLevelGenerator {
 
     public Player getPlayer() {
         return player;
+    }
+
+    public int getRegion(float x, float y) {
+        try {
+            return regions[(int) x][(int) y];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // Gdx.app.log("ERROR", e.toString());
+        }
+
+        return -1;
+    }
+
+    public int getRegion(Vector2 position) {
+        return getRegion(position.x, position.y);
     }
 
 }

@@ -15,7 +15,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
-import com.trent.awesomejumper.engine.modelcomponents.popups.Message;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.models.Player;
@@ -24,7 +23,7 @@ import com.trent.awesomejumper.engine.physics.CollisionBox;
 import com.trent.awesomejumper.tiles.Tile;
 
 import static com.trent.awesomejumper.utils.Utilities.formVec;
-import static com.trent.awesomejumper.tiles.Tile.TileType.*;
+
 /**
  * Created by trent on 12.06.2015.
  * Rendering Engine for AwesomeJumper.
@@ -81,6 +80,7 @@ public class RenderingEngine {
     static final int DE_ENTITIES = 6;
     static final int DE_RESOLUTION = 7;
     static final int DE_CURSOR = 8;
+    static final int DE_REGION = 9;
 
 
     public static Array<String> debugStrings;
@@ -105,8 +105,8 @@ public class RenderingEngine {
         this.hudRenderer = new HUDRenderer(player);
         this.popUpManager = PopUpManager.createPopUpManager();
         this.allTextures = new TextureAtlas();
-        this.debugStrings = new Array<>(9);
-        for(int i = 0; i < 9; i++) {
+        this.debugStrings = new Array<>(10);
+        for(int i = 0; i < 10; i++) {
             debugStrings.add(new String(""));
         }
 
@@ -325,13 +325,13 @@ public class RenderingEngine {
             Vector2 position = newTile.getPosition();
             if(!game.onDebugMode()) {
                 switch (type) {
-                    case BROWN:
+                    case WALL:
                         sb.draw(brownNormal, position.x, position.y, Tile.SIZE, Tile.SIZE);
                         break;
                     case STONE:
                         sb.draw(greyNormal, position.x, position.y, Tile.SIZE, Tile.SIZE);
                         break;
-                    case BROWN_s:
+                    case FLOOR:
                         sb.draw(brownShadow, position.x, position.y, Tile.SIZE, Tile.SIZE);
                         break;
                     case ICE:
@@ -431,6 +431,7 @@ public class RenderingEngine {
         debugStrings.set(DE_ENTITIES,"Entities,Drawn :" + Integer.toString(Entity.entityCount) + " , " + Integer.toString(WorldContainer.nodes));
         debugStrings.set(DE_RESOLUTION, Gdx.graphics.getWidth() + "*" + Gdx.graphics.getHeight() + ", ZOOM: " + zoom + ", FPS :" + Gdx.graphics.getFramesPerSecond());
         debugStrings.set(DE_CURSOR, Double.toString(Math.floor(InputHandler.mouse.x)) + " | " + Double.toString(Math.floor(InputHandler.mouse.y)));
+        debugStrings.set(DE_REGION, Integer.toString(worldContainer.getRandomLevelGenerator().getRegion(InputHandler.mouse)));
         consoleFont.setColor(Color.BLUE);
         for(int i = 0; i < debugStrings.size; i++) {
             consoleFont.draw(debugBatch, debugStrings.get(i), 14, CONSOLE_LINE_HEIGHT *i);

@@ -95,7 +95,7 @@ public class Level {
                         tiles[x][yPos] = new StoneTile(position);
                         break;
                     case 3:
-                        tiles[x][yPos] = new Tile(new Vector2(x, yPos), TileType.BROWN_s, true);
+                        tiles[x][yPos] = new Tile(new Vector2(x, yPos), TileType.FLOOR, true);
                         break;
                     case 4:
                         tiles[x][yPos] = new IceTile(position);

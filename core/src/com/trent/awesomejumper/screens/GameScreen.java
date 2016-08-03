@@ -146,9 +146,16 @@ public class GameScreen implements Screen, InputProcessor{
             inputHandler.reload();
         }
 
-        if(keycode == Keys.M) {
-           worldContainer.getRandomLevelGenerator().generateMaze(new Vector2(8,8));
+        if(keycode == Keys.B) {
+           worldContainer.getRandomLevelGenerator().connectRegions();
         }
+        if(keycode == Keys.N) {
+            worldContainer.getRandomLevelGenerator().removeExtraDoors();
+        }
+        if(keycode == Keys.M) {
+            worldContainer.getRandomLevelGenerator().removeDeadEnds();
+        }
+
 
         return false;
     }
