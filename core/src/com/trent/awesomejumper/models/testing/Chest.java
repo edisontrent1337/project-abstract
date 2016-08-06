@@ -15,13 +15,13 @@ import com.trent.awesomejumper.engine.physics.CollisionBox;
 public class Chest extends Entity {
 
 
-    private final float WIDTH = 0.75f;               //  24 pixel
-    private final float HEIGHT = 0.4375f;            //  19 Pixel - 5 Pixel "behind space
+    private final float WIDTH = 0.3725f;               //  24 pixel
+    private final float HEIGHT = 0.21875f;            //  19 Pixel - 5 Pixel "behind space
     private final float MASS = 0.4f;
     private final float FRICTION = 0.895f;
     private final float ELASTICITY = 0.45f;
-    private final float SPRITE_WIDTH = 1f;           // 32 px width
-    private final float SPRITE_HEIGHT = 1f;          // 32 px height
+    private final float SPRITE_WIDTH = 0.5625f;           // 32 px width
+    private final float SPRITE_HEIGHT = 0.75f;          // 32 px height
     private final float MAX_SPEED = 5f;
     private final Vector2 OFFSET = new Vector2(0.125f, 0); // 4 px space in chest sprite
 

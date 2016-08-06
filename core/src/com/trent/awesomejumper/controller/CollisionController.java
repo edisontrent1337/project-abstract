@@ -259,8 +259,7 @@ public class CollisionController {
                 if (projectileCollisionDetection((Projectile) other, entity, otherFrameVelo, entityFrameVelo, delta)) {
                     continue;
                 }
-            }
-            else if (entity.getClass() == Projectile.class) {
+            } else if (entity.getClass() == Projectile.class) {
                 if (projectileCollisionDetection((Projectile) entity, other, entityFrameVelo, otherFrameVelo, delta)) {
                     return;
                 } else
@@ -273,8 +272,7 @@ public class CollisionController {
              */
             else if (entity.getClass() == Projectile.class && other.getClass() == Projectile.class) {
                 continue;
-            }
-            else if (checkCollision(otherBox, entityBox)) {
+            } else if (checkCollision(otherBox, entityBox)) {
 
                 /**
                  * deltaVelocity - Relative velocity between both participants of the collision.
@@ -538,11 +536,10 @@ public class CollisionController {
 
         Vector2 deltaVelocity = sub(projectileVelocity, entityVelocity);
         Vector2 collisionNormal = resolutionVector.cpy().nor();
-        float force = projectile.getBody().getMass()*projectileVelocity.cpy().scl(1/delta).len()*(1/entity.getBody().getMass());
+        float force = projectile.getBody().getMass() * projectileVelocity.cpy().scl(1 / delta).len() * (1 / entity.getBody().getMass());
 
-        Vector2 impulse = createReflectionImpulse(deltaVelocity,collisionNormal,entity.getBody().getElasticity());
-        impulse.scl(force*force);
-
+        Vector2 impulse = createReflectionImpulse(deltaVelocity, collisionNormal, entity.getBody().getElasticity());
+        impulse.scl(force * force);
 
 
         /**
@@ -556,19 +553,13 @@ public class CollisionController {
              * z-height to hit the entity or not.
              * TODO: z component should only be cosmetic as it hinders gameplay. maybe scrap idea of hitbox skeleton.
              */
-            if (checkCollision(projectile.getBounds(), entityBounds)) {                      // shadows collide
-                // for(CollisionBox entityHitBox : entity.getBodyHitboxes()) {                 // all entity hitboxes across the z axis are checked
-                //if(checkCollision(entityHitBox, projectile.getProjectileBox())) {
-                projectile.setVelocity(0f, 0f);
-                if (entity.hasHealth) {
-                    entity.getHealth().takeDamage(projectile.dealDamage(entityBounds));
-                    entity.getBody().addImpulse(impulse);
-                }
-                projectile.destroy();
-                return true;
+            projectile.setVelocity(0f, 0f);
+            if (entity.hasHealth) {
+                entity.getHealth().takeDamage(projectile.dealDamage(entityBounds));
+                entity.getBody().addImpulse(impulse);
             }
-            // }
-            //}
+            projectile.destroy();
+            return true;
         } else if (checkCollision(projectile.getBounds(), entityBounds)) {
 
             projectile.setVelocity(0f, 0f);
@@ -592,8 +583,8 @@ public class CollisionController {
      * Resolution of projectile / world collision with the method of continuous collision detection.
      * On successful hit, the projectile is destroyed.
      *
-     * @param projectile         Projectile entity
-     * @param tile               Tile to be hit
+     * @param projectile Projectile entity
+     * @param tile       Tile to be hit
      * @return true, if a collision occurred, false otherwise.
      */
     private boolean projectileCollisionDetection(Projectile projectile, Tile tile) {

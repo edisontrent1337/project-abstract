@@ -5,6 +5,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -23,6 +24,7 @@ import com.trent.awesomejumper.engine.physics.CollisionBox;
 import com.trent.awesomejumper.tiles.Tile;
 
 import static com.trent.awesomejumper.utils.Utilities.formVec;
+import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.*;
 
 /**
  * Created by trent on 12.06.2015.
@@ -44,8 +46,9 @@ public class RenderingEngine {
     private SkyBox farSky01, farSky02, nearSky01, nearSky02;
     public OrthographicCamera cam, uiCam;
     static final float CAMERA_WIDTH = 32;
-    static final float CAMERA_HEIGHT =18f;
+    static final float CAMERA_HEIGHT = 18f;
     private final float LERP_FACTOR = 0.075f;
+    private final float ZOOM = 0.6f;
 
     /**
      * Pixel per unit scale. The screen shows 16 * 9 units, for pixel perfect accuracy we need
@@ -58,6 +61,8 @@ public class RenderingEngine {
 
     // TEXTURES: TILES
     private TextureRegion brownNormal, greyNormal, brownShadow, iceNormal;
+    private Array<TextureAtlas.AtlasRegion> wallTextures;
+    private Array<TextureAtlas.AtlasRegion> floorTextures;
 
     // TEXTURES: ENVIRONMENT
     private TextureRegion grass01, grass01l, grass01r, grass02, snow01;
@@ -106,17 +111,19 @@ public class RenderingEngine {
         this.popUpManager = PopUpManager.createPopUpManager();
         this.allTextures = new TextureAtlas();
         this.debugStrings = new Array<>(10);
-        for(int i = 0; i < 10; i++) {
+        for (int i = 0; i < 10; i++) {
             debugStrings.add(new String(""));
         }
 
+        Pixmap mouse = new Pixmap(Gdx.files.internal("img/crosshair.png"));
+        Gdx.input.setCursorImage(mouse,15,15);
 
         /** CAMERA SETUP: MAIN VIEW
          * ZOOM = 16.66667 , other options: initialize camera with parameters
          * 16,9 and leave zoom at 1.
-          */
+         */
         cam = new OrthographicCamera(CAMERA_WIDTH, CAMERA_HEIGHT);
-        cam.zoom = 1f;
+        cam.zoom = ZOOM;
         zoom = cam.zoom;
         this.ppuX = Gdx.graphics.getWidth() / (CAMERA_WIDTH * zoom);
         this.ppuY = Gdx.graphics.getHeight() / (CAMERA_HEIGHT * zoom);
@@ -149,14 +156,13 @@ public class RenderingEngine {
         // HUD
         hudRenderer.loadTextures();
         //FONTS
-        consoleFont = new BitmapFont(Gdx.files.internal("fonts/munro_regular_14.fnt"),Gdx.files.internal("fonts/munro_regular_14_0.png"),false);
+        consoleFont = new BitmapFont(Gdx.files.internal("fonts/munro_regular_14.fnt"), Gdx.files.internal("fonts/munro_regular_14_0.png"), false);
         consoleFont.setColor(Color.WHITE);
         consoleFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
-        messageFont = new BitmapFont(Gdx.files.internal("fonts/munro_outlined.fnt"),Gdx.files.internal("fonts/munro_outlined_0.png"),false);
+        messageFont = new BitmapFont(Gdx.files.internal("fonts/munro_outlined.fnt"), Gdx.files.internal("fonts/munro_outlined_0.png"), false);
         messageFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        messageFont.getData().setScale(1f/ppuX, 1f/ppuY);
-
+        messageFont.getData().setScale(1f / ppuX, 1f / ppuY);
 
 
         // TEXTURE ATLAS
@@ -167,13 +173,14 @@ public class RenderingEngine {
          * Iterate over all entities and manipulate their graphics component.
          */
 
-        for(Entity e : worldContainer.getEntities()) {
+        for (Entity e : worldContainer.getEntities()) {
             initGraphics(e);
         }
 
-
+        wallTextures = allTextures.findRegions("wall");
+        floorTextures = allTextures.findRegions("floor");
         // TILE TEXTURES
-        brownNormal = allTextures.findRegion("brown-01");
+        brownNormal = allTextures.findRegion("floor");
         brownShadow = allTextures.findRegion("brown-02");
         greyNormal = allTextures.findRegion("grey-01");
         iceNormal = allTextures.findRegion("ice-01");
@@ -194,17 +201,18 @@ public class RenderingEngine {
      * Initializes the graphics component of the entity e.
      * Loads animations, idle frames and other sprites and bundles them into a graphic
      * component.
+     *
      * @param e
      */
     public void initGraphics(Entity e) {
 
-        if(e.hasGraphics) {
+        if (e.hasGraphics) {
             Graphics g = e.getGraphics();
             Array<TextureAtlas.AtlasRegion> regions = allTextures.findRegions(g.getTextureRegName());
             g.setIdleFrames(regions.first());
             g.setShadow(allTextures.findRegion(g.getTextureRegName() + "_shadow"));
 
-            for(int i = 1; i < regions.size; i++) {
+            for (int i = 1; i < regions.size; i++) {
                 g.addKeyFrame(regions.get(i));
             }
             g.createWalkAnimations();
@@ -228,20 +236,20 @@ public class RenderingEngine {
         sb.begin();
         //drawBg();
         drawTiles();
-        if(game.hitboxesEnabled()) {
-                sb.end();
-                drawHitboxes();
-                sb.begin();
-            }
+        if (game.hitboxesEnabled()) {
+            sb.end();
+            drawHitboxes();
+            sb.begin();
+        }
 
-        if(game.entitiesEnabled()) {
+        if (game.entitiesEnabled()) {
             drawEntities();
             drawPopUps();
         }
         sb.end();
         debugBatch.setProjectionMatrix(uiCam.combined);
         debugBatch.begin();
-        if(game.infoEnabled()) {
+        if (game.infoEnabled()) {
             drawInfo();
         }
         debugBatch.end();
@@ -252,6 +260,7 @@ public class RenderingEngine {
 
     /**
      * Moves the camera smoothly behind the player and stops it at the edges of the level
+     *
      * @param playerX player's x position
      * @param playerY player's y position
      */
@@ -263,30 +272,28 @@ public class RenderingEngine {
         float xLerp = (playerX - tempX) * LERP_FACTOR;
         tempX += xLerp;
 
-        float yLerp =  (playerY - tempY) * LERP_FACTOR;
+        float yLerp = (playerY - tempY) * LERP_FACTOR;
         tempY += yLerp;
 
 
         float updatedX, updatedY;
-        if(playerX - cam.position.x >= 0f) {
+        if (playerX - cam.position.x >= 0f) {
             updatedX = ((int) (Math.floor(tempX * ppuX))) / ppuX;
-        }
-        else {
+        } else {
             updatedX = ((int) (Math.ceil(tempX * ppuX))) / ppuX;
 
         }
 
-        if(playerY - cam.position.y >= 0f) {
+        if (playerY - cam.position.y >= 0f) {
             updatedY = ((int) (Math.floor(tempY * ppuY))) / ppuY;
-        }
-        else {
+        } else {
             updatedY = ((int) (Math.ceil(tempY * ppuY))) / ppuY;
 
         }
 
-        if(updatedX < 4)
+        if (updatedX < 4)
             updatedX = 4;
-        if(updatedY < 4)
+        if (updatedY < 4)
             updatedY = 4;
 
         cam.position.set(updatedX, updatedY, 0);
@@ -302,7 +309,7 @@ public class RenderingEngine {
      */
     public void drawEntities() {
         Vector2 cameraPosition = new Vector2(cam.position.x, cam.position.y);
-        for(Entity e : worldContainer.getEntitiesToBeRendered(cameraPosition, CAMERA_WIDTH, CAMERA_HEIGHT)) {
+        for (Entity e : worldContainer.getEntitiesToBeRendered(cameraPosition, CAMERA_WIDTH, CAMERA_HEIGHT)) {
             e.render(sb);
         }
 
@@ -320,25 +327,31 @@ public class RenderingEngine {
 
     private void drawTiles() {
         Vector2 cameraPosition = new Vector2(cam.position.x, cam.position.y);
-        for(Tile newTile : worldContainer.getTilesToBeRendered(cameraPosition, CAMERA_WIDTH*cam.zoom, CAMERA_HEIGHT*cam.zoom)) {
+        TextureRegion wall;
+        TextureRegion floor;
+        for (Tile newTile : worldContainer.getTilesToBeRendered(cameraPosition, CAMERA_WIDTH * cam.zoom, CAMERA_HEIGHT * cam.zoom)) {
             Tile.TileType type = newTile.getType();
             Vector2 position = newTile.getPosition();
-            if(!game.onDebugMode()) {
+            if (!game.onDebugMode()) {
                 switch (type) {
                     case WALL:
-                        sb.draw(brownNormal, position.x, position.y, Tile.SIZE, Tile.SIZE);
+                        wall = wallTextures.get(newTile.tileIndex);
+                        sb.draw(wall, position.x, position.y, Tile.SIZE, Tile.SIZE);
                         break;
                     case STONE:
                         sb.draw(greyNormal, position.x, position.y, Tile.SIZE, Tile.SIZE);
                         break;
                     case FLOOR:
-                        sb.draw(brownShadow, position.x, position.y, Tile.SIZE, Tile.SIZE);
+                        floor = floorTextures.get(0);
+                        sb.draw(floor, position.x, position.y, Tile.SIZE, Tile.SIZE);
                         break;
                     case ICE:
                         sb.draw(iceNormal, position.x, position.y, Tile.SIZE, Tile.SIZE);
                         break;
                     case TRAMPOLINE:
                         sb.draw(iceNormal, position.x, position.y, Tile.SIZE, Tile.SIZE);
+                        break;
+                    default:
                         break;
 
                 }
@@ -349,8 +362,8 @@ public class RenderingEngine {
                 sb.end();
                 debugRenderer.setProjectionMatrix(cam.combined);
                 debugRenderer.begin(ShapeRenderer.ShapeType.Line);
-                if(!newTile.isPassable())
-                newTile.getCollisionBox().draw(debugRenderer);
+                if (!newTile.isPassable())
+                    newTile.getCollisionBox().draw(debugRenderer);
                 debugRenderer.end();
                 sb.begin();
             }
@@ -422,19 +435,19 @@ public class RenderingEngine {
     // ---------------------------------------------------------------------------------------------
 
     public void drawInfo() {
-        debugStrings.set(DE_ACCELERATION,"ACC: " +  player.getAcceleration() );
-        debugStrings.set(DE_VELOCITY, "VEL: " +  player.getVelocity());
+        debugStrings.set(DE_ACCELERATION, "ACC: " + player.getAcceleration());
+        debugStrings.set(DE_VELOCITY, "VEL: " + player.getVelocity());
         debugStrings.set(DE_STATE, "STATE: " + player.getState().toString());
         debugStrings.set(DE_POSITION, "POS: " + player.getPosition());
         debugStrings.set(DE_POSITION_OFFSET, "PAO: " + player.getBody().getBounds().getPositionAndOffset());
         debugStrings.set(DE_CAMERA_POSITION, "CAM: " + formVec(cam.position.x, cam.position.y));
-        debugStrings.set(DE_ENTITIES,"Entities,Drawn :" + Integer.toString(Entity.entityCount) + " , " + Integer.toString(WorldContainer.nodes));
+        debugStrings.set(DE_ENTITIES, "Entities,Drawn :" + Integer.toString(Entity.entityCount) + " , " + Integer.toString(WorldContainer.nodes));
         debugStrings.set(DE_RESOLUTION, Gdx.graphics.getWidth() + "*" + Gdx.graphics.getHeight() + ", ZOOM: " + zoom + ", FPS :" + Gdx.graphics.getFramesPerSecond());
         debugStrings.set(DE_CURSOR, Double.toString(Math.floor(InputHandler.mouse.x)) + " | " + Double.toString(Math.floor(InputHandler.mouse.y)));
         debugStrings.set(DE_REGION, Integer.toString(worldContainer.getRandomLevelGenerator().getRegion(InputHandler.mouse)));
         consoleFont.setColor(Color.BLUE);
-        for(int i = 0; i < debugStrings.size; i++) {
-            consoleFont.draw(debugBatch, debugStrings.get(i), 14, CONSOLE_LINE_HEIGHT *i);
+        for (int i = 0; i < debugStrings.size; i++) {
+            consoleFont.draw(debugBatch, debugStrings.get(i), 14, CONSOLE_LINE_HEIGHT * i);
         }
     }
 
@@ -444,20 +457,20 @@ public class RenderingEngine {
         debugRenderer.begin(ShapeRenderer.ShapeType.Line);
 
 
-        for(Entity e : worldContainer.getEntities()) {
+        for (Entity e : worldContainer.getEntities()) {
             /**
              * Only if the body flag is enabled, body hitboxes will be drawn.
              */
             debugRenderer.setColor(1, 0, 0, 1);
             e.getBounds().draw(debugRenderer);
-            if(game.bodyEnabled()) {
+            if (game.bodyEnabled()) {
                 for (CollisionBox r : e.getBodyHitboxes()) {
                     debugRenderer.setColor(Color.YELLOW);
                     r.draw(debugRenderer);
                 }
             }
 
-            if(e.getBody().isCollidedWithWorld()) {
+            if (e.getBody().isCollidedWithWorld()) {
                 debugRenderer.end();
                 debugRenderer.begin(ShapeRenderer.ShapeType.Filled);
                 debugRenderer.setColor(Color.RED);
@@ -474,15 +487,15 @@ public class RenderingEngine {
         /**
          * vertical and horizontal components are separated here to show  which impact is bigger
          */
-        Vector2 playerX = new Vector2(player.getVelocity().x,0f).cpy().scl(player.getPlayerDelta()).scl(25);
-        Vector2 playerY = new Vector2(0f,player.getVelocity().y).cpy().scl(player.getPlayerDelta()).scl(25);
+        Vector2 playerX = new Vector2(player.getVelocity().x, 0f).cpy().scl(player.getPlayerDelta()).scl(25);
+        Vector2 playerY = new Vector2(0f, player.getVelocity().y).cpy().scl(player.getPlayerDelta()).scl(25);
 
         debugRenderer.rectLine(player.getPosition(), player.getPosition().cpy().add(playerX), 5 * (1 / ppuX));
         debugRenderer.rectLine(player.getPosition(), player.getPosition().cpy().add(playerY), 5 * (1 / ppuY));
 
         debugRenderer.setColor(1f, 0f, 0f, 0.5f);
         for (Tile t : worldContainer.getCollisionTiles()) {
-            if(t != null)
+            if (t != null)
                 debugRenderer.rect(t.getPosition().x, t.getPosition().y, Tile.SIZE, Tile.SIZE);
         }
 
@@ -492,14 +505,13 @@ public class RenderingEngine {
 
 
     public void resize(int w, int h) {
-        uiCam = new OrthographicCamera(w,h);
-        uiCam.position.set(w/2,h/2,0);
-        ppuX = Gdx.graphics.getWidth() / (CAMERA_WIDTH*zoom);
-        ppuY = Gdx.graphics.getHeight() / (CAMERA_HEIGHT*zoom);
-        messageFont.getData().setScale(1/ppuX, 1/ppuY);
-        hudRenderer.resize(w,h);
+        uiCam = new OrthographicCamera(w, h);
+        uiCam.position.set(w / 2, h / 2, 0);
+        ppuX = Gdx.graphics.getWidth() / (CAMERA_WIDTH * zoom);
+        ppuY = Gdx.graphics.getHeight() / (CAMERA_HEIGHT * zoom);
+        messageFont.getData().setScale(1 / ppuX, 1 / ppuY);
+        hudRenderer.resize(w, h);
     }
-
 
 
     // GETTER AND SETTER
@@ -514,11 +526,11 @@ public class RenderingEngine {
     }
 
     public void setZoom(float zoom) {
-            float oldZoom = cam.zoom;
-            oldZoom += 0.1d * zoom;
-            cam.zoom = oldZoom;
-            ppuX = Gdx.graphics.getWidth() / (CAMERA_WIDTH*cam.zoom);
-            ppuY = Gdx.graphics.getHeight() / (CAMERA_HEIGHT*cam.zoom);
+        float oldZoom = cam.zoom;
+        oldZoom += 0.1d * zoom;
+        cam.zoom = oldZoom;
+        ppuX = Gdx.graphics.getWidth() / (CAMERA_WIDTH * cam.zoom);
+        ppuY = Gdx.graphics.getHeight() / (CAMERA_HEIGHT * cam.zoom);
     }
 
 }

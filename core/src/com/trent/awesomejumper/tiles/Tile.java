@@ -31,6 +31,8 @@ public class Tile {
         }
     }
 
+    public int tileIndex = -1;
+
     public static final float SIZE = 1f;
     private long roomID = 0;
     Rectangle bounds = new Rectangle();

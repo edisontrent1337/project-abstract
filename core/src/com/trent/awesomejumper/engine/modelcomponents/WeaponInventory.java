@@ -148,8 +148,8 @@ public class WeaponInventory extends ModelComponent {
             weaponPrimary.getBody().setOrientation(entity.getBody().getOrientation());
             weaponPrimary.getBody().setAngleOfRotation(angle(weaponPrimary.getBody().getOrientation()));
             Vector2 circle = entity.getBody().getOrientation().cpy();
-            if (circle.len2() > 0.75f)
-                circle.nor().scl(0.75f);
+            if (circle.len2() > 0.5f)
+                circle.nor().scl(0.5f);
             weaponPrimary.getBody().getPosition().add(circle);
         }
         if (secondaryEquipped) {
@@ -158,8 +158,8 @@ public class WeaponInventory extends ModelComponent {
             weaponSecondary.getBody().setOrientation(entity.getBody().getOrientation());
             weaponSecondary.getBody().setAngleOfRotation(angle(weaponSecondary.getBody().getOrientation()));
             Vector2 circle = new Vector2(getNormal(entity.getBody().getOrientation()));
-            if (circle.len2() > 0.75f)
-                circle.nor().scl(0.75f);
+            if (circle.len2() > 0.5f)
+                circle.nor().scl(0.5f);
             weaponSecondary.getBody().getPosition().add(circle);
         }
     }

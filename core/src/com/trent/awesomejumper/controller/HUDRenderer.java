@@ -15,6 +15,13 @@ import com.trent.awesomejumper.models.weapons.Weapon;
 public class HUDRenderer {
 
 
+
+    private final String NO_WEAPON = "NO WEAPON";
+
+    private final int WEAPON_OFFSET_X = 200;
+    private final int WEAPON_OFFSET_Y = 100;
+    private final int SHADOW_OFFSET = 4;
+
     private OrthographicCamera hudCam;
     private SpriteBatch hudBatch;
     private BitmapFont hudFont;
@@ -56,24 +63,24 @@ public class HUDRenderer {
 
 
         if(!player.getWeaponInventory().isPrimaryEquipped()) {
-            hudFont.draw(hudBatch, "NO WEAPON",Gdx.graphics.getWidth() - 200,50);
+            drawFontWithShadow(NO_WEAPON, Gdx.graphics.getWidth() - WEAPON_OFFSET_X, WEAPON_OFFSET_Y);
         }
 
         else {
-            hudFont.draw(hudBatch, primaryWeapon.getWeaponComponent().getWeaponName(), Gdx.graphics.getWidth() - 200, 50);
-            hudFont.draw(hudBatch, primaryWeapon.getWeaponComponent().getWeaponStatus(), Gdx.graphics.getWidth() - 100, 50);
+            drawFontWithShadow(primaryWeapon.getWeaponComponent().getWeaponName(), Gdx.graphics.getWidth() - WEAPON_OFFSET_X, WEAPON_OFFSET_Y);
+            drawFontWithShadow(primaryWeapon.getWeaponComponent().getWeaponStatus(), Gdx.graphics.getWidth() - WEAPON_OFFSET_X / 2, WEAPON_OFFSET_Y);
 
         }
 
-        if(!player.getWeaponInventory().isSecondaryEquipped()) {
-            hudFont.draw(hudBatch, "NO WEAPON",Gdx.graphics.getWidth() - 200,25);
+       /* if(!player.getWeaponInventory().isSecondaryEquipped()) {
+            hudFont.draw(hudBatch, "NO WEAPON",Gdx.graphics.getWidth() - 200,75);
         }
 
         else {
             hudFont.draw(hudBatch, secondaryWeapon.getWeaponComponent().getWeaponName(), Gdx.graphics.getWidth() - 200, 25);
             hudFont.draw(hudBatch, secondaryWeapon.getWeaponComponent().getWeaponStatus(), Gdx.graphics.getWidth() - 100, 25);
 
-        }
+        }*/
 
 
         hudFont.draw(hudBatch,player.getHealth().toString(), 100,Gdx.graphics.getHeight() - 50);
@@ -86,6 +93,14 @@ public class HUDRenderer {
     public void resize(int w, int h) {
         hudCam = new OrthographicCamera(w,h);
         hudCam.position.set(w/2,h/2,0);
+    }
+
+
+    private void drawFontWithShadow(String text, int x, int y) {
+        hudFont.setColor(Color.BLACK);
+        hudFont.draw(hudBatch,text, x + SHADOW_OFFSET,y - SHADOW_OFFSET);
+        hudFont.setColor(Color.WHITE);
+        hudFont.draw(hudBatch,text,x,y);
     }
 
 }

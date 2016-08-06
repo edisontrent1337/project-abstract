@@ -29,7 +29,7 @@ public class Player extends Entity {
 
     // TODO: Add JSON support to outsource this information
     // 17*22 px outlines, 10px offset to each side
-    private final float GRAPHIC_SCALE = 1.5f;
+    private final float GRAPHIC_SCALE = 1f;
     private final float X_OFFSET = 0.32f*GRAPHIC_SCALE;
     private final float MASS = 10f;
     private final float FRICTION = 0.66f;
@@ -37,7 +37,7 @@ public class Player extends Entity {
     private final float SPRITE_WIDTH = 1f*GRAPHIC_SCALE;  // 48px
     private final float SPRITE_HEIGHT = 1f*GRAPHIC_SCALE; // 48px
     private final float FRAME_DURATION = 0.05f;
-    private final float MAX_SPEED = 7f;
+    private final float MAX_SPEED = 3.8f;
     private int startHealth  = 2000;
     private final String SPRITE_PREFIX = "link";
 

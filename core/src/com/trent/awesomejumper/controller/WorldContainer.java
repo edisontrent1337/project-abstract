@@ -2,6 +2,7 @@ package com.trent.awesomejumper.controller;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
+import com.trent.awesomejumper.controller.levelgeneration.RandomLevelGenerator;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.Level;
@@ -68,15 +69,15 @@ public class WorldContainer {
         pistol2 = new Pistol(new Vector2(5f, 6f));
         level = new Level();*/
 
-        randomLevelGenerator = new com.trent.awesomejumper.controller.levelgeneration.RandomLevelGenerator();
+        randomLevelGenerator = new RandomLevelGenerator();
         randomLevelGenerator.init();
         randomLevelGenerator.load();
 
         entities = randomLevelGenerator.getEntities();
 
-        /*for(Entity e: entities) {
+        for(Entity e: entities) {
             registerEntity(e);
-        }*/
+        }
 
         player = randomLevelGenerator.getPlayer();
 

@@ -16,13 +16,13 @@ import com.trent.awesomejumper.engine.modelcomponents.WeaponComponent;
 public class Pistol extends Weapon {
 
 
-    private final float WIDTH = 0.75f;               //  24 pixel
-    private final float HEIGHT = 0.4375f;            //  19 Pixel - 5 Pixel "behind space
+    private final float WIDTH = 0.375f;               //  24 pixel
+    private final float HEIGHT = 0.21875f;            //  19 Pixel - 5 Pixel "behind space
     private final float MASS = 0.150f;
     private final float FRICTION = 0.945f;
     private final float ELASTICITY = 0.45f;
-    private final float SPRITE_WIDTH = 0.75f;           // 24 px width
-    private final float SPRITE_HEIGHT = 0.75f;          // 24 px height
+    private final float SPRITE_WIDTH = 0.5f;           // 24 px width
+    private final float SPRITE_HEIGHT = 0.5f;          // 24 px height
     private final float MAX_SPEED = 5f;
 
     private final int AMMO = 100;

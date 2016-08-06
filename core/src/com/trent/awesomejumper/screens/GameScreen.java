@@ -156,6 +156,10 @@ public class GameScreen implements Screen, InputProcessor{
             worldContainer.getRandomLevelGenerator().removeDeadEnds();
         }
 
+        if(keycode == Keys.F11) {
+            Gdx.graphics.setDisplayMode(1920,1080,true);
+        }
+
 
         return false;
     }

@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.models.Player;
+import com.trent.awesomejumper.models.testing.Chest;
+import com.trent.awesomejumper.models.weapons.Pistol;
 import com.trent.awesomejumper.tiles.DefaultTile;
 import com.trent.awesomejumper.tiles.Tile;
 import com.trent.awesomejumper.utils.Interval;
@@ -114,6 +116,7 @@ public class RandomLevelGenerator {
          * Init seed and level size. The level dimensions must be odd.
          */
         seed = System.currentTimeMillis();
+        //seed = 1470478995911l;//
         random = new Random(seed);
         levelWidth = MIN_LEVEL_WIDTH + random.nextInt((MAX_LEVEL_WIDTH - MIN_LEVEL_WIDTH) / 2) * 2 + 1;
         levelHeight = MIN_LEVEL_HEIGHT + random.nextInt((MAX_LEVEL_HEIGHT - MIN_LEVEL_HEIGHT) / 2) * 2 + 1;
@@ -254,6 +257,7 @@ public class RandomLevelGenerator {
         removeExtraDoors();
         Gdx.app.log("LEVEL", "REMOVING DEAD ENDS");
         removeDeadEnds();
+        calculateBitMasks();
         placePlayer();
     }
 
@@ -309,6 +313,11 @@ public class RandomLevelGenerator {
                 }
             }
             totalRegions++;
+
+            Pistol p = new Pistol(r.getCenter());
+            Chest c = new Chest(r.getCenter().cpy().add(1,1));
+            entities.add(p);
+            entities.add(c);
 
         }
     }
@@ -508,8 +517,8 @@ public class RandomLevelGenerator {
                 /**
                  * Check all 4 cardinal neighbours from the current position [x,y]
                  */
-                for (int i = 0; i < CARDINALS.length; i++) {
-                    Vector2 direction = CARDINALS[i];
+                for (int i = 0; i < CARDINAL_DIRS.length; i++) {
+                    Vector2 direction = CARDINAL_DIRS[i];
                     Vector2 destination = new Vector2(x, y).add(direction.cpy().scl(2));
                     //Vector2 destination = d.position.cpy().add(direction.cpy().scl(2));
                     if (checkBounds(destination)) {
@@ -645,36 +654,33 @@ public class RandomLevelGenerator {
      * Removes all dead ends from the level.
      */
     public void removeDeadEnds() {
-        boolean done = false;
 
-        while (!done) {
-            done = true;
+        boolean deadEndFound = true;
+        while (deadEndFound) {
+            deadEndFound = false;
             for (int x = 0; x < levelWidth; x++) {
                 for (int y = 0; y < levelHeight; y++) {
                     if (getTile(x, y).getType() == WALL)
                         continue;
 
                     int exits = 0;
-                    for (Vector2 c : CARDINALS) {
+                    for (Vector2 c : CARDINAL_DIRS) {
                         if (getTile(new Vector2(x, y).add(c)).getType() != WALL)
                             exits++;
                     }
 
-                    if (exits != 1)
-                        continue;
-
-                    done = false;
-
-                    setLevelData(new Vector2(x, y), WALL);
-
+                    /**
+                     * If there exist less than 2 exits, we found a dead end.
+                     * The dead end is converted into a wall.
+                     */
+                    if (exits < 2) {
+                        deadEndFound = true;
+                        setLevelData(new Vector2(x, y), WALL);
+                    }
 
                 }
             }
-
-
         }
-
-
     }
 
     /**
@@ -714,6 +720,133 @@ public class RandomLevelGenerator {
             Gdx.app.log("PATH", t.getPosition().toString());
 
         return path;
+    }
+
+
+    private void calculateBitMasks() {
+
+        /**
+         * Setting all tiles with no floor neighbours to void tiles.
+         */
+        for (int x = 0; x < levelWidth; x++) {
+            for (int y = 0; y < levelHeight; y++) {
+
+                int floorNeighbours = 0;
+
+                for (Vector2 c : CARDINALS_AND_INTERMEDIATES) {
+                    if (checkBounds(new Vector2(x, y).add(c))) {
+                        if (getTile(new Vector2(x, y).add(c)).getType() == FLOOR) {
+                            floorNeighbours++;
+                        }
+                    }
+                }
+
+                if (floorNeighbours == 0) {
+                    getTile(x, y).tileIndex = VOID;
+                }
+
+
+            }
+        }
+
+        for(int x = 0; x < levelWidth; x++) {
+            for(int y = 0; y < levelHeight; y++) {
+
+                if(getTile(x,y).getType() == FLOOR || getTile(x,y).tileIndex == VOID)
+                    continue;
+
+
+                if(isFloor(N_DIR,x,y)) {
+                   if(isFloor(NW_DIR,x,y) && isFloor(W_DIR,x,y)) {
+                       getTile(x,y).tileIndex = SOUTH_EAST_INNER; // 5
+                   }
+
+                    else if(isFloor(NE_DIR,x,y) && isFloor(E_DIR,x,y)) {
+                        getTile(x,y).tileIndex = SOUTH_WEST_INNER; // 6
+                    }
+
+                    else
+                        getTile(x,y).tileIndex = SOUTH_WALL; // 3
+
+                }
+
+
+                else if(isFloor(E_DIR,x,y)) {
+                     if(isFloor(N_DIR,x,y) && isFloor(NE_DIR,x,y)) {
+                         getTile(x,y).tileIndex = SOUTH_WEST_INNER; // 6
+                     }
+                    else if(isFloor(S_DIR,x,y) && isFloor(SE_DIR,x,y)) {
+                         getTile(x,y).tileIndex = NORTH_EAST_INNER; // 7
+                     }
+
+                    else {
+                         getTile(x,y).tileIndex = WEST_WALL; // 4
+                     }
+
+
+                }
+
+
+                else if(isFloor(S_DIR,x,y)) {
+                    if(isFloor(E_DIR,x,y) && isFloor(SE_DIR,x,y)) {
+                        getTile(x,y).tileIndex = NORTH_EAST_INNER; // 7
+                    }
+                    else if(isFloor(W_DIR,x,y) && isFloor(SW_DIR,x,y)) {
+                        getTile(x,y).tileIndex = NORTH_WEST_INNER; // 8
+                    }
+                    else {
+                        getTile(x,y).tileIndex = NORTH_WALL; // 1
+                    }
+
+
+                }
+
+
+                else if(isFloor(W_DIR,x,y)) {
+                    if(isFloor(S_DIR,x,y) && isFloor(SW_DIR,x,y)) {
+                        getTile(x,y).tileIndex = NORTH_WEST_INNER; // 8
+                    }
+                    else if(isFloor(N_DIR,x,y) && isFloor(NW_DIR,x,y)) {
+                        getTile(x,y).tileIndex = SOUTH_EAST_INNER; // 5
+                    }
+                    else {
+                        getTile(x,y).tileIndex =EAST_WALL;
+                    }
+                }
+
+                else if(isFloor(SE_DIR,x,y)) {
+                    getTile(x,y).tileIndex = SOUTH_EAST_OUTER;
+                }
+
+                else if(isFloor(SW_DIR,x,y)) {
+                    getTile(x,y).tileIndex = SOUTH_WEST_OUTER;
+                }
+
+                else if(isFloor(NW_DIR,x,y)) {
+                    getTile(x,y).tileIndex = NORTH_WEST_OUTER;
+                }
+
+                else if(isFloor(NE_DIR,x,y)) {
+                    getTile(x,y).tileIndex = NORTH_EAST_OUTER;
+                }
+
+
+            }
+
+        }
+
+
+    }
+
+    /**
+     * Checks whether an adjacent tile is a floor tile.
+     * @param direction direction in which the check is performed
+     * @param x x position
+     * @param y y position
+     * @return
+     */
+    private boolean isFloor(Vector2 direction, int x, int y) {
+        return getTile(new Vector2(x,y).add(direction)).getType() == FLOOR;
     }
 
     private void placePlayer() {
@@ -842,10 +975,9 @@ public class RandomLevelGenerator {
 
         ArrayList<Vector2> neighbourDirections = new ArrayList<>();
         // Checking all 4 cardinal directions
-        for (Vector2 dir : CARDINALS) {
+        for (Vector2 dir : CARDINAL_DIRS) {
             // add the direction to the tiles position to get to the neighbour tile.
-            Vector2 neighbourAddress = position;
-            if (canBeCarved(neighbourAddress, dir)) {
+            if (canBeCarved(position, dir)) {
                 // If there exists a adjacent tile, add the direction in which it lies to the array.
                 neighbourDirections.add(dir);
             }
@@ -856,8 +988,8 @@ public class RandomLevelGenerator {
     /**
      * Checks whether the given coordinates x and y are inside the bounds of the level.
      *
-     * @param x
-     * @param y
+     * @param x x position
+     * @param y y position
      * @return true if inside the bounds, false otherwise.
      */
     public boolean checkBounds(float x, float y) {
@@ -871,7 +1003,8 @@ public class RandomLevelGenerator {
 
     /**
      * Decides whether a corridor can be carved in the given direction
-     * @param position position
+     *
+     * @param position  position
      * @param direction direction
      * @return
      */

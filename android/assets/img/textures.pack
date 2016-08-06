@@ -5,392 +5,420 @@ filter: Nearest,Nearest
 repeat: none
 background-01
   rotate: false
-  xy: 1, 543
+  xy: 0, 542
   size: 800, 480
   orig: 800, 480
   offset: 0, 0
   index: -1
 farclouds-01
   rotate: false
-  xy: 1, 61
+  xy: 0, 60
   size: 800, 480
   orig: 800, 480
   offset: 0, 0
   index: -1
 brown-01-121
   rotate: false
-  xy: 803, 991
+  xy: 802, 990
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 brown-01
   rotate: false
-  xy: 1, 27
+  xy: 0, 26
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 grass-01
   rotate: false
-  xy: 1, 1
+  xy: 0, 0
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 brown-02
   rotate: false
-  xy: 803, 957
+  xy: 802, 956
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 brown-02232
   rotate: false
-  xy: 837, 991
+  xy: 836, 990
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-fiveseven
+crosshair
   rotate: false
-  xy: 35, 27
+  xy: 34, 26
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
-  index: 1
+  index: -1
 grass-01l
   rotate: false
-  xy: 27, 1
+  xy: 26, 0
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 fiveseven_shadow
   rotate: false
-  xy: 803, 923
+  xy: 802, 922
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 link_shadow
   rotate: false
-  xy: 803, 923
+  xy: 802, 922
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 wood_chest_shadow
   rotate: false
-  xy: 803, 923
+  xy: 802, 922
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
+floor
+  rotate: false
+  xy: 836, 956
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 0
 grass-01r
   rotate: false
-  xy: 53, 1
+  xy: 52, 0
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 grey-01
   rotate: false
-  xy: 69, 27
+  xy: 68, 26
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 grass-02
   rotate: false
-  xy: 79, 1
+  xy: 78, 0
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 ice-01
   rotate: false
-  xy: 103, 27
+  xy: 102, 26
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 mushroomRed
   rotate: false
-  xy: 105, 1
+  xy: 104, 0
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 link
   rotate: false
-  xy: 837, 957
+  xy: 870, 990
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 1
 link
   rotate: false
-  xy: 871, 991
+  xy: 802, 888
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 2
 link
   rotate: false
-  xy: 803, 889
+  xy: 836, 922
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 3
 link
   rotate: false
-  xy: 137, 27
+  xy: 136, 26
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 4
 sign-01
   rotate: false
-  xy: 131, 1
+  xy: 130, 0
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 link
   rotate: false
-  xy: 837, 923
+  xy: 870, 956
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 5
 link
   rotate: false
-  xy: 871, 957
+  xy: 904, 990
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 6
 link
   rotate: false
-  xy: 905, 991
+  xy: 802, 854
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 7
 link
   rotate: false
-  xy: 803, 855
+  xy: 836, 888
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 8
 link
   rotate: false
-  xy: 171, 27
+  xy: 170, 26
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 9
 snow-01
   rotate: false
-  xy: 157, 1
+  xy: 156, 0
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 link
   rotate: false
-  xy: 837, 889
+  xy: 870, 922
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 10
 link
   rotate: false
-  xy: 871, 923
+  xy: 904, 956
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 11
 player
   rotate: false
-  xy: 905, 957
+  xy: 938, 990
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 1
 player
   rotate: false
-  xy: 939, 991
+  xy: 802, 820
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 2
 player
   rotate: false
-  xy: 803, 821
+  xy: 836, 854
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 3
 player
   rotate: false
-  xy: 205, 27
+  xy: 204, 26
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 4
 player
   rotate: false
-  xy: 837, 855
+  xy: 870, 888
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 5
 player
   rotate: false
-  xy: 871, 889
+  xy: 904, 922
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: 6
 player_jump
   rotate: false
-  xy: 905, 923
+  xy: 938, 956
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 shadow-01
   rotate: false
-  xy: 939, 957
+  xy: 972, 990
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 tile
   rotate: false
-  xy: 973, 991
+  xy: 802, 786
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-wall_bl
+wall
   rotate: false
-  xy: 803, 787
+  xy: 836, 820
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
-  index: -1
-wall_bm
+  index: 0
+wall
   rotate: false
-  xy: 239, 27
+  xy: 238, 26
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
-  index: -1
-wall_um
+  index: 1
+wall
   rotate: false
-  xy: 239, 27
+  xy: 870, 854
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
-  index: -1
-wall_br
+  index: 2
+wall
   rotate: false
-  xy: 837, 821
+  xy: 904, 888
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
-  index: -1
-wall_cbl
+  index: 3
+wall
   rotate: false
-  xy: 871, 855
+  xy: 938, 922
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
-  index: -1
-wall_cbr
+  index: 4
+wall
   rotate: false
-  xy: 905, 889
+  xy: 972, 956
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
-  index: -1
-wall_cul
+  index: 5
+wall
   rotate: false
-  xy: 939, 923
+  xy: 802, 752
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
-  index: -1
-wall_cur
+  index: 6
+wall
   rotate: false
-  xy: 973, 957
+  xy: 836, 786
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
-  index: -1
-wall_l
+  index: 7
+wall
   rotate: false
-  xy: 803, 753
+  xy: 272, 26
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
-  index: -1
-wall_m
+  index: 8
+wall
   rotate: false
-  xy: 273, 27
+  xy: 870, 820
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
-  index: -1
-wall_r
+  index: 9
+wall
   rotate: false
-  xy: 837, 787
+  xy: 904, 854
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
-  index: -1
-wall_ul
+  index: 10
+wall
   rotate: false
-  xy: 871, 821
+  xy: 938, 888
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
-  index: -1
-wall_ur
+  index: 11
+wall
   rotate: false
-  xy: 905, 855
+  xy: 972, 922
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 12
+wall
+  rotate: false
+  xy: 802, 718
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 13
+wood_chest_old
+  rotate: false
+  xy: 836, 752
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 wood_chest
   rotate: false
-  xy: 939, 889
-  size: 32, 32
-  orig: 32, 32
+  xy: 182, 0
+  size: 18, 24
+  orig: 18, 24
+  offset: 0, 0
+  index: 1
+fiveseven
+  rotate: false
+  xy: 1006, 1006
+  size: 16, 16
+  orig: 16, 16
   offset: 0, 0
   index: 1
 flower-01
   rotate: false
-  xy: 183, 13
+  xy: 306, 46
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 projectile
   rotate: false
-  xy: 1007, 1015
+  xy: 870, 810
   size: 12, 8
   orig: 12, 8
   offset: 0, 0
   index: 1
 projectile_shadow
   rotate: false
-  xy: 973, 947
+  xy: 904, 844
   size: 12, 8
   orig: 12, 8
   offset: 0, 0
@@ -402,14 +430,14 @@ filter: Nearest,Nearest
 repeat: none
 nearclouds-01
   rotate: false
-  xy: 1, 483
+  xy: 0, 482
   size: 800, 480
   orig: 800, 480
   offset: 0, 0
   index: -1
 sky-04
   rotate: false
-  xy: 1, 1
+  xy: 0, 0
   size: 800, 480
   orig: 800, 480
   offset: 0, 0
@@ -421,7 +449,7 @@ filter: Nearest,Nearest
 repeat: none
 sun-01
   rotate: false
-  xy: 1, 1
+  xy: 0, 0
   size: 800, 480
   orig: 800, 480
   offset: 0, 0
