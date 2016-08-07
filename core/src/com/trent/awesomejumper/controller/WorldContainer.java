@@ -5,10 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.controller.levelgeneration.RandomLevelGenerator;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
-import com.trent.awesomejumper.models.Level;
 import com.trent.awesomejumper.models.Player;
-import com.trent.awesomejumper.models.testing.Chest;
-import com.trent.awesomejumper.models.weapons.Pistol;
 import com.trent.awesomejumper.tiles.Tile;
 
 import static com.trent.awesomejumper.utils.Utilities.sub;
@@ -39,17 +36,13 @@ public class WorldContainer {
     private HashSet<Entity> weaponDrops = new HashSet<>();
 
     private Player player;
-    private Chest chest;
-    private Pistol pistol, pistol2;
-    private Level level;
     //TODO Change these to HashSet
     private ArrayList tilesToBeDrawn = new ArrayList();
     private ArrayList entitiesToBeDrawn = new ArrayList<>();
     private ArrayList<Tile> collisionTiles = new ArrayList<>();
 
-    // TESTING
 
-    private com.trent.awesomejumper.controller.levelgeneration.RandomLevelGenerator randomLevelGenerator;
+    private RandomLevelGenerator randomLevelGenerator;
 
 
     // CONSTRUCTOR
@@ -62,13 +55,6 @@ public class WorldContainer {
         entitiesToBeDrawn = new ArrayList<>();
         projectiles = new HashSet<>();
 
-
-       /* player = new Player(new Vector2(12.5f, 7f));
-        chest = new Chest(new Vector2(5,5));
-        pistol = new Pistol(new Vector2(6f,7f));
-        pistol2 = new Pistol(new Vector2(5f, 6f));
-        level = new Level();*/
-
         randomLevelGenerator = new RandomLevelGenerator();
         randomLevelGenerator.init();
         randomLevelGenerator.load();
@@ -80,17 +66,10 @@ public class WorldContainer {
         }
 
         player = randomLevelGenerator.getPlayer();
-
         registerEntity(player);
-        /*
-        registerEntity(chest);
-        registerEntity(pistol);
-        registerEntity(pistol2);*/
+
+
     }
-
-
-
-
 
 
     // ---------------------------------------------------------------------------------------------

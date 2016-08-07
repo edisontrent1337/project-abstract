@@ -60,19 +60,16 @@ public class RenderingEngine {
     static TextureAtlas allTextures;
 
     // TEXTURES: TILES
-    private TextureRegion brownNormal, greyNormal, brownShadow, iceNormal;
     private Array<TextureAtlas.AtlasRegion> wallTextures;
     private Array<TextureAtlas.AtlasRegion> floorTextures;
 
-    // TEXTURES: ENVIRONMENT
-    private TextureRegion grass01, grass01l, grass01r, grass02, snow01;
 
     // TEXTURES: SKY
     private TextureRegion background01, farSkyTexture, nearSkyTexture, sunTexture;
 
 
     // FONTS
-    private BitmapFont consoleFont, uiFont, messageFont;
+    private BitmapFont consoleFont, messageFont;
 
     // DEBUG & STRINGS
 
@@ -115,12 +112,14 @@ public class RenderingEngine {
             debugStrings.add(new String(""));
         }
 
+        /**
+         * TODO: Implement Game states and different screens and let the states handle the
+         * cursor.
+         */
         Pixmap mouse = new Pixmap(Gdx.files.internal("img/crosshair.png"));
         Gdx.input.setCursorImage(mouse,15,15);
 
         /** CAMERA SETUP: MAIN VIEW
-         * ZOOM = 16.66667 , other options: initialize camera with parameters
-         * 16,9 and leave zoom at 1.
          */
         cam = new OrthographicCamera(CAMERA_WIDTH, CAMERA_HEIGHT);
         cam.zoom = ZOOM;
@@ -177,18 +176,10 @@ public class RenderingEngine {
             initGraphics(e);
         }
 
+        // TILE TEXTURES
         wallTextures = allTextures.findRegions("wall");
         floorTextures = allTextures.findRegions("floor");
-        // TILE TEXTURES
-        brownNormal = allTextures.findRegion("floor");
-        brownShadow = allTextures.findRegion("brown-02");
-        greyNormal = allTextures.findRegion("grey-01");
-        iceNormal = allTextures.findRegion("ice-01");
-        grass02 = allTextures.findRegion("grass-02");
-        grass01 = allTextures.findRegion("grass-01");
-        grass01r = allTextures.findRegion("grass-01r");
-        grass01l = allTextures.findRegion("grass-01l");
-        snow01 = allTextures.findRegion("snow-01");
+
 
         // SKY TEXTURES
         background01 = allTextures.findRegion("background-01");
@@ -318,7 +309,7 @@ public class RenderingEngine {
     /**
      * Draws popups from game events (Picking up items/weapons, dealing damage, healing)
      */
-    public void drawPopUps() {
+    private void drawPopUps() {
         popUpManager.render(sb, messageFont);
     }
 
@@ -338,18 +329,9 @@ public class RenderingEngine {
                         wall = wallTextures.get(newTile.tileIndex);
                         sb.draw(wall, position.x, position.y, Tile.SIZE, Tile.SIZE);
                         break;
-                    case STONE:
-                        sb.draw(greyNormal, position.x, position.y, Tile.SIZE, Tile.SIZE);
-                        break;
                     case FLOOR:
                         floor = floorTextures.get(0);
                         sb.draw(floor, position.x, position.y, Tile.SIZE, Tile.SIZE);
-                        break;
-                    case ICE:
-                        sb.draw(iceNormal, position.x, position.y, Tile.SIZE, Tile.SIZE);
-                        break;
-                    case TRAMPOLINE:
-                        sb.draw(iceNormal, position.x, position.y, Tile.SIZE, Tile.SIZE);
                         break;
                     default:
                         break;

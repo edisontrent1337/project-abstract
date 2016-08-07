@@ -1,10 +1,9 @@
 package com.trent.awesomejumper.controller;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.popups.Message;
 
 import java.util.HashMap;
@@ -124,7 +123,11 @@ public class PopUpManager {
                 /**
                  * Draw message to screen. Always reset the scaling after rendering.
                  */
-                font.draw(spriteBatch, message.getMessage(), message.getPosition().x + xOffset, message.getPosition().y + yOffset);
+
+                GlyphLayout glyphLayout = new GlyphLayout();
+                glyphLayout.setText(font,message.getMessage());
+                float messageWidth = glyphLayout.width;
+                font.draw(spriteBatch, glyphLayout, message.getPosition().x + xOffset - messageWidth/2, message.getPosition().y + yOffset);
                 font.getData().setScale(1f/RenderingEngine.ppuX, 1f/RenderingEngine.ppuY);
 
             }

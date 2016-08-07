@@ -5,15 +5,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.trent.awesomejumper.engine.entity.Entity;
-import com.trent.awesomejumper.engine.modelcomponents.popups.PopUpFeed;
 import com.trent.awesomejumper.exceptions.InvalidWeaponSlotException;
-import com.trent.awesomejumper.models.Level;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
 import com.trent.awesomejumper.models.testing.Projectile;
 import com.trent.awesomejumper.utils.Interval;
 import com.trent.awesomejumper.tiles.Tile;
-import com.trent.awesomejumper.engine.modelcomponents.popups.Message;
 
 import static com.trent.awesomejumper.utils.Utilities.*;
 import static com.trent.awesomejumper.utils.PhysicalConstants.*;
@@ -226,13 +223,12 @@ public class CollisionController {
             Vector2 otherFrameVelo = other.getVelocity().cpy().scl(delta);
 
             /**
+             * TODO: implement better way of pickup collision
              * Weapon/pickup collision detection
              */
             if (entity.equals(player)) {
                 switch (other.getType()) {
                     case DROPPED_WEAPON_ENTITY:
-                        /*if((WorldController.worldTime - other.registerTime) < 2.00f)
-                            break;*/
                         if (checkCollision(entityBox, otherBox)) {
                             try {
                                 if (player.getWeaponInventory().equipWeapon(other, 1)) {

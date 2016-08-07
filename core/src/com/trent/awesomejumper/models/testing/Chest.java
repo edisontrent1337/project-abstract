@@ -15,6 +15,8 @@ import com.trent.awesomejumper.engine.physics.CollisionBox;
 public class Chest extends Entity {
 
 
+    private final int SPRITE_SIZE = 24;
+
     private final float WIDTH = 0.3725f;               //  24 pixel
     private final float HEIGHT = 0.21875f;            //  19 Pixel - 5 Pixel "behind space
     private final float MASS = 0.4f;

@@ -99,4 +99,6 @@ public class EntityManager {
         renderingEngine.setPlayer(worldContainer.getPlayer());
     }
 
+
+
 }

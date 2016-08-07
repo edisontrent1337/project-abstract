@@ -77,24 +77,7 @@ public class Room {
         closestNeighbour = this;
     }
 
-    public Room() {
-        this.xPos = 0;
-        this.yPos = 0;
-        this.width = 0;
-        this.height = 0;
 
-        this.xDimensions = new Interval(xPos, xPos + width);
-        this.yDimensions = new Interval(yPos, yPos + height);
-
-        this.xDimensionsAndDistance = new Interval(xDimensions.min - MIN_ROOM_DISTANCE, xDimensions.max + MIN_ROOM_DISTANCE);
-        this.yDimensionsAndDistance = new Interval(yDimensions.min - MIN_ROOM_DISTANCE, yDimensions.max + MIN_ROOM_DISTANCE);
-        this.ID = idCounter.getAndIncrement();
-
-        this.center = new Vector2(xPos + width / 2, yPos + height / 2);
-        initDoorData();
-        closestNeighbour = this;
-
-    }
 
     // METHODS & FUNCTIONS
     // ---------------------------------------------------------------------------------------------

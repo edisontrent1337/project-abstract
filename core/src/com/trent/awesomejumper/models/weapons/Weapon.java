@@ -26,6 +26,7 @@ public class Weapon extends Entity {
         /**
          * Resets the owner of this weapon after 1.5 seconds of being unequipped so it can
          * be grabbed and equipped again.
+         * TODO: implement weapon pickup with the press of a button
          */
         if(time - registerTime > EQUIP_TIMEOUT && !equipped) {
             setOwner(this);

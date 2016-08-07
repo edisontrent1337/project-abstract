@@ -36,8 +36,6 @@ public class Graphics extends ModelComponent{
 
     private float width, height, alpha, originX, originY;
     private boolean supportsRotation = false, supportsShadowRotation = true;
-    boolean flipX = false;
-    boolean flipped = false;
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
