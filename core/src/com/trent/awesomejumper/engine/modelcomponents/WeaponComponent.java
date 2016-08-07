@@ -50,7 +50,6 @@ public class WeaponComponent extends ModelComponent {
 
         if (currentClip != 0) {
 
-            //TODO implement camera shaking when shooting
 
             currentClip--;
             Projectile projectile = new Projectile(entity.getBody().getCenter().cpy(), entity.getHeight());

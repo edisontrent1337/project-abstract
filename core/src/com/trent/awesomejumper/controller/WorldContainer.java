@@ -308,7 +308,7 @@ public class WorldContainer {
     public void reset() {
         entities.clear();
         player.destroy();
-        randomLevelGenerator = new com.trent.awesomejumper.controller.levelgeneration.RandomLevelGenerator();
+        randomLevelGenerator = new RandomLevelGenerator();
         randomLevelGenerator.init();
         randomLevelGenerator.load();
         // TODO: insert here: entities = randomLevelGenerator.getEntities()
@@ -343,7 +343,7 @@ public class WorldContainer {
         return projectiles;
     }
 
-    public com.trent.awesomejumper.controller.levelgeneration.RandomLevelGenerator getRandomLevelGenerator() {
+    public RandomLevelGenerator getRandomLevelGenerator() {
         return randomLevelGenerator;
     }
 

@@ -519,9 +519,11 @@ public class CollisionController {
      * @param entityVelocity     positional change of entity per delta time unit
      * @return true, if a collision occurred, false otherwise.
      */
-    // TODO: make projectile collision only exclusive to living entities.
     private boolean projectileCollisionDetection(Projectile projectile, Entity entity, Vector2 projectileVelocity, Vector2 entityVelocity, float delta) {
 
+        // If the other entity can not be hurt, ignore the collision detection.
+        if(!entity.hasHealth)
+            return false;
         CollisionBox entityBounds = entity.getBounds();
         // relative velocity between projectile and entity
         float relativeVelocity = sub(projectileVelocity, entityVelocity).len();

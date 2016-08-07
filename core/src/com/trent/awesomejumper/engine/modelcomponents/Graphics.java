@@ -16,9 +16,7 @@ import static com.trent.awesomejumper.utils.Utilities.dot;
  * Created by Sinthu on 09.12.2015.
  * Graphics component implementation. Holds textures and animations of game entities.
  * Manages current frame to be displayed.
- * TODO: maybe outsource render method to RenderingEngine because component should more ore less
- * only represent data and functions to create or hold data, not to modify it as this is the task of
- * the controllers.
+
  */
 public class Graphics extends ModelComponent{
 

@@ -15,7 +15,6 @@ public class SkyBox extends Entity {
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
 
-    //TODO: BUGGY!
     public SkyBox(Vector2 position, float width, float speed) {
         body = new Body(this, width, width);
         body.setBounds(new CollisionBox(position, 2f * width, 2 * 0.5625f * width));

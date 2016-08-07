@@ -26,8 +26,6 @@ import static com.trent.awesomejumper.tiles.Tile.TileType.*;
 import static com.trent.awesomejumper.controller.levelgeneration.Room.Type.*;
 
 /**
- * //TODO: DOCUMENTATION
- * //TODO: implement chunks that use each a new random object with their position as the seed.
  * Controller responsible for generating random levels.
  * Uses procedural random level generation.
  * Created by Sinthu on 22.07.2016.
@@ -274,7 +272,6 @@ public class RandomLevelGenerator {
             int endX = startX + r.getWidth();
             int startY = r.getyPos();
             int endY = startY + r.getHeight();
-            // TODO: DOCUMENTATION
 
             // bottom left corner
             roomCorners.add(new Vector2(startX - 1, startY));

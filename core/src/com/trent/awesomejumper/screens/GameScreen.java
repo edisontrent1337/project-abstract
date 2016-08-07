@@ -224,11 +224,10 @@ public class GameScreen implements Screen, InputProcessor{
         return false;
     }
 
-    //TODO: Implement scrolling as a way to change height of shots
 
     @Override
     public boolean scrolled(int amount) {
-        renderingEngine.setZoom(amount);
+        //renderingEngine.setZoom(amount);
         return false;
     }
 
