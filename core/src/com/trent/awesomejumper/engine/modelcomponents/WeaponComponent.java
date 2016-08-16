@@ -1,6 +1,5 @@
 package com.trent.awesomejumper.engine.modelcomponents;
 
-import com.trent.awesomejumper.controller.EntityManager;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.models.testing.Projectile;
 
@@ -25,14 +24,14 @@ public class WeaponComponent extends ModelComponent {
     private float timeFired = 0f;
     private float timeReloaded = 0f;
 
-    private String weaponName;
+    private String name;
     private String weaponDesc;
 
     private boolean isEquipped;
 
-    public WeaponComponent(Entity weapon, String weaponName) {
+    public WeaponComponent(Entity weapon, String name) {
         this.entity = weapon;
-        this.weaponName = weaponName;
+        this.name = name;
         entity.hasWeaponComponent = true;
     }
 
@@ -51,8 +50,6 @@ public class WeaponComponent extends ModelComponent {
             return;
 
         if (currentClip != 0) {
-
-
             currentClip--;
             Projectile projectile = new Projectile(entity.getBody().getCenter().cpy(), entity.getHeight());
             projectile.getBody().setVelocity(entity.getBody().getOrientation().cpy().nor().scl(speed));
@@ -101,8 +98,8 @@ public class WeaponComponent extends ModelComponent {
         this.speed = speed;
     }
 
-    public String getWeaponName() {
-        return weaponName;
+    public String getName() {
+        return name;
     }
 
 
@@ -116,7 +113,7 @@ public class WeaponComponent extends ModelComponent {
     }
 
 
-    public String getWeaponStatus() {
+    public String getStatus() {
         String ammoString = Integer.toString(ammo);
         String currentClipString = Integer.toString(currentClip);
         return currentClipString + "/" + ammoString;

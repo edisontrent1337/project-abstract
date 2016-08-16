@@ -15,16 +15,6 @@ public class Weapon extends Entity {
     }
 
 
-    public Weapon(final Weapon weapon) {
-        this.body = weapon.getBody();
-        this.graphics = weapon.getGraphics();
-        this.weaponComponent = weapon.getWeaponComponent();
-        this.type = weapon.getType();
-    }
-
-    public WeaponComponent getWeaponComponent() {
-        return weaponComponent;
-    }
 
     @Override
     public void update(float delta) {
@@ -41,6 +31,20 @@ public class Weapon extends Entity {
 
     }
 
+    // GETTER AND SETTER
+    // ---------------------------------------------------------------------------------------------
+
+    public WeaponComponent getWeaponComponent() {
+        return weaponComponent;
+    }
+
+    public String getStatus() {
+        return  weaponComponent.getStatus();
+    }
+
+    public String getName() {
+        return weaponComponent.getName();
+    }
 
     public void setEquipped(boolean equipped) {
         weaponComponent.setEquipped(equipped);

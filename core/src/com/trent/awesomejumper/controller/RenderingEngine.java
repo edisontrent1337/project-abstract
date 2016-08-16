@@ -158,9 +158,9 @@ public class RenderingEngine {
         consoleFont.setColor(Color.WHITE);
         consoleFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
-        messageFont = new BitmapFont(Gdx.files.internal("fonts/munro_outlined.fnt"), Gdx.files.internal("fonts/munro_outlined_0.png"), false);
+        messageFont = new BitmapFont(Gdx.files.internal("fonts/munro_regular_14.fnt"), Gdx.files.internal("fonts/munro_regular_14_0.png"), false);
         messageFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        messageFont.getData().setScale(1f / ppuX, 1f / ppuY);
+        messageFont.getData().setScale(1f / ppuX, 1 / ppuY);
 
 
         // TEXTURE ATLAS

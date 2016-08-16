@@ -1,6 +1,5 @@
 package com.trent.awesomejumper.engine.entity;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -241,6 +240,16 @@ public class Entity implements EntityInterface {
             graphics.render(spriteBatch);
     }
 
+    public void hide() {
+        if(hasGraphics)
+            graphics.hide();
+
+    }
+
+    public void show() {
+        if(hasGraphics)
+            graphics.show();
+    }
     // HEALTH
     // ---------------------------------------------------------------------------------------------
 
@@ -327,17 +336,5 @@ public class Entity implements EntityInterface {
         return owner;
     }
 
-    public void hide() {
-        if(hasGraphics)
-            graphics.hide();
-
-    }
-
-    public void show() {
-        if(hasGraphics)
-            graphics.show();
-
-
-    }
 
 }

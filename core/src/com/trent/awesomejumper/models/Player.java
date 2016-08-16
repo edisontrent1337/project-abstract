@@ -57,7 +57,7 @@ public class Player extends Entity {
         graphics = new Graphics(this,FRAME_DURATION,SPRITE_PREFIX,SPRITE_WIDTH,SPRITE_HEIGHT);  // enable graphics
         health = new Health(this, startHealth);                                                 // enable health
 
-        weaponInventory = new WeaponInventory(this, 2);
+        weaponInventory = new WeaponInventory(this);
 
 
         body.setBounds(new CollisionBox(position, WIDTH_X, WIDTH_Y));

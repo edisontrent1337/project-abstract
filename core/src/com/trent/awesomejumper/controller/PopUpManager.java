@@ -17,6 +17,7 @@ import java.util.Map;
  * Does not depend on entity or event that creates the popup.
  * Better implementation than the previous popup component as the popup rendering was tied to the
  * existence of the entity.
+ * TODO: GIVE POPUP ITS OWN FONT
  * Created by Sinthu on 30.03.2016.
  */
 public class PopUpManager {

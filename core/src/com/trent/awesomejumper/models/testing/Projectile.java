@@ -83,7 +83,4 @@ public class Projectile extends Entity {
         return (int) (coeff * baseDamage);
     }
 
-    public CollisionBox getProjectileBox() {
-        return projectileBox;
-    }
 }

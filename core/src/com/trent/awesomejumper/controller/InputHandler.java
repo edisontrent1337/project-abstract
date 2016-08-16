@@ -89,7 +89,7 @@ public class InputHandler {
     }
 
     public void fire() {
-       player.getWeaponInventory().fire();
+        player.getWeaponInventory().fire();
     }
 
 
@@ -97,7 +97,6 @@ public class InputHandler {
         player.getWeaponInventory().changeWeapon(direction);
     }
 
-    //TESTING
     public void dropWeapon() {
         player.getWeaponInventory().dropWeapon();
     }
@@ -122,8 +121,8 @@ public class InputHandler {
          *
          */
 
-        mouse.x = camera.position.x - (camera.viewportWidth*camera.zoom)/2f + Gdx.input.getX()/RenderingEngine.ppuX;
-        mouse.y = camera.position.y - (camera.viewportHeight*camera.zoom)/2f + (Gdx.graphics.getHeight() - Gdx.input.getY())/RenderingEngine.ppuY;
+        mouse.x = camera.position.x - (camera.viewportWidth * camera.zoom) / 2f + Gdx.input.getX() / RenderingEngine.ppuX;
+        mouse.y = camera.position.y - (camera.viewportHeight * camera.zoom) / 2f + (Gdx.graphics.getHeight() - Gdx.input.getY()) / RenderingEngine.ppuY;
 
 
         // WALKING UP
