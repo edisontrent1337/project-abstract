@@ -28,6 +28,8 @@ public class WeaponComponent extends ModelComponent {
     private String weaponName;
     private String weaponDesc;
 
+    private boolean isEquipped;
+
     public WeaponComponent(Entity weapon, String weaponName) {
         this.entity = weapon;
         this.weaponName = weaponName;
@@ -102,6 +104,17 @@ public class WeaponComponent extends ModelComponent {
     public String getWeaponName() {
         return weaponName;
     }
+
+
+
+    public void setEquipped(boolean isEquipped) {
+        this.isEquipped = isEquipped;
+    }
+
+    public boolean isEquipped() {
+        return isEquipped;
+    }
+
 
     public String getWeaponStatus() {
         String ammoString = Integer.toString(ammo);

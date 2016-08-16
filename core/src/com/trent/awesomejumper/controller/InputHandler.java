@@ -89,12 +89,17 @@ public class InputHandler {
     }
 
     public void fire() {
-       player.getWeaponInventory().fire(true,true);
+       player.getWeaponInventory().fire();
+    }
+
+
+    public void changeWeapon(int direction) {
+        player.getWeaponInventory().changeWeapon(direction);
     }
 
     //TESTING
-    public void dropWeapon(int slot) {
-        player.getWeaponInventory().dropWeapon(slot);
+    public void dropWeapon() {
+        player.getWeaponInventory().dropWeapon();
     }
 
 

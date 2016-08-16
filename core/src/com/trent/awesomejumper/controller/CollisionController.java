@@ -9,6 +9,7 @@ import com.trent.awesomejumper.exceptions.InvalidWeaponSlotException;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
 import com.trent.awesomejumper.models.testing.Projectile;
+import com.trent.awesomejumper.models.weapons.Weapon;
 import com.trent.awesomejumper.utils.Interval;
 import com.trent.awesomejumper.tiles.Tile;
 
@@ -230,14 +231,9 @@ public class CollisionController {
                 switch (other.getType()) {
                     case DROPPED_WEAPON_ENTITY:
                         if (checkCollision(entityBox, otherBox)) {
-                            try {
-                                if (player.getWeaponInventory().equipWeapon(other, 1)) {
-                                    worldContainer.getWeaponDrops().remove(other);
-                                }
-
-                            } catch (InvalidWeaponSlotException e) {
-                                Gdx.app.log("ERROR", "There was an error while trying to equip the following weapon:" + other.getClass().toString());
-                            }
+                            player.getWeaponInventory().equipWeapon((Weapon) other);
+                            worldContainer.getWeaponDrops().remove(other);
+                            continue;
                         }
                         break;
 
@@ -251,7 +247,7 @@ public class CollisionController {
              * If the other participant is a projectile, a special routine is called to resolve
              * entity / projectile collision
              */
-            if (other.getClass() == Projectile.class) {
+            else if (other.getClass() == Projectile.class) {
                 if (projectileCollisionDetection((Projectile) other, entity, otherFrameVelo, entityFrameVelo, delta)) {
                     continue;
                 }
@@ -295,6 +291,7 @@ public class CollisionController {
                  */
                 if (!entity.getBody().isCollidedWithWorld()) {
                     entity.getBody().addImpulse(impulseEntity.cpy().scl(otherMass / massSum));
+                    Gdx.app.log("TRIGGERED", "ENTITY");
                 }
 
                 /**
@@ -304,6 +301,7 @@ public class CollisionController {
                  */
 
                 if (!other.getBody().isCollidedWithWorld()) {
+                    Gdx.app.log("TRIGGERED", "OTHER");
                     other.getPosition().add(resolutionVector.cpy().scl(-1f));
                     other.getBody().addImpulse(impulseOther.cpy().scl(-entityMass / massSum));
                 }
@@ -522,7 +520,7 @@ public class CollisionController {
     private boolean projectileCollisionDetection(Projectile projectile, Entity entity, Vector2 projectileVelocity, Vector2 entityVelocity, float delta) {
 
         // If the other entity can not be hurt, ignore the collision detection.
-        if(!entity.hasHealth)
+        if (!entity.hasHealth)
             return false;
         CollisionBox entityBounds = entity.getBounds();
         // relative velocity between projectile and entity

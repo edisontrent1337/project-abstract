@@ -114,8 +114,6 @@ public class Player extends Entity {
 
 
 
-
-
     @Override
     public void update(float delta) {
         playerDelta = delta;

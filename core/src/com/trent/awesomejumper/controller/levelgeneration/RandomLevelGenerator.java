@@ -40,7 +40,8 @@ public class RandomLevelGenerator {
     private int levelWidth;
     private int levelHeight;
 
-    private HashSet<Entity> entities;
+    //private HashSet<Entity> entities;
+    private HashMap<Integer,Entity> entities;
     //TODO: use a map to implement functions like getRoomById()....
     //TODO: insert smaller walls inside rooms to make them more random
     private HashMap<Long, Room> roomMap;
@@ -126,7 +127,8 @@ public class RandomLevelGenerator {
         this.levelData = new Tile[levelWidth][levelHeight];
         this.regions = new int[levelWidth][levelHeight];
         this.rooms = new ArrayList<>();
-        this.entities = new HashSet<>();
+        //this.entities = new HashSet<>();
+        this.entities = new HashMap<>();
 
     }
 
@@ -312,9 +314,19 @@ public class RandomLevelGenerator {
             totalRegions++;
 
             Pistol p = new Pistol(r.getCenter());
+            Pistol q = new Pistol(r.getCenter().add(1,1));
+            Pistol s = new Pistol(r.getCenter().add(1,2));
+            Pistol t = new Pistol(r.getCenter().add(2,1));
             Chest c = new Chest(r.getCenter().cpy().add(1,1));
-            entities.add(p);
-            entities.add(c);
+
+            /*entities.add(p);
+            entities.add(c);*/
+
+            entities.put(p.getID(),p);
+            entities.put(q.getID(),q);
+            entities.put(s.getID(),s);
+            entities.put(t.getID(),t);
+            entities.put(c.getID(),c);
 
         }
     }
@@ -1126,7 +1138,8 @@ public class RandomLevelGenerator {
         return levelData[(int) position.x][(int) position.y];
     }
 
-    public HashSet<Entity> getEntities() {
+    //public HashSet<Entity> getEntities() {
+    public HashMap<Integer,Entity> getEntities() {
         return entities;
     }
 

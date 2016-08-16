@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.weapons.Weapon;
@@ -22,13 +23,14 @@ public class HUDRenderer {
     private final int WEAPON_OFFSET_Y = 100;
     private final int SHADOW_OFFSET = 4;
 
+    private static final int XY_PADDING = 100;
+
     private OrthographicCamera hudCam;
     private SpriteBatch hudBatch;
     private BitmapFont hudFont;
     private Player player;
 
-    private Weapon primaryWeapon;
-    private Weapon secondaryWeapon;
+    private Weapon selectedWeapon;
 
     public HUDRenderer(Player player) {
         this.hudCam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -55,35 +57,34 @@ public class HUDRenderer {
     public void render() {
 
         hudCam.update();
-        primaryWeapon = player.getWeaponInventory().getWeaponPrimary();
-        secondaryWeapon = player.getWeaponInventory().getWeaponSecondary();
 
         hudBatch.setProjectionMatrix(hudCam.combined);
         hudBatch.begin();
 
+        /**
+         * Render weapon information
+         *
+         */
+        /*GlyphLayout weapon = new GlyphLayout();
+        GlyphLayout ammo = new GlyphLayout();
+        ammo.setText(hudFont, selectedWeapon.getWeaponComponent().getWeaponStatus());
+        weapon.setText(hudFont, selectedWeapon.getWeaponComponent().getWeaponName());
 
-        if(!player.getWeaponInventory().isPrimaryEquipped()) {
+        if(!player.getWeaponInventory().isWeaponInHand()) {
             drawFontWithShadow(NO_WEAPON, Gdx.graphics.getWidth() - WEAPON_OFFSET_X, WEAPON_OFFSET_Y);
         }
 
         else {
-            drawFontWithShadow(primaryWeapon.getWeaponComponent().getWeaponName(), Gdx.graphics.getWidth() - WEAPON_OFFSET_X, WEAPON_OFFSET_Y);
-            drawFontWithShadow(primaryWeapon.getWeaponComponent().getWeaponStatus(), Gdx.graphics.getWidth() - WEAPON_OFFSET_X / 2, WEAPON_OFFSET_Y);
-
-        }
-
-       /* if(!player.getWeaponInventory().isSecondaryEquipped()) {
-            hudFont.draw(hudBatch, "NO WEAPON",Gdx.graphics.getWidth() - 200,75);
-        }
-
-        else {
-            hudFont.draw(hudBatch, secondaryWeapon.getWeaponComponent().getWeaponName(), Gdx.graphics.getWidth() - 200, 25);
-            hudFont.draw(hudBatch, secondaryWeapon.getWeaponComponent().getWeaponStatus(), Gdx.graphics.getWidth() - 100, 25);
+            drawFontWithShadow(selectedWeapon.getWeaponComponent().getWeaponName(), Gdx.graphics.getWidth() - WEAPON_OFFSET_X, WEAPON_OFFSET_Y);
+            drawFontWithShadow(selectedWeapon.getWeaponComponent().getWeaponStatus(), Gdx.graphics.getWidth() - WEAPON_OFFSET_X / 2, WEAPON_OFFSET_Y);
 
         }*/
 
 
+
+
         hudFont.draw(hudBatch,player.getHealth().toString(), 100,Gdx.graphics.getHeight() - 50);
+
 
         hudBatch.end();
 
@@ -102,5 +103,9 @@ public class HUDRenderer {
         hudFont.setColor(Color.WHITE);
         hudFont.draw(hudBatch,text,x,y);
     }
+
+
+
+
 
 }

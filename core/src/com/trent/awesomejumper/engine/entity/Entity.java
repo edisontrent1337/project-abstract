@@ -327,4 +327,17 @@ public class Entity implements EntityInterface {
         return owner;
     }
 
+    public void hide() {
+        if(hasGraphics)
+            graphics.hide();
+
+    }
+
+    public void show() {
+        if(hasGraphics)
+            graphics.show();
+
+
+    }
+
 }

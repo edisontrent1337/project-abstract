@@ -8,11 +8,18 @@ import com.trent.awesomejumper.engine.modelcomponents.WeaponComponent;
  */
 public class Weapon extends Entity {
 
-    private final float EQUIP_TIMEOUT = 1.50f;
-    private boolean equipped = false;
+    protected static final float EQUIP_TIMEOUT = 1.5f;
 
     public Weapon() {
 
+    }
+
+
+    public Weapon(final Weapon weapon) {
+        this.body = weapon.getBody();
+        this.graphics = weapon.getGraphics();
+        this.weaponComponent = weapon.getWeaponComponent();
+        this.type = weapon.getType();
     }
 
     public WeaponComponent getWeaponComponent() {
@@ -28,7 +35,7 @@ public class Weapon extends Entity {
          * be grabbed and equipped again.
          * TODO: implement weapon pickup with the press of a button
          */
-        if(time - registerTime > EQUIP_TIMEOUT && !equipped) {
+        if(time - registerTime > EQUIP_TIMEOUT && !weaponComponent.isEquipped()) {
             setOwner(this);
         }
 
@@ -36,7 +43,10 @@ public class Weapon extends Entity {
 
 
     public void setEquipped(boolean equipped) {
-        this.equipped = equipped;
+        weaponComponent.setEquipped(equipped);
+    }
+    public boolean isEquipped() {
+        return weaponComponent.isEquipped();
     }
 
 

@@ -34,6 +34,7 @@ public class Graphics extends ModelComponent{
 
     private float width, height, alpha, originX, originY;
     private boolean supportsRotation = false, supportsShadowRotation = true;
+    private boolean visible = false;
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
@@ -54,10 +55,11 @@ public class Graphics extends ModelComponent{
         this.originX = width / 2f;
         this.originY = height / 2f;
 
-        FRAME_DURATION = frameDuration;
+        this.FRAME_DURATION = frameDuration;
         alpha = 1f;
         // Enable graphics component
         entity.hasGraphics = true;
+        visible = true;
     }
 
 
@@ -100,6 +102,10 @@ public class Graphics extends ModelComponent{
      * @param sb sprite batch used to draw textures.
      */
     public void render(SpriteBatch sb) {
+        // If the sprite is set invisible, it will not be rendered.
+        if(!visible)
+            return;
+
         switch (entity.getState()) {
             case IDLE: currentFrame = entity.facingL ? idleFrameL : idleFrameR;
                 break;
@@ -196,6 +202,14 @@ public class Graphics extends ModelComponent{
 
     public void disableShadowRotations() {
         supportsShadowRotation = false;
+    }
+
+    public void show() {
+        visible = true;
+    }
+
+    public void hide() {
+        visible = false;
     }
 
 

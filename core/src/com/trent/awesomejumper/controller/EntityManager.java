@@ -66,6 +66,9 @@ public class EntityManager {
          * Add the entity to different sub collections which are used for specific collision
          * events such as collecting pickups or equipping weapons.
          */
+        if(entity.getType() == null)
+            Gdx.app.log("ERROR", "ENTITY TYPE WAS NULL");
+
         switch (entity.getType()) {
             case PICKUP_ENTITY:
                 worldContainer.getPickups().add(entity);
@@ -97,6 +100,10 @@ public class EntityManager {
         renderingEngine.loadTextures();
         renderingEngine.initGraphics(worldContainer.getPlayer());
         renderingEngine.setPlayer(worldContainer.getPlayer());
+    }
+
+    public Entity getEntityByID(int id) {
+        return worldContainer.getEntityByID(id);
     }
 
 

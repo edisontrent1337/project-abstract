@@ -357,7 +357,7 @@ public class Body extends ModelComponent {
 
     /**
      * Resets the bodies aim reference and rotation.
-     * Also reenables collisiondetection
+     * Also re-enables collision detection
      */
     public void reset() {
         enableCollisionDetection();

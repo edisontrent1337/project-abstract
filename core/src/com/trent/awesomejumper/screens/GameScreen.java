@@ -138,8 +138,7 @@ public class GameScreen implements Screen, InputProcessor{
         }
 
         if(keycode == Keys.Q) {
-            inputHandler.dropWeapon(1);
-            inputHandler.dropWeapon(2);
+            inputHandler.dropWeapon();
         }
 
         if(keycode == Keys.R) {
@@ -228,6 +227,7 @@ public class GameScreen implements Screen, InputProcessor{
     @Override
     public boolean scrolled(int amount) {
         //renderingEngine.setZoom(amount);
+        inputHandler.changeWeapon(amount);
         return false;
     }
 

@@ -24,7 +24,6 @@ import com.trent.awesomejumper.engine.physics.CollisionBox;
 import com.trent.awesomejumper.tiles.Tile;
 
 import static com.trent.awesomejumper.utils.Utilities.formVec;
-import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.*;
 
 /**
  * Created by trent on 12.06.2015.
@@ -423,7 +422,7 @@ public class RenderingEngine {
         debugStrings.set(DE_POSITION, "POS: " + player.getPosition());
         debugStrings.set(DE_POSITION_OFFSET, "PAO: " + player.getBody().getBounds().getPositionAndOffset());
         debugStrings.set(DE_CAMERA_POSITION, "CAM: " + formVec(cam.position.x, cam.position.y));
-        debugStrings.set(DE_ENTITIES, "Entities,Drawn :" + Integer.toString(Entity.entityCount) + " , " + Integer.toString(WorldContainer.nodes));
+        debugStrings.set(DE_ENTITIES, "ENTITIES: " + "INIT :" + Integer.toString(Entity.entityCount) + " ,REG: " +Integer.toString(WorldContainer.registredNodes) + ", DRAW :" +  Integer.toString(WorldContainer.renderNodes));
         debugStrings.set(DE_RESOLUTION, Gdx.graphics.getWidth() + "*" + Gdx.graphics.getHeight() + ", ZOOM: " + zoom + ", FPS :" + Gdx.graphics.getFramesPerSecond());
         debugStrings.set(DE_CURSOR, Double.toString(Math.floor(InputHandler.mouse.x)) + " | " + Double.toString(Math.floor(InputHandler.mouse.y)));
         debugStrings.set(DE_REGION, Integer.toString(worldContainer.getRandomLevelGenerator().getRegion(InputHandler.mouse)));

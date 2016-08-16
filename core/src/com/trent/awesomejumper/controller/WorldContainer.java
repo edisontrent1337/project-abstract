@@ -12,8 +12,10 @@ import static com.trent.awesomejumper.utils.Utilities.sub;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created by Sinthu on 12.06.2015.
@@ -27,9 +29,12 @@ public class WorldContainer {
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
 
-    public static int nodes = 0;
+    public static int renderNodes = 0;
+    public static int registredNodes = 0;
 
-    private HashSet<Entity> entities = new HashSet<>();
+   // private HashSet<Entity> entities = new HashSet<>();
+
+    private HashMap<Integer,Entity> entities;
     private HashSet<Entity> projectiles = new HashSet<>();
     private HashSet<Entity> pickups = new HashSet<>();
     private HashSet<Entity> enemies = new HashSet<>();
@@ -49,7 +54,8 @@ public class WorldContainer {
     // ---------------------------------------------------------------------------------------------
 
     public WorldContainer() {
-        entities = new HashSet<>();
+        entities = new HashMap<>();
+        //entities = new HashSet<>();
         pickups = new HashSet<>();
         weaponDrops = new HashSet<>();
         entitiesToBeDrawn = new ArrayList<>();
@@ -61,7 +67,7 @@ public class WorldContainer {
 
         entities = randomLevelGenerator.getEntities();
 
-        for(Entity e: entities) {
+        for(Entity e: entities.values()) {
             registerEntity(e);
         }
 
@@ -171,7 +177,7 @@ public class WorldContainer {
         if(fovEndY > randomLevelGenerator.getLevelHeight())
             fovEndY = randomLevelGenerator.getLevelHeight();
 
-        for (Entity e : entities) {
+        for (Entity e : entities.values()) {
             if(e.getBody().getPosition().x > fovStartX &&
                     e.getBody().getPosition().x <= fovEndX &&
                     e.getBody().getPosition().y > fovStartY &&
@@ -195,7 +201,8 @@ public class WorldContainer {
             }
         });
         Collections.reverse(entitiesToBeDrawn);
-        nodes = entitiesToBeDrawn.size();
+        renderNodes = entitiesToBeDrawn.size();
+        registredNodes = entities.size();
         return entitiesToBeDrawn;
     }
 
@@ -216,7 +223,7 @@ public class WorldContainer {
 
         HashSet<Entity> entityNeighbourhood = e.getBody().getEntityNeighbourHood();
 
-        for(Entity other: entities) {
+        for(Entity other: entities.values()) {
             if(other.equals(e))
                 continue;
             float dst = sub(e.getPosition(), other.getPosition()).len2(); // distance between entities
@@ -243,10 +250,17 @@ public class WorldContainer {
      */
     public void garbageRemoval() {
 
-        for(Iterator<Entity> it = entities.iterator(); it.hasNext();) {
+        /*for(Iterator<Entity> it = entities.iterator(); it.hasNext();) {
             if(!it.next().isAlive()) {
                 it.remove();
             }
+        }*/
+
+
+        for(Iterator<Map.Entry<Integer,Entity>> it = entities.entrySet().iterator(); it.hasNext();) {
+            Entity e = it.next().getValue();
+            if(!e.isAlive())
+                it.remove();
         }
 
         for(Iterator<Entity> it = entitiesToBeDrawn.iterator(); it.hasNext();) {
@@ -255,7 +269,7 @@ public class WorldContainer {
             }
         }
 
-        for(Entity e: entities) {
+        for(Entity e: entities.values()) {
             for(Iterator<Entity> it = e.getBody().getEntityNeighbourHood().iterator(); it.hasNext();) {
                 if(!it.next().isAlive())
                     it.remove();
@@ -272,7 +286,8 @@ public class WorldContainer {
 
     public void registerEntity(Entity entity) {
 
-        entities.add(entity);
+        entities.put(entity.getID(),entity);
+       // entities.add(entity);
         entity.registerTime = entity.time;
         if(AwesomeJumperMain.onDebugMode()) {
             Gdx.app.log("Registrated entity at", Float.toString(entity.registerTime));
@@ -293,9 +308,7 @@ public class WorldContainer {
      * @return
      */
     public boolean placeEntity(Entity entity, Vector2 position) {
-        Gdx.app.log("Weapon pos before drop", entity.getPosition().toString());
         entity.setPosition(position.cpy());
-        Gdx.app.log("Weapon pos after drop", entity.getPosition().toString());
         //TODO: add here this switch
         /*switch (Entity.Type) {
             case DROPPED_WEAPON_ENTITY:
@@ -328,10 +341,14 @@ public class WorldContainer {
         return collisionTiles;
     }
 
+
     public HashSet<Entity> getEntities() {
-        return entities;
+        return new HashSet<>(entities.values());
     }
 
+    public HashMap<Integer,Entity> getEntityMap() {
+        return entities;
+    }
     public HashSet<Entity> getWeaponDrops() {
         return weaponDrops;
     }
@@ -346,5 +363,14 @@ public class WorldContainer {
     public RandomLevelGenerator getRandomLevelGenerator() {
         return randomLevelGenerator;
     }
+
+    public Entity getEntityByID(int id) {
+        Entity e =entities.get(id);
+        if(e == null) {
+            Gdx.app.log("ERROR", "THE REQUESTED ENTITY WAS NOT FOUND. ENTITY ID: " + Integer.toString(id));
+        }
+        return entities.get(id);
+    }
+
 
 }
