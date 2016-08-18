@@ -1,8 +1,10 @@
-package com.trent.awesomejumper.controller;
+package com.trent.awesomejumper.controller.input;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+import com.trent.awesomejumper.controller.rendering.RenderingEngine;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.models.Player;
 
@@ -40,6 +42,8 @@ public class InputHandler {
     public static Vector2 mouse = new Vector2(0f, 0f);
     private OrthographicCamera camera;
 
+    Vector3 temp;
+
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
 
@@ -49,6 +53,8 @@ public class InputHandler {
         this.camera = camera;
         this.mouse = new Vector2(0f, 0f);
         player.getBody().setAimReference(mouse);
+
+        temp = new Vector3();
     }
 
 
@@ -121,9 +127,14 @@ public class InputHandler {
          *
          */
 
-        mouse.x = camera.position.x - (camera.viewportWidth * camera.zoom) / 2f + Gdx.input.getX() / RenderingEngine.ppuX;
-        mouse.y = camera.position.y - (camera.viewportHeight * camera.zoom) / 2f + (Gdx.graphics.getHeight() - Gdx.input.getY()) / RenderingEngine.ppuY;
+        /*mouse.x = camera.position.x - (camera.viewportWidth * camera.zoom) / 2f + Gdx.input.getX() / RenderingEngine.ppuX;
+        mouse.y = camera.position.y - (camera.viewportHeight * camera.zoom) / 2f + (Gdx.graphics.getHeight() - Gdx.input.getY()) / RenderingEngine.ppuY;*/
 
+        temp.set(Gdx.input.getX(), Gdx.input.getY(),0);
+        camera.unproject(temp);
+
+        mouse.x = temp.x;
+        mouse.y = temp.y;
 
         // WALKING UP
 

@@ -29,6 +29,7 @@ import static com.trent.awesomejumper.controller.levelgeneration.Room.Type.*;
  * Controller responsible for generating random levels.
  * Uses procedural random level generation.
  * Created by Sinthu on 22.07.2016.
+ * TODO: random level generator sometimes crashes.
  */
 public class RandomLevelGenerator {
 

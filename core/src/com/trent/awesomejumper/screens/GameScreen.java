@@ -1,22 +1,21 @@
 package com.trent.awesomejumper.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.controller.EntityManager;
 import com.trent.awesomejumper.controller.WorldContainer;
-import com.trent.awesomejumper.controller.InputHandler;
-import com.trent.awesomejumper.controller.RenderingEngine;
+import com.trent.awesomejumper.controller.assets.AssetLoader;
+import com.trent.awesomejumper.controller.input.InputHandler;
+import com.trent.awesomejumper.controller.rendering.RenderingEngine;
 import com.trent.awesomejumper.controller.WorldController;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.testing.Chest;
-
-import java.util.Random;
 
 /**
  * Created by Sinthu on 12.06.2015.
@@ -32,6 +31,7 @@ public class GameScreen implements Screen, InputProcessor{
     private AwesomeJumperMain game;
     private RenderingEngine renderingEngine;
     private EntityManager entityManager;
+    private AssetLoader assetLoader;
 
 
     // CONSTRUCTOR
@@ -44,6 +44,8 @@ public class GameScreen implements Screen, InputProcessor{
 
     @Override
     public void show() {
+        // TODO: load assets with asset loader here.
+        // TODO: move input processor to input handler.
         worldContainer = new WorldContainer();
         renderingEngine = new RenderingEngine(worldContainer, game);
         entityManager.setControllers(worldContainer,renderingEngine);
@@ -87,6 +89,10 @@ public class GameScreen implements Screen, InputProcessor{
     public void dispose() {
 
     }
+
+
+
+
 
     @Override
     public boolean keyDown(int keycode) {
@@ -157,7 +163,8 @@ public class GameScreen implements Screen, InputProcessor{
         }
 
         if(keycode == Keys.F11) {
-            Gdx.graphics.setDisplayMode(1920,1080,true);
+            Graphics.DisplayMode mode = Gdx.graphics.getDisplayMode();
+            Gdx.graphics.setFullscreenMode(mode);
         }
 
 

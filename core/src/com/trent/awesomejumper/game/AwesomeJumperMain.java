@@ -13,6 +13,7 @@ public class AwesomeJumperMain extends Game {
     private boolean drawBody = false;
 
     public AssetManager assetManager = new AssetManager();
+
     @Override
     public void create() {
         setScreen(new SplashScreen(this));

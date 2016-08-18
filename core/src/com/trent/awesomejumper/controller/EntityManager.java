@@ -1,9 +1,7 @@
 package com.trent.awesomejumper.controller;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.entity.Entity;
-import com.trent.awesomejumper.engine.entity.EntityInterface;
 
 /**
  * Manages the registration of entities at runtime. Adds entities to specified collections of
@@ -21,7 +19,7 @@ public class EntityManager {
     // ---------------------------------------------------------------------------------------------
 
     private WorldContainer worldContainer;
-    private RenderingEngine renderingEngine;
+    private com.trent.awesomejumper.controller.rendering.RenderingEngine renderingEngine;
 
     private EntityManager() {
 
@@ -42,7 +40,7 @@ public class EntityManager {
     // METHODS & FUNCTIONS
     // ---------------------------------------------------------------------------------------------
 
-    public void setControllers(WorldContainer worldContainer, RenderingEngine renderingEngine) {
+    public void setControllers(WorldContainer worldContainer, com.trent.awesomejumper.controller.rendering.RenderingEngine renderingEngine) {
         this.worldContainer = worldContainer;
         this.renderingEngine = renderingEngine;
     }
@@ -97,7 +95,7 @@ public class EntityManager {
 
     public void reset() {
         worldContainer.reset();
-        renderingEngine.loadTextures();
+        renderingEngine.loadTexturesAndFonts();
         renderingEngine.initGraphics(worldContainer.getPlayer());
         renderingEngine.setPlayer(worldContainer.getPlayer());
     }

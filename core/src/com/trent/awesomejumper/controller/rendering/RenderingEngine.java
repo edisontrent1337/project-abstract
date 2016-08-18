@@ -1,8 +1,9 @@
-package com.trent.awesomejumper.controller;
+package com.trent.awesomejumper.controller.rendering;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -11,10 +12,16 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+
+import static com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
+
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.trent.awesomejumper.controller.input.InputHandler;
+import com.trent.awesomejumper.controller.WorldContainer;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.engine.entity.Entity;
@@ -28,26 +35,35 @@ import static com.trent.awesomejumper.utils.Utilities.formVec;
 /**
  * Created by trent on 12.06.2015.
  * Rendering Engine for AwesomeJumper.
- * Renders player, level, skybox and enemies on screen.
+ * Renders player, all other entities, pop ups, hud and debug info on screen.
+ * Uses 2 sprite batches and cameras to render main view and debug info.
  */
-public class RenderingEngine {
+public class RenderingEngine extends Renderer {
 
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
 
     private WorldContainer worldContainer;
-    private HUDRenderer hudRenderer;
-    private PopUpManager popUpManager;
+    private HudRenderer hudRenderer;
+    private PopUpRenderer popUpRenderer;
     private AssetManager assetManager;
 
     private Player player;
     private AwesomeJumperMain game;
     private SkyBox farSky01, farSky02, nearSky01, nearSky02;
-    public OrthographicCamera cam, uiCam;
+    private OrthographicCamera debugCam;
     static final float CAMERA_WIDTH = 32;
     static final float CAMERA_HEIGHT = 18f;
     private final float LERP_FACTOR = 0.075f;
     private final float ZOOM = 0.6f;
+
+    protected static Vector2 camPositionInPx;
+
+
+    // SPRITE BATCHE
+    //private SpriteBatch sb, debugBatch;
+
+    private SpriteBatch debugBatch;
 
     /**
      * Pixel per unit scale. The screen shows 16 * 9 units, for pixel perfect accuracy we need
@@ -68,7 +84,12 @@ public class RenderingEngine {
 
 
     // FONTS
-    private BitmapFont consoleFont, messageFont;
+    private BitmapFont debugFont, hudFont, popUpFont;
+    private FreeTypeFontGenerator fontGenerator;
+    private static final String munroRegular = "fonts/munro_regular.fnt";
+    private static final String munroSmall = "fonts/munro_small.fnt";
+    private static final String munroNarrow = "fonts/munro_narrow.fnt";
+
 
     // DEBUG & STRINGS
 
@@ -85,26 +106,32 @@ public class RenderingEngine {
 
 
     public static Array<String> debugStrings;
-    private float zoom;
     private final int CONSOLE_LINE_HEIGHT = 32;
-    ShapeRenderer debugRenderer = new ShapeRenderer();
+    ShapeRenderer shapeRenderer = new ShapeRenderer();
 
-    // SPRITE BATCHES
-    private SpriteBatch sb, debugBatch;
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
 
+
     public RenderingEngine(WorldContainer worldContainer, AwesomeJumperMain game) {
+        // Init renderer, start with a default camera and sprite batch
+        super(CAMERA_WIDTH, CAMERA_HEIGHT);
+
         this.worldContainer = worldContainer;
         this.game = game;
+        this.player = worldContainer.getPlayer();
         /*this.farSky01 = worldContainer.getLevel().getSkyBoxes().get(0);
         this.farSky02 = worldContainer.getLevel().getSkyBoxes().get(1);
         this.nearSky01 = worldContainer.getLevel().getSkyBoxes().get(2);
         this.nearSky02 = worldContainer.getLevel().getSkyBoxes().get(3);*/
-        this.player = worldContainer.getPlayer();
-        this.hudRenderer = new HUDRenderer(player);
-        this.popUpManager = PopUpManager.createPopUpManager();
+
+        /**
+         * Initialization of other renderers
+         */
+        this.hudRenderer = new HudRenderer(player);
+        this.popUpRenderer = PopUpRenderer.createPopUpRenderer();
+        camPositionInPx = new Vector2(0, 0);
         this.allTextures = new TextureAtlas();
         this.debugStrings = new Array<>(10);
         for (int i = 0; i < 10; i++) {
@@ -115,28 +142,34 @@ public class RenderingEngine {
          * TODO: Implement Game states and different screens and let the states handle the
          * cursor.
          */
-        Pixmap mouse = new Pixmap(Gdx.files.internal("img/crosshair.png"));
-        Gdx.input.setCursorImage(mouse,15,15);
 
-        /** CAMERA SETUP: MAIN VIEW
+        /**
+         * CURSOR SETUP
          */
-        cam = new OrthographicCamera(CAMERA_WIDTH, CAMERA_HEIGHT);
+
+        Pixmap mouse = new Pixmap(Gdx.files.internal("img/crosshair.png"));
+        Cursor crosshair = Gdx.graphics.newCursor(mouse, 15, 15);
+        Gdx.graphics.setCursor(crosshair);
+
+        /** CAMERA SETUP:
+         *  MAIN VIEW
+         */
         cam.zoom = ZOOM;
-        zoom = cam.zoom;
-        this.ppuX = Gdx.graphics.getWidth() / (CAMERA_WIDTH * zoom);
-        this.ppuY = Gdx.graphics.getHeight() / (CAMERA_HEIGHT * zoom);
-        cam.position.set(player.getPosition().x, player.getPosition().y + 2, 0);
+        this.ppuX = Gdx.graphics.getWidth() / (CAMERA_WIDTH * cam.zoom);
+        this.ppuY = Gdx.graphics.getHeight() / (CAMERA_HEIGHT * cam.zoom);
+        cam.position.set(player.getPosition().x, player.getPosition().y, 0);
         cam.update();
 
-        // CAMERA SETUP: UI
-        uiCam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        uiCam.position.set(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2, 0);
-        uiCam.update();
+        /**
+         *CAMERA SETUP:
+         * DEBUG
+         */
+        debugCam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        debugCam.position.set(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2, 0);
+        debugCam.update();
 
-        // SPRITEBATCHES
-        sb = new SpriteBatch();
         debugBatch = new SpriteBatch();
-        loadTextures();
+        loadTexturesAndFonts();
 
 
     }
@@ -147,20 +180,38 @@ public class RenderingEngine {
 
     /**
      * Loads all textures from the asset manager and generates corresponding animations for each entity.
-     * Also loads world tile textures.
+     * Also loads world wall and floor textures.
+     * Initializes all other render-classes such as HudRenderer and PopUpRenderer
      */
-    public void loadTextures() {
+    public void loadTexturesAndFonts() {
 
+
+        fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/munro_regular.ttf"));
         // HUD
-        hudRenderer.loadTextures();
-        //FONTS
-        consoleFont = new BitmapFont(Gdx.files.internal("fonts/munro_regular_14.fnt"), Gdx.files.internal("fonts/munro_regular_14_0.png"), false);
-        consoleFont.setColor(Color.WHITE);
-        consoleFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        hudRenderer.loadTexturesAndFonts(fontGenerator);
 
-        messageFont = new BitmapFont(Gdx.files.internal("fonts/munro_regular_14.fnt"), Gdx.files.internal("fonts/munro_regular_14_0.png"), false);
-        messageFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        messageFont.getData().setScale(1f / ppuX, 1 / ppuY);
+        // POPUPMANAGER
+        popUpRenderer.loadTexturesAndFonts(fontGenerator);
+
+        FreeTypeFontParameter debugFontParams = new FreeTypeFontParameter();
+        debugFontParams.size = 32;
+        debugFontParams.color = Color.WHITE;
+        debugFontParams.shadowColor = Color.BLACK;
+        debugFontParams.shadowOffsetX = 2;
+        debugFontParams.shadowOffsetY = 2;
+        debugFontParams.minFilter = Texture.TextureFilter.Nearest;
+        debugFontParams.magFilter = Texture.TextureFilter.Nearest;
+
+        debugFont = fontGenerator.generateFont(debugFontParams);
+
+        //FONTS
+        /*consoleFont = new BitmapFont(Gdx.files.internal("fonts/munro_regular_14.fnt"), Gdx.files.internal("fonts/munro_regular_14_0.png"), false);
+        debugFont.setColor(Color.WHITE);
+        debugFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+
+        popUpFont = new BitmapFont(Gdx.files.internal("fonts/munro_regular_14.fnt"), Gdx.files.internal("fonts/munro_regular_14_0.png"), false);
+        popUpFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        popUpFont.getData().setScale(1f / ppuX, 1 / ppuY);*/
 
 
         // TEXTURE ATLAS
@@ -212,41 +263,50 @@ public class RenderingEngine {
 
     // RENDERING
     // ---------------------------------------------------------------------------------------------
+    @Override
     public void render() {
 
         /**
          * SPRITEBATCH sb IS USED TO DRAW EVERYTHING TO THE SCREEN
-         * SPRITEBATCH debugBatch IS USED TO DRAW UI INFORMATION
+         * SPRITEBATCH debugBatch IS USED TO DRAW DEBUG INFORMATION
          */
 
-
-        uiCam.update();
+        debugCam.update();
         moveCamera(player.getPosition().x, player.getPosition().y);
+
+        camPositionInPx.set(cam.position.x * ppuX, cam.position.y * ppuY);
+       // camPositionInPx.set(player.getPosition().x * ppuX, player.getPosition().y * ppuY);
+
         sb.setProjectionMatrix(cam.combined);
         sb.begin();
-        //drawBg();
-        drawTiles();
-        if (game.hitboxesEnabled()) {
-            sb.end();
-            drawHitboxes();
-            sb.begin();
-        }
-
-        if (game.entitiesEnabled()) {
-            drawEntities();
-            drawPopUps();
+        {
+            // TILES
+            renderTiles();
+            // HITBOXES
+            if (game.hitboxesEnabled()) {
+                sb.end();
+                drawHitboxes();
+                sb.begin();
+            }
+            // ENTITIES
+            if (game.entitiesEnabled()) {
+                renderEntities();
+            }
         }
         sb.end();
-        debugBatch.setProjectionMatrix(uiCam.combined);
-        debugBatch.begin();
+
+        // DEBUG INFO
         if (game.infoEnabled()) {
-            drawInfo();
+            renderDebugInfo();
         }
-        debugBatch.end();
+
+        // OTHER RENDERERS
+        popUpRenderer.render();
         hudRenderer.render();
     }
 
     // CAMERA MOVEMENT
+    // ---------------------------------------------------------------------------------------------
 
     /**
      * Moves the camera smoothly behind the player and stops it at the edges of the level
@@ -291,13 +351,13 @@ public class RenderingEngine {
     }
 
 
-    // DRAW ENTITIES
+    // ENTITY RENDERING
     // ---------------------------------------------------------------------------------------------
 
     /**
      * Iterates over all entities in the world and renders them on the screen.
      */
-    public void drawEntities() {
+    public void renderEntities() {
         Vector2 cameraPosition = new Vector2(cam.position.x, cam.position.y);
         for (Entity e : worldContainer.getEntitiesToBeRendered(cameraPosition, CAMERA_WIDTH, CAMERA_HEIGHT)) {
             e.render(sb);
@@ -305,17 +365,10 @@ public class RenderingEngine {
 
     }
 
-    /**
-     * Draws popups from game events (Picking up items/weapons, dealing damage, healing)
-     */
-    private void drawPopUps() {
-        popUpManager.render(sb, messageFont);
-    }
-
     // DRAW TILES
     // ---------------------------------------------------------------------------------------------
 
-    private void drawTiles() {
+    private void renderTiles() {
         Vector2 cameraPosition = new Vector2(cam.position.x, cam.position.y);
         TextureRegion wall;
         TextureRegion floor;
@@ -341,11 +394,11 @@ public class RenderingEngine {
 
             if (game.onDebugMode()) {
                 sb.end();
-                debugRenderer.setProjectionMatrix(cam.combined);
-                debugRenderer.begin(ShapeRenderer.ShapeType.Line);
+                shapeRenderer.setProjectionMatrix(cam.combined);
+                shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
                 if (!newTile.isPassable())
-                    newTile.getCollisionBox().draw(debugRenderer);
-                debugRenderer.end();
+                    newTile.getCollisionBox().draw(shapeRenderer);
+                shapeRenderer.end();
                 sb.begin();
             }
         }
@@ -377,35 +430,35 @@ public class RenderingEngine {
         sb.draw(nearSkyTexture, nClouds01.x, 0, nClouds01.y, nClouds01.z);
         sb.draw(nearSkyTexture, nClouds02.x, 0, nClouds02.y, nClouds02.z);
 
-        if (fClouds01.x + fClouds01.y <= cam.position.x - zoom / 2) {
+        if (fClouds01.x + fClouds01.y <= cam.position.x - cam.zoom / 2) {
             farSky01.setPositionX(fClouds02.x + fClouds02.y);
         }
 
-        if (fClouds02.x + fClouds02.y <= cam.position.x - zoom / 2) {
+        if (fClouds02.x + fClouds02.y <= cam.position.x - cam.zoom / 2) {
             farSky02.setPositionX(fClouds01.x + fClouds01.y);
         }
 
-        if (fClouds01.x > cam.position.x - zoom / 2) {
+        if (fClouds01.x > cam.position.x - cam.zoom / 2) {
             farSky02.setPositionX(fClouds01.x - fClouds01.y);
         }
 
-        if (fClouds02.x > cam.position.x - zoom / 2) {
+        if (fClouds02.x > cam.position.x - cam.zoom / 2) {
             farSky01.setPositionX(fClouds02.x - fClouds02.y);
         }
 
-        if (nClouds01.x + nClouds01.y <= cam.position.x - zoom / 2) {
+        if (nClouds01.x + nClouds01.y <= cam.position.x - cam.zoom / 2) {
             nearSky01.setPositionX(nClouds02.x + nClouds02.y);
         }
 
-        if (nClouds02.x + nClouds02.y <= cam.position.x - zoom / 2) {
+        if (nClouds02.x + nClouds02.y <= cam.position.x - cam.zoom / 2) {
             nearSky02.setPositionX(nClouds01.x + nClouds01.y);
         }
 
-        if (nClouds01.x > cam.position.x - zoom / 2) {
+        if (nClouds01.x > cam.position.x - cam.zoom / 2) {
             nearSky02.setPositionX(nClouds01.x - nClouds01.y);
         }
 
-        if (nClouds02.x > cam.position.x - zoom / 2) {
+        if (nClouds02.x > cam.position.x - cam.zoom / 2) {
             nearSky01.setPositionX(nClouds02.x - nClouds02.y);
         }
 
@@ -415,83 +468,91 @@ public class RenderingEngine {
     // DEBUG INFO
     // ---------------------------------------------------------------------------------------------
 
-    public void drawInfo() {
+    public void renderDebugInfo() {
+        Vector3 temp = new Vector3();
+        temp.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+        cam.unproject(temp);
         debugStrings.set(DE_ACCELERATION, "ACC: " + player.getAcceleration());
         debugStrings.set(DE_VELOCITY, "VEL: " + player.getVelocity());
         debugStrings.set(DE_STATE, "STATE: " + player.getState().toString());
         debugStrings.set(DE_POSITION, "POS: " + player.getPosition());
         debugStrings.set(DE_POSITION_OFFSET, "PAO: " + player.getBody().getBounds().getPositionAndOffset());
-        debugStrings.set(DE_CAMERA_POSITION, "CAM: " + formVec(cam.position.x, cam.position.y));
-        debugStrings.set(DE_ENTITIES, "ENTITIES: " + "INIT :" + Integer.toString(Entity.entityCount) + " ,REG: " +Integer.toString(WorldContainer.registredNodes) + ", DRAW :" +  Integer.toString(WorldContainer.renderNodes));
-        debugStrings.set(DE_RESOLUTION, Gdx.graphics.getWidth() + "*" + Gdx.graphics.getHeight() + ", ZOOM: " + zoom + ", FPS :" + Gdx.graphics.getFramesPerSecond());
-        debugStrings.set(DE_CURSOR, Double.toString(Math.floor(InputHandler.mouse.x)) + " | " + Double.toString(Math.floor(InputHandler.mouse.y)));
+        debugStrings.set(DE_CAMERA_POSITION, "CAM: " + formVec(cam.position.x, cam.position.y) + " CAM PX: " + cam.position.x * ppuX + " , " + cam.position.y * ppuY);
+        debugStrings.set(DE_ENTITIES, "ENTITIES: " + "INIT :" + Integer.toString(Entity.entityCount) + " ,REG: " + Integer.toString(WorldContainer.registredNodes) + ", DRAW :" + Integer.toString(WorldContainer.renderNodes));
+        debugStrings.set(DE_RESOLUTION, Gdx.graphics.getWidth() + "*" + Gdx.graphics.getHeight() + ", ZOOM: " + cam.zoom + ", FPS :" + Gdx.graphics.getFramesPerSecond());
+        debugStrings.set(DE_CURSOR, Double.toString(Math.floor(InputHandler.mouse.x)) + " | " + Double.toString(Math.floor(InputHandler.mouse.y)) + " PIXEL: " + Gdx.input.getX() + " , " + Gdx.input.getY()
+                + " UNPRO " + temp.toString());
         debugStrings.set(DE_REGION, Integer.toString(worldContainer.getRandomLevelGenerator().getRegion(InputHandler.mouse)));
-        consoleFont.setColor(Color.BLUE);
+
+        debugBatch.setProjectionMatrix(debugCam.combined);
+        debugBatch.begin();
         for (int i = 0; i < debugStrings.size; i++) {
-            consoleFont.draw(debugBatch, debugStrings.get(i), 14, CONSOLE_LINE_HEIGHT * i);
+            debugFont.draw(debugBatch, debugStrings.get(i), 14, CONSOLE_LINE_HEIGHT * i);
         }
+        debugBatch.end();
     }
 
-
+    // HITBOXES
+    // ---------------------------------------------------------------------------------------------
     public void drawHitboxes() {
-        debugRenderer.setProjectionMatrix(cam.combined);
-        debugRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setProjectionMatrix(cam.combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
 
 
         for (Entity e : worldContainer.getEntities()) {
             /**
              * Only if the body flag is enabled, body hitboxes will be drawn.
              */
-            debugRenderer.setColor(1, 0, 0, 1);
-            e.getBounds().draw(debugRenderer);
+            shapeRenderer.setColor(1, 0, 0, 1);
+            e.getBounds().draw(shapeRenderer);
             if (game.bodyEnabled()) {
                 for (CollisionBox r : e.getBodyHitboxes()) {
-                    debugRenderer.setColor(Color.YELLOW);
-                    r.draw(debugRenderer);
+                    shapeRenderer.setColor(Color.YELLOW);
+                    r.draw(shapeRenderer);
                 }
             }
 
             if (e.getBody().isCollidedWithWorld()) {
-                debugRenderer.end();
-                debugRenderer.begin(ShapeRenderer.ShapeType.Filled);
-                debugRenderer.setColor(Color.RED);
-                debugRenderer.rect(e.getBounds().getPositionAndOffset().x, e.getBounds().getPositionAndOffset().y, e.getBounds().getWidth(), e.getBounds().getHeight());
-                debugRenderer.end();
-                debugRenderer.begin(ShapeRenderer.ShapeType.Line);
+                shapeRenderer.end();
+                shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+                shapeRenderer.setColor(Color.RED);
+                shapeRenderer.rect(e.getBounds().getPositionAndOffset().x, e.getBounds().getPositionAndOffset().y, e.getBounds().getWidth(), e.getBounds().getHeight());
+                shapeRenderer.end();
+                shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
             }
         }
-        debugRenderer.end();
+        shapeRenderer.end();
         // HITBOXES OF TILES AFFECTED BY COLLISION DETECTION
         Gdx.gl.glEnable(GL20.GL_BLEND);
-        debugRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        debugRenderer.setColor(0, 0.5f, 0.5f, 1);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(0, 0.5f, 0.5f, 1);
         /**
          * vertical and horizontal components are separated here to show  which impact is bigger
          */
         Vector2 playerX = new Vector2(player.getVelocity().x, 0f).cpy().scl(player.getPlayerDelta()).scl(25);
         Vector2 playerY = new Vector2(0f, player.getVelocity().y).cpy().scl(player.getPlayerDelta()).scl(25);
 
-        debugRenderer.rectLine(player.getPosition(), player.getPosition().cpy().add(playerX), 5 * (1 / ppuX));
-        debugRenderer.rectLine(player.getPosition(), player.getPosition().cpy().add(playerY), 5 * (1 / ppuY));
+        shapeRenderer.rectLine(player.getPosition(), player.getPosition().cpy().add(playerX), 5 * (1 / ppuX));
+        shapeRenderer.rectLine(player.getPosition(), player.getPosition().cpy().add(playerY), 5 * (1 / ppuY));
 
-        debugRenderer.setColor(1f, 0f, 0f, 0.5f);
+        shapeRenderer.setColor(1f, 0f, 0f, 0.5f);
         for (Tile t : worldContainer.getCollisionTiles()) {
             if (t != null)
-                debugRenderer.rect(t.getPosition().x, t.getPosition().y, Tile.SIZE, Tile.SIZE);
+                shapeRenderer.rect(t.getPosition().x, t.getPosition().y, Tile.SIZE, Tile.SIZE);
         }
 
-        debugRenderer.end();
+        shapeRenderer.end();
         Gdx.gl.glDisable(GL20.GL_BLEND);
     }
 
 
     public void resize(int w, int h) {
-        uiCam = new OrthographicCamera(w, h);
-        uiCam.position.set(w / 2, h / 2, 0);
-        ppuX = Gdx.graphics.getWidth() / (CAMERA_WIDTH * zoom);
-        ppuY = Gdx.graphics.getHeight() / (CAMERA_HEIGHT * zoom);
-        messageFont.getData().setScale(1 / ppuX, 1 / ppuY);
+        debugCam = new OrthographicCamera(w, h);
+        debugCam.position.set(w / 2f, h / 2f, 0);
+        ppuX = Gdx.graphics.getWidth() / (CAMERA_WIDTH * cam.zoom);
+        ppuY = Gdx.graphics.getHeight() / (CAMERA_HEIGHT * cam.zoom);
         hudRenderer.resize(w, h);
+        popUpRenderer.resize(w, h);
     }
 
 

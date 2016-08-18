@@ -1,11 +1,13 @@
 package com.trent.awesomejumper.engine.modelcomponents;
 
-import com.trent.awesomejumper.controller.PopUpManager;
-import com.trent.awesomejumper.controller.RenderingEngine;
+import com.badlogic.gdx.Gdx;
+import com.trent.awesomejumper.controller.levelgeneration.RandomLevelGenerator;
+import com.trent.awesomejumper.controller.rendering.PopUpRenderer;
 import com.trent.awesomejumper.controller.WorldController;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.popups.Message;
-import com.trent.awesomejumper.engine.modelcomponents.popups.PopUpFeed;
+
+import java.util.Random;
 
 /**
  * Created by Sinthu on 09.12.2015.
@@ -22,6 +24,7 @@ public class Health extends ModelComponent {
     private final float INVINCIBILITY_TIME;
     private float tookDamage = 0f;
 
+    private Random random;
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
@@ -36,32 +39,46 @@ public class Health extends ModelComponent {
         this.maxHp = maxHp;
         this.hp = maxHp;
         this.INVINCIBILITY_TIME = 0.33f;
+        this.random = new Random(System.currentTimeMillis());
 
         // enable health for entity
         entity.hasHealth = true;
-    }
 
+    }
 
 
     public void heal(float heal) {
         hp += heal;
 
-        if(hp > maxHp)
+        if (hp > maxHp)
             hp = maxHp;
     }
 
 
     public boolean takeDamage(int dmg) {
 
-        if(entity.time - tookDamage < INVINCIBILITY_TIME)
+        if (entity.time - tookDamage < INVINCIBILITY_TIME)
             return false;
-        hp -= dmg;
-        Message message = new Message(Integer.toString(dmg),entity.getPosition(), WorldController.worldTime, 2.00f);
+        Message message;
+
+        if (random.nextInt(100) > 95) {
+            dmg *= 1.25f;
+            hp -= dmg;
+            message = new Message("-" + Integer.toString(dmg), entity.getBody().getCenter(), WorldController.worldTime, 1.5f);
+            PopUpRenderer.getInstance().addMessageToCategory(PopUpRenderer.PopUpCategories.CRT, message);
+            Gdx.app.log("CRIT","YEA");
+        } else {
+
+            hp -= dmg;
+            message = new Message("-" + Integer.toString(dmg), entity.getBody().getCenter(), WorldController.worldTime, 1.50f);
+            PopUpRenderer.getInstance().addMessageToCategory(PopUpRenderer.PopUpCategories.DMG, message);
+        }
+
+
         /**
          * Access popup manager globally to add damage popup.
          */
-        PopUpManager.getInstance().addMessageToCategory(PopUpManager.PopUpCategories.DMG, message);
-        if(hp <= 0) {
+        if (hp <= 0) {
             hp = 0;
             entity.setState(Entity.State.DEAD);
             entity.destroy();
@@ -69,7 +86,7 @@ public class Health extends ModelComponent {
         }
         tookDamage = entity.time;
 
-    return true;
+        return true;
     }
 
     // ---------------------------------------------------------------------------------------------

@@ -1,9 +1,10 @@
-package com.trent.awesomejumper.controller;
+package com.trent.awesomejumper.controller.collision;
 
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.trent.awesomejumper.controller.WorldContainer;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.exceptions.InvalidWeaponSlotException;
 import com.trent.awesomejumper.models.Player;

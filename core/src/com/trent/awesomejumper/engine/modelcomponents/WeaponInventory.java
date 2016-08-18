@@ -3,12 +3,12 @@ package com.trent.awesomejumper.engine.modelcomponents;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.controller.EntityManager;
-import com.trent.awesomejumper.controller.PopUpManager;
+import com.trent.awesomejumper.controller.rendering.PopUpRenderer;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.popups.Message;
 import com.trent.awesomejumper.models.weapons.Weapon;
 
-import static com.trent.awesomejumper.controller.PopUpManager.PopUpCategories.*;
+import static com.trent.awesomejumper.controller.rendering.PopUpRenderer.PopUpCategories.*;
 
 import java.util.ArrayList;
 
@@ -166,8 +166,8 @@ public class WeaponInventory extends ModelComponent {
         Gdx.app.log("INVENTORY POINTER", Integer.toString(inventoryPointer));
         Gdx.app.log("CURRENT WEAPON ID", Integer.toString(selectedWeaponID));
 
-        Message equipMessage = new Message(weapon.getName(), entity.getPosition().cpy(), entity.time, 2.00f);
-        PopUpManager.getInstance().addMessageToCategory(MISC, equipMessage);
+        Message equipMessage = new Message(weapon.getName(), entity.getBody().getCenter(), entity.time, 1.00f);
+        PopUpRenderer.getInstance().addMessageToCategory(MISC, equipMessage);
 
         return false;
 
@@ -188,7 +188,6 @@ public class WeaponInventory extends ModelComponent {
         else
             direction = 1;
 
-        Message changeMessage;
         /**
          *  Save the current weapon in the inventory. If the player held a weapon before the change,
          *  this weapon will be hidden.
@@ -211,15 +210,12 @@ public class WeaponInventory extends ModelComponent {
             selectedWeapon.getBody().setPosition(entity.getPosition().cpy());
             selectedWeapon.setOwner(entity);
             holdingAWeapon = true;
-            changeMessage = new Message(selectedWeapon.getName(), entity.getPosition().cpy(), entity.time, 2.00f);
         } else {
             // The player has no weapon in his hand.
             holdingAWeapon = false;
             selectedWeapon = null;
-            changeMessage = new Message("NO WEAPON", entity.getPosition().cpy(), entity.time, 2.00f);
         }
 
-        PopUpManager.getInstance().addMessageToCategory(MISC, changeMessage);
         Gdx.app.log("EVENT", "END OF CHANGE");
         Gdx.app.log("WEAPONS EQUIPPED", Integer.toString(weaponsEquipped));
         Gdx.app.log("INVENTORY POINTER", Integer.toString(inventoryPointer));

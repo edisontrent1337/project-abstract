@@ -20,7 +20,7 @@ public class WorldController {
 
     private WorldContainer worldContainer;
     private com.trent.awesomejumper.controller.levelgeneration.RandomLevelGenerator randomLevelGenerator;
-    private CollisionController collisionController;
+    private com.trent.awesomejumper.controller.collision.CollisionController collisionController;
 
     public static float worldTime = 0f;
 
@@ -32,7 +32,7 @@ public class WorldController {
     public WorldController(WorldContainer worldContainer) {
         this.worldContainer = worldContainer;
         this.randomLevelGenerator = worldContainer.getRandomLevelGenerator();
-        this.collisionController = new CollisionController(worldContainer);
+        this.collisionController = new com.trent.awesomejumper.controller.collision.CollisionController(worldContainer);
     }
 
 

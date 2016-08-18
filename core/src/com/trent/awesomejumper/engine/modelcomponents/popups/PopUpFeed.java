@@ -3,9 +3,8 @@ package com.trent.awesomejumper.engine.modelcomponents.popups;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.trent.awesomejumper.controller.PopUpManager;
-import com.trent.awesomejumper.controller.PopUpManager.PopUpCategories;
-import com.trent.awesomejumper.controller.RenderingEngine;
+import com.trent.awesomejumper.controller.rendering.PopUpRenderer.PopUpCategories;
+import com.trent.awesomejumper.controller.rendering.RenderingEngine;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.ModelComponent;
 
@@ -120,7 +119,7 @@ public class PopUpFeed extends ModelComponent {
                  * Draw message to screen. Always reset the scaling after rendering.
                  */
                 font.draw(spriteBatch, message.getMessage(), entity.getPosition().x + entity.getWidth() / 2 + xOffset, entity.getPosition().y + entity.getHeight() + yOffset);
-                font.getData().setScale(1f/RenderingEngine.ppuX, 1f/RenderingEngine.ppuY);
+                font.getData().setScale(1,1);
 
             }
 

@@ -1,5 +1,6 @@
 package com.trent.awesomejumper.engine.entity;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -219,6 +220,7 @@ public class Entity implements EntityInterface {
 
         if(hasBody)
             body.update(delta);
+
     }
 
     // GRAPHICS
