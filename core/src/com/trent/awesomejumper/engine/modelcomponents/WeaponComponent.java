@@ -1,5 +1,7 @@
 package com.trent.awesomejumper.engine.modelcomponents;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.models.testing.Projectile;
 
@@ -46,12 +48,12 @@ public class WeaponComponent extends ModelComponent {
     public void fire() {
         if (entity.time - timeFired < recoverTime)
             return;
-        if(entity.time - timeReloaded < reloadTime)
+        if (entity.time - timeReloaded < reloadTime)
             return;
 
         if (currentClip != 0) {
             currentClip--;
-            Projectile projectile = new Projectile(entity.getBody().getCenter().cpy(), entity.getHeight());
+            Projectile projectile = new Projectile(entity.getBody().getCenter().cpy(), 0);
             projectile.getBody().setVelocity(entity.getBody().getOrientation().cpy().nor().scl(speed));
             projectile.getBody().setAngleOfRotation(entity.getBody().getAngleOfRotation());
             projectile.register();
@@ -103,7 +105,6 @@ public class WeaponComponent extends ModelComponent {
     }
 
 
-
     public void setEquipped(boolean isEquipped) {
         this.isEquipped = isEquipped;
     }
@@ -118,7 +119,6 @@ public class WeaponComponent extends ModelComponent {
         String currentClipString = Integer.toString(currentClip);
         return currentClipString + "/" + ammoString;
     }
-
 
 
 }

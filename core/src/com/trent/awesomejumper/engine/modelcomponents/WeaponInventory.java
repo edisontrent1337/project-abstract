@@ -251,7 +251,7 @@ public class WeaponInventory extends ModelComponent {
             selectedWeapon = (Weapon) EntityManager.getInstance().getEntityByID(selectedWeaponID);
             selectedWeapon.getBody().setPosition(entity.getBody().getCenter().cpy().sub(selectedWeapon.getBody().getHalfDimensions()));
             selectedWeapon.getBody().setAimReference(entity.getBody().getAimReference());
-            selectedWeapon.getBody().setOrientation(entity.getBody().getOrientation());
+            selectedWeapon.getBody().setOrientation(entity.getBody().getAimReference().cpy().sub(selectedWeapon.getBody().getCenter()));
             selectedWeapon.getBody().setAngleOfRotation(angle(selectedWeapon.getBody().getOrientation()));
             Vector2 circle = entity.getBody().getOrientation().cpy();
             if (circle.len2() > 0.5f)

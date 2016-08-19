@@ -522,6 +522,12 @@ public class RenderingEngine extends Renderer {
             }
         }
         shapeRenderer.end();
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(Color.GREEN);
+
+        shapeRenderer.line(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter(),player.getWeaponInventory().getSelectedWeapon().getBody().getAimReference());
+        shapeRenderer.end();
         // HITBOXES OF TILES AFFECTED BY COLLISION DETECTION
         Gdx.gl.glEnable(GL20.GL_BLEND);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);

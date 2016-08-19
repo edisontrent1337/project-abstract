@@ -91,6 +91,10 @@ public class Body extends ModelComponent {
 
     public void update(float delta) {
 
+        if(entity.getClass().equals(Projectile.class)) {
+            Gdx.app.log("VELO", velocity.toString());
+        }
+
         position.add(velocity.cpy().scl(delta));
         /**
          * If collision detection on this body is enabled, the bounds collision box will be updated

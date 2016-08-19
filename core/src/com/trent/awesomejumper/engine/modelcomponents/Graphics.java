@@ -167,6 +167,13 @@ public class Graphics extends ModelComponent {
          * HP BAR Rendering
          */
         sb.end();
+
+        hpRenderer.setProjectionMatrix(sb.getProjectionMatrix());
+        hpRenderer.begin(ShapeRenderer.ShapeType.Point);
+        hpRenderer.point(entity.getBody().getCenter().x,entity.getBody().getCenter().y,0);
+        hpRenderer.end();
+
+
         {
             renderHealthBar(sb.getProjectionMatrix());
         }
