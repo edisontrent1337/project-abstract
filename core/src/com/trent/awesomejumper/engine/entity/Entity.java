@@ -10,7 +10,6 @@ import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.engine.modelcomponents.Health;
 import com.trent.awesomejumper.engine.modelcomponents.WeaponComponent;
 import com.trent.awesomejumper.engine.modelcomponents.WeaponInventory;
-import com.trent.awesomejumper.engine.modelcomponents.popups.PopUpFeed;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -49,7 +48,6 @@ public class Entity implements EntityInterface {
     protected Health health;
     protected WeaponInventory weaponInventory;
     protected WeaponComponent weaponComponent;
-    protected PopUpFeed popUpFeed;
 
     protected Entity owner;
 
@@ -282,19 +280,6 @@ public class Entity implements EntityInterface {
     public void updateWeaponPositions() {
         if(hasWeaponInventory)
             weaponInventory.updateWeaponPositions();
-    }
-
-    // POP UP RENDERING
-    // ---------------------------------------------------------------------------------------------
-
-    @Override
-    public PopUpFeed getPopUpFeed() {
-        return popUpFeed;
-    }
-
-    @Override
-    public void setPopUpFeed(PopUpFeed popUpFeed) {
-        this.popUpFeed = popUpFeed;
     }
 
 

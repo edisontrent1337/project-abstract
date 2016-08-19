@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.trent.awesomejumper.models.Player;
@@ -47,7 +46,7 @@ public class HudRenderer extends Renderer {
     public HudRenderer(Player player) {
         // Init renderer, start with a default camera and sprite batch
         super(CAMERA_WIDTH,CAMERA_HEIGHT);
-        cam.position.set(CAMERA_WIDTH / 2, CAMERA_HEIGHT / 2, 0);
+        camera.position.set(CAMERA_WIDTH / 2, CAMERA_HEIGHT / 2, 0);
         //this.hudCam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         //this.hudBatch = new SpriteBatch();
         this.player = player;
@@ -80,21 +79,21 @@ public class HudRenderer extends Renderer {
         /*hudFont = new BitmapFont(Gdx.files.internal("fonts/munro_outlined.fnt"), Gdx.files.internal("fonts/munro_outlined_0.png"), false);
         hudFont.setColor(Color.WHITE);
         hudFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);*/
-        cam.update();
+        camera.update();
     }
 
 
     public void render() {
 
-        cam.update();
-        sb.setProjectionMatrix(cam.combined);
-        sb.begin();
+        camera.update();
+        spriteBatch.setProjectionMatrix(camera.combined);
+        spriteBatch.begin();
             drawHealthAndExp();
             drawTime();
             drawMiniMap();
             drawWeaponHUD();
-            hudFont.draw(sb, player.getHealth().toString(), 100, Gdx.graphics.getHeight() - 50);
-        sb.end();
+            hudFont.draw(spriteBatch, player.getHealth().toString(), 100, Gdx.graphics.getHeight() - 50);
+        spriteBatch.end();
         /**
          * Render weapon information
          *
@@ -122,19 +121,19 @@ public class HudRenderer extends Renderer {
 
 
     public void resize(int w, int h) {
-        cam = new OrthographicCamera(w, h);
-        cam.position.set(w / 2, h / 2, 0);
+        camera = new OrthographicCamera(w, h);
+        camera.position.set(w / 2, h / 2, 0);
         this.w = w;
         this.h = h;
-        cam.update();
+        camera.update();
     }
 
 
     private void drawFontWithShadow(String text, int x, int y) {
         hudFont.setColor(Color.BLACK);
-        hudFont.draw(sb, text, x + SHADOW_OFFSET, y - SHADOW_OFFSET);
+        hudFont.draw(spriteBatch, text, x + SHADOW_OFFSET, y - SHADOW_OFFSET);
         hudFont.setColor(Color.WHITE);
-        hudFont.draw(sb, text, x, y);
+        hudFont.draw(spriteBatch, text, x, y);
     }
 
 
@@ -159,8 +158,8 @@ public class HudRenderer extends Renderer {
         float nameWidth = weaponName.width;
         float ammoWidth = ammo.width;
 
-        hudFont.draw(sb, weaponName, w - (nameWidth +50), 50);
-        hudFont.draw(sb, ammo, w - (ammoWidth + 50), 100);
+        hudFont.draw(spriteBatch, weaponName, w - (nameWidth +50), 50);
+        hudFont.draw(spriteBatch, ammo, w - (ammoWidth + 50), 100);
 
 
     }

@@ -9,15 +9,15 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
  */
 public abstract class Renderer {
 
-    protected SpriteBatch sb;
-    protected OrthographicCamera cam;
+    protected SpriteBatch spriteBatch;
+    protected OrthographicCamera camera;
     protected ShapeRenderer rectRenderer;
 
 
 
     public Renderer(float viewPortWidth, float viewPortHeight) {
-        this.cam = new OrthographicCamera(viewPortWidth, viewPortHeight);
-        this.sb = new SpriteBatch();
+        this.camera = new OrthographicCamera(viewPortWidth, viewPortHeight);
+        this.spriteBatch = new SpriteBatch();
         this.rectRenderer = new ShapeRenderer();
 
     }

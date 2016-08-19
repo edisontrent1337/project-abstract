@@ -1,7 +1,6 @@
 package com.trent.awesomejumper.engine.modelcomponents;
 
 import com.badlogic.gdx.Gdx;
-import com.trent.awesomejumper.controller.levelgeneration.RandomLevelGenerator;
 import com.trent.awesomejumper.controller.rendering.PopUpRenderer;
 import com.trent.awesomejumper.controller.WorldController;
 import com.trent.awesomejumper.engine.entity.Entity;
@@ -20,9 +19,10 @@ public class Health extends ModelComponent {
     private int maxHp;
     private float def;
     private float regeneration;
+    private int lastDamage;
 
     private final float INVINCIBILITY_TIME;
-    private float tookDamage = 0f;
+    private float tookDamageAt = 0f;
 
     private Random random;
 
@@ -40,7 +40,7 @@ public class Health extends ModelComponent {
         this.hp = maxHp;
         this.INVINCIBILITY_TIME = 0.33f;
         this.random = new Random(System.currentTimeMillis());
-
+        this.lastDamage = 0;
         // enable health for entity
         entity.hasHealth = true;
 
@@ -57,7 +57,7 @@ public class Health extends ModelComponent {
 
     public boolean takeDamage(int dmg) {
 
-        if (entity.time - tookDamage < INVINCIBILITY_TIME)
+        if (entity.time - tookDamageAt < INVINCIBILITY_TIME)
             return false;
         Message message;
 
@@ -84,7 +84,8 @@ public class Health extends ModelComponent {
             entity.destroy();
             return true;
         }
-        tookDamage = entity.time;
+        tookDamageAt = entity.time;
+        lastDamage = dmg;
 
         return true;
     }
@@ -96,6 +97,18 @@ public class Health extends ModelComponent {
     public float getHp() {
         return hp;
 
+    }
+
+    public float getMaxHp() {
+        return maxHp;
+    }
+
+    public float tookDamageAt() {
+        return tookDamageAt;
+    }
+
+    public int getLastDamage() {
+        return lastDamage;
     }
 
     @Override

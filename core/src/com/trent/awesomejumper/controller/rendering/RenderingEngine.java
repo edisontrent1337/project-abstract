@@ -61,7 +61,7 @@ public class RenderingEngine extends Renderer {
 
 
     // SPRITE BATCHE
-    //private SpriteBatch sb, debugBatch;
+    //private SpriteBatch spriteBatch, debugBatch;
 
     private SpriteBatch debugBatch;
 
@@ -154,11 +154,11 @@ public class RenderingEngine extends Renderer {
         /** CAMERA SETUP:
          *  MAIN VIEW
          */
-        cam.zoom = ZOOM;
-        this.ppuX = Gdx.graphics.getWidth() / (CAMERA_WIDTH * cam.zoom);
-        this.ppuY = Gdx.graphics.getHeight() / (CAMERA_HEIGHT * cam.zoom);
-        cam.position.set(player.getPosition().x, player.getPosition().y, 0);
-        cam.update();
+        camera.zoom = ZOOM;
+        this.ppuX = Gdx.graphics.getWidth() / (CAMERA_WIDTH * camera.zoom);
+        this.ppuY = Gdx.graphics.getHeight() / (CAMERA_HEIGHT * camera.zoom);
+        camera.position.set(player.getPosition().x, player.getPosition().y, 0);
+        camera.update();
 
         /**
          *CAMERA SETUP:
@@ -267,33 +267,33 @@ public class RenderingEngine extends Renderer {
     public void render() {
 
         /**
-         * SPRITEBATCH sb IS USED TO DRAW EVERYTHING TO THE SCREEN
+         * SPRITEBATCH spriteBatch IS USED TO DRAW EVERYTHING TO THE SCREEN
          * SPRITEBATCH debugBatch IS USED TO DRAW DEBUG INFORMATION
          */
 
         debugCam.update();
         moveCamera(player.getPosition().x, player.getPosition().y);
 
-        camPositionInPx.set(cam.position.x * ppuX, cam.position.y * ppuY);
+        camPositionInPx.set(camera.position.x * ppuX, camera.position.y * ppuY);
        // camPositionInPx.set(player.getPosition().x * ppuX, player.getPosition().y * ppuY);
 
-        sb.setProjectionMatrix(cam.combined);
-        sb.begin();
+        spriteBatch.setProjectionMatrix(camera.combined);
+        spriteBatch.begin();
         {
             // TILES
             renderTiles();
             // HITBOXES
             if (game.hitboxesEnabled()) {
-                sb.end();
+                spriteBatch.end();
                 drawHitboxes();
-                sb.begin();
+                spriteBatch.begin();
             }
             // ENTITIES
             if (game.entitiesEnabled()) {
                 renderEntities();
             }
         }
-        sb.end();
+        spriteBatch.end();
 
         // DEBUG INFO
         if (game.infoEnabled()) {
@@ -316,8 +316,8 @@ public class RenderingEngine extends Renderer {
      */
     private void moveCamera(float playerX, float playerY) {
 
-        float tempX = cam.position.x;
-        float tempY = cam.position.y;
+        float tempX = camera.position.x;
+        float tempY = camera.position.y;
 
         float xLerp = (playerX - tempX) * LERP_FACTOR;
         tempX += xLerp;
@@ -327,14 +327,14 @@ public class RenderingEngine extends Renderer {
 
 
         float updatedX, updatedY;
-        if (playerX - cam.position.x >= 0f) {
+        if (playerX - camera.position.x >= 0f) {
             updatedX = ((int) (Math.floor(tempX * ppuX))) / ppuX;
         } else {
             updatedX = ((int) (Math.ceil(tempX * ppuX))) / ppuX;
 
         }
 
-        if (playerY - cam.position.y >= 0f) {
+        if (playerY - camera.position.y >= 0f) {
             updatedY = ((int) (Math.floor(tempY * ppuY))) / ppuY;
         } else {
             updatedY = ((int) (Math.ceil(tempY * ppuY))) / ppuY;
@@ -346,8 +346,8 @@ public class RenderingEngine extends Renderer {
         if (updatedY < 4)
             updatedY = 4;
 
-        cam.position.set(updatedX, updatedY, 0);
-        cam.update();
+        camera.position.set(updatedX, updatedY, 0);
+        camera.update();
     }
 
 
@@ -358,9 +358,9 @@ public class RenderingEngine extends Renderer {
      * Iterates over all entities in the world and renders them on the screen.
      */
     public void renderEntities() {
-        Vector2 cameraPosition = new Vector2(cam.position.x, cam.position.y);
+        Vector2 cameraPosition = new Vector2(camera.position.x, camera.position.y);
         for (Entity e : worldContainer.getEntitiesToBeRendered(cameraPosition, CAMERA_WIDTH, CAMERA_HEIGHT)) {
-            e.render(sb);
+            e.render(spriteBatch);
         }
 
     }
@@ -369,21 +369,21 @@ public class RenderingEngine extends Renderer {
     // ---------------------------------------------------------------------------------------------
 
     private void renderTiles() {
-        Vector2 cameraPosition = new Vector2(cam.position.x, cam.position.y);
+        Vector2 cameraPosition = new Vector2(camera.position.x, camera.position.y);
         TextureRegion wall;
         TextureRegion floor;
-        for (Tile newTile : worldContainer.getTilesToBeRendered(cameraPosition, CAMERA_WIDTH * cam.zoom, CAMERA_HEIGHT * cam.zoom)) {
+        for (Tile newTile : worldContainer.getTilesToBeRendered(cameraPosition, CAMERA_WIDTH * camera.zoom, CAMERA_HEIGHT * camera.zoom)) {
             Tile.TileType type = newTile.getType();
             Vector2 position = newTile.getPosition();
             if (!game.onDebugMode()) {
                 switch (type) {
                     case WALL:
                         wall = wallTextures.get(newTile.tileIndex);
-                        sb.draw(wall, position.x, position.y, Tile.SIZE, Tile.SIZE);
+                        spriteBatch.draw(wall, position.x, position.y, Tile.SIZE, Tile.SIZE);
                         break;
                     case FLOOR:
                         floor = floorTextures.get(0);
-                        sb.draw(floor, position.x, position.y, Tile.SIZE, Tile.SIZE);
+                        spriteBatch.draw(floor, position.x, position.y, Tile.SIZE, Tile.SIZE);
                         break;
                     default:
                         break;
@@ -393,13 +393,13 @@ public class RenderingEngine extends Renderer {
             }
 
             if (game.onDebugMode()) {
-                sb.end();
-                shapeRenderer.setProjectionMatrix(cam.combined);
+                spriteBatch.end();
+                shapeRenderer.setProjectionMatrix(camera.combined);
                 shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
                 if (!newTile.isPassable())
                     newTile.getCollisionBox().draw(shapeRenderer);
                 shapeRenderer.end();
-                sb.begin();
+                spriteBatch.begin();
             }
         }
 
@@ -420,45 +420,45 @@ public class RenderingEngine extends Renderer {
         Vector3 nClouds01 = new Vector3(nearSky01.getPosition().x, nearSky01.getBounds().getWidth(), nearSky01.getBounds().getHeight());
         Vector3 nClouds02 = new Vector3(nearSky02.getPosition().x, nearSky02.getBounds().getWidth(), nearSky02.getBounds().getHeight());
         // ----- BACKGROUND SKY
-        sb.draw(background01, skyBoxPos01X, 0, fClouds01.y, fClouds01.z);
-        sb.draw(background01, skyBoxPos02X, 0, fClouds01.y, fClouds01.z);
-        sb.draw(sunTexture, fClouds02.x, 0, fClouds01.y, fClouds01.z);
+        spriteBatch.draw(background01, skyBoxPos01X, 0, fClouds01.y, fClouds01.z);
+        spriteBatch.draw(background01, skyBoxPos02X, 0, fClouds01.y, fClouds01.z);
+        spriteBatch.draw(sunTexture, fClouds02.x, 0, fClouds01.y, fClouds01.z);
         // ----- FAR AWAY CLOUDS
-        sb.draw(farSkyTexture, fClouds01.x, 0, fClouds01.y, fClouds01.z);
-        sb.draw(farSkyTexture, fClouds02.x, 0, fClouds02.y, fClouds02.z);
+        spriteBatch.draw(farSkyTexture, fClouds01.x, 0, fClouds01.y, fClouds01.z);
+        spriteBatch.draw(farSkyTexture, fClouds02.x, 0, fClouds02.y, fClouds02.z);
         // ----- NEAR CLOUDS
-        sb.draw(nearSkyTexture, nClouds01.x, 0, nClouds01.y, nClouds01.z);
-        sb.draw(nearSkyTexture, nClouds02.x, 0, nClouds02.y, nClouds02.z);
+        spriteBatch.draw(nearSkyTexture, nClouds01.x, 0, nClouds01.y, nClouds01.z);
+        spriteBatch.draw(nearSkyTexture, nClouds02.x, 0, nClouds02.y, nClouds02.z);
 
-        if (fClouds01.x + fClouds01.y <= cam.position.x - cam.zoom / 2) {
+        if (fClouds01.x + fClouds01.y <= camera.position.x - camera.zoom / 2) {
             farSky01.setPositionX(fClouds02.x + fClouds02.y);
         }
 
-        if (fClouds02.x + fClouds02.y <= cam.position.x - cam.zoom / 2) {
+        if (fClouds02.x + fClouds02.y <= camera.position.x - camera.zoom / 2) {
             farSky02.setPositionX(fClouds01.x + fClouds01.y);
         }
 
-        if (fClouds01.x > cam.position.x - cam.zoom / 2) {
+        if (fClouds01.x > camera.position.x - camera.zoom / 2) {
             farSky02.setPositionX(fClouds01.x - fClouds01.y);
         }
 
-        if (fClouds02.x > cam.position.x - cam.zoom / 2) {
+        if (fClouds02.x > camera.position.x - camera.zoom / 2) {
             farSky01.setPositionX(fClouds02.x - fClouds02.y);
         }
 
-        if (nClouds01.x + nClouds01.y <= cam.position.x - cam.zoom / 2) {
+        if (nClouds01.x + nClouds01.y <= camera.position.x - camera.zoom / 2) {
             nearSky01.setPositionX(nClouds02.x + nClouds02.y);
         }
 
-        if (nClouds02.x + nClouds02.y <= cam.position.x - cam.zoom / 2) {
+        if (nClouds02.x + nClouds02.y <= camera.position.x - camera.zoom / 2) {
             nearSky02.setPositionX(nClouds01.x + nClouds01.y);
         }
 
-        if (nClouds01.x > cam.position.x - cam.zoom / 2) {
+        if (nClouds01.x > camera.position.x - camera.zoom / 2) {
             nearSky02.setPositionX(nClouds01.x - nClouds01.y);
         }
 
-        if (nClouds02.x > cam.position.x - cam.zoom / 2) {
+        if (nClouds02.x > camera.position.x - camera.zoom / 2) {
             nearSky01.setPositionX(nClouds02.x - nClouds02.y);
         }
 
@@ -471,15 +471,15 @@ public class RenderingEngine extends Renderer {
     public void renderDebugInfo() {
         Vector3 temp = new Vector3();
         temp.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-        cam.unproject(temp);
+        camera.unproject(temp);
         debugStrings.set(DE_ACCELERATION, "ACC: " + player.getAcceleration());
         debugStrings.set(DE_VELOCITY, "VEL: " + player.getVelocity());
         debugStrings.set(DE_STATE, "STATE: " + player.getState().toString());
         debugStrings.set(DE_POSITION, "POS: " + player.getPosition());
         debugStrings.set(DE_POSITION_OFFSET, "PAO: " + player.getBody().getBounds().getPositionAndOffset());
-        debugStrings.set(DE_CAMERA_POSITION, "CAM: " + formVec(cam.position.x, cam.position.y) + " CAM PX: " + cam.position.x * ppuX + " , " + cam.position.y * ppuY);
+        debugStrings.set(DE_CAMERA_POSITION, "CAM: " + formVec(camera.position.x, camera.position.y) + " CAM PX: " + camera.position.x * ppuX + " , " + camera.position.y * ppuY);
         debugStrings.set(DE_ENTITIES, "ENTITIES: " + "INIT :" + Integer.toString(Entity.entityCount) + " ,REG: " + Integer.toString(WorldContainer.registredNodes) + ", DRAW :" + Integer.toString(WorldContainer.renderNodes));
-        debugStrings.set(DE_RESOLUTION, Gdx.graphics.getWidth() + "*" + Gdx.graphics.getHeight() + ", ZOOM: " + cam.zoom + ", FPS :" + Gdx.graphics.getFramesPerSecond());
+        debugStrings.set(DE_RESOLUTION, Gdx.graphics.getWidth() + "*" + Gdx.graphics.getHeight() + ", ZOOM: " + camera.zoom + ", FPS :" + Gdx.graphics.getFramesPerSecond());
         debugStrings.set(DE_CURSOR, Double.toString(Math.floor(InputHandler.mouse.x)) + " | " + Double.toString(Math.floor(InputHandler.mouse.y)) + " PIXEL: " + Gdx.input.getX() + " , " + Gdx.input.getY()
                 + " UNPRO " + temp.toString());
         debugStrings.set(DE_REGION, Integer.toString(worldContainer.getRandomLevelGenerator().getRegion(InputHandler.mouse)));
@@ -495,7 +495,7 @@ public class RenderingEngine extends Renderer {
     // HITBOXES
     // ---------------------------------------------------------------------------------------------
     public void drawHitboxes() {
-        shapeRenderer.setProjectionMatrix(cam.combined);
+        shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
 
 
@@ -549,8 +549,8 @@ public class RenderingEngine extends Renderer {
     public void resize(int w, int h) {
         debugCam = new OrthographicCamera(w, h);
         debugCam.position.set(w / 2f, h / 2f, 0);
-        ppuX = Gdx.graphics.getWidth() / (CAMERA_WIDTH * cam.zoom);
-        ppuY = Gdx.graphics.getHeight() / (CAMERA_HEIGHT * cam.zoom);
+        ppuX = Gdx.graphics.getWidth() / (CAMERA_WIDTH * camera.zoom);
+        ppuY = Gdx.graphics.getHeight() / (CAMERA_HEIGHT * camera.zoom);
         hudRenderer.resize(w, h);
         popUpRenderer.resize(w, h);
     }
@@ -560,7 +560,7 @@ public class RenderingEngine extends Renderer {
     // ---------------------------------------------------------------------------------------------
 
     public OrthographicCamera getGameCamera() {
-        return cam;
+        return camera;
     }
 
     public void setPlayer(Player player) {
@@ -568,11 +568,11 @@ public class RenderingEngine extends Renderer {
     }
 
     public void setZoom(float zoom) {
-        float oldZoom = cam.zoom;
+        float oldZoom = camera.zoom;
         oldZoom += 0.1d * zoom;
-        cam.zoom = oldZoom;
-        ppuX = Gdx.graphics.getWidth() / (CAMERA_WIDTH * cam.zoom);
-        ppuY = Gdx.graphics.getHeight() / (CAMERA_HEIGHT * cam.zoom);
+        camera.zoom = oldZoom;
+        ppuX = Gdx.graphics.getWidth() / (CAMERA_WIDTH * camera.zoom);
+        ppuY = Gdx.graphics.getHeight() / (CAMERA_HEIGHT * camera.zoom);
     }
 
 }

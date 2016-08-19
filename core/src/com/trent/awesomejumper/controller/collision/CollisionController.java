@@ -292,7 +292,6 @@ public class CollisionController {
                  */
                 if (!entity.getBody().isCollidedWithWorld()) {
                     entity.getBody().addImpulse(impulseEntity.cpy().scl(otherMass / massSum));
-                    Gdx.app.log("TRIGGERED", "ENTITY");
                 }
 
                 /**
@@ -302,7 +301,6 @@ public class CollisionController {
                  */
 
                 if (!other.getBody().isCollidedWithWorld()) {
-                    Gdx.app.log("TRIGGERED", "OTHER");
                     other.getPosition().add(resolutionVector.cpy().scl(-1f));
                     other.getBody().addImpulse(impulseOther.cpy().scl(-entityMass / massSum));
                 }

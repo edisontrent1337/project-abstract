@@ -6,7 +6,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.Body;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
-import com.trent.awesomejumper.engine.modelcomponents.popups.PopUpFeed;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
 
 
@@ -28,7 +27,7 @@ public class Projectile extends Entity {
     private final float TORQUE = 50f;
 
     //TESTING
-    private final int baseDamage = 90;
+    private final int baseDamage = 635;
     private CollisionBox projectileBox;
 
 
@@ -36,7 +35,6 @@ public class Projectile extends Entity {
     public Projectile(Vector2 position, float z) {
         this.body = new Body(this, WIDTH_X, WIDTH_Y);
         this.graphics = new Graphics(this,FRAME_DURATION,"projectile", SPRITE_WIDTH, SPRITE_HEIGHT);
-        this.popUpFeed = new PopUpFeed(this);
 
         body.setBounds(new CollisionBox(position, WIDTH_X, WIDTH_Y));
         body.setPosition(position);

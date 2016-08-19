@@ -6,7 +6,6 @@ import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.Body;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.engine.modelcomponents.Health;
-import com.trent.awesomejumper.engine.modelcomponents.popups.PopUpFeed;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
 
 /**
@@ -33,7 +32,7 @@ public class Chest extends Entity {
 
         body = new Body(this, WIDTH,HEIGHT);
         graphics = new Graphics(this, 0f,"wood_chest", SPRITE_WIDTH,SPRITE_HEIGHT);
-        health = new Health(this, 100);
+        health = new Health(this, 1000);
         body.setPosition(position);
         body.setMass(MASS);
         body.setFriction(FRICTION);

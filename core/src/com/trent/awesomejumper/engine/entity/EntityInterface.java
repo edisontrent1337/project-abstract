@@ -2,7 +2,6 @@ package com.trent.awesomejumper.engine.entity;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.trent.awesomejumper.engine.modelcomponents.*;
-import com.trent.awesomejumper.engine.modelcomponents.popups.PopUpFeed;
 
 /**
  * Created by Sinthu on 09.12.2015.
@@ -53,8 +52,7 @@ public interface EntityInterface {
     void setWeaponInventory(WeaponInventory weaponInventory);
     void updateWeaponPositions();
 
-    PopUpFeed getPopUpFeed();
-    void setPopUpFeed(PopUpFeed feed);
+
 
     Type getType();
 
