@@ -13,8 +13,5 @@ public abstract class ModelComponent {
 
     }
 
-    public ModelComponent(Entity entity) {
-        this.entity = entity;
-    }
 
 }

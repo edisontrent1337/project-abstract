@@ -1,6 +1,7 @@
 package com.trent.awesomejumper.controller;
 
 import com.badlogic.gdx.math.Vector2;
+import com.trent.awesomejumper.controller.collision.CollisionController;
 import com.trent.awesomejumper.engine.entity.Entity;
 
 import java.util.Iterator;
@@ -19,8 +20,7 @@ public class WorldController {
     // ---------------------------------------------------------------------------------------------
 
     private WorldContainer worldContainer;
-    private com.trent.awesomejumper.controller.levelgeneration.RandomLevelGenerator randomLevelGenerator;
-    private com.trent.awesomejumper.controller.collision.CollisionController collisionController;
+    private CollisionController collisionController;
 
     public static float worldTime = 0f;
 
@@ -31,7 +31,6 @@ public class WorldController {
 
     public WorldController(WorldContainer worldContainer) {
         this.worldContainer = worldContainer;
-        this.randomLevelGenerator = worldContainer.getRandomLevelGenerator();
         this.collisionController = new com.trent.awesomejumper.controller.collision.CollisionController(worldContainer);
     }
 
@@ -83,10 +82,11 @@ public class WorldController {
 
         }*/
 
-        manageEntitySpeed(delta);
+        manageEntitySpeed();
 
         for(Entity e : worldContainer.getEntities()) {
             e.update(delta);
+            //TODO: EDIT THIS.
             e.updateWeaponPositions();
         }
 
@@ -102,7 +102,7 @@ public class WorldController {
 
 
 
-    private void manageEntitySpeed(float delta) {
+    private void manageEntitySpeed() {
         for (Entity entity : worldContainer.getEntities()) {
             if (entity.getAcceleration().x == 0) {
                 entity.getVelocity().x *= entity.getBody().getFriction();

@@ -275,7 +275,6 @@ public class RenderingEngine extends Renderer {
         moveCamera(player.getPosition().x, player.getPosition().y);
 
         camPositionInPx.set(camera.position.x * ppuX, camera.position.y * ppuY);
-       // camPositionInPx.set(player.getPosition().x * ppuX, player.getPosition().y * ppuY);
 
         spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();

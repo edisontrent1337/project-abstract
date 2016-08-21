@@ -42,7 +42,7 @@ public class WeaponInventory extends ModelComponent {
     private ArrayList<Integer> weapons;
 
     private boolean holdingAWeapon = false;
-    private int inventoryPointer = 0;
+    private int inventoryPointer = 0;           // points to the weapon currently being held
     private int weaponsEquipped = 0;
 
     private int selectedWeaponID = NO_WEAPON;

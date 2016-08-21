@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.modelcomponents.Body;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
-import com.trent.awesomejumper.engine.modelcomponents.WeaponComponent;
+import com.trent.awesomejumper.engine.modelcomponents.weapons.GunComponent;
 
 /**
  * TODO: implement range
@@ -35,16 +35,19 @@ public class Pistol extends Weapon {
     public Pistol(Vector2 position) {
         this.body = new Body(this, WIDTH, HEIGHT);
         this.graphics = new Graphics(this, 0f, "fiveseven", SPRITE_WIDTH, SPRITE_HEIGHT);
-        this.weaponComponent = new WeaponComponent(this, "FIVE-SEVEN");
+        this.gunComponent = new GunComponent(this, "FIVE-SEVEN");
+
+        // TODO: change above code to this
+       // entityComponents.put(ComponentIndex.BODY, new Body(this, WIDTH,HEIGHT));
 
         body.setMass(MASS);
         body.setFriction(FRICTION);
         body.setElasticity(ELASTICITY);
         body.setPosition(position);
         body.setMaxVelocity(MAX_SPEED);
-        weaponComponent.setAmmoAndClips(AMMO, CLIP_SIZE);
-        weaponComponent.setProjectileSpeed(PROJECTILE_SPEED);
-        weaponComponent.setWeaponTimings(RECOVER_TIME, RELOAD_TIME);
+        gunComponent.setAmmoAndClips(AMMO, CLIP_SIZE);
+        gunComponent.setProjectileSpeed(PROJECTILE_SPEED);
+        gunComponent.setWeaponTimings(RECOVER_TIME, RELOAD_TIME);
 
         graphics.enableRotations();
         graphics.disableShadowRotations();

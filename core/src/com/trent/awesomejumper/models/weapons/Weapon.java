@@ -1,19 +1,18 @@
 package com.trent.awesomejumper.models.weapons;
 
 import com.trent.awesomejumper.engine.entity.Entity;
-import com.trent.awesomejumper.engine.modelcomponents.WeaponComponent;
+import com.trent.awesomejumper.engine.modelcomponents.weapons.GunComponent;
 
 /**
  * Created by Sinthu on 01.03.2016.
  */
-public class Weapon extends Entity {
+public class Weapon extends Entity implements WeaponInterface {
 
     protected static final float EQUIP_TIMEOUT = 1.5f;
 
     public Weapon() {
 
     }
-
 
 
     @Override
@@ -25,32 +24,50 @@ public class Weapon extends Entity {
          * be grabbed and equipped again.
          * TODO: implement weapon pickup with the press of a button
          */
-        if(time - registerTime > EQUIP_TIMEOUT && !weaponComponent.isEquipped()) {
+        if (time - registerTime > EQUIP_TIMEOUT && !gunComponent.isEquipped()) {
             setOwner(this);
         }
 
     }
 
+
+    // METHODS & FUNCTIONS
+    @Override
+    public void fire() {
+        gunComponent.fire();
+    }
+
+
+
+    @Override
+    public void setEquipped(boolean equipped) {
+
+        gunComponent.setEquipped(equipped);
+    }
+
+    @Override
+    public void repair() {
+
+    }
+
+
     // GETTER AND SETTER
     // ---------------------------------------------------------------------------------------------
 
-    public WeaponComponent getWeaponComponent() {
-        return weaponComponent;
+    public GunComponent getWeaponComponent() {
+        return gunComponent;
     }
 
     public String getStatus() {
-        return  weaponComponent.getStatus();
+        return gunComponent.getStatus();
     }
 
     public String getName() {
-        return weaponComponent.getName();
+        return gunComponent.getName();
     }
 
-    public void setEquipped(boolean equipped) {
-        weaponComponent.setEquipped(equipped);
-    }
     public boolean isEquipped() {
-        return weaponComponent.isEquipped();
+        return gunComponent.isEquipped();
     }
 
 

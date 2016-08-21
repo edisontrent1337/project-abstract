@@ -1,6 +1,5 @@
 package com.trent.awesomejumper.engine.entity;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -8,9 +7,12 @@ import com.trent.awesomejumper.controller.EntityManager;
 import com.trent.awesomejumper.engine.modelcomponents.Body;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.engine.modelcomponents.Health;
-import com.trent.awesomejumper.engine.modelcomponents.WeaponComponent;
+import com.trent.awesomejumper.engine.modelcomponents.ModelComponent;
+import com.trent.awesomejumper.engine.modelcomponents.weapons.GunComponent;
 import com.trent.awesomejumper.engine.modelcomponents.WeaponInventory;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
+
+import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -29,7 +31,9 @@ public class Entity implements EntityInterface {
         BODY(0),
         GRAPHICS(1),
         HEALTH(2),
-        POP_UPS(3),
+        WEAPON_INVENTORY(3),
+        WEAPON_COMPONENT(4),
+
         ;
 
         private int value;
@@ -47,7 +51,7 @@ public class Entity implements EntityInterface {
     protected Graphics graphics;
     protected Health health;
     protected WeaponInventory weaponInventory;
-    protected WeaponComponent weaponComponent;
+    protected GunComponent gunComponent;
 
     protected Entity owner;
 
@@ -73,6 +77,8 @@ public class Entity implements EntityInterface {
         }
 
     }
+
+    protected HashMap<ComponentIndex,ModelComponent> entityComponents;
 
     public State state;
 

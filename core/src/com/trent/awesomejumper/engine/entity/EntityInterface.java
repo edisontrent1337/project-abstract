@@ -50,6 +50,7 @@ public interface EntityInterface {
 
     WeaponInventory getWeaponInventory();
     void setWeaponInventory(WeaponInventory weaponInventory);
+    //TODO: remove this!
     void updateWeaponPositions();
 
 

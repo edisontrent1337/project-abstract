@@ -1,8 +1,7 @@
-package com.trent.awesomejumper.engine.modelcomponents;
+package com.trent.awesomejumper.engine.modelcomponents.weapons;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.entity.Entity;
+import com.trent.awesomejumper.engine.modelcomponents.ModelComponent;
 import com.trent.awesomejumper.models.testing.Projectile;
 
 /**
@@ -13,7 +12,7 @@ import com.trent.awesomejumper.models.testing.Projectile;
  * Functions like fire(), reload(), drop()
  * Created by Sinthu on 01.03.2016.
  */
-public class WeaponComponent extends ModelComponent {
+public class GunComponent extends WeaponComponent implements Reloadable {
 
 
     // TODO: implement recoil with a vertex shader.
@@ -31,7 +30,7 @@ public class WeaponComponent extends ModelComponent {
 
     private boolean isEquipped;
 
-    public WeaponComponent(Entity weapon, String name) {
+    public GunComponent(Entity weapon, String name) {
         this.entity = weapon;
         this.name = name;
         entity.hasWeaponComponent = true;
@@ -45,6 +44,7 @@ public class WeaponComponent extends ModelComponent {
      * Direction, speed and orientation are set depending on the owner of the weapon that
      * fires the projectile.
      */
+    @Override
     public void fire() {
         if (entity.time - timeFired < recoverTime)
             return;
@@ -53,7 +53,7 @@ public class WeaponComponent extends ModelComponent {
 
         if (currentClip != 0) {
             currentClip--;
-            Projectile projectile = new Projectile(entity.getBody().getCenter().cpy(), 0);
+            Projectile projectile = new Projectile(entity.getBody().getCenter().cpy(), entity.getBody().getHeightZ());
             projectile.getBody().setVelocity(entity.getBody().getOrientation().cpy().nor().scl(speed));
             projectile.getBody().setAngleOfRotation(entity.getBody().getAngleOfRotation());
             projectile.register();
@@ -64,6 +64,11 @@ public class WeaponComponent extends ModelComponent {
         if (currentClip == 0) {
             reload();
         }
+    }
+
+    @Override
+    public void setEquipped(boolean isEquipped) {
+        this.isEquipped = isEquipped;
     }
 
     public void reload() {
@@ -104,10 +109,6 @@ public class WeaponComponent extends ModelComponent {
         return name;
     }
 
-
-    public void setEquipped(boolean isEquipped) {
-        this.isEquipped = isEquipped;
-    }
 
     public boolean isEquipped() {
         return isEquipped;
