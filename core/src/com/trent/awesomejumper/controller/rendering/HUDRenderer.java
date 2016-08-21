@@ -94,28 +94,6 @@ public class HudRenderer extends Renderer {
             drawWeaponHUD();
             hudFont.draw(spriteBatch, player.getHealth().toString(), 100, Gdx.graphics.getHeight() - 50);
         spriteBatch.end();
-        /**
-         * Render weapon information
-         *
-         */
-        /*GlyphLayout weapon = new GlyphLayout();
-        GlyphLayout ammo = new GlyphLayout();
-        ammo.setText(hudFont, selectedWeapon.getWeaponComponent().getStatus());
-        weapon.setText(hudFont, selectedWeapon.getWeaponComponent().getName());
-
-        if(!player.getWeaponInventory().isHoldingAWeapon()) {
-            drawFontWithShadow(NO_WEAPON, Gdx.graphics.getWidth() - WEAPON_OFFSET_X, WEAPON_OFFSET_Y);
-        }
-
-        else {
-            drawFontWithShadow(selectedWeapon.getWeaponComponent().getName(), Gdx.graphics.getWidth() - WEAPON_OFFSET_X, WEAPON_OFFSET_Y);
-            drawFontWithShadow(selectedWeapon.getWeaponComponent().getStatus(), Gdx.graphics.getWidth() - WEAPON_OFFSET_X / 2, WEAPON_OFFSET_Y);
-
-        }*/
-
-
-
-
 
     }
 
