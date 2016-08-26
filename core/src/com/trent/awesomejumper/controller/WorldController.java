@@ -3,6 +3,7 @@ package com.trent.awesomejumper.controller;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.controller.collision.CollisionController;
 import com.trent.awesomejumper.engine.entity.Entity;
+import com.trent.awesomejumper.models.projectile.Projectile;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -60,15 +61,28 @@ public class WorldController {
         }
 
 
-        for(Entity e: worldContainer.getEntities()) {
+        for(Entity e : worldContainer.getEntities()) {
             if(!e.isAlive() || !e.getBody().isCollisionDetectionEnabled())
                 continue;
-            collisionController.collisionDetection(e,delta);
+            collisionController.resolveWorldCollisions(e,delta);
         }
 
+
+        for(Entity e: worldContainer.getMobileEntities()) {
+            if(!e.isAlive() || !e.getBody().isCollisionDetectionEnabled())
+                continue;
+            collisionController.resolveEntityCollisions(e,delta);
+        }
+
+        for(Entity e : worldContainer.getLivingEntities()) {
+            for(Projectile p: worldContainer.getProjectiles())
+                collisionController.projectileCollisionDetection(e,p,delta);
+        }
+
+        //TODO: for(Projectile p: worldContainer.getProjectiles()) collisionController.projectileCollision(p)
         worldContainer.garbageRemoval();
 
-        for(Entity e: worldContainer.getEntities()) {
+        for(Entity e: worldContainer.getMobileEntities()) {
             LinkedList<Vector2> impulseList = e.getBody().getImpulses();
             for(Iterator<Vector2> it = impulseList.iterator(); it.hasNext();) {
                 e.getVelocity().add(it.next());
@@ -86,8 +100,6 @@ public class WorldController {
 
         for(Entity e : worldContainer.getEntities()) {
             e.update(delta);
-            //TODO: EDIT THIS.
-            e.updateWeaponPositions();
         }
 
 

@@ -3,8 +3,10 @@ package com.trent.awesomejumper.models;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.trent.awesomejumper.controller.EntityManager;
 import com.trent.awesomejumper.controller.input.InputHandler;
 import com.trent.awesomejumper.engine.entity.Entity;
+import com.trent.awesomejumper.engine.entity.LivingEntity;
 import com.trent.awesomejumper.engine.modelcomponents.Body;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.engine.modelcomponents.Health;
@@ -17,7 +19,7 @@ import static com.trent.awesomejumper.utils.Utilities.sub;
 /**
  * Created by Sinthu on 12.06.2015.
  */
-public class Player extends Entity {
+public class Player extends Entity implements LivingEntity{
 
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
@@ -47,6 +49,8 @@ public class Player extends Entity {
     private CollisionBox head, torso, legs;
 
     private float playerDelta;
+
+   // protected WeaponInventory weaponInventory;
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
@@ -121,6 +125,8 @@ public class Player extends Entity {
         body.setOrientation(sub(body.getCenter(),body.getAimReference()));
         body.setAngleOfRotation(angle(body.getOrientation()));
 
+        weaponInventory.updateWeaponPositions();
+
 
     }
 
@@ -129,13 +135,19 @@ public class Player extends Entity {
         super.render(spriteBatch);
     }
 
-    @Override
-    public void updateWeaponPositions() {
-        super.updateWeaponPositions();
-    }
 
     public float getPlayerDelta() {
         return playerDelta;
+    }
+
+    public WeaponInventory getWeaponInventory() {
+        return weaponInventory;
+    }
+
+
+    @Override
+    public void register() {
+        EntityManager.getInstance().registerEntity(this);
     }
 
 }

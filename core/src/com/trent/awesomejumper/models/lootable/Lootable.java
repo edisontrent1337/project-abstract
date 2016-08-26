@@ -1,17 +1,25 @@
-package com.trent.awesomejumper.models.testing;
+package com.trent.awesomejumper.models.lootable;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
+import com.trent.awesomejumper.controller.EntityManager;
 import com.trent.awesomejumper.engine.entity.Entity;
+import com.trent.awesomejumper.engine.entity.LivingEntity;
 import com.trent.awesomejumper.engine.modelcomponents.Body;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.engine.modelcomponents.Health;
+import com.trent.awesomejumper.engine.modelcomponents.ModelComponent;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
 
 /**
  * Created by Sinthu on 10.12.2015.
  */
-public class Chest extends Entity {
+public class Lootable extends Entity implements LivingEntity {
 
 
     private final int SPRITE_SIZE = 24;
@@ -28,7 +36,10 @@ public class Chest extends Entity {
 
     private final float FRAME_DURATION = 0.066f;
 
-    public Chest(Vector2 position) {
+    JsonValue test = new JsonReader().parse(Gdx.files.internal("data/entities/lootable.json"));
+    Array<ModelComponent> modelComponents = new Array<>();
+
+    public Lootable(Vector2 position) {
 
         body = new Body(this, WIDTH,HEIGHT);
         graphics = new Graphics(this, 0f,"wood_chest", SPRITE_WIDTH,SPRITE_HEIGHT);
@@ -60,4 +71,9 @@ public class Chest extends Entity {
         super.render(spriteBatch);
     }
 
+
+    @Override
+    public void register() {
+        EntityManager.getInstance().registerEntity(this);
+    }
 }

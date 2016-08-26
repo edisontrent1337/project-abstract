@@ -3,6 +3,7 @@ package com.trent.awesomejumper.engine.entity;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.trent.awesomejumper.engine.modelcomponents.*;
 
+
 /**
  * Created by Sinthu on 09.12.2015.
  */
@@ -30,6 +31,11 @@ public interface EntityInterface {
     }
 
 
+
+
+
+
+
     /**
      * Actions an entity can perform.
      */
@@ -39,6 +45,12 @@ public interface EntityInterface {
     void register();
     boolean isAlive();
 
+
+    /**
+     * Body and Graphic components are the two main components that should always be visible, because
+     * rarely an entity without both body and graphics is needed.
+     *
+     */
     Body getBody();
     void setBody(Body body);
 
@@ -47,13 +59,6 @@ public interface EntityInterface {
 
     Health getHealth();
     void setHealth(Health health);
-
-    WeaponInventory getWeaponInventory();
-    void setWeaponInventory(WeaponInventory weaponInventory);
-    //TODO: remove this!
-    void updateWeaponPositions();
-
-
 
     Type getType();
 

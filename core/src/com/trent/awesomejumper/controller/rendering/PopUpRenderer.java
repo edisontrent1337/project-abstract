@@ -187,10 +187,12 @@ public class PopUpRenderer extends Renderer {
      */
     public void loadTexturesAndFonts(FreeTypeFontGenerator generator) {
         FreeTypeFontParameter popUpParams = new FreeTypeFontParameter();
-        popUpParams.size = 32;
-        popUpParams.shadowColor = new Color(99/255, 66/255,66/255,1);
+        popUpParams.size = 24;
+        popUpParams.shadowColor = SHADOW_COLOR;
         popUpParams.shadowOffsetX = 2;
         popUpParams.shadowOffsetY = 2;
+        popUpParams.borderColor = BORDER_COLOR;
+        popUpParams.borderWidth = 2;
         popUpFont = generator.generateFont(popUpParams);
     }
 

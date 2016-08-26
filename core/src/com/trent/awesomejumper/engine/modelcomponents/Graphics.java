@@ -9,11 +9,10 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
-import com.trent.awesomejumper.controller.WorldController;
 import com.trent.awesomejumper.controller.rendering.RenderingEngine;
 import com.trent.awesomejumper.engine.entity.Entity;
 
-import static com.trent.awesomejumper.utils.Utilities.dot;
+import static com.trent.awesomejumper.engine.modelcomponents.ModelComponent.ComponentID;
 
 /**
  * Created by Sinthu on 09.12.2015.
@@ -72,7 +71,7 @@ public class Graphics extends ModelComponent {
         this.FRAME_DURATION = frameDuration;
         alpha = 1f;
         // Enable graphics component
-        entity.hasGraphics = true;
+        entity.enableComponent(ComponentID.GRAPHICS);
         visible = true;
 
         hpRenderer = new ShapeRenderer();
@@ -168,15 +167,17 @@ public class Graphics extends ModelComponent {
          */
         sb.end();
 
-        hpRenderer.setProjectionMatrix(sb.getProjectionMatrix());
+        /*hpRenderer.setProjectionMatrix(sb.getProjectionMatrix());
         hpRenderer.begin(ShapeRenderer.ShapeType.Point);
         hpRenderer.point(entity.getBody().getCenter().x,entity.getBody().getCenter().y,0);
-        hpRenderer.end();
+        hpRenderer.end();*/
 
 
-        {
-            renderHealthBar(sb.getProjectionMatrix());
-        }
+            {
+                if(entity.has(ComponentID.HEALTH))
+                renderHealthBar(sb.getProjectionMatrix());
+            }
+
         sb.begin();
 
 
@@ -185,7 +186,6 @@ public class Graphics extends ModelComponent {
 
 
     private void renderHealthBar(Matrix4 projectionMatrix) {
-        if (entity.hasHealth) {
             Health health = entity.getHealth();
             if (health.getHp() == health.getMaxHp())
                 return;
@@ -252,7 +252,6 @@ public class Graphics extends ModelComponent {
             hpRenderer.end();
 
             Gdx.gl.glDisable(GL20.GL_BLEND);
-        }
     }
 
 

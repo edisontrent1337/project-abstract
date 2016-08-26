@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.modelcomponents.Body;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.engine.modelcomponents.weapons.GunComponent;
+import com.trent.awesomejumper.engine.physics.CollisionBox;
 
 /**
  * TODO: implement range
@@ -38,13 +39,17 @@ public class Pistol extends Weapon {
         this.gunComponent = new GunComponent(this, "FIVE-SEVEN");
 
         // TODO: change above code to this
-       // entityComponents.put(ComponentIndex.BODY, new Body(this, WIDTH,HEIGHT));
+       // entityComponents.put(ComponentID.BODY, new Body(this, WIDTH,HEIGHT));
+
 
         body.setMass(MASS);
         body.setFriction(FRICTION);
         body.setElasticity(ELASTICITY);
         body.setPosition(position);
         body.setMaxVelocity(MAX_SPEED);
+        body.setBounds(new CollisionBox(position, WIDTH, HEIGHT));
+
+
         gunComponent.setAmmoAndClips(AMMO, CLIP_SIZE);
         gunComponent.setProjectileSpeed(PROJECTILE_SPEED);
         gunComponent.setWeaponTimings(RECOVER_TIME, RELOAD_TIME);

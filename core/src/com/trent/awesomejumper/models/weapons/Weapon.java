@@ -1,12 +1,15 @@
 package com.trent.awesomejumper.models.weapons;
 
+import com.trent.awesomejumper.controller.EntityManager;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.weapons.GunComponent;
+import com.trent.awesomejumper.engine.modelcomponents.weapons.WeaponComponent;
 
 /**
  * Created by Sinthu on 01.03.2016.
  */
-public class Weapon extends Entity implements WeaponInterface {
+public class Weapon extends Entity implements WeaponInterface{
+
 
     protected static final float EQUIP_TIMEOUT = 1.5f;
 
@@ -45,11 +48,17 @@ public class Weapon extends Entity implements WeaponInterface {
         gunComponent.setEquipped(equipped);
     }
 
+
     @Override
     public void repair() {
 
     }
 
+
+    @Override
+    public void register() {
+        EntityManager.getInstance().registerEntity(this);
+    }
 
     // GETTER AND SETTER
     // ---------------------------------------------------------------------------------------------

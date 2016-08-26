@@ -7,13 +7,17 @@ import com.trent.awesomejumper.controller.EntityManager;
 import com.trent.awesomejumper.engine.modelcomponents.Body;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.engine.modelcomponents.Health;
-import com.trent.awesomejumper.engine.modelcomponents.ModelComponent;
-import com.trent.awesomejumper.engine.modelcomponents.weapons.GunComponent;
 import com.trent.awesomejumper.engine.modelcomponents.WeaponInventory;
+import com.trent.awesomejumper.engine.modelcomponents.weapons.GunComponent;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
 
-import java.util.HashMap;
+import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.trent.awesomejumper.engine.modelcomponents.ModelComponent.ComponentID.*;
+import static com.trent.awesomejumper.engine.modelcomponents.ModelComponent.ComponentID;
+
 
 /**
  * Created by Sinthu on 12.06.2015.
@@ -27,31 +31,18 @@ public class Entity implements EntityInterface {
 
     private final int ID;
 
-    public enum ComponentIndex {
-        BODY(0),
-        GRAPHICS(1),
-        HEALTH(2),
-        WEAPON_INVENTORY(3),
-        WEAPON_COMPONENT(4),
-
-        ;
-
-        private int value;
-
-        ComponentIndex(int value) {
-            this.value = value;
-        }
-    }
-
 
     public static int entityCount = 0;
-    public boolean hasBody = false, hasGraphics = false, hasHealth = false, hasWeaponInventory = false,
-    hasPopUps = false, hasWeaponComponent = false;
+
+    /**
+     * List of all different components available.
+     */
     protected Body body;
     protected Graphics graphics;
     protected Health health;
     protected WeaponInventory weaponInventory;
     protected GunComponent gunComponent;
+
 
     protected Entity owner;
 
@@ -68,6 +59,7 @@ public class Entity implements EntityInterface {
         DEAD(6);
 
         private final int value;
+
         State(int value) {
             this.value = value;
         }
@@ -78,7 +70,7 @@ public class Entity implements EntityInterface {
 
     }
 
-    protected HashMap<ComponentIndex,ModelComponent> entityComponents;
+    protected HashSet<ComponentID> components;
 
     public State state;
 
@@ -91,7 +83,8 @@ public class Entity implements EntityInterface {
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
 
-    public Entity(){
+    public Entity() {
+        components = new HashSet<>();
         entityCount++;
         ID = createID();
         owner = this;
@@ -104,13 +97,14 @@ public class Entity implements EntityInterface {
     public CollisionBox getBounds() {
         return body.getBounds();
     }
+
     public void setBounds(float x, float y) {
         body.setBounds(x, y);
 
     }
 
     public Array<CollisionBox> getBodyHitboxes() {
-        return body.getHitboxSkeleton();
+        return getBody().getHitboxSkeleton();
     }
 
     public Vector2 getPosition() {
@@ -120,7 +114,6 @@ public class Entity implements EntityInterface {
     public void setPosition(Vector2 position) {
         body.setPosition(position);
     }
-
 
 
     public void setPositionX(float x) {
@@ -171,6 +164,7 @@ public class Entity implements EntityInterface {
     public Vector2 getVelocity() {
         return body.getVelocity();
     }
+
     public float getMaxVelocity() {
         return body.getMaxVelocity();
     }
@@ -200,6 +194,7 @@ public class Entity implements EntityInterface {
         alive = false;
         entityCount--;
     }
+
     @Override
     public boolean isAlive() {
         return alive;
@@ -222,7 +217,7 @@ public class Entity implements EntityInterface {
     public void update(float delta) {
         time += delta;
 
-        if(hasBody)
+        if (has(BODY))
             body.update(delta);
 
     }
@@ -242,18 +237,18 @@ public class Entity implements EntityInterface {
 
     @Override
     public void render(SpriteBatch spriteBatch) {
-        if(hasGraphics)
+        if (has(GRAPHICS))
             graphics.render(spriteBatch);
     }
 
     public void hide() {
-        if(hasGraphics)
+        if (has(GRAPHICS))
             graphics.hide();
 
     }
 
     public void show() {
-        if(hasGraphics)
+        if (has(GRAPHICS))
             graphics.show();
     }
     // HEALTH
@@ -269,23 +264,12 @@ public class Entity implements EntityInterface {
 
     }
 
-    // WEAPON INVENTORY
-    // ---------------------------------------------------------------------------------------------
 
-    @Override
-    public WeaponInventory getWeaponInventory() {
-        return weaponInventory;
+    public boolean has(ComponentID componentID) {
+        return components.contains(componentID);
     }
-
-    @Override
-    public void setWeaponInventory(WeaponInventory weaponInventory) {
-
-    }
-
-    @Override
-    public void updateWeaponPositions() {
-        if(hasWeaponInventory)
-            weaponInventory.updateWeaponPositions();
+    public void enableComponent(ComponentID id) {
+        components.add(id);
     }
 
 

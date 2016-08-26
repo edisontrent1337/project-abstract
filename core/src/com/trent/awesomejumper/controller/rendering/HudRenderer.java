@@ -27,8 +27,8 @@ public class HudRenderer extends Renderer {
 
     private static final int XY_PADDING = 100;
 
-   // private OrthographicCamera hudCam;
-   // private SpriteBatch hudBatch;
+    // private OrthographicCamera hudCam;
+    // private SpriteBatch hudBatch;
 
 
     // FONTS:
@@ -45,7 +45,7 @@ public class HudRenderer extends Renderer {
 
     public HudRenderer(Player player) {
         // Init renderer, start with a default camera and sprite batch
-        super(CAMERA_WIDTH,CAMERA_HEIGHT);
+        super(CAMERA_WIDTH, CAMERA_HEIGHT);
         camera.position.set(CAMERA_WIDTH / 2, CAMERA_HEIGHT / 2, 0);
         //this.hudCam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         //this.hudBatch = new SpriteBatch();
@@ -67,18 +67,17 @@ public class HudRenderer extends Renderer {
         hudFontParams.color = Color.WHITE;
         hudFontParams.size = 32;
         hudFontParams.borderColor = Color.BLACK;
+        hudFontParams.shadowColor = SHADOW_COLOR;
         hudFontParams.shadowOffsetX = 2;
         hudFontParams.shadowOffsetY = 2;
         hudFontParams.minFilter = Texture.TextureFilter.Nearest;
         hudFontParams.magFilter = Texture.TextureFilter.Nearest;
 
+        hudFontParams.borderColor = BORDER_COLOR;
+        hudFontParams.borderWidth = 2;
+
         hudFont = generator.generateFont(hudFontParams);
 
-
-
-        /*hudFont = new BitmapFont(Gdx.files.internal("fonts/munro_outlined.fnt"), Gdx.files.internal("fonts/munro_outlined_0.png"), false);
-        hudFont.setColor(Color.WHITE);
-        hudFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);*/
         camera.update();
     }
 
@@ -88,11 +87,11 @@ public class HudRenderer extends Renderer {
         camera.update();
         spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
-            drawHealthAndExp();
-            drawTime();
-            drawMiniMap();
-            drawWeaponHUD();
-            hudFont.draw(spriteBatch, player.getHealth().toString(), 100, Gdx.graphics.getHeight() - 50);
+        drawHealthAndExp();
+        drawTime();
+        drawMiniMap();
+        drawWeaponHUD();
+        hudFont.draw(spriteBatch, player.getHealth().toString(), 100, Gdx.graphics.getHeight() - 50);
         spriteBatch.end();
 
     }
@@ -104,14 +103,6 @@ public class HudRenderer extends Renderer {
         this.w = w;
         this.h = h;
         camera.update();
-    }
-
-
-    private void drawFontWithShadow(String text, int x, int y) {
-        hudFont.setColor(Color.BLACK);
-        hudFont.draw(spriteBatch, text, x + SHADOW_OFFSET, y - SHADOW_OFFSET);
-        hudFont.setColor(Color.WHITE);
-        hudFont.draw(spriteBatch, text, x, y);
     }
 
 
@@ -127,16 +118,15 @@ public class HudRenderer extends Renderer {
             selectedWeapon = player.getWeaponInventory().getSelectedWeapon();
             weaponName.setText(hudFont, selectedWeapon.getName());
             ammo.setText(hudFont, selectedWeapon.getStatus());
-        }
-        else {
-            weaponName.setText(hudFont,NO_WEAPON);
-            ammo.setText(hudFont,"");
+        } else {
+            weaponName.setText(hudFont, NO_WEAPON);
+            ammo.setText(hudFont, "");
         }
 
         float nameWidth = weaponName.width;
         float ammoWidth = ammo.width;
 
-        hudFont.draw(spriteBatch, weaponName, w - (nameWidth +50), 50);
+        hudFont.draw(spriteBatch, weaponName, w - (nameWidth + 50), 50);
         hudFont.draw(spriteBatch, ammo, w - (ammoWidth + 50), 100);
 
 

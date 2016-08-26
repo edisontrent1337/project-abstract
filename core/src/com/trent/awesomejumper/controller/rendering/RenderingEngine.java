@@ -13,24 +13,25 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-
-import static com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
-
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import com.trent.awesomejumper.controller.input.InputHandler;
 import com.trent.awesomejumper.controller.WorldContainer;
-import com.trent.awesomejumper.engine.modelcomponents.Graphics;
-import com.trent.awesomejumper.game.AwesomeJumperMain;
+import com.trent.awesomejumper.controller.input.InputHandler;
 import com.trent.awesomejumper.engine.entity.Entity;
+import com.trent.awesomejumper.engine.modelcomponents.Graphics;
+import com.trent.awesomejumper.engine.modelcomponents.ModelComponent;
+import com.trent.awesomejumper.engine.physics.CollisionBox;
+import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.SkyBox;
-import com.trent.awesomejumper.engine.physics.CollisionBox;
 import com.trent.awesomejumper.tiles.Tile;
 
+import static com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import static com.trent.awesomejumper.utils.Utilities.formVec;
+import static com.trent.awesomejumper.engine.modelcomponents.ModelComponent.ComponentID.*;
+
 
 /**
  * Created by trent on 12.06.2015.
@@ -133,8 +134,8 @@ public class RenderingEngine extends Renderer {
         this.popUpRenderer = PopUpRenderer.createPopUpRenderer();
         camPositionInPx = new Vector2(0, 0);
         this.allTextures = new TextureAtlas();
-        this.debugStrings = new Array<>(10);
-        for (int i = 0; i < 10; i++) {
+        this.debugStrings = new Array<>();
+        for (int i = 0; i < 20; i++) {
             debugStrings.add(new String(""));
         }
 
@@ -194,7 +195,7 @@ public class RenderingEngine extends Renderer {
         popUpRenderer.loadTexturesAndFonts(fontGenerator);
 
         FreeTypeFontParameter debugFontParams = new FreeTypeFontParameter();
-        debugFontParams.size = 32;
+        debugFontParams.size = 24;
         debugFontParams.color = Color.WHITE;
         debugFontParams.shadowColor = Color.BLACK;
         debugFontParams.shadowOffsetX = 2;
@@ -203,16 +204,6 @@ public class RenderingEngine extends Renderer {
         debugFontParams.magFilter = Texture.TextureFilter.Nearest;
 
         debugFont = fontGenerator.generateFont(debugFontParams);
-
-        //FONTS
-        /*consoleFont = new BitmapFont(Gdx.files.internal("fonts/munro_regular_14.fnt"), Gdx.files.internal("fonts/munro_regular_14_0.png"), false);
-        debugFont.setColor(Color.WHITE);
-        debugFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-
-        popUpFont = new BitmapFont(Gdx.files.internal("fonts/munro_regular_14.fnt"), Gdx.files.internal("fonts/munro_regular_14_0.png"), false);
-        popUpFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        popUpFont.getData().setScale(1f / ppuX, 1 / ppuY);*/
-
 
         // TEXTURE ATLAS
         // -----------------------------------------------------------------------------------------
@@ -223,7 +214,7 @@ public class RenderingEngine extends Renderer {
          */
 
         for (Entity e : worldContainer.getEntities()) {
-            initGraphics(e);
+           // initGraphics(e);
         }
 
         // TILE TEXTURES
@@ -247,7 +238,7 @@ public class RenderingEngine extends Renderer {
      */
     public void initGraphics(Entity e) {
 
-        if (e.hasGraphics) {
+        if (e.has(GRAPHICS)) {
             Graphics g = e.getGraphics();
             Array<TextureAtlas.AtlasRegion> regions = allTextures.findRegions(g.getTextureRegName());
             g.setIdleFrames(regions.first());
@@ -483,6 +474,14 @@ public class RenderingEngine extends Renderer {
                 + " UNPRO " + temp.toString());
         debugStrings.set(DE_REGION, Integer.toString(worldContainer.getRandomLevelGenerator().getRegion(InputHandler.mouse)));
 
+
+        debugStrings.set(DE_REGION+1, "ENTITIES:    "  + Integer.toString(worldContainer.getEntities().size()));
+        debugStrings.set(DE_REGION+2, "PROJECTILES:    "  + Integer.toString(worldContainer.getProjectiles().size()));
+        debugStrings.set(DE_REGION+3, "MOBILE ENTITIES:    "  + Integer.toString(worldContainer.getMobileEntities().size()));
+        debugStrings.set(DE_REGION+4, "LIVING ENTITIES:    "  + Integer.toString(worldContainer.getLivingEntities().size()));
+        debugStrings.set(DE_REGION+5, "WEAPON DROP ENTITIES:    "  + Integer.toString(worldContainer.getWeaponDrops().size()));
+
+
         debugBatch.setProjectionMatrix(debugCam.combined);
         debugBatch.begin();
         for (int i = 0; i < debugStrings.size; i++) {
@@ -525,7 +524,8 @@ public class RenderingEngine extends Renderer {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setColor(Color.GREEN);
 
-        shapeRenderer.line(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter(),player.getWeaponInventory().getSelectedWeapon().getBody().getAimReference());
+        if(player.getWeaponInventory().isHoldingAWeapon())
+            shapeRenderer.line(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter(),player.getWeaponInventory().getSelectedWeapon().getBody().getAimReference());
         shapeRenderer.end();
         // HITBOXES OF TILES AFFECTED BY COLLISION DETECTION
         Gdx.gl.glEnable(GL20.GL_BLEND);

@@ -9,6 +9,18 @@ public abstract class ModelComponent {
 
     protected Entity entity;
 
+    /**
+     * Enum used to identify components of entities.
+     */
+    public enum ComponentID {
+        BODY,
+        GRAPHICS,
+        HEALTH,
+        WEAPON_INVENTORY,
+        WEAPON_COMPONENT;
+    }
+
+
     public ModelComponent() {
 
     }

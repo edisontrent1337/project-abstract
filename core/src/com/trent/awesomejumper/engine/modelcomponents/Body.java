@@ -5,8 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
-import com.trent.awesomejumper.models.testing.Projectile;
-import com.trent.awesomejumper.models.weapons.Pistol;
+import com.trent.awesomejumper.models.projectile.Projectile;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -85,15 +84,12 @@ public class Body extends ModelComponent {
         this.center = new Vector2(position.x + width / 2f, position.y + height / 2f);
         this.zOffset = 0f;
         hitboxSkeleton.clear();
-        entity.hasBody = true;
+        entity.enableComponent(ComponentID.BODY);
     }
 
 
     public void update(float delta) {
 
-        if(entity.getClass().equals(Projectile.class)) {
-            Gdx.app.log("VELO", velocity.toString());
-        }
 
         position.add(velocity.cpy().scl(delta));
         /**
@@ -369,6 +365,7 @@ public class Body extends ModelComponent {
         setAngleOfRotation(0);
         setVelocity(0,0);
         setAcceleration(0,0);
+        entity.setOwner(entity);
     }
 
 }

@@ -1,0 +1,23 @@
+{
+  "components": [
+    {
+    "body": {
+      "width": 0.3725,
+      "height": 0.21875,
+      "maxVelocity": 5,
+      "mass": 0.4,
+      "friction": 0.895,
+      "elasticity": 0.45,
+      "offsetX": 0.125,
+      "offsetY": 0,
+      "damageCoefficient": 0.5
+    }}
+  ,
+    {
+      "graphics": {
+        "spriteWidth": 0.5625,
+        "spriteHeight": 0.75
+      }
+    }
+  ]
+}

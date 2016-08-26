@@ -1,8 +1,7 @@
 package com.trent.awesomejumper.engine.modelcomponents.weapons;
 
 import com.trent.awesomejumper.engine.entity.Entity;
-import com.trent.awesomejumper.engine.modelcomponents.ModelComponent;
-import com.trent.awesomejumper.models.testing.Projectile;
+import com.trent.awesomejumper.models.projectile.Projectile;
 
 /**
  * Weapon component class. Defines the behaviour and attributes of weapons in the game.
@@ -12,7 +11,7 @@ import com.trent.awesomejumper.models.testing.Projectile;
  * Functions like fire(), reload(), drop()
  * Created by Sinthu on 01.03.2016.
  */
-public class GunComponent extends WeaponComponent implements Reloadable {
+public class GunComponent extends WeaponComponent {
 
 
     // TODO: implement recoil with a vertex shader.
@@ -33,7 +32,7 @@ public class GunComponent extends WeaponComponent implements Reloadable {
     public GunComponent(Entity weapon, String name) {
         this.entity = weapon;
         this.name = name;
-        entity.hasWeaponComponent = true;
+        entity.enableComponent(ComponentID.WEAPON_COMPONENT);
     }
 
     // METHODS & FUNCTIONS
@@ -54,9 +53,9 @@ public class GunComponent extends WeaponComponent implements Reloadable {
         if (currentClip != 0) {
             currentClip--;
             Projectile projectile = new Projectile(entity.getBody().getCenter().cpy(), entity.getBody().getHeightZ());
+            projectile.register();
             projectile.getBody().setVelocity(entity.getBody().getOrientation().cpy().nor().scl(speed));
             projectile.getBody().setAngleOfRotation(entity.getBody().getAngleOfRotation());
-            projectile.register();
             projectile.setOwner(entity.getOwner().getOwner());
             timeFired = entity.time;
         }

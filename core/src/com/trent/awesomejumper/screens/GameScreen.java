@@ -15,7 +15,7 @@ import com.trent.awesomejumper.controller.rendering.RenderingEngine;
 import com.trent.awesomejumper.controller.WorldController;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
-import com.trent.awesomejumper.models.testing.Chest;
+import com.trent.awesomejumper.models.lootable.Lootable;
 
 /**
  * Created by Sinthu on 12.06.2015.
@@ -49,6 +49,7 @@ public class GameScreen implements Screen, InputProcessor{
         worldContainer = new WorldContainer();
         renderingEngine = new RenderingEngine(worldContainer, game);
         entityManager.setControllers(worldContainer,renderingEngine);
+        worldContainer.init();
         controller = new WorldController(worldContainer);
         inputHandler = new InputHandler(worldContainer.getPlayer(), renderingEngine.getGameCamera());
         Gdx.input.setInputProcessor(this);
@@ -120,7 +121,7 @@ public class GameScreen implements Screen, InputProcessor{
         }
 
         if(keycode == Keys.U) {
-            Entity e = new Chest(worldContainer.getPlayer().getPosition().cpy().add(1,2));
+            Entity e = new Lootable(worldContainer.getPlayer().getPosition().cpy().add(1,2));
             e.register();
         }
 

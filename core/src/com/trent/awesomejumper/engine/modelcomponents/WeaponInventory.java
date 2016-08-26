@@ -6,6 +6,7 @@ import com.trent.awesomejumper.controller.EntityManager;
 import com.trent.awesomejumper.controller.rendering.PopUpRenderer;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.popups.Message;
+import com.trent.awesomejumper.engine.physics.CollisionBox;
 import com.trent.awesomejumper.models.weapons.Weapon;
 
 import static com.trent.awesomejumper.controller.rendering.PopUpRenderer.PopUpCategories.*;
@@ -24,16 +25,6 @@ public class WeaponInventory extends ModelComponent {
 
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
-    public enum Slot {
-        PRIMARY(0),
-        SECONDARY(1);
-
-        private int slot;
-
-        Slot(int slot) {
-            this.slot = slot;
-        }
-    }
 
     private Weapon selectedWeapon;               // currently selected weapon entity
     private static int MAX_SLOTS = 3;            // number of weapon slots this inventory has
@@ -53,7 +44,7 @@ public class WeaponInventory extends ModelComponent {
     public WeaponInventory(Entity entity) {
         this.entity = entity;
         this.weapons = new ArrayList<>(MAX_SLOTS);
-        entity.hasWeaponInventory = true;
+        entity.enableComponent(ComponentID.WEAPON_INVENTORY);
 
         for (int i = 0; i < MAX_SLOTS; i++) {
             weapons.add(NO_WEAPON);
@@ -250,6 +241,8 @@ public class WeaponInventory extends ModelComponent {
         if (selectedWeaponID != NO_WEAPON) {
             selectedWeapon = (Weapon) EntityManager.getInstance().getEntityByID(selectedWeaponID);
             selectedWeapon.getBody().setPosition(entity.getBody().getCenter().cpy().sub(selectedWeapon.getBody().getHalfDimensions()));
+
+
             selectedWeapon.getBody().setAimReference(entity.getBody().getAimReference());
             selectedWeapon.getBody().setOrientation(entity.getBody().getAimReference().cpy().sub(selectedWeapon.getBody().getCenter()));
             selectedWeapon.getBody().setAngleOfRotation(angle(selectedWeapon.getBody().getOrientation()));

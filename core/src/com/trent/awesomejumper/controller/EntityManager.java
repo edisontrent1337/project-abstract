@@ -1,8 +1,13 @@
 package com.trent.awesomejumper.controller;
 
 import com.badlogic.gdx.Gdx;
+import com.trent.awesomejumper.controller.rendering.RenderingEngine;
 import com.trent.awesomejumper.engine.entity.Entity;
+import com.trent.awesomejumper.models.lootable.Lootable;
+import com.trent.awesomejumper.models.projectile.Projectile;
+import com.trent.awesomejumper.models.weapons.Weapon;
 
+import static com.trent.awesomejumper.engine.modelcomponents.ModelComponent.ComponentID.HEALTH;
 /**
  * Manages the registration of entities at runtime. Adds entities to specified collections of
  * worldContainer and loads its textures with renderingEngine.
@@ -19,7 +24,7 @@ public class EntityManager {
     // ---------------------------------------------------------------------------------------------
 
     private WorldContainer worldContainer;
-    private com.trent.awesomejumper.controller.rendering.RenderingEngine renderingEngine;
+    private RenderingEngine renderingEngine;
 
     private EntityManager() {
 
@@ -40,7 +45,7 @@ public class EntityManager {
     // METHODS & FUNCTIONS
     // ---------------------------------------------------------------------------------------------
 
-    public void setControllers(WorldContainer worldContainer, com.trent.awesomejumper.controller.rendering.RenderingEngine renderingEngine) {
+    public void setControllers(WorldContainer worldContainer, RenderingEngine renderingEngine) {
         this.worldContainer = worldContainer;
         this.renderingEngine = renderingEngine;
     }
@@ -49,47 +54,88 @@ public class EntityManager {
     /**
      * Adds the entity to all relevant collections. Decides with the help of the entities type
      * to which collections the entity should be added.
-     * @param entity
+     * @param //entity
      */
+//    public void registerEntity(Entity entity) {
+//
+//        /**
+//         * Add the entity to the main entity collection that holds all entities.
+//         * Also load necessary assets.
+//         */
+//        worldContainer.registerEntity(entity);
+//        renderingEngine.initGraphics(entity);
+//
+//        /**
+//         * Add the entity to different sub collections which are used for specific collision
+//         * events such as collecting pickups or equipping weapons.
+//         */
+//        if(entity.getType() == null)
+//            Gdx.app.log("ERROR", "ENTITY TYPE WAS NULL");
+//
+//        switch (entity.getType()) {
+//            case PICKUP_ENTITY:
+//                worldContainer.getPickups().add(entity);
+//                worldContainer.getMobileEntities().add(entity);
+//                worldContainer.placeEntity(entity, entity.getPosition());
+//                entity.getBody().reset();
+//                break;
+//            case PROJECTILE_ENTITY:
+//                worldContainer.getProjectiles().add((Projectile)entity);
+//                renderingEngine.initGraphics(entity);
+//                break;
+//            case REGULAR_ENTITY:
+//                break;
+//            case DROPPED_WEAPON_ENTITY:
+//                worldContainer.getWeaponDrops().add(entity);
+//                worldContainer.getMobileEntities().add(entity);
+//                worldContainer.placeEntity(entity,entity.getOwner().getBounds().getPositionAndOffset());
+//                entity.getBody().reset();
+//                break;
+//            default:
+//                break;
+//        }
+//
+//
+//    }
+
+    public void registerEntity(Projectile projectile) {
+        worldContainer.registerEntity(projectile);
+        worldContainer.getProjectiles().add(projectile);
+
+        renderingEngine.initGraphics(projectile);
+    }
+
+    public void registerEntity(Weapon weapon) {
+        worldContainer.registerEntity(weapon);
+        worldContainer.getWeaponDrops().add(weapon);
+        worldContainer.getMobileEntities().add(weapon);
+        worldContainer.placeEntity(weapon, weapon.getOwner().getBounds().getPositionAndOffset());
+        //worldContainer.placeEntity(weapon, weapon.getPosition());
+        weapon.getBody().reset();
+
+
+        renderingEngine.initGraphics(weapon);
+    }
+
+
+    public void registerEntity(Lootable lootable) {
+        worldContainer.registerEntity(lootable);
+        worldContainer.getMobileEntities().add(lootable);
+
+        if(lootable.has(HEALTH))
+            worldContainer.getLivingEntities().add(lootable);
+
+        renderingEngine.initGraphics(lootable);
+    }
+
     public void registerEntity(Entity entity) {
-
-        /**
-         * Add the entity to the main entity collection that holds all entities.
-         * Also load necessary assets.
-         */
         worldContainer.registerEntity(entity);
+        worldContainer.getMobileEntities().add(entity);
+
+        if(entity.has(HEALTH))
+            worldContainer.getLivingEntities().add(entity);
+
         renderingEngine.initGraphics(entity);
-
-        /**
-         * Add the entity to different sub collections which are used for specific collision
-         * events such as collecting pickups or equipping weapons.
-         */
-        if(entity.getType() == null)
-            Gdx.app.log("ERROR", "ENTITY TYPE WAS NULL");
-
-        switch (entity.getType()) {
-            case PICKUP_ENTITY:
-                worldContainer.getPickups().add(entity);
-                worldContainer.placeEntity(entity, entity.getPosition());
-                entity.getBody().reset();
-                break;
-            case PROJECTILE_ENTITY:
-                worldContainer.getProjectiles().add(entity);
-                renderingEngine.initGraphics(entity);
-                break;
-            case REGULAR_ENTITY:
-                break;
-            case DROPPED_WEAPON_ENTITY:
-                worldContainer.getWeaponDrops().add(entity);
-                Gdx.app.log("Owner", entity.getOwner().getGraphics().getTextureRegName());
-                worldContainer.placeEntity(entity,entity.getOwner().getBounds().getPositionAndOffset());
-                entity.getBody().reset();
-                break;
-            default:
-                break;
-        }
-
-
     }
 
 

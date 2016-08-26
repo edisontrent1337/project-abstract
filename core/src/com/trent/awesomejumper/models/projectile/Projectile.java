@@ -1,8 +1,9 @@
-package com.trent.awesomejumper.models.testing;
+package com.trent.awesomejumper.models.projectile;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.trent.awesomejumper.controller.EntityManager;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.Body;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
@@ -79,6 +80,11 @@ public class Projectile extends Entity {
         float coeff = 0.90f + (float)(Math.random() * 0.2f);
         //Gdx.app.log("Coefficient", Float.toString(coeff));
         return (int) (coeff * baseDamage);
+    }
+
+    @Override
+    public void register() {
+        EntityManager.getInstance().registerEntity(this);
     }
 
 }

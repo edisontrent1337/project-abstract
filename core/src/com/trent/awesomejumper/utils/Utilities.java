@@ -171,9 +171,18 @@ public class Utilities {
     }
 
 
-
     // EASING FUNCTIONS
+    // ---------------------------------------------------------------------------------------------
 
 
+    // COLOR CREATION
+    // ---------------------------------------------------------------------------------------------
+    public static Color color(int r, int g, int b) {
+        return color(r,g,b,256);
+    }
+
+    public static Color color(int r, int g ,int b, float a) {
+        return new Color(r/256f, g/256f, b/256f, a);
+    }
 
 }

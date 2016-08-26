@@ -42,7 +42,7 @@ public class Health extends ModelComponent {
         this.random = new Random(System.currentTimeMillis());
         this.lastDamage = 0;
         // enable health for entity
-        entity.hasHealth = true;
+        entity.enableComponent(ComponentID.HEALTH);
 
     }
 
