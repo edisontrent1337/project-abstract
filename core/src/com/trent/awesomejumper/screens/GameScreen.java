@@ -58,6 +58,7 @@ public class GameScreen implements Screen, InputProcessor{
 
     @Override
     public void render(float delta) {
+        delta = Math.min(delta, 1/60f);
         Gdx.gl.glClearColor(1f, 247f / 255f, 178f / 255f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         // TODO: add domain specific methods: input, graphics, network, ai, sound, physics

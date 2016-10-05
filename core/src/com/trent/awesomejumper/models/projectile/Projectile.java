@@ -19,7 +19,7 @@ public class Projectile extends Entity {
     private final float WIDTH_X = 0.1875f*0.8f;
     private final float WIDTH_Y = 0.09375f*0.8f;
     private final float MASS = 0.1f;
-    private final float FRICTION = 0.999f;
+    private final float FRICTION = 1f;
     private final float ELASTICITY = 0f;
     private final float SPRITE_WIDTH = 0.1875f*0.8f;
     private final float SPRITE_HEIGHT = 0.09375f*0.8f;

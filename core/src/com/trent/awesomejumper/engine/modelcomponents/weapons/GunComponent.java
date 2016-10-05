@@ -1,5 +1,6 @@
 package com.trent.awesomejumper.engine.modelcomponents.weapons;
 
+import com.badlogic.gdx.Gdx;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.models.projectile.Projectile;
 
@@ -54,7 +55,11 @@ public class GunComponent extends WeaponComponent {
             currentClip--;
             Projectile projectile = new Projectile(entity.getBody().getCenter().cpy(), entity.getBody().getHeightZ());
             projectile.register();
-            projectile.getBody().setVelocity(entity.getBody().getOrientation().cpy().nor().scl(speed));
+          //  projectile.getBody().setVelocity(entity.getBody().getOrientation().cpy().nor().scl(speed));
+            Gdx.app.log("START",projectile.getPosition().toString());
+            projectile.getBody().addImpulse(entity.getBody().getOrientation().cpy().nor().scl(speed));
+            Gdx.app.log("SCALED",projectile.getBody().getImpulses().getFirst().cpy().nor().scl(48f/60f).toString());
+            projectile.getBody().getPosition().sub(projectile.getBody().getImpulses().get(0).cpy().scl(1/60f));
             projectile.getBody().setAngleOfRotation(entity.getBody().getAngleOfRotation());
             projectile.setOwner(entity.getOwner().getOwner());
             timeFired = entity.time;

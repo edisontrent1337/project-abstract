@@ -61,6 +61,7 @@ public class CollisionController {
      *
      * @param delta time which has passed since the last update frame
      */
+    // TODO: REMOVE THIS.
     public void collisionDetection(Entity entity, float delta) {
 
         // reset resolutionVector to (0f,0f)

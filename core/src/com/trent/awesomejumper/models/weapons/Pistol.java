@@ -38,9 +38,6 @@ public class Pistol extends Weapon {
         this.graphics = new Graphics(this, 0f, "fiveseven", SPRITE_WIDTH, SPRITE_HEIGHT);
         this.gunComponent = new GunComponent(this, "FIVE-SEVEN");
 
-        // TODO: change above code to this
-       // entityComponents.put(ComponentID.BODY, new Body(this, WIDTH,HEIGHT));
-
 
         body.setMass(MASS);
         body.setFriction(FRICTION);
