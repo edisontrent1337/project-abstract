@@ -803,9 +803,6 @@ public class CollisionController {
         CollisionBox entityBox = entity.getBounds();
         CollisionBox otherBox = other.getBounds();
 
-        Vector2 entityFrameVelo = entity.getVelocity().cpy();
-        Vector2 otherFrameVelo = other.getVelocity().cpy().scl(delta);
-
         /**
          * TODO: implement better way of pickup collision
          * Weapon/pickup collision detection
@@ -815,7 +812,6 @@ public class CollisionController {
                 case DROPPED_WEAPON_ENTITY:
                     if (checkCollision(entityBox, otherBox)) {
                         player.getWeaponInventory().equipWeapon((Weapon) other);
-                        worldContainer.getWeaponDrops().remove(other);
                         continue;
                     }
                     break;

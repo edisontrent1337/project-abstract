@@ -292,6 +292,9 @@ public class WeaponInventory extends ModelComponent {
 
     }
 
+    public int getWeaponsEquipped() {
+        return weaponsEquipped;
+    }
 
     public String getInventoryStatus() {
         if (!holdingAWeapon)

@@ -67,7 +67,6 @@ public class WorldController {
             if(!e.isAlive() || !e.getBody().isCollisionDetectionEnabled())
                 continue;
             collisionController.resolveWorldCollisions(e,delta);
-            //TODO: garbage removal after each step.
         }
 
 
@@ -75,20 +74,17 @@ public class WorldController {
             if(!e.isAlive() || !e.getBody().isCollisionDetectionEnabled())
                 continue;
             collisionController.resolveEntityCollisions(e,delta);
-            //TODO: garbage removal after each step. garbageRemoval.
-
         }
 
         for(Entity e : worldContainer.getLivingEntities()) {
             for(Projectile p: worldContainer.getProjectiles())
                 collisionController.projectileCollisionDetection(e,p,delta);
-            //TODO: garbage removal after each step.
         }
 
-        //TODO: for(Projectile p: worldContainer.getProjectiles()) collisionController.projectileCollision(p)
         worldContainer.garbageRemoval();
 
         // TODO: add a function called applyImpulses()
+
         for(Entity e: worldContainer.getEntities()) {
             LinkedList<Vector2> impulseList = e.getBody().getImpulses();
             for(Iterator<Vector2> it = impulseList.iterator(); it.hasNext();) {

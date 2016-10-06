@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import static com.trent.awesomejumper.engine.modelcomponents.ModelComponent.ComponentID.GRAPHICS;
 import static com.trent.awesomejumper.utils.Utilities.sub;
@@ -27,6 +28,7 @@ import static com.trent.awesomejumper.utils.Utilities.sub;
  * Holds the player, the level with its environmental items such as random paths of dirt,
  * rocks, flowers etc. and also items, collectables and enemies.
  * Holds a list of all entities and manages all specific lists of entities needed by the controllers.
+ * This class is managed by the {@link EntityManager}.
  */
 public class WorldContainer {
 
@@ -36,18 +38,34 @@ public class WorldContainer {
     public static int renderNodes = 0;
     public static int registredNodes = 0;
 
+    /**
+     * The following maps and sets manage all entities in the world.
+     * Separate sets are needed for the collision detection to work properly, as there is a need
+     * to differentiate between different types of entities.
+     */
+    // Map containing all entities in the game. Maps entity IDs with entities.
+    private HashMap<Integer, Entity> entities;
 
-    private HashMap<Integer, Entity> entities;               // all entities
-    private HashSet<Projectile> projectiles = new HashSet<>();  // projectile subset
-    private HashSet<Pickup> pickups = new HashSet<>();      // pickup subset
-    private HashSet<Entity> mobileEntities = new HashSet<>(); // mobile, alive entities subset
-    private HashSet<Weapon> weaponDrops = new HashSet<>();    //weapon drop subset
-    private HashSet<Entity> livingEntities = new HashSet<>(); // subset of all entities that can take damage
+    // Subset containing all projectiles
+    private HashSet<Projectile> projectiles = new HashSet<>();
+
+    // Subset containing all pickups (ammo, medikits,...)
+    private HashSet<Pickup> pickups = new HashSet<>();
+
+    // Subset containing all mobile entities. These are entities that are able to move
+    // and be affected by explosions
+    private HashSet<Entity> mobileEntities = new HashSet<>();
+
+    // Subset containing all dropped weapons the player can pick up.
+    private HashSet<Weapon> weaponDrops = new HashSet<>();
+
+    // Subset containing all living entities that can take damage
+    private HashSet<Entity> livingEntities = new HashSet<>();   // subset of all entities that can take damage
 
     private Player player;
     //TODO Change these to HashSet
     private ArrayList tilesToBeDrawn = new ArrayList();
-    private ArrayList entitiesToBeDrawn = new ArrayList<>();
+    private ArrayList<Entity> entitiesToBeDrawn = new ArrayList<>();
     private ArrayList<Tile> collisionTiles = new ArrayList<>();
 
 
@@ -63,26 +81,16 @@ public class WorldContainer {
         weaponDrops = new HashSet<>();
         entitiesToBeDrawn = new ArrayList<>();
         projectiles = new HashSet<>();
-
         randomLevelGenerator = new RandomLevelGenerator();
         randomLevelGenerator.init();
-        randomLevelGenerator.load();
-
-        entities = randomLevelGenerator.getEntities();
-
-
+        entities = randomLevelGenerator.load();
         player = randomLevelGenerator.getPlayer();
-        registerEntity(player);
-
-
-
     }
 
 
-    public void init() {
+    public void initAllEntities() {
         for(Iterator<? extends Entity> it = entities.values().iterator(); it.hasNext();) {
             Entity e = it.next();
-            registerEntity(e);
             e.register();
         }
     }
@@ -264,12 +272,6 @@ public class WorldContainer {
      */
     public void garbageRemoval() {
 
-        /*for(Iterator<Entity> it = entities.iterator(); it.hasNext();) {
-            if(!it.next().isAlive()) {
-                it.remove();
-            }
-        }*/
-
 
         for (Iterator<Map.Entry<Integer, Entity>> it = entities.entrySet().iterator(); it.hasNext(); ) {
             Entity e = it.next().getValue();
@@ -315,9 +317,16 @@ public class WorldContainer {
         }
 
 
-
     }
 
+
+    public void garbageRemoval(Set<? extends Entity> entities) {
+        for(Iterator<? extends Entity> it= entities.iterator(); it.hasNext();) {
+            if(!it.next().isAlive()) {
+                it.remove();
+            }
+        }
+    }
 
     // ---------------------------------------------------------------------------------------------
     // REGISTER ENTITIES
@@ -330,6 +339,12 @@ public class WorldContainer {
         if (AwesomeJumperMain.onDebugMode()) {
             Gdx.app.log("Registrated entity at", Float.toString(entity.registerTime));
             Gdx.app.log("Entity registrated", String.format("%04d", (entity.getID())));
+        }
+    }
+
+    public void registerEntities(Set<Entity> entities) {
+        for(Entity e : entities) {
+            registerEntity(e);
         }
     }
 

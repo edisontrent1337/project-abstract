@@ -479,7 +479,7 @@ public class RenderingEngine extends Renderer {
         debugStrings.set(DE_REGION+2, "PROJECTILES:    "  + Integer.toString(worldContainer.getProjectiles().size()));
         debugStrings.set(DE_REGION+3, "MOBILE ENTITIES:    "  + Integer.toString(worldContainer.getMobileEntities().size()));
         debugStrings.set(DE_REGION+4, "LIVING ENTITIES:    "  + Integer.toString(worldContainer.getLivingEntities().size()));
-        debugStrings.set(DE_REGION+5, "WEAPON DROP ENTITIES:    "  + Integer.toString(worldContainer.getWeaponDrops().size()));
+        debugStrings.set(DE_REGION+5, "WEAPON DROP ENTITIES:    "  + Integer.toString(worldContainer.getWeaponDrops().size()) + " EQUIPPED: " + Integer.toString(player.getWeaponInventory().getWeaponsEquipped()));
 
 
         debugBatch.setProjectionMatrix(debugCam.combined);

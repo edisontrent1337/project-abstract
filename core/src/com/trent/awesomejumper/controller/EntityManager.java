@@ -3,6 +3,7 @@ package com.trent.awesomejumper.controller;
 import com.badlogic.gdx.Gdx;
 import com.trent.awesomejumper.controller.rendering.RenderingEngine;
 import com.trent.awesomejumper.engine.entity.Entity;
+import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.lootable.Lootable;
 import com.trent.awesomejumper.models.projectile.Projectile;
 import com.trent.awesomejumper.models.weapons.Weapon;
@@ -54,87 +55,63 @@ public class EntityManager {
     /**
      * Adds the entity to all relevant collections. Decides with the help of the entities type
      * to which collections the entity should be added.
-     * @param //entity
      */
-//    public void registerEntity(Entity entity) {
-//
-//        /**
-//         * Add the entity to the main entity collection that holds all entities.
-//         * Also load necessary assets.
-//         */
-//        worldContainer.registerEntity(entity);
-//        renderingEngine.initGraphics(entity);
-//
-//        /**
-//         * Add the entity to different sub collections which are used for specific collision
-//         * events such as collecting pickups or equipping weapons.
-//         */
-//        if(entity.getType() == null)
-//            Gdx.app.log("ERROR", "ENTITY TYPE WAS NULL");
-//
-//        switch (entity.getType()) {
-//            case PICKUP_ENTITY:
-//                worldContainer.getPickups().add(entity);
-//                worldContainer.getMobileEntities().add(entity);
-//                worldContainer.placeEntity(entity, entity.getPosition());
-//                entity.getBody().reset();
-//                break;
-//            case PROJECTILE_ENTITY:
-//                worldContainer.getProjectiles().add((Projectile)entity);
-//                renderingEngine.initGraphics(entity);
-//                break;
-//            case REGULAR_ENTITY:
-//                break;
-//            case DROPPED_WEAPON_ENTITY:
-//                worldContainer.getWeaponDrops().add(entity);
-//                worldContainer.getMobileEntities().add(entity);
-//                worldContainer.placeEntity(entity,entity.getOwner().getBounds().getPositionAndOffset());
-//                entity.getBody().reset();
-//                break;
-//            default:
-//                break;
-//        }
-//
-//
-//    }
 
+    /**
+     * Register projectile
+     * @param projectile
+     */
     public void registerEntity(Projectile projectile) {
         worldContainer.registerEntity(projectile);
         worldContainer.getProjectiles().add(projectile);
-
         renderingEngine.initGraphics(projectile);
     }
 
+    /**
+     * Register weapon
+     * @param weapon
+     */
     public void registerEntity(Weapon weapon) {
+        Gdx.app.log("EVENT", "REGISTRED WEAPON");
         worldContainer.registerEntity(weapon);
         worldContainer.getWeaponDrops().add(weapon);
         worldContainer.getMobileEntities().add(weapon);
         worldContainer.placeEntity(weapon, weapon.getOwner().getBounds().getPositionAndOffset());
-        //worldContainer.placeEntity(weapon, weapon.getPosition());
         weapon.getBody().reset();
-
-
         renderingEngine.initGraphics(weapon);
     }
 
-
+    /**
+     * Register lootable
+     * @param lootable
+     */
     public void registerEntity(Lootable lootable) {
         worldContainer.registerEntity(lootable);
         worldContainer.getMobileEntities().add(lootable);
-
         if(lootable.has(HEALTH))
             worldContainer.getLivingEntities().add(lootable);
-
         renderingEngine.initGraphics(lootable);
     }
 
+    /**
+     * Register player
+     * @param player
+     */
+    public void registerEntity(Player player) {
+        worldContainer.registerEntity(player);
+        worldContainer.getMobileEntities().add(player);
+        worldContainer.getLivingEntities().add(player);
+        renderingEngine.initGraphics(player);
+    }
+
+    /**
+     * If none of the above method signatures apply, this is the default registration method.
+     */
     public void registerEntity(Entity entity) {
         worldContainer.registerEntity(entity);
         worldContainer.getMobileEntities().add(entity);
-
         if(entity.has(HEALTH))
             worldContainer.getLivingEntities().add(entity);
-
         renderingEngine.initGraphics(entity);
     }
 

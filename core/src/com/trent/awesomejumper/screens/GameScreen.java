@@ -49,11 +49,14 @@ public class GameScreen implements Screen, InputProcessor{
         worldContainer = new WorldContainer();
         renderingEngine = new RenderingEngine(worldContainer, game);
         entityManager.setControllers(worldContainer,renderingEngine);
-        worldContainer.init();
+
+        /**
+         * Init all entity collections and sort all pre existing entities in their respective collections.
+         */
+        worldContainer.initAllEntities();
         controller = new WorldController(worldContainer);
         inputHandler = new InputHandler(worldContainer.getPlayer(), renderingEngine.getGameCamera());
         Gdx.input.setInputProcessor(this);
-
     }
 
     @Override

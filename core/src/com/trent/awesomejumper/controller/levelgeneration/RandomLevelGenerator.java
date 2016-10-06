@@ -23,33 +23,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Random;
 
-import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.CARDINALS_AND_INTERMEDIATES;
-import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.CARDINAL_DIRS;
-import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.EAST;
-import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.EAST_WALL;
-import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.E_DIR;
-import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.NE_DIR;
-import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.NORTH;
-import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.NORTH_EAST_INNER;
-import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.NORTH_EAST_OUTER;
-import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.NORTH_WALL;
-import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.NORTH_WEST_INNER;
-import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.NORTH_WEST_OUTER;
-import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.NW_DIR;
-import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.N_DIR;
-import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.SE_DIR;
-import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.SOUTH;
-import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.SOUTH_EAST_INNER;
-import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.SOUTH_EAST_OUTER;
-import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.SOUTH_WALL;
-import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.SOUTH_WEST_INNER;
-import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.SOUTH_WEST_OUTER;
-import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.SW_DIR;
-import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.S_DIR;
-import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.VOID;
-import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.WEST;
-import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.WEST_WALL;
-import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.W_DIR;
+import static com.trent.awesomejumper.controller.levelgeneration.LevelConstants.*;
 import static com.trent.awesomejumper.controller.levelgeneration.Room.Type.BIG;
 import static com.trent.awesomejumper.controller.levelgeneration.Room.Type.GIANT;
 import static com.trent.awesomejumper.controller.levelgeneration.Room.Type.MEDIUM;
@@ -187,8 +161,6 @@ public class RandomLevelGenerator {
 
     }
 
-    //TODO: This class must provide a method which returns a collection of all pre-game-play existing
-    // entities such as enemies, loot and weapons.
 
     /**
      * Loads a dungeon using the current seed.
@@ -203,8 +175,9 @@ public class RandomLevelGenerator {
      * 8) remove all extra doors
      * 9) remove all dead ends
      * 10) finally placing the player in a random room.
+     * @return  returns a HashMap of all predefined entities in the level.
      */
-    public void load() {
+    public HashMap<Integer, Entity> load() {
         Room.Type baseRoomType; // holds the general size of the room. Random rectangularity is added later.
         /**
          * First phase: generate rooms and store them in an array.
@@ -295,6 +268,8 @@ public class RandomLevelGenerator {
         removeDeadEnds();
         calculateBitMasks();
         placePlayer();
+
+        return entities;
     }
 
 
@@ -350,9 +325,9 @@ public class RandomLevelGenerator {
             totalRegions++;
 
             Pistol p = new Pistol(r.getCenter());
-            Pistol q = new Pistol(r.getCenter().add(1,1));
-            Pistol s = new Pistol(r.getCenter().add(1,2));
-            Pistol t = new Pistol(r.getCenter().add(2,1));
+            Pistol q = new Pistol(r.getCenter().cpy().add(1,1));
+            Pistol s = new Pistol(r.getCenter().cpy().add(1,2));
+            Pistol t = new Pistol(r.getCenter().cpy().add(2,1));
             Lootable c = new Lootable(r.getCenter().cpy().add(3,1));
 
             /*entities.add(p);
@@ -899,7 +874,7 @@ public class RandomLevelGenerator {
         Room home = rooms.get(homeRoomID);
         Gdx.app.log("HOME ROOM", home.toString() + "\n CENTER:" + home.getCenter().toString());
         player = new Player(home.getCenter());
-
+        entities.put(player.getID(),player);
         Gdx.app.log("NUMBER OF ROOMS", Integer.toString(rooms.size()));
         Gdx.app.log("-------------------", "-----------------------");
         Gdx.app.log("NUMBER OF TINY ROOMS", Integer.toString(tinyRooms));
@@ -1174,10 +1149,6 @@ public class RandomLevelGenerator {
         return levelData[(int) position.x][(int) position.y];
     }
 
-    //public HashSet<Entity> getEntities() {
-    public HashMap<Integer,Entity> getEntities() {
-        return entities;
-    }
 
     public int getLevelWidth() {
         return levelWidth;
