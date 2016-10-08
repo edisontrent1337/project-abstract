@@ -10,7 +10,6 @@ public final class PhysicalConstants {
     }
 
     public static final float ACCELERATION = 16f;
-    public static final float MAX_TRAMPOLINE_SPEED = 15.4f;
 
     public static final float MIN_WALKING_SPEED = 0.01f;
 

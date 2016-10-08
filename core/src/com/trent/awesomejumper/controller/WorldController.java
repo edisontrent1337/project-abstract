@@ -63,19 +63,28 @@ public class WorldController {
         }
 
 
+        /**
+         * Resolve entity/world collisions.
+         */
         for(Entity e : worldContainer.getEntities()) {
             if(!e.isAlive() || !e.getBody().isCollisionDetectionEnabled())
                 continue;
             collisionController.resolveWorldCollisions(e,delta);
         }
 
-
+        /**
+         * Resolve entity/entity collisions.
+         */
         for(Entity e: worldContainer.getMobileEntities()) {
             if(!e.isAlive() || !e.getBody().isCollisionDetectionEnabled())
                 continue;
             collisionController.resolveEntityCollisions(e,delta);
         }
 
+        /**
+         * Resolve entity/projectile collisions.
+         * Here, only living entities that can take damage are considered.
+         */
         for(Entity e : worldContainer.getLivingEntities()) {
             for(Projectile p: worldContainer.getProjectiles())
                 collisionController.projectileCollisionDetection(e,p,delta);
@@ -83,18 +92,7 @@ public class WorldController {
 
         worldContainer.garbageRemoval();
 
-        // TODO: add a function called applyImpulses()
-
-        for(Entity e: worldContainer.getEntities()) {
-            LinkedList<Vector2> impulseList = e.getBody().getImpulses();
-            for(Iterator<Vector2> it = impulseList.iterator(); it.hasNext();) {
-                e.getVelocity().add(it.next());
-                it.remove();
-            }
-
-        }
-
-
+        addImpulses();
 
         manageEntitySpeed();
 
@@ -113,7 +111,21 @@ public class WorldController {
     }
 
 
+    private void addImpulses() {
+        for(Entity e: worldContainer.getEntities()) {
+            LinkedList<Vector2> impulseList = e.getBody().getImpulses();
+            for(Iterator<Vector2> it = impulseList.iterator(); it.hasNext();) {
+                e.getVelocity().add(it.next());
+                it.remove();
+            }
 
+        }
+    }
+
+
+    /**
+     * Caps all entities movement speed at their maximum value.
+     */
     private void manageEntitySpeed() {
         for (Entity entity : worldContainer.getEntities()) {
             if (entity.getAcceleration().x == 0) {

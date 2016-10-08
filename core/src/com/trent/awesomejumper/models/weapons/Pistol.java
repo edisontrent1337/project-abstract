@@ -18,6 +18,7 @@ public class Pistol extends Weapon {
 
 
     private final float WIDTH = 0.375f;               //  24 pixel
+    //private final float WIDTH = 0.7f;               //  24 pixel
     private final float HEIGHT = 0.21875f;            //  19 Pixel - 5 Pixel "behind space
     private final float MASS = 0.150f;
     private final float FRICTION = 0.945f;

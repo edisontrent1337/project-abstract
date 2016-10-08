@@ -30,6 +30,8 @@ public class WeaponInventory extends ModelComponent {
     private static int MAX_SLOTS = 3;            // number of weapon slots this inventory has
     private static final int NO_WEAPON = -1;     // constant representing id of no weapon
 
+    private final float WEAPON_DISTANCE = 0.40f;
+
     private ArrayList<Integer> weapons;
 
     private boolean holdingAWeapon = false;
@@ -91,16 +93,20 @@ public class WeaponInventory extends ModelComponent {
         Gdx.app.log("INVENTORY POINTER", Integer.toString(inventoryPointer));
         Gdx.app.log("CURRENT WEAPON ID", Integer.toString(selectedWeaponID));
 
+        /**
+         * Every weapon picked up will have its collision detection disabled,
+         * owner set to the entity that owns this weapon inventory and set its equipped flag to true.
+         */
+        weapon.getBody().disableCollisionDetection();
+        weapon.setOwner(entity);
+        weapon.setEquipped(true);
 
         // If the inventory is empty
         if (weaponsEquipped == 0) {
             inventoryPointer = 0;
             selectedWeapon = weapon;
             selectedWeaponID = weapon.getID();
-            selectedWeapon.getBody().disableCollisionDetection();
             selectedWeapon.getBody().setPosition(entity.getPosition().cpy());
-            selectedWeapon.setOwner(entity);
-            selectedWeapon.setEquipped(true);
             saveWeapon(selectedWeaponID, inventoryPointer);
             holdingAWeapon = true;
             weaponsEquipped++;
@@ -111,15 +117,20 @@ public class WeaponInventory extends ModelComponent {
          *
          */
         else if (weaponsEquipped < MAX_SLOTS) {
-            for (int i = 0; i < MAX_SLOTS; i++) {
-                if (weapons.get(i) == NO_WEAPON) {
-                    weapon.setOwner(entity);
-                    weapon.setEquipped(true);
+            // Iterating through all slots to find an empty one.
+            for (int slot = 0; slot < MAX_SLOTS; slot++) {
+                // If the current slot is empty, save the weapon here and hide it.
+                if (weapons.get(slot) == NO_WEAPON) {
                     weapon.hide();
-                    saveWeapon(weapon.getID(), i);
+                    saveWeapon(weapon.getID(), slot);
                 }
             }
             weaponsEquipped++;
+
+            /**
+             * If the inventory is full after the weapon was picked up, the first weapon is
+             * auto equipped and shown.
+             */
             if (weaponsEquipped == MAX_SLOTS) {
                 selectedWeaponID = weapons.get(inventoryPointer);
                 selectedWeapon = (Weapon) EntityManager.getInstance().getEntityByID(selectedWeaponID);
@@ -145,10 +156,6 @@ public class WeaponInventory extends ModelComponent {
             saveWeapon(selectedWeaponID, inventoryPointer);
             selectedWeapon.show();
             selectedWeapon.getBody().setPosition(entity.getPosition().cpy());
-            // disabeling collision detection as the weapon is now part of the entities inventory.
-            selectedWeapon.getBody().disableCollisionDetection();
-            selectedWeapon.setOwner(entity);
-            selectedWeapon.setEquipped(true);
             holdingAWeapon = true;
             weaponsEquipped++;
         }
@@ -238,19 +245,21 @@ public class WeaponInventory extends ModelComponent {
 
 
     public void updateWeaponPositions() {
-        if (selectedWeaponID != NO_WEAPON) {
-            selectedWeapon = (Weapon) EntityManager.getInstance().getEntityByID(selectedWeaponID);
-            selectedWeapon.getBody().setPosition(entity.getBody().getCenter().cpy().sub(selectedWeapon.getBody().getHalfDimensions()));
 
+        Vector2 weaponDirection = entity.getBody().getOrientation().cpy();
+        weaponDirection.nor().scl(WEAPON_DISTANCE);
 
-            selectedWeapon.getBody().setAimReference(entity.getBody().getAimReference());
-            selectedWeapon.getBody().setOrientation(entity.getBody().getAimReference().cpy().sub(selectedWeapon.getBody().getCenter()));
-            selectedWeapon.getBody().setAngleOfRotation(angle(selectedWeapon.getBody().getOrientation()));
-            Vector2 circle = entity.getBody().getOrientation().cpy();
-            if (circle.len2() > 0.5f)
-                circle.nor().scl(0.5f);
-            selectedWeapon.getBody().getPosition().add(circle);
+        for (Integer weaponID : weapons) {
+            if (weaponID == NO_WEAPON)
+                continue;
+            Weapon w = (Weapon) EntityManager.getInstance().getEntityByID(weaponID);
+            w.getBody().setPosition(entity.getBody().getCenter().cpy().sub(w.getBody().getHalfDimensions()));
+            w.getBody().setAimReference(entity.getBody().getAimReference());
+            w.getBody().setOrientation(entity.getBody().getOrientation());
+            w.getBody().setAngleOfRotation(entity.getBody().getAngleOfRotation());
+            w.getBody().getPosition().add(weaponDirection);
         }
+
 
     }
 

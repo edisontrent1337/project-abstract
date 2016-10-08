@@ -521,11 +521,23 @@ public class RenderingEngine extends Renderer {
         }
         shapeRenderer.end();
 
+        /**
+         * Drawing a line to the point of aim.
+         */
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setColor(Color.GREEN);
 
         if(player.getWeaponInventory().isHoldingAWeapon())
             shapeRenderer.line(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter(),player.getWeaponInventory().getSelectedWeapon().getBody().getAimReference());
+
+        /**
+         * Drawing a line to all entities in the neighbourhood.
+         */
+        shapeRenderer.setColor(Color.BLUE);
+        for(Entity e : player.getBody().getEntityNeighbourHood()) {
+            shapeRenderer.line(player.getBody().getCenter(), e.getBody().getCenter());
+        }
+
         shapeRenderer.end();
         // HITBOXES OF TILES AFFECTED BY COLLISION DETECTION
         Gdx.gl.glEnable(GL20.GL_BLEND);

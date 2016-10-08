@@ -38,6 +38,8 @@ public class WorldContainer {
     public static int renderNodes = 0;
     public static int registredNodes = 0;
 
+    private static final float NEIGHBOURHOOD_RANGE = 2.0f;
+
     /**
      * The following maps and sets manage all entities in the world.
      * Separate sets are needed for the collision detection to work properly, as there is a need
@@ -63,7 +65,7 @@ public class WorldContainer {
     private HashSet<Entity> livingEntities = new HashSet<>();   // subset of all entities that can take damage
 
     private Player player;
-    //TODO Change these to HashSet
+
     private ArrayList tilesToBeDrawn = new ArrayList();
     private ArrayList<Entity> entitiesToBeDrawn = new ArrayList<>();
     private ArrayList<Tile> collisionTiles = new ArrayList<>();
@@ -89,7 +91,7 @@ public class WorldContainer {
 
 
     public void initAllEntities() {
-        for(Iterator<? extends Entity> it = entities.values().iterator(); it.hasNext();) {
+        for (Iterator<? extends Entity> it = entities.values().iterator(); it.hasNext(); ) {
             Entity e = it.next();
             e.register();
         }
@@ -248,10 +250,16 @@ public class WorldContainer {
         for (Entity other : mobileEntities) {
             if (other.equals(e))
                 continue;
-            float dst = sub(e.getPosition(), other.getPosition()).len2(); // distance between entities
-            if (dst <= 3) {
-                if (!entityNeighbourhood.contains(other))
+
+
+            float dst = sub(e.getBody().getCenter(), other.getBody().getCenter()).len(); // distance between entities
+            if (dst <= NEIGHBOURHOOD_RANGE) {
+                if (!entityNeighbourhood.contains(other) && other.getBody().isCollisionDetectionEnabled())
                     entityNeighbourhood.add(other);
+
+                if(entityNeighbourhood.contains(other) && !other.getBody().isCollisionDetectionEnabled())
+                    entityNeighbourhood.remove(other);
+
             } else {
                 entityNeighbourhood.remove(other);
             }
@@ -273,18 +281,27 @@ public class WorldContainer {
     public void garbageRemoval() {
 
 
+        /**
+         * Remove dead entities from the main entity map.
+         */
         for (Iterator<Map.Entry<Integer, Entity>> it = entities.entrySet().iterator(); it.hasNext(); ) {
             Entity e = it.next().getValue();
             if (!e.isAlive())
                 it.remove();
         }
 
+        /**
+         * Remove dead entities from the entitiesToBeDrawn set.
+         */
         for (Iterator<Entity> it = entitiesToBeDrawn.iterator(); it.hasNext(); ) {
             if (!it.next().isAlive()) {
                 it.remove();
             }
         }
 
+        /**
+         * Remove dead entities from the entity neighbourhoods.
+         */
         for (Entity e : entities.values()) {
             for (Iterator<Entity> it = e.getBody().getEntityNeighbourHood().iterator(); it.hasNext(); ) {
                 if (!it.next().isAlive())
@@ -294,25 +311,32 @@ public class WorldContainer {
         }
 
 
-        for(Iterator<? extends Entity> it = projectiles.iterator(); it.hasNext();) {
-            if(!it.next().isAlive()) {
+        /**
+         * Remove dead projectiles.
+         */
+        for (Iterator<? extends Entity> it = projectiles.iterator(); it.hasNext(); ) {
+            if (!it.next().isAlive()) {
                 it.remove();
             }
         }
 
 
-        for(Iterator<Weapon> it = weaponDrops.iterator(); it.hasNext();) {
-            if(!it.next().isAlive())
+        for (Iterator<Weapon> it = weaponDrops.iterator(); it.hasNext(); ) {
+            if (!it.next().isAlive())
                 it.remove();
         }
 
-        for(Iterator<Entity> it = mobileEntities.iterator(); it.hasNext();) {
-            if(!it.next().isAlive())
+        /**
+         * Remove dead mobile entities.
+         */
+        for (Iterator<Entity> it = mobileEntities.iterator(); it.hasNext(); ) {
+            if (!it.next().isAlive())
                 it.remove();
         }
 
-        for(Iterator<Entity> it = livingEntities.iterator(); it.hasNext();) {
-            if(!it.next().isAlive())
+
+        for (Iterator<Entity> it = livingEntities.iterator(); it.hasNext(); ) {
+            if (!it.next().isAlive())
                 it.remove();
         }
 
@@ -321,8 +345,8 @@ public class WorldContainer {
 
 
     public void garbageRemoval(Set<? extends Entity> entities) {
-        for(Iterator<? extends Entity> it= entities.iterator(); it.hasNext();) {
-            if(!it.next().isAlive()) {
+        for (Iterator<? extends Entity> it = entities.iterator(); it.hasNext(); ) {
+            if (!it.next().isAlive()) {
                 it.remove();
             }
         }
@@ -343,7 +367,7 @@ public class WorldContainer {
     }
 
     public void registerEntities(Set<Entity> entities) {
-        for(Entity e : entities) {
+        for (Entity e : entities) {
             registerEntity(e);
         }
     }

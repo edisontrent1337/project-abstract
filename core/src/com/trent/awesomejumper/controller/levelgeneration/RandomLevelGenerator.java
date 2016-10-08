@@ -125,7 +125,6 @@ public class RandomLevelGenerator {
          * Init seed and level size. The level dimensions must be odd.
          */
         seed = System.currentTimeMillis();
-        //seed = 1470478995911l;//
         random = new Random(seed);
         levelWidth = MIN_LEVEL_WIDTH + random.nextInt((MAX_LEVEL_WIDTH - MIN_LEVEL_WIDTH) / 2) * 2 + 1;
         levelHeight = MIN_LEVEL_HEIGHT + random.nextInt((MAX_LEVEL_HEIGHT - MIN_LEVEL_HEIGHT) / 2) * 2 + 1;
@@ -137,7 +136,6 @@ public class RandomLevelGenerator {
         this.levelData = new Tile[levelWidth][levelHeight];
         this.regions = new int[levelWidth][levelHeight];
         this.rooms = new ArrayList<>();
-        //this.entities = new HashSet<>();
         this.entities = new HashMap<>();
 
     }
