@@ -13,6 +13,9 @@ import com.trent.awesomejumper.models.weapons.Weapon;
 import com.trent.awesomejumper.tiles.Tile;
 import com.trent.awesomejumper.utils.Interval;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import static com.trent.awesomejumper.engine.modelcomponents.ModelComponent.ComponentID.HEALTH;
 import static com.trent.awesomejumper.utils.PhysicalConstants.FRICTIONAL_COEFFICIENT;
 import static com.trent.awesomejumper.utils.Utilities.dot;
@@ -59,11 +62,11 @@ public class CollisionController {
      *
      * @param delta time which has passed since the last update frame
      */
-    public void resolveEntityCollisions(Entity entity, float delta) {
+    public void resolveEntityCollisions(Entity entity, Set<? extends Entity> others, float delta) {
 
         entity.getVelocity().scl(delta);
 
-        for (Entity other : worldContainer.updatedEntityNeighbourHood(entity)) {
+        for (Entity other : others) {
             /**
              * If the two participants are the same, one of them is part of the other such as equipped weapons etc.
              * or one of them is declared "dead", move to the next entity in neighbourhood

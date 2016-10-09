@@ -17,7 +17,6 @@ import static com.trent.awesomejumper.utils.PhysicalConstants.*;
 public class WorldController {
 
 
-
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
 
@@ -27,7 +26,6 @@ public class WorldController {
     public static float worldTime = 0f;
 
 
-
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
 
@@ -35,9 +33,6 @@ public class WorldController {
         this.worldContainer = worldContainer;
         this.collisionController = new com.trent.awesomejumper.controller.collision.CollisionController(worldContainer);
     }
-
-
-
 
 
     // UPDATE FUNCTION: COLLISION DETECTION
@@ -50,15 +45,15 @@ public class WorldController {
      * - apply impulses to all entities that are left alive
      * - limit entity speed
      * - finally update positional information of all entities
+     *
      * @param delta time between frames
      */
     public void update(float delta) {
 
 
-
         worldTime += delta;
 
-        for(Entity e: worldContainer.getEntities()) {
+        for (Entity e : worldContainer.getEntities()) {
             e.getAcceleration().scl(delta);
             e.getVelocity().add(e.getAcceleration());
         }
@@ -67,33 +62,29 @@ public class WorldController {
         /**
          * Resolve entity/world collisions.
          */
-        for(Entity e : worldContainer.getEntities()) {
-            if(!e.isAlive() || !e.getBody().isCollisionDetectionEnabled())
+        for (Entity e : worldContainer.getEntities()) {
+            if (!e.isAlive() || !e.getBody().isCollisionDetectionEnabled())
                 continue;
-            collisionController.resolveWorldCollisions(e,delta);
+            collisionController.resolveWorldCollisions(e, delta);
         }
 
-
-        for(Weapon w : worldContainer.getWeaponDrops()) {
-            
-        }
 
         /**
          * Resolve entity/entity collisions.
          */
-        for(Entity e: worldContainer.getMobileEntities()) {
-            if(!e.isAlive() || !e.getBody().isCollisionDetectionEnabled())
+        for (Entity e : worldContainer.getMobileEntities()) {
+            if (!e.isAlive() || !e.getBody().isCollisionDetectionEnabled())
                 continue;
-            collisionController.resolveEntityCollisions(e,delta);
+            collisionController.resolveEntityCollisions(e, worldContainer.updatedEntityNeighbourHood(e), delta);
         }
 
         /**
          * Resolve entity/projectile collisions.
          * Here, only living entities that can take damage are considered.
          */
-        for(Entity e : worldContainer.getLivingEntities()) {
-            for(Projectile p: worldContainer.getProjectiles())
-                collisionController.projectileCollisionDetection(e,p,delta);
+        for (Entity e : worldContainer.getLivingEntities()) {
+            for (Projectile p : worldContainer.getProjectiles())
+                collisionController.projectileCollisionDetection(e, p, delta);
         }
 
         worldContainer.garbageRemoval();
@@ -102,7 +93,7 @@ public class WorldController {
 
         manageEntitySpeed();
 
-        for(Entity e : worldContainer.getEntities()) {
+        for (Entity e : worldContainer.getEntities()) {
             e.update(delta);
         }
 
@@ -118,9 +109,9 @@ public class WorldController {
 
 
     private void addImpulses() {
-        for(Entity e: worldContainer.getEntities()) {
+        for (Entity e : worldContainer.getEntities()) {
             LinkedList<Vector2> impulseList = e.getBody().getImpulses();
-            for(Iterator<Vector2> it = impulseList.iterator(); it.hasNext();) {
+            for (Iterator<Vector2> it = impulseList.iterator(); it.hasNext(); ) {
                 e.getVelocity().add(it.next());
                 it.remove();
             }

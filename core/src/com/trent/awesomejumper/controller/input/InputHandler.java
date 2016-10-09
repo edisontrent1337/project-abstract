@@ -58,9 +58,12 @@ public class InputHandler {
     private OrthographicCamera camera;
 
     private float dropPressed = 0f;
+    /**
+     * Determines how long the drop button has to be pressed to drop a weapon.
+     */
     private final float DROP_THRESHOLD = 0.75f;
 
-    private final float EQUIP_DISTANCE = 0.75f;
+    private final float EQUIP_DISTANCE = 0.66f;
     private final float EQUIP_THRESHOLD = 0.33f;
 
     Vector3 temp;
@@ -144,11 +147,9 @@ public class InputHandler {
 
 
     public void changeWeapon(int direction) {
+        // Resetting the drop pressed time prevents dropping weapons right after selecting them.
+        dropPressed = player.time;
         player.getWeaponInventory().changeWeapon(direction);
-    }
-
-    public void dropWeapon() {
-        player.getWeaponInventory().dropWeapon();
     }
 
 
@@ -193,7 +194,6 @@ public class InputHandler {
                 if (target != null) {
                     if (player.time - player.getWeaponInventory().equipTime > EQUIP_THRESHOLD)
                         player.getWeaponInventory().equipWeapon((Weapon) target);
-
                 }
             }
 
@@ -202,8 +202,10 @@ public class InputHandler {
         // DROP WEAPON
 
         if (keyMap.get(Keys.DROP) && (WorldController.worldTime - dropPressed > DROP_THRESHOLD)) {
-            Utilities.log("DROPPED WEAPON");
-            player.getWeaponInventory().dropWeapon();
+            if (player.getWeaponInventory().isHoldingAWeapon()) {
+                Utilities.log("DROPPED WEAPON");
+                player.getWeaponInventory().dropWeapon();
+            }
         }
 
         temp.set(Gdx.input.getX(), Gdx.input.getY(), 0);

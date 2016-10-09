@@ -34,13 +34,6 @@ public class GameScreen implements Screen, InputProcessor{
     private EntityManager entityManager;
     private AssetLoader assetLoader;
 
-
-    // TESTING
-    private float dropPressedTime = 0f;
-    private float dropReleasedTime = 0f;
-    private final float DROP_THRESHOLD = 2.00f;
-    private boolean dropPressed = false;
-
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
     public GameScreen (AwesomeJumperMain game) {

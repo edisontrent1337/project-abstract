@@ -44,7 +44,6 @@ public class WeaponInventory extends ModelComponent {
     private int selectedWeaponID = NO_WEAPON;
 
     public float equipTime = 0f;
-
     private boolean inventoryFull = false;
 
     // CONSTRUCTOR
