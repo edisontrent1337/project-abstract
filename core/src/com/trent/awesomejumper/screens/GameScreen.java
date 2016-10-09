@@ -16,6 +16,7 @@ import com.trent.awesomejumper.controller.WorldController;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.lootable.Lootable;
+import com.trent.awesomejumper.utils.Utilities;
 
 /**
  * Created by Sinthu on 12.06.2015.
@@ -33,6 +34,12 @@ public class GameScreen implements Screen, InputProcessor{
     private EntityManager entityManager;
     private AssetLoader assetLoader;
 
+
+    // TESTING
+    private float dropPressedTime = 0f;
+    private float dropReleasedTime = 0f;
+    private final float DROP_THRESHOLD = 2.00f;
+    private boolean dropPressed = false;
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
@@ -102,6 +109,8 @@ public class GameScreen implements Screen, InputProcessor{
     @Override
     public boolean keyDown(int keycode) {
 
+        if(keycode == Keys.L)
+            game.toggleLogging();
 
         if (keycode == Keys.A) {
             inputHandler.leftPressed();
@@ -136,7 +145,7 @@ public class GameScreen implements Screen, InputProcessor{
         if (keycode == Keys.T) {
             game.toggleDebugMode();
         }
-        if(keycode == Keys.E) {
+        if(keycode == Keys.P) {
             game.toggleEntities();
         }
         if(keycode == Keys.H) {
@@ -150,8 +159,11 @@ public class GameScreen implements Screen, InputProcessor{
         }
 
         if(keycode == Keys.Q) {
-            inputHandler.dropWeapon();
+            inputHandler.dropPressed();
         }
+
+        if(keycode == Keys.E)
+            inputHandler.pickUpPressed();
 
         if(keycode == Keys.R) {
             inputHandler.reload();
@@ -190,6 +202,13 @@ public class GameScreen implements Screen, InputProcessor{
         if(keycode == Keys.S) {
             inputHandler.downReleased();
         }
+
+        if(keycode == Keys.Q) {
+            inputHandler.dropReleased();
+            inputHandler.pickUpReleased();
+        }
+        if(keycode == Keys.E)
+            inputHandler.pickUpReleased();
 
         return false;
     }

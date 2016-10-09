@@ -5,6 +5,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
 
+import java.util.HashSet;
+
 /**
  * Created by Sinthu on 12.06.2015.
  */
@@ -46,6 +48,8 @@ public class Tile {
 
     private boolean visited = false;
     private Tile predecessor = null;
+
+    private HashSet<Tile>neighBourHood = new HashSet<>();
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
@@ -158,5 +162,18 @@ public class Tile {
     public Tile getPredecessor() {
         return predecessor;
     }
+
+    public void addNeighbourData(Tile tile) {
+        neighBourHood.add(tile);
+    }
+
+    public HashSet<Tile> getNeighbourHood() {
+        return neighBourHood;
+    }
+
+    public Vector2 getCenter() {
+        return collisionBox.getCenter();
+    }
+
 
 }

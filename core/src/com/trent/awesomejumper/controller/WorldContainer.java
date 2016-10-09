@@ -10,6 +10,7 @@ import com.trent.awesomejumper.models.pickups.Pickup;
 import com.trent.awesomejumper.models.projectile.Projectile;
 import com.trent.awesomejumper.models.weapons.Weapon;
 import com.trent.awesomejumper.tiles.Tile;
+import com.trent.awesomejumper.utils.Utilities;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -234,6 +235,17 @@ public class WorldContainer {
     // ENTITY NEIGHBOURHOOD MANAGEMENT
     // ---------------------------------------------------------------------------------------------
 
+    public class WeaponAndDistance {
+        Weapon weapon;
+        float distance;
+
+        public WeaponAndDistance(Weapon w, float distance) {
+            this.weapon = w;
+            this.distance = distance;
+        }
+
+    }
+
     /**
      * Updates the list of entities close to the specified entity e.
      * The neighbourhood list describes the perimeter of radius 3 around the entity and is used by
@@ -257,7 +269,7 @@ public class WorldContainer {
                 if (!entityNeighbourhood.contains(other) && other.getBody().isCollisionDetectionEnabled())
                     entityNeighbourhood.add(other);
 
-                if(entityNeighbourhood.contains(other) && !other.getBody().isCollisionDetectionEnabled())
+                if (entityNeighbourhood.contains(other) && !other.getBody().isCollisionDetectionEnabled())
                     entityNeighbourhood.remove(other);
 
             } else {
@@ -267,6 +279,12 @@ public class WorldContainer {
 
         }
         return entityNeighbourhood;
+    }
+
+
+    public HashSet<WeaponAndDistance> updateNearbyPickups(){
+
+        return null;
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -386,7 +404,38 @@ public class WorldContainer {
      * @return
      */
     public boolean placeEntity(Entity entity, Vector2 position) {
-        entity.setPosition(position.cpy());
+
+        Vector2 destination = position.cpy();
+        if (randomLevelGenerator.getTile(position).getType().equals(Tile.TileType.WALL)) {
+            Utilities.log("WEAPON OUT OF BOUNDS", entity.getPosition().toString());
+            Utilities.log("INSIDE TILE", randomLevelGenerator.getTile(position).getPosition().toString());
+            Utilities.log("NEIGHBOURHOOD SIZE", Float.toString(randomLevelGenerator.getTile(position).getNeighbourHood().size()));
+            float minDst = Float.MAX_VALUE;
+            for (Tile t : randomLevelGenerator.getTile(position).getNeighbourHood()) {
+                Utilities.log("NEIGHBOUR TILE", t.getPosition().toString());
+
+                float dst;
+
+                if (!entity.getOwner().equals(entity))
+                    dst = position.dst(t.getPosition());
+                else
+                    dst = entity.getOwner().getPosition().dst(t.getPosition());
+
+                if (dst < minDst) {
+                    minDst = dst;
+                    Utilities.log("NEW MINIMAL DST", Float.toString(minDst));
+                    Utilities.log("NEW CENTER", t.getCollisionBox().getCenter().toString());
+                    destination = t.getCollisionBox().getCenter().cpy();
+
+                }
+
+            }
+            Utilities.log(destination.toString());
+        }
+        entity.setPosition(destination);
+
+        //entity.setPosition(new Vector2(Math.round(player.getPosition().cpy().x - 1), Math.round(player.getPosition().cpy().y - 1 )));
+        Utilities.log(entity.getPosition().toString());
 
         return false;
     }

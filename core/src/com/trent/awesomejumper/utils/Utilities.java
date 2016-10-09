@@ -1,9 +1,11 @@
 package com.trent.awesomejumper.utils;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
+import com.trent.awesomejumper.game.AwesomeJumperMain;
 
 /**
  * Created by Sinthu on 12.06.2015.
@@ -184,5 +186,18 @@ public class Utilities {
     public static Color color(int r, int g ,int b, float a) {
         return new Color(r/256f, g/256f, b/256f, a);
     }
+
+    // LOGGING
+    // ---------------------------------------------------------------------------------------------
+
+    public static void log(String title, String message) {
+        if(AwesomeJumperMain.onLogging())
+            Gdx.app.log(title,message);
+    }
+
+    public static void log(String message) {
+        log("EVENT", message);
+    }
+
 
 }

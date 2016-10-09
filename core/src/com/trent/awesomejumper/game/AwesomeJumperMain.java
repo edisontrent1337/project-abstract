@@ -7,6 +7,7 @@ import com.trent.awesomejumper.screens.SplashScreen;
 public class AwesomeJumperMain extends Game {
 
     private static boolean debugMode = false;
+    private static boolean logging = true;
     private boolean drawEntities = true;
     private boolean drawHitboxes = false;
     private boolean drawInfo = false;
@@ -23,8 +24,15 @@ public class AwesomeJumperMain extends Game {
         return assetManager;
     }
 
-    public void toggleDebugMode() {
-        this.debugMode = !debugMode;
+    public void toggleDebugMode() {debugMode = !debugMode;
+    }
+
+    public void toggleLogging() {
+        logging = !logging;
+    }
+
+    public static boolean onLogging() {
+        return logging;
     }
 
     public static boolean onDebugMode() {

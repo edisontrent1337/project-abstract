@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.controller.collision.CollisionController;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.models.projectile.Projectile;
+import com.trent.awesomejumper.models.weapons.Weapon;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -70,6 +71,11 @@ public class WorldController {
             if(!e.isAlive() || !e.getBody().isCollisionDetectionEnabled())
                 continue;
             collisionController.resolveWorldCollisions(e,delta);
+        }
+
+
+        for(Weapon w : worldContainer.getWeaponDrops()) {
+            
         }
 
         /**

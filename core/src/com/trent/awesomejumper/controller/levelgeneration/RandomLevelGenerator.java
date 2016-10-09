@@ -745,6 +745,9 @@ public class RandomLevelGenerator {
 
         /**
          * Setting all tiles with no floor neighbours to void tiles.
+         * Also adding information about neighbour floor tiles to all tiles.
+         * This information is used to find the closest valid place for a drop to be placed if
+         * it otherwise would land out of bounds.
          */
         for (int x = 0; x < levelWidth; x++) {
             for (int y = 0; y < levelHeight; y++) {
@@ -755,6 +758,8 @@ public class RandomLevelGenerator {
                     if (checkBounds(new Vector2(x, y).add(c))) {
                         if (getTile(new Vector2(x, y).add(c)).getType() == FLOOR) {
                             floorNeighbours++;
+                            // add the floor neighbour to the tile's data.
+                            getTile(x,y).addNeighbourData(getTile(new Vector2(x,y).add(c)));
                         }
                     }
                 }

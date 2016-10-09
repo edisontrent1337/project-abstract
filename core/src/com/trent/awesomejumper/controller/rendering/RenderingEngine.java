@@ -87,9 +87,6 @@ public class RenderingEngine extends Renderer {
     // FONTS
     private BitmapFont debugFont, hudFont, popUpFont;
     private FreeTypeFontGenerator fontGenerator;
-    private static final String munroRegular = "fonts/munro_regular.fnt";
-    private static final String munroSmall = "fonts/munro_small.fnt";
-    private static final String munroNarrow = "fonts/munro_narrow.fnt";
 
 
     // DEBUG & STRINGS
@@ -209,13 +206,6 @@ public class RenderingEngine extends Renderer {
         // -----------------------------------------------------------------------------------------
 
         allTextures = game.getAssetManager().get(("img/textures.pack"), TextureAtlas.class);
-        /**
-         * Iterate over all entities and manipulate their graphics component.
-         */
-
-        for (Entity e : worldContainer.getEntities()) {
-           // initGraphics(e);
-        }
 
         // TILE TEXTURES
         wallTextures = allTextures.findRegions("wall");
@@ -386,7 +376,7 @@ public class RenderingEngine extends Renderer {
                 spriteBatch.end();
                 shapeRenderer.setProjectionMatrix(camera.combined);
                 shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-                if (!newTile.isPassable())
+               //if (!newTile.isPassable())
                     newTile.getCollisionBox().draw(shapeRenderer);
                 shapeRenderer.end();
                 spriteBatch.begin();
@@ -480,7 +470,7 @@ public class RenderingEngine extends Renderer {
         debugStrings.set(DE_REGION+3, "MOBILE ENTITIES:    "  + Integer.toString(worldContainer.getMobileEntities().size()));
         debugStrings.set(DE_REGION+4, "LIVING ENTITIES:    "  + Integer.toString(worldContainer.getLivingEntities().size()));
         debugStrings.set(DE_REGION+5, "WEAPON DROP ENTITIES:    "  + Integer.toString(worldContainer.getWeaponDrops().size()) + " EQUIPPED: " + Integer.toString(player.getWeaponInventory().getWeaponsEquipped()));
-
+        debugStrings.set(DE_REGION+6, "LOGGING: " + Boolean.toString(AwesomeJumperMain.onLogging()));
 
         debugBatch.setProjectionMatrix(debugCam.combined);
         debugBatch.begin();
@@ -554,8 +544,9 @@ public class RenderingEngine extends Renderer {
 
         shapeRenderer.setColor(1f, 0f, 0f, 0.5f);
         for (Tile t : worldContainer.getCollisionTiles()) {
-            if (t != null)
+            if (t != null) {
                 shapeRenderer.rect(t.getPosition().x, t.getPosition().y, Tile.SIZE, Tile.SIZE);
+            }
         }
 
         shapeRenderer.end();

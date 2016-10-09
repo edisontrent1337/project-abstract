@@ -76,7 +76,7 @@ public class EntityManager {
         worldContainer.registerEntity(weapon);
         worldContainer.getWeaponDrops().add(weapon);
         worldContainer.getMobileEntities().add(weapon);
-        worldContainer.placeEntity(weapon, weapon.getOwner().getBounds().getPositionAndOffset());
+        worldContainer.placeEntity(weapon, weapon.getPosition());
         weapon.getBody().reset();
         renderingEngine.initGraphics(weapon);
     }

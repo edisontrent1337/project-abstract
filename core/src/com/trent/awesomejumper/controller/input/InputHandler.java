@@ -4,9 +4,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.trent.awesomejumper.controller.rendering.RenderingEngine;
+import com.trent.awesomejumper.controller.WorldController;
+import com.trent.awesomejumper.controller.rendering.PopUpRenderer;
 import com.trent.awesomejumper.engine.entity.Entity;
+import com.trent.awesomejumper.engine.entity.EntityInterface;
+import com.trent.awesomejumper.engine.modelcomponents.popups.Message;
 import com.trent.awesomejumper.models.Player;
+import com.trent.awesomejumper.models.weapons.Weapon;
+import com.trent.awesomejumper.utils.Utilities;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +27,15 @@ public class InputHandler {
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
     enum Keys {
-        UP, DOWN, LEFT, RIGHT, MOUSE1, MOUSE2, R
+        UP,
+        DOWN,
+        LEFT,
+        RIGHT,
+        MOUSE1,
+        MOUSE2,
+        RELOAD,
+        DROP,
+        PICKUP
     }
 
     private Player player;
@@ -35,12 +48,20 @@ public class InputHandler {
         keyMap.put(Keys.RIGHT, false);
         keyMap.put(Keys.MOUSE1, false);
         keyMap.put(Keys.MOUSE2, false);
-        keyMap.put(Keys.R, false);
+        keyMap.put(Keys.RELOAD, false);
+        keyMap.put(Keys.DROP, false);
+        keyMap.put(Keys.PICKUP, false);
     }
 
 
     public static Vector2 mouse = new Vector2(0f, 0f);
     private OrthographicCamera camera;
+
+    private float dropPressed = 0f;
+    private final float DROP_THRESHOLD = 0.75f;
+
+    private final float EQUIP_DISTANCE = 0.75f;
+    private final float EQUIP_THRESHOLD = 0.33f;
 
     Vector3 temp;
 
@@ -94,8 +115,31 @@ public class InputHandler {
         keyMap.put(Keys.DOWN, false);
     }
 
+    public void dropPressed() {
+        if (!keyMap.get(Keys.DROP))
+            dropPressed = player.time;
+        Utilities.log("DROP PRESSED", Float.toString(dropPressed));
+        keyMap.put(Keys.DROP, true);
+
+
+    }
+
+    public void dropReleased() {
+        Utilities.log("DROP RELEASED", Float.toString(WorldController.worldTime));
+        dropPressed = 0f;
+        keyMap.put(Keys.DROP, false);
+    }
+
     public void fire() {
         player.getWeaponInventory().fire();
+    }
+
+    public void pickUpPressed() {
+        keyMap.put(Keys.PICKUP, true);
+    }
+
+    public void pickUpReleased() {
+        keyMap.put(Keys.PICKUP, false);
     }
 
 
@@ -127,10 +171,42 @@ public class InputHandler {
          *
          */
 
-        /*mouse.x = camera.position.x - (camera.viewportWidth * camera.zoom) / 2f + Gdx.input.getX() / RenderingEngine.ppuX;
-        mouse.y = camera.position.y - (camera.viewportHeight * camera.zoom) / 2f + (Gdx.graphics.getHeight() - Gdx.input.getY()) / RenderingEngine.ppuY;*/
+        // PICK UP WEAPON
 
-        temp.set(Gdx.input.getX(), Gdx.input.getY(),0);
+        if (keyMap.get(Keys.PICKUP)) {
+
+            float mindst = Float.MAX_VALUE;
+            float dst = 0;
+            Entity target = null;
+            for (Entity e : player.getBody().getEntityNeighbourHood()) {
+                if (e.getType().equals(EntityInterface.Type.DROPPED_WEAPON_ENTITY)) {
+
+                    dst = e.getBody().getCenter().cpy().dst(player.getBody().getCenter().cpy());
+                    if (dst > EQUIP_DISTANCE)
+                        continue;
+
+                    if (dst < mindst) {
+                        target = e;
+                        mindst = dst;
+                    }
+                }
+                if (target != null) {
+                    if (player.time - player.getWeaponInventory().equipTime > EQUIP_THRESHOLD)
+                        player.getWeaponInventory().equipWeapon((Weapon) target);
+
+                }
+            }
+
+        }
+
+        // DROP WEAPON
+
+        if (keyMap.get(Keys.DROP) && (WorldController.worldTime - dropPressed > DROP_THRESHOLD)) {
+            Utilities.log("DROPPED WEAPON");
+            player.getWeaponInventory().dropWeapon();
+        }
+
+        temp.set(Gdx.input.getX(), Gdx.input.getY(), 0);
         camera.unproject(temp);
 
         mouse.x = temp.x;

@@ -132,6 +132,7 @@ public class Body extends ModelComponent {
 
     public void setPosition(Vector2 position) {
         this.position = position;
+        bounds.update(position);
     }
 
     public void setPositionX(float x) {
@@ -368,12 +369,12 @@ public class Body extends ModelComponent {
      * Also re-enables collision detection
      */
     public void reset() {
-        enableCollisionDetection();
         setAimReference(new Vector2(0f,0f));
         setAngleOfRotation(0);
         setVelocity(0,0);
         setAcceleration(0,0);
         entity.setOwner(entity);
+        enableCollisionDetection();
     }
 
 }

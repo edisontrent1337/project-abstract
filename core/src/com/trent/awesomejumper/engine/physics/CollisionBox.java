@@ -53,7 +53,7 @@ public class CollisionBox {
     }
 
     private float width, height;
-    private Vector2 position, min, max, offset;
+    private Vector2 position, min, max, offset, center;
     private Array<Vector2> edges, vertices, normals;
 
     public BoxType type;
@@ -84,6 +84,7 @@ public class CollisionBox {
         this.width = width;
         this.height = height;
         this.type = BoxType.RECTANGLE;
+        this.center = new Vector2(position.x + width/2f, position.y + height/2f);
 
         // VERTICES
         // -----------------------------------------------------------------------------------------
@@ -149,6 +150,13 @@ public class CollisionBox {
 
 
         }
+
+        Vector2 centroid = new Vector2();
+        for(Vector2 v : vertices) {
+            centroid.add(v);
+        }
+        centroid.scl(1f/vertices.size);
+        this.center = centroid;
 
         addEdgesAndNormals();
 
@@ -216,6 +224,7 @@ public class CollisionBox {
             renderer.rect(v.x - VHALF, v.y - VHALF, VSIZE, VSIZE);
         }
 
+        renderer.rect(center.x- VHALF,center.y - VHALF, VSIZE,VSIZE);
 
         renderer.setColor(color);
     }
@@ -230,6 +239,7 @@ public class CollisionBox {
     public void update(Vector2 newPosition) {
 
         position.set(newPosition);
+        center.set(newPosition.cpy().add((width + offset.cpy().x )/2f, (offset.cpy().y + height)/2f));
         /**
          * Iterate over all vertices, set their base position to position and add the "path" created
          * by all edges combined to the new position of the vertex.
@@ -301,6 +311,10 @@ public class CollisionBox {
 
     public Array<Vector2> getEdges() {
         return edges;
+    }
+
+    public Vector2 getCenter() {
+        return center;
     }
 
     public Array<Vector2> getNormals() {
