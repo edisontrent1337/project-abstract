@@ -24,6 +24,8 @@ public class Interval {
         return a >= min && a <= max;
     }
 
-
+    public boolean contains(float a) {
+        return a >= min && a <= max;
+    }
 
 }

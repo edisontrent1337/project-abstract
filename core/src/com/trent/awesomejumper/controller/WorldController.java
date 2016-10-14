@@ -82,6 +82,7 @@ public class WorldController {
          * Resolve entity/projectile collisions.
          * Here, only living entities that can take damage are considered.
          */
+
         for (Entity e : worldContainer.getLivingEntities()) {
             for (Projectile p : worldContainer.getProjectiles())
                 collisionController.projectileCollisionDetection(e, p, delta);

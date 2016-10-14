@@ -17,20 +17,23 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.StringBuilder;
 import com.trent.awesomejumper.controller.WorldContainer;
 import com.trent.awesomejumper.controller.input.InputHandler;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
-import com.trent.awesomejumper.engine.modelcomponents.ModelComponent;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.SkyBox;
 import com.trent.awesomejumper.tiles.Tile;
 
+import java.util.EnumMap;
+import java.util.HashMap;
+
 import static com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
-import static com.trent.awesomejumper.utils.Utilities.formVec;
-import static com.trent.awesomejumper.engine.modelcomponents.ModelComponent.ComponentID.*;
+import static com.trent.awesomejumper.engine.modelcomponents.ModelComponent.ComponentID.GRAPHICS;
+import static com.trent.awesomejumper.utils.Utilities.printVec;
 
 
 /**
@@ -59,6 +62,7 @@ public class RenderingEngine extends Renderer {
     private final float ZOOM = 0.6f;
 
     protected static Vector2 camPositionInPx;
+    private Vector3 unprojectedMousePosition;
 
 
     // SPRITE BATCHE
@@ -91,19 +95,30 @@ public class RenderingEngine extends Renderer {
 
     // DEBUG & STRINGS
 
-    static final int DE_ACCELERATION = 0;
-    static final int DE_VELOCITY = 1;
-    static final int DE_STATE = 2;
-    static final int DE_POSITION = 3;
-    static final int DE_POSITION_OFFSET = 4;
-    static final int DE_CAMERA_POSITION = 5;
-    static final int DE_ENTITIES = 6;
-    static final int DE_RESOLUTION = 7;
-    static final int DE_CURSOR = 8;
-    static final int DE_REGION = 9;
 
 
-    public static Array<String> debugStrings;
+    private enum DEBUG_CONSTANTS {
+        DE_ACCELERATION,
+        DE_VELOCITY,
+        DE_STATE,
+        DE_POSITION,
+        DE_POSITION_OFFSET,
+        DE_CAMERA_POSITION,
+        DE_ENTITY_COUNT,
+        DE_RESOLUTION,
+        DE_CURSOR_POSITION,
+        DE_ROOM_REGION,
+        DE_ENTITY_INSTANCE_COUNT,
+        DE_PROJECTILE_COUNT,
+        DE_WEAPON_DROP_COUNT,
+        DE_MOBILE_ENTITY_COUNT,
+        DE_LIVING_ENTITY_COUNT,
+        DE_LOGGING
+
+    }
+
+
+    public static EnumMap<DEBUG_CONSTANTS,String> debugStrings;
     private final int CONSOLE_LINE_HEIGHT = 32;
     ShapeRenderer shapeRenderer = new ShapeRenderer();
 
@@ -131,9 +146,9 @@ public class RenderingEngine extends Renderer {
         this.popUpRenderer = PopUpRenderer.createPopUpRenderer();
         camPositionInPx = new Vector2(0, 0);
         this.allTextures = new TextureAtlas();
-        this.debugStrings = new Array<>();
-        for (int i = 0; i < 20; i++) {
-            debugStrings.add(new String(""));
+        this.debugStrings = new EnumMap<>(DEBUG_CONSTANTS.class);
+        for (DEBUG_CONSTANTS c : DEBUG_CONSTANTS.values()) {
+            debugStrings.put(c,"");
         }
 
         /**
@@ -168,6 +183,8 @@ public class RenderingEngine extends Renderer {
 
         debugBatch = new SpriteBatch();
         loadTexturesAndFonts();
+
+        unprojectedMousePosition = new Vector3();
 
 
     }
@@ -254,6 +271,9 @@ public class RenderingEngine extends Renderer {
 
         debugCam.update();
         moveCamera(player.getPosition().x, player.getPosition().y);
+
+        unprojectedMousePosition.set(Gdx.input.getX(),Gdx.input.getY(),0f);
+        camera.unproject(unprojectedMousePosition);
 
         camPositionInPx.set(camera.position.x * ppuX, camera.position.y * ppuY);
 
@@ -376,7 +396,7 @@ public class RenderingEngine extends Renderer {
                 spriteBatch.end();
                 shapeRenderer.setProjectionMatrix(camera.combined);
                 shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-               //if (!newTile.isPassable())
+                if (!newTile.isPassable())
                     newTile.getCollisionBox().draw(shapeRenderer);
                 shapeRenderer.end();
                 spriteBatch.begin();
@@ -449,64 +469,100 @@ public class RenderingEngine extends Renderer {
     // ---------------------------------------------------------------------------------------------
 
     public void renderDebugInfo() {
-        Vector3 temp = new Vector3();
-        temp.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-        camera.unproject(temp);
-        debugStrings.set(DE_ACCELERATION, "ACC: " + player.getAcceleration());
-        debugStrings.set(DE_VELOCITY, "VEL: " + player.getVelocity());
-        debugStrings.set(DE_STATE, "STATE: " + player.getState().toString());
-        debugStrings.set(DE_POSITION, "POS: " + player.getPosition());
-        debugStrings.set(DE_POSITION_OFFSET, "PAO: " + player.getBody().getBounds().getPositionAndOffset());
-        debugStrings.set(DE_CAMERA_POSITION, "CAM: " + formVec(camera.position.x, camera.position.y) + " CAM PX: " + camera.position.x * ppuX + " , " + camera.position.y * ppuY);
-        debugStrings.set(DE_ENTITIES, "ENTITIES: " + "INIT :" + Integer.toString(Entity.entityCount) + " ,REG: " + Integer.toString(WorldContainer.registredNodes) + ", DRAW :" + Integer.toString(WorldContainer.renderNodes));
-        debugStrings.set(DE_RESOLUTION, Gdx.graphics.getWidth() + "*" + Gdx.graphics.getHeight() + ", ZOOM: " + camera.zoom + ", FPS :" + Gdx.graphics.getFramesPerSecond());
-        debugStrings.set(DE_CURSOR, Double.toString(Math.floor(InputHandler.mouse.x)) + " | " + Double.toString(Math.floor(InputHandler.mouse.y)) + " PIXEL: " + Gdx.input.getX() + " , " + Gdx.input.getY()
-                + " UNPRO " + temp.toString());
-        debugStrings.set(DE_REGION, Integer.toString(worldContainer.getRandomLevelGenerator().getRegion(InputHandler.mouse)));
-
-
-        debugStrings.set(DE_REGION+1, "ENTITIES:    "  + Integer.toString(worldContainer.getEntities().size()));
-        debugStrings.set(DE_REGION+2, "PROJECTILES:    "  + Integer.toString(worldContainer.getProjectiles().size()));
-        debugStrings.set(DE_REGION+3, "MOBILE ENTITIES:    "  + Integer.toString(worldContainer.getMobileEntities().size()));
-        debugStrings.set(DE_REGION+4, "LIVING ENTITIES:    "  + Integer.toString(worldContainer.getLivingEntities().size()));
-        debugStrings.set(DE_REGION+5, "WEAPON DROP ENTITIES:    "  + Integer.toString(worldContainer.getWeaponDrops().size()) + " EQUIPPED: " + Integer.toString(player.getWeaponInventory().getWeaponsEquipped()));
-        debugStrings.set(DE_REGION+6, "LOGGING: " + Boolean.toString(AwesomeJumperMain.onLogging()));
-
+        // updating the debug information
+        updateDebugStrings();
         debugBatch.setProjectionMatrix(debugCam.combined);
         debugBatch.begin();
-        for (int i = 0; i < debugStrings.size; i++) {
-            debugFont.draw(debugBatch, debugStrings.get(i), 14, CONSOLE_LINE_HEIGHT * i);
+        int i = 0;
+        for (DEBUG_CONSTANTS c : debugStrings.keySet()) {
+            debugFont.draw(debugBatch, debugStrings.get(c), 14, CONSOLE_LINE_HEIGHT * i);
+            i++;
         }
         debugBatch.end();
+    }
+
+    /**
+     * INSERT HERE ALL NEW DEBUG STRINGS THAT SHOULD BE DISPLAYED IN GAME.
+     */
+    private void updateDebugStrings() {
+        StringBuilder builder = new StringBuilder();
+
+        debugStrings.put(DEBUG_CONSTANTS.DE_ACCELERATION, "ACC: " + player.getAcceleration());
+        debugStrings.put(DEBUG_CONSTANTS.DE_VELOCITY, "VEL: " + player.getVelocity());
+        debugStrings.put(DEBUG_CONSTANTS.DE_STATE, "STATE: " + player.getState().toString());
+        debugStrings.put(DEBUG_CONSTANTS.DE_POSITION, "POS: " + player.getPosition());
+        debugStrings.put(DEBUG_CONSTANTS.DE_POSITION_OFFSET, "PAO: " + player.getBody().getBounds().getPositionAndOffset());
+
+        builder.append("CAM:    ").append(printVec(camera.position.x, camera.position.y));
+        builder.append("CAM PX: ").append(printVec(new Vector2(camera.position.cpy().x * ppuX, camera.position.cpy().y * ppuY)));
+
+        debugStrings.put(DEBUG_CONSTANTS.DE_CAMERA_POSITION, builder.toString());
+        builder.setLength(0);
+
+        builder.append("ENTITIES: INITIALISED:").append(Entity.entityCount);
+        builder.append(" REGISTERED: ").append(WorldContainer.registeredNodes);
+        builder.append(" DRAWN: ").append(WorldContainer.renderNodes);
+
+        debugStrings.put(DEBUG_CONSTANTS.DE_ENTITY_COUNT, builder.toString());
+        builder.setLength(0);
+
+        builder.append(Gdx.graphics.getWidth()).append("*").append(Gdx.graphics.getHeight());
+        builder.append("ZOOM: ").append(camera.zoom).append(", FPS: ").append(Gdx.graphics.getFramesPerSecond());
+
+        debugStrings.put(DEBUG_CONSTANTS.DE_RESOLUTION, builder.toString());
+        builder.setLength(0);
+
+        builder.append(InputHandler.getCursorPostion()).append(" PIXEL: ").append(printVec(Gdx.input.getX(),Gdx.input.getY()));
+        builder.append(" UNPRO: ").append(printVec(unprojectedMousePosition.x,unprojectedMousePosition.y));
+
+
+        debugStrings.put(DEBUG_CONSTANTS.DE_CURSOR_POSITION, builder.toString());
+        builder.setLength(0);
+
+        debugStrings.put(DEBUG_CONSTANTS.DE_ROOM_REGION, Integer.toString(worldContainer.getRandomLevelGenerator().getRegion(InputHandler.mouse)));
+        debugStrings.put(DEBUG_CONSTANTS.DE_ROOM_REGION, "ENTITIES: " + Integer.toString(worldContainer.getEntities().size()));
+        debugStrings.put(DEBUG_CONSTANTS.DE_PROJECTILE_COUNT, "PROJECTILES: " + Integer.toString(worldContainer.getProjectiles().size()));
+        debugStrings.put(DEBUG_CONSTANTS.DE_MOBILE_ENTITY_COUNT, "MOBILE ENTITIES: " + Integer.toString(worldContainer.getMobileEntities().size()));
+        debugStrings.put(DEBUG_CONSTANTS.DE_LIVING_ENTITY_COUNT, "LIVING ENTITIES: " + Integer.toString(worldContainer.getLivingEntities().size()));
+        builder.append("WEAPON DROP ENTITIES: ").append(worldContainer.getWeaponDrops().size());
+        builder.append(" EQUIPPED").append(player.getWeaponInventory().getWeaponsEquipped());
+        debugStrings.put(DEBUG_CONSTANTS.DE_WEAPON_DROP_COUNT, builder.toString());
+        builder.setLength(0);
+
+        debugStrings.put(DEBUG_CONSTANTS.DE_LOGGING, "LOGGING: " + Boolean.toString(AwesomeJumperMain.onLogging()));
     }
 
     // HITBOXES
     // ---------------------------------------------------------------------------------------------
     public void drawHitboxes() {
         shapeRenderer.setProjectionMatrix(camera.combined);
+
+        /**
+         * Drawing entity hitboxes.
+         */
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-
-
-        for (Entity e : worldContainer.getEntities()) {
-            /**
-             * Only if the body flag is enabled, body hitboxes will be drawn.
-             */
-            shapeRenderer.setColor(1, 0, 0, 1);
-            e.getBounds().draw(shapeRenderer);
-            if (game.bodyEnabled()) {
-                for (CollisionBox r : e.getBodyHitboxes()) {
-                    shapeRenderer.setColor(Color.YELLOW);
-                    r.draw(shapeRenderer);
+        {
+            for (Entity e : worldContainer.getEntities()) {
+                /**
+                 * Only if the body flag is enabled, body hitboxes will be drawn.
+                 */
+                shapeRenderer.setColor(1, 0, 0, 1);
+                e.getBounds().draw(shapeRenderer);
+                if (game.bodyEnabled()) {
+                    for (CollisionBox r : e.getBodyHitboxes()) {
+                        shapeRenderer.setColor(Color.YELLOW);
+                        r.draw(shapeRenderer);
+                    }
                 }
-            }
 
-            if (e.getBody().isCollidedWithWorld()) {
-                shapeRenderer.end();
-                shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-                shapeRenderer.setColor(Color.RED);
-                shapeRenderer.rect(e.getBounds().getPositionAndOffset().x, e.getBounds().getPositionAndOffset().y, e.getBounds().getWidth(), e.getBounds().getHeight());
-                shapeRenderer.end();
-                shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+                if (e.getBody().isCollidedWithWorld()) {
+                    shapeRenderer.end();
+                    shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+                    shapeRenderer.setColor(Color.RED);
+                    shapeRenderer.rect(e.getBounds().getPositionAndOffset().x, e.getBounds().getPositionAndOffset().y, e.getBounds().getWidth(), e.getBounds().getHeight());
+                    shapeRenderer.end();
+                    shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+                }
             }
         }
         shapeRenderer.end();
@@ -515,40 +571,54 @@ public class RenderingEngine extends Renderer {
          * Drawing a line to the point of aim.
          */
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(Color.GREEN);
+        {
+            shapeRenderer.setColor(Color.GREEN);
+            if (player.getWeaponInventory().isHoldingAWeapon())
+                shapeRenderer.line(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter(), player.getWeaponInventory().getSelectedWeapon().getBody().getAimReference());
 
-        if(player.getWeaponInventory().isHoldingAWeapon())
-            shapeRenderer.line(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter(),player.getWeaponInventory().getSelectedWeapon().getBody().getAimReference());
-
-        /**
-         * Drawing a line to all entities in the neighbourhood.
-         */
-        shapeRenderer.setColor(Color.BLUE);
-        for(Entity e : player.getBody().getEntityNeighbourHood()) {
-            shapeRenderer.line(player.getBody().getCenter(), e.getBody().getCenter());
+            /**
+             * Drawing a line to all entities in the neighbourhood.
+             */
+            shapeRenderer.setColor(Color.BLUE);
+            for (Entity e : player.getBody().getEntityNeighbourHood()) {
+                shapeRenderer.line(player.getBody().getCenter(), e.getBody().getCenter());
+            }
         }
-
         shapeRenderer.end();
+
+        // DRAW SPATIAL HASHING CELLS
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        {
+            shapeRenderer.setColor(Color.PINK);
+                for(Vector2 v : worldContainer.getSpatialHashingData().keySet())
+                    shapeRenderer.rect(v.x, v.y, worldContainer.getSpatialFactor(), worldContainer.getSpatialFactor());
+                    //Utilities.log(String.format("%1d|%2d|%3d%4d", x*spatialSize,y*spatialSize, worldContainer.getSpatialFactor(), worldContainer.getSpatialFactor()));
+        }
+        shapeRenderer.end();
+
+
         // HITBOXES OF TILES AFFECTED BY COLLISION DETECTION
         Gdx.gl.glEnable(GL20.GL_BLEND);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(0, 0.5f, 0.5f, 1);
-        /**
-         * vertical and horizontal components are separated here to show  which impact is bigger
-         */
-        Vector2 playerX = new Vector2(player.getVelocity().x, 0f).cpy().scl(player.getPlayerDelta()).scl(25);
-        Vector2 playerY = new Vector2(0f, player.getVelocity().y).cpy().scl(player.getPlayerDelta()).scl(25);
+        {
+            shapeRenderer.setColor(0, 0.5f, 0.5f, 1);
 
-        shapeRenderer.rectLine(player.getPosition(), player.getPosition().cpy().add(playerX), 5 * (1 / ppuX));
-        shapeRenderer.rectLine(player.getPosition(), player.getPosition().cpy().add(playerY), 5 * (1 / ppuY));
+            /**
+             * vertical and horizontal components are separated here to show  which impact is bigger
+             */
+            Vector2 playerX = new Vector2(player.getVelocity().x, 0f).cpy().scl(player.getPlayerDelta()).scl(25);
+            Vector2 playerY = new Vector2(0f, player.getVelocity().y).cpy().scl(player.getPlayerDelta()).scl(25);
 
-        shapeRenderer.setColor(1f, 0f, 0f, 0.5f);
-        for (Tile t : worldContainer.getCollisionTiles()) {
-            if (t != null) {
-                shapeRenderer.rect(t.getPosition().x, t.getPosition().y, Tile.SIZE, Tile.SIZE);
+            shapeRenderer.rectLine(player.getPosition(), player.getPosition().cpy().add(playerX), 5 * (1 / ppuX));
+            shapeRenderer.rectLine(player.getPosition(), player.getPosition().cpy().add(playerY), 5 * (1 / ppuY));
+
+            shapeRenderer.setColor(1f, 0f, 0f, 0.5f);
+            for (Tile t : worldContainer.getCollisionTiles()) {
+                if (t != null) {
+                    shapeRenderer.rect(t.getPosition().x, t.getPosition().y, Tile.SIZE, Tile.SIZE);
+                }
             }
         }
-
         shapeRenderer.end();
         Gdx.gl.glDisable(GL20.GL_BLEND);
     }

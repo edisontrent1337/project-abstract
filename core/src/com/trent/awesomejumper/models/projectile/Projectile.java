@@ -4,10 +4,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.controller.EntityManager;
+import com.trent.awesomejumper.controller.rendering.PopUpRenderer;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.Body;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
+import com.trent.awesomejumper.engine.modelcomponents.popups.Message;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
+
+import static com.trent.awesomejumper.controller.rendering.PopUpRenderer.PopUpCategories.MISC;
 
 
 /**
@@ -86,5 +90,8 @@ public class Projectile extends Entity {
     public void register() {
         EntityManager.getInstance().registerEntity(this);
     }
+
+
+
 
 }

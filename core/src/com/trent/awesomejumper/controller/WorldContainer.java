@@ -10,6 +10,7 @@ import com.trent.awesomejumper.models.pickups.Pickup;
 import com.trent.awesomejumper.models.projectile.Projectile;
 import com.trent.awesomejumper.models.weapons.Weapon;
 import com.trent.awesomejumper.tiles.Tile;
+import com.trent.awesomejumper.utils.Interval;
 import com.trent.awesomejumper.utils.Utilities;
 
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ public class WorldContainer {
     // ---------------------------------------------------------------------------------------------
 
     public static int renderNodes = 0;
-    public static int registredNodes = 0;
+    public static int registeredNodes = 0;
 
     private static final float NEIGHBOURHOOD_RANGE = 2.0f;
 
@@ -46,8 +47,16 @@ public class WorldContainer {
      * Separate sets are needed for the collision detection to work properly, as there is a need
      * to differentiate between different types of entities.
      */
+
+    private int SPATIAL_WIDTH = 0;
+    private int SPATIAL_HEIGHT = 0;
+
     // Map containing all entities in the game. Maps entity IDs with entities.
-    private HashMap<Integer, Entity> entities;
+    private HashMap<Integer, Entity> entities = new HashMap<>();
+
+    // Map for spatial hashing
+    private HashMap<Vector2, Set<Entity>> spatialHashingData = new HashMap<>();
+    private final int SPATIAL_HASH_GRID_SIZE = 3;
 
     // Subset containing all projectiles
     private HashSet<Projectile> projectiles = new HashSet<>();
@@ -79,18 +88,159 @@ public class WorldContainer {
     // ---------------------------------------------------------------------------------------------
 
     public WorldContainer() {
-        entities = new HashMap<>();
-        pickups = new HashSet<>();
-        weaponDrops = new HashSet<>();
-        entitiesToBeDrawn = new ArrayList<>();
-        projectiles = new HashSet<>();
         randomLevelGenerator = new RandomLevelGenerator();
         randomLevelGenerator.init();
         entities = randomLevelGenerator.load();
         player = randomLevelGenerator.getPlayer();
+
+        initSpatialData();
     }
 
 
+    // ---------------------------------------------------------------------------------------------
+    // SPATIAL HASHING METHODS
+    // ---------------------------------------------------------------------------------------------
+
+    /**
+     * Clears the spatial hashing data structure.
+     */
+    public void clearSpatialHashData() {
+
+        spatialHashingData.clear();
+        for (int x = 0; x < SPATIAL_WIDTH; x++) {
+            for (int y = 0; y < SPATIAL_HEIGHT; y++) {
+                spatialHashingData.put(new Vector2(x * SPATIAL_HASH_GRID_SIZE, y * SPATIAL_HASH_GRID_SIZE), new HashSet<Entity>());
+            }
+        }
+    }
+
+    private void addEntityToSpatialHashingData(Entity entity) {
+
+        HashSet<Vector2> hashKeys = getKeyPositions(entity);
+        for (Vector2 v : hashKeys) {
+            if (spatialHashingData.containsKey(v))
+                spatialHashingData.get(v).add(entity);
+            else
+                Utilities.log(String.format("ERROR ADDING THE FOLLOWING ENTITY TO THE LOCATION %1s" +
+                        "IN THE SPATIAL HASHING DATA: %2s", v.toString(), entity.toString()));
+        }
+    }
+
+    private void initSpatialData() {
+
+        SPATIAL_WIDTH = randomLevelGenerator.getLevelWidth() / SPATIAL_HASH_GRID_SIZE;
+        SPATIAL_HEIGHT = randomLevelGenerator.getLevelHeight() / SPATIAL_HASH_GRID_SIZE;
+
+        Utilities.log("SPATIAL DIMENSIONS:  " + Integer.toString(SPATIAL_WIDTH) + " :   " + Integer.toString(SPATIAL_HEIGHT));
+
+        /**
+         * Generate keys at valid Vector2 positions.
+         * Every multiple of SPATIAL_HASH_GRID_SIZE is a valid key in the spatial hashing data structure.
+         */
+        for (int x = 0; x < SPATIAL_WIDTH; x++) {
+            for (int y = 0; y < SPATIAL_HEIGHT; y++) {
+                spatialHashingData.put(new Vector2(x * SPATIAL_HASH_GRID_SIZE, y * SPATIAL_HASH_GRID_SIZE), new HashSet<Entity>());
+            }
+        }
+
+        for (Vector2 v : spatialHashingData.keySet()) {
+            Utilities.log("VALID SPATIAL KEY", v.toString());
+        }
+
+        /**
+         * Add each entity/tile to the Vector2-keys they touch with their Vec2-position.
+         */
+        for (Entity e : entities.values()) {
+            HashSet<Vector2> spatialKeys = getKeyPositions(e);
+            for (Vector2 v : spatialKeys) {
+                spatialHashingData.get(v).add(e);
+            }
+        }
+
+
+        for (Map.Entry<Vector2, Set<Entity>> entry : spatialHashingData.entrySet()) {
+
+            if (!entry.getValue().isEmpty()) {
+                Vector2 key = entry.getKey();
+                Interval x = new Interval(key.x * SPATIAL_HASH_GRID_SIZE, (key.x + SPATIAL_HASH_GRID_SIZE) * SPATIAL_HASH_GRID_SIZE);
+                Interval y = new Interval(key.y * SPATIAL_HASH_GRID_SIZE, (key.y + SPATIAL_HASH_GRID_SIZE) * SPATIAL_HASH_GRID_SIZE);
+                Utilities.log("KEY POSITION AND VALUES", entry.getKey().toString());
+                Utilities.log("VALID ENTITY X POSITIONS FOR THIS KEY", x.toString());
+                Utilities.log("VALID ENTITY Y POSITIONS FOR THIS KEY", y.toString());
+
+
+                for (Entity e : entry.getValue()) {
+
+                    Utilities.log(e.toString());
+                    if (!x.contains(e.getPosition().x))
+                        Utilities.log("ENTITY IS OUT OF BOUNDS FOR THIS KEY ON X AXIS");
+                    if (!y.contains(e.getPosition().y))
+                        Utilities.log("ENTITY IS OUT OF BOUNDS FOR THIS KEY ON Y AXIS");
+                }
+            }
+        }
+    }
+
+    /**
+     * Gets a list of keys for the spatial data structure. The list of keys represent the
+     * quadrants and entity is positioned in.
+     *
+     * @param x x position of the entity / tile
+     * @param y y position of the entity / tile
+     * @param w width of the entity / tile
+     * @param h hieght of the entity / tile
+     * @return
+     */
+    public HashSet<Vector2> getKeyPositions(float x, float y, float w, float h) {
+
+        Utilities.log("ENTITY Position X ", Float.toString(x));
+        Utilities.log("ENTITY Position Y ", Float.toString(y));
+        Utilities.log("ENTITY Width ", Float.toString(w));
+        Utilities.log("ENTITY Height ", Float.toString(h));
+
+        int spatialX = (int) Math.floor(x / SPATIAL_HASH_GRID_SIZE);
+        int spatialY = (int) Math.floor(y / SPATIAL_HASH_GRID_SIZE);
+        int spatialWx = (int) Math.floor((x + w) / SPATIAL_HASH_GRID_SIZE);
+        int spatialHy = (int) Math.floor((y + h) / SPATIAL_HASH_GRID_SIZE);
+
+        Utilities.log("SPATIALX", Integer.toString(spatialX));
+        Utilities.log("SPATIALY", Integer.toString(spatialY));
+        Utilities.log("SPATIALWX", Integer.toString(spatialWx));
+        Utilities.log("SPATIALHY", Integer.toString(spatialHy));
+
+        spatialX -= spatialX % SPATIAL_HASH_GRID_SIZE;
+        spatialY -= spatialY % SPATIAL_HASH_GRID_SIZE;
+        spatialWx -= spatialWx % SPATIAL_HASH_GRID_SIZE;
+        spatialHy -= spatialHy % SPATIAL_HASH_GRID_SIZE;
+
+        HashSet<Vector2> result = new HashSet<>();
+
+        result.add(new Vector2(spatialX, spatialY));
+        result.add(new Vector2(spatialWx, spatialY));
+        result.add(new Vector2(spatialX, spatialHy));
+        result.add(new Vector2(spatialWx, spatialHy));
+
+
+        Utilities.log("GENERATED KEYS");
+        for (Vector2 v : result) {
+            Utilities.log("KEY", v.toString());
+        }
+
+
+        return result;
+    }
+
+    public HashSet<Vector2> getKeyPositions(Entity e) {
+        return getKeyPositions(e.getPosition().cpy().x, e.getPosition().cpy().y, e.getWidth(), e.getHeight());
+    }
+
+    public HashSet<Vector2> getKeyPositions(Tile t) {
+        return getKeyPositions(t.getPosition().x, t.getPosition().y, t.getBounds().getWidth(), t.getBounds().getHeight());
+    }
+
+    /**
+     * Registers all entities and puts them in their respective collection
+     */
     public void initAllEntities() {
         for (Iterator<? extends Entity> it = entities.values().iterator(); it.hasNext(); ) {
             Entity e = it.next();
@@ -103,6 +253,14 @@ public class WorldContainer {
     // LIST OF TILES TO BE DRAWN
     // ---------------------------------------------------------------------------------------------
 
+    /**
+     * returns an ordererd list of entities currently in view.
+     *
+     * @param cameraPosition position of the game camera
+     * @param camW           camera width
+     * @param camH           camera height
+     * @return
+     */
     public ArrayList<Tile> getTilesToBeRendered(Vector2 cameraPosition, float camW, float camH) {
 
         // GET CURRENT FOV COORDINATES AND ONLY RENDER WHAT THE PLAYER SEES
@@ -226,7 +384,7 @@ public class WorldContainer {
         });
         Collections.reverse(entitiesToBeDrawn);
         renderNodes = entitiesToBeDrawn.size();
-        registredNodes = entities.size();
+        registeredNodes = entities.size();
         return entitiesToBeDrawn;
     }
 
@@ -282,7 +440,7 @@ public class WorldContainer {
     }
 
 
-    public HashSet<WeaponAndDistance> updateNearbyPickups(){
+    public HashSet<WeaponAndDistance> updateNearbyPickups() {
 
         return null;
     }
@@ -376,11 +534,12 @@ public class WorldContainer {
 
     public void registerEntity(Entity entity) {
 
+
         entities.put(entity.getID(), entity);
         entity.registerTime = entity.time;
         if (AwesomeJumperMain.onDebugMode()) {
-            Gdx.app.log("Registrated entity at", Float.toString(entity.registerTime));
-            Gdx.app.log("Entity registrated", String.format("%04d", (entity.getID())));
+            Gdx.app.log("Registered entity at", Float.toString(entity.registerTime));
+            Gdx.app.log("Entity registered", String.format("%04d", (entity.getID())));
         }
     }
 
@@ -434,7 +593,6 @@ public class WorldContainer {
         }
         entity.setPosition(destination);
 
-        //entity.setPosition(new Vector2(Math.round(player.getPosition().cpy().x - 1), Math.round(player.getPosition().cpy().y - 1 )));
         Utilities.log(entity.getPosition().toString());
 
         return false;
@@ -505,5 +663,20 @@ public class WorldContainer {
         return entities.get(id);
     }
 
+    // GETTER FOR SPATIAL DIMENSIONS
+    public int getSpatialWidth() {
+        return SPATIAL_WIDTH;
+    }
 
+    public int getSpatialHeight() {
+        return SPATIAL_HEIGHT;
+    }
+
+    public int getSpatialFactor() {
+        return SPATIAL_HASH_GRID_SIZE;
+    }
+
+    public HashMap<Vector2, Set<Entity>> getSpatialHashingData() {
+        return spatialHashingData;
+    }
 }

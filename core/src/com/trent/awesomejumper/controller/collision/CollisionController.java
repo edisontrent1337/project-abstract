@@ -5,17 +5,22 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.trent.awesomejumper.controller.WorldContainer;
+import com.trent.awesomejumper.controller.rendering.PopUpRenderer;
 import com.trent.awesomejumper.engine.entity.Entity;
+import com.trent.awesomejumper.engine.modelcomponents.popups.Message;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
+import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.projectile.Projectile;
 import com.trent.awesomejumper.models.weapons.Weapon;
 import com.trent.awesomejumper.tiles.Tile;
 import com.trent.awesomejumper.utils.Interval;
+import com.trent.awesomejumper.utils.Utilities;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import static com.trent.awesomejumper.controller.rendering.PopUpRenderer.PopUpCategories.MISC;
 import static com.trent.awesomejumper.engine.modelcomponents.ModelComponent.ComponentID.HEALTH;
 import static com.trent.awesomejumper.utils.PhysicalConstants.FRICTIONAL_COEFFICIENT;
 import static com.trent.awesomejumper.utils.Utilities.dot;
@@ -517,6 +522,8 @@ public class CollisionController {
      */
     private boolean projectileCollisionDetection(Projectile projectile, Entity entity, Vector2 projectileVelocity, Vector2 entityVelocity, float delta) {
 
+
+        //TODO: REMOVE THIS.
         if (entity instanceof Weapon) {
             Gdx.app.log("WEAPON", "COLLIDED WITH PROJECTILE");
         }
@@ -550,6 +557,27 @@ public class CollisionController {
          * can happen in the next frame, so it has to be resolved by checkCollision
          */
         if (framesToImpact > 0 && framesToImpact < 1) {
+            float step = 0.05f;
+            float numberOfSteps = dst / step;
+            Utilities.log("NUMBER OF STEPS", Float.toString(numberOfSteps));
+            for(float i = 0f; i <= numberOfSteps; i++) {
+                Vector2 projectilePosition = projectile.getPosition();
+                Vector2 frameStep = deltaVelocity.cpy().nor().scl(step);
+                Utilities.log("OLD POSITION", projectilePosition.toString());
+                Utilities.log("FRAME STEP", frameStep.toString());
+                projectilePosition.add(frameStep);
+                Utilities.log("NEW POSITION", projectilePosition.toString());
+                projectile.setPosition(projectilePosition);
+
+                if(checkCollision(projectile.getBounds(), entityBounds)) {
+                    Utilities.log("Collision detected.");
+                    break;
+                }
+            }
+
+            Message m = new Message(projectile.getPosition().cpy().toString(), projectile.getPosition().cpy(), entity.time, 3.00f);
+            PopUpRenderer.getInstance().addMessageToCategory(MISC, m);
+
             /**
              * If the bounds/shadows of the projectile and the entity collide,
              * another check has to pass: whether or not the projectile is in the correct
@@ -564,6 +592,8 @@ public class CollisionController {
             projectile.destroy();
             return true;
         } else if (checkCollision(projectile.getBounds(), entityBounds)) {
+            Message m = new Message(projectile.getPosition().cpy().toString(), projectile.getPosition().cpy(), entity.time, 3.00f);
+            PopUpRenderer.getInstance().addMessageToCategory(MISC, m);
 
             projectile.setVelocity(0f, 0f);
             if (entity.has(HEALTH)) {
@@ -592,17 +622,44 @@ public class CollisionController {
      */
     private boolean projectileCollisionDetection(Projectile projectile, Tile tile) {
 
+
+
+
         float dst = sub(projectile.getPosition(), tile.getPosition()).len();
         float framesTillImpact = dst / projectile.getVelocity().len();
 
         // FAST BULLET
         if (framesTillImpact > 0 && framesTillImpact < 1) {
+            float step = 0.0125f;
+            float numberOfSteps = dst / step;
+            Utilities.log("NUMBER OF STEPS", Float.toString(numberOfSteps));
+            for(float i = 0f; i <= numberOfSteps; i++) {
+                Vector2 projectilePosition = projectile.getPosition();
+                Vector2 frameStep = projectile.getVelocity().cpy().nor().scl(step);
+                Utilities.log("OLD POSITION", projectilePosition.toString());
+                Utilities.log("FRAME STEP", frameStep.toString());
+                projectilePosition.add(frameStep);
+                Utilities.log("NEW POSITION", projectilePosition.toString());
+                projectile.setPosition(projectilePosition);
+
+                if(checkCollision(projectile.getBounds(), tile.getCollisionBox())) {
+                    Utilities.log("Collision detected.");
+                    return true;
+                }
+            }
+            Message m = new Message(projectile.getPosition().cpy().toString(), projectile.getPosition().cpy(), projectile.time, 3.00f);
+            PopUpRenderer.getInstance().addMessageToCategory(MISC, m);
             projectile.setVelocity(0f, 0f);
             projectile.destroy();
+
             return true;
         }
         // SLOW BULLET
         else if (checkCollision(projectile.getBounds(), tile.getCollisionBox())) {
+
+            Message m = new Message(projectile.getPosition().cpy().toString(), projectile.getPosition().cpy(), projectile.time, 3.00f);
+            PopUpRenderer.getInstance().addMessageToCategory(MISC, m);
+
             projectile.setVelocity(0f, 0f);
             projectile.destroy();
             return true;

@@ -34,7 +34,7 @@ public class Utilities {
      * Formats an input vector v for console output. Rounded to 3 decimal places.
      * @param v - input vector
      */
-    public static String formVec(Vector2 v) {
+    public static String printVec(Vector2 v) {
         return "(" + String.format("%.3f", v.x) + "|" + String.format("%.3f", v.y) + ")";
     }
 
@@ -44,8 +44,11 @@ public class Utilities {
      * @param x input x component
      * @param y inpit y component
      */
-    public static String formVec(float x, float y) {
-        return formVec(new Vector2(x, y));
+    public static String printVec(float x, float y) {
+        return printVec(new Vector2(x, y));
+    }
+    public static String printVec(double x, double y) {
+        return printVec(new Vector2((float)x, (float)y));
     }
 
 

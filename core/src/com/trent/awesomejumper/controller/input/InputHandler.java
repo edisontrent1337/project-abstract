@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.trent.awesomejumper.utils.PhysicalConstants.ACCELERATION;
+import static com.trent.awesomejumper.utils.Utilities.printVec;
 
 /**
  * InputHandler class. Handles player input regarding the GameScreen.
@@ -288,8 +289,15 @@ public class InputHandler {
     }
 
 
+    // GETTER & SETTER
+    // ---------------------------------------------------------------------------------------------
+
     public void setPlayer(Player player) {
         this.player = player;
+    }
+
+    public static String getCursorPostion() {
+        return printVec(Math.floor(mouse.x), Math.floor(mouse.y)) + " | " + printVec(mouse);
     }
 
 }

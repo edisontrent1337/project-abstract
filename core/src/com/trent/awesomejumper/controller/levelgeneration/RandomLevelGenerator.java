@@ -394,7 +394,6 @@ public class RandomLevelGenerator {
 
     }
 
-
     /**
      * Sorts the room array by the rooms coordinates.
      */

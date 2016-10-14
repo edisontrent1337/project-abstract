@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.trent.awesomejumper.controller.EntityManager;
+import com.trent.awesomejumper.controller.WorldContainer;
+import com.trent.awesomejumper.controller.WorldController;
 import com.trent.awesomejumper.engine.modelcomponents.Body;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.engine.modelcomponents.Health;
@@ -84,6 +86,7 @@ public class Entity implements EntityInterface {
     // ---------------------------------------------------------------------------------------------
 
     public Entity() {
+        time = WorldController.worldTime;
         components = new HashSet<>();
         entityCount++;
         ID = createID();
@@ -311,6 +314,14 @@ public class Entity implements EntityInterface {
 
     public Entity getOwner() {
         return owner;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("NAME: %s ID: %05d POSITION: %.2f | %.2f ALIVE: %s",
+                this.getClass().getSimpleName(), ID, getPosition().x, getPosition().y,
+                Boolean.toString(alive));
+
     }
 
 
