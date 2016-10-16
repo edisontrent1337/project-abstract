@@ -49,7 +49,7 @@ public class RandomLevelGenerator {
     private int levelHeight;
 
     //private HashSet<Entity> entities;
-    private HashMap<Integer,Entity> entities;
+    private HashMap<Integer, Entity> entities;
     private HashSet<Weapon> weaponDrops;
     private HashSet<Pickup> pickups;
     //TODO: use a map to implement functions like getRoomById()....
@@ -173,7 +173,8 @@ public class RandomLevelGenerator {
      * 8) remove all extra doors
      * 9) remove all dead ends
      * 10) finally placing the player in a random room.
-     * @return  returns a HashMap of all predefined entities in the level.
+     *
+     * @return returns a HashMap of all predefined entities in the level.
      */
     public HashMap<Integer, Entity> load() {
         Room.Type baseRoomType; // holds the general size of the room. Random rectangularity is added later.
@@ -323,19 +324,19 @@ public class RandomLevelGenerator {
             totalRegions++;
 
             Pistol p = new Pistol(r.getCenter());
-            Pistol q = new Pistol(r.getCenter().cpy().add(1,1));
-            Pistol s = new Pistol(r.getCenter().cpy().add(1,2));
-            Pistol t = new Pistol(r.getCenter().cpy().add(2,1));
-            Lootable c = new Lootable(r.getCenter().cpy().add(3,1));
+            Pistol q = new Pistol(r.getCenter().cpy().add(1, 1));
+            Pistol s = new Pistol(r.getCenter().cpy().add(1, 2));
+            Pistol t = new Pistol(r.getCenter().cpy().add(2, 1));
+            Lootable c = new Lootable(r.getCenter().cpy().add(3, 1));
 
             /*entities.add(p);
             entities.add(c);*/
 
-            entities.put(p.getID(),p);
-            entities.put(q.getID(),q);
-            entities.put(s.getID(),s);
-            entities.put(t.getID(),t);
-            entities.put(c.getID(),c);
+            entities.put(p.getID(), p);
+            entities.put(q.getID(), q);
+            entities.put(s.getID(), s);
+            entities.put(t.getID(), t);
+            entities.put(c.getID(), c);
 
         }
     }
@@ -758,7 +759,7 @@ public class RandomLevelGenerator {
                         if (getTile(new Vector2(x, y).add(c)).getType() == FLOOR) {
                             floorNeighbours++;
                             // add the floor neighbour to the tile's data.
-                            getTile(x,y).addNeighbourData(getTile(new Vector2(x,y).add(c)));
+                            getTile(x, y).addNeighbourData(getTile(new Vector2(x, y).add(c)));
                         }
                     }
                 }
@@ -771,85 +772,57 @@ public class RandomLevelGenerator {
             }
         }
 
-        for(int x = 0; x < levelWidth; x++) {
-            for(int y = 0; y < levelHeight; y++) {
+        for (int x = 0; x < levelWidth; x++) {
+            for (int y = 0; y < levelHeight; y++) {
 
-                if(getTile(x,y).getType() == FLOOR || getTile(x,y).tileIndex == VOID)
+                if (getTile(x, y).getType() == FLOOR || getTile(x, y).tileIndex == VOID)
                     continue;
 
 
-                if(isFloor(N_DIR,x,y)) {
-                   if(isFloor(NW_DIR,x,y) && isFloor(W_DIR,x,y)) {
-                       getTile(x,y).tileIndex = SOUTH_EAST_INNER; // 5
-                   }
+                if (isFloor(N_DIR, x, y)) {
+                    if (isFloor(NW_DIR, x, y) && isFloor(W_DIR, x, y)) {
+                        getTile(x, y).tileIndex = SOUTH_EAST_INNER; // 5
+                    } else if (isFloor(NE_DIR, x, y) && isFloor(E_DIR, x, y)) {
+                        getTile(x, y).tileIndex = SOUTH_WEST_INNER; // 6
+                    } else
+                        getTile(x, y).tileIndex = SOUTH_WALL; // 3
 
-                    else if(isFloor(NE_DIR,x,y) && isFloor(E_DIR,x,y)) {
-                        getTile(x,y).tileIndex = SOUTH_WEST_INNER; // 6
-                    }
-
-                    else
-                        getTile(x,y).tileIndex = SOUTH_WALL; // 3
-
-                }
-
-
-                else if(isFloor(E_DIR,x,y)) {
-                     if(isFloor(N_DIR,x,y) && isFloor(NE_DIR,x,y)) {
-                         getTile(x,y).tileIndex = SOUTH_WEST_INNER; // 6
-                     }
-                    else if(isFloor(S_DIR,x,y) && isFloor(SE_DIR,x,y)) {
-                         getTile(x,y).tileIndex = NORTH_EAST_INNER; // 7
-                     }
-
-                    else {
-                         getTile(x,y).tileIndex = WEST_WALL; // 4
-                     }
-
-
-                }
-
-
-                else if(isFloor(S_DIR,x,y)) {
-                    if(isFloor(E_DIR,x,y) && isFloor(SE_DIR,x,y)) {
-                        getTile(x,y).tileIndex = NORTH_EAST_INNER; // 7
-                    }
-                    else if(isFloor(W_DIR,x,y) && isFloor(SW_DIR,x,y)) {
-                        getTile(x,y).tileIndex = NORTH_WEST_INNER; // 8
-                    }
-                    else {
-                        getTile(x,y).tileIndex = NORTH_WALL; // 1
+                } else if (isFloor(E_DIR, x, y)) {
+                    if (isFloor(N_DIR, x, y) && isFloor(NE_DIR, x, y)) {
+                        getTile(x, y).tileIndex = SOUTH_WEST_INNER; // 6
+                    } else if (isFloor(S_DIR, x, y) && isFloor(SE_DIR, x, y)) {
+                        getTile(x, y).tileIndex = NORTH_EAST_INNER; // 7
+                    } else {
+                        getTile(x, y).tileIndex = WEST_WALL; // 4
                     }
 
 
-                }
-
-
-                else if(isFloor(W_DIR,x,y)) {
-                    if(isFloor(S_DIR,x,y) && isFloor(SW_DIR,x,y)) {
-                        getTile(x,y).tileIndex = NORTH_WEST_INNER; // 8
+                } else if (isFloor(S_DIR, x, y)) {
+                    if (isFloor(E_DIR, x, y) && isFloor(SE_DIR, x, y)) {
+                        getTile(x, y).tileIndex = NORTH_EAST_INNER; // 7
+                    } else if (isFloor(W_DIR, x, y) && isFloor(SW_DIR, x, y)) {
+                        getTile(x, y).tileIndex = NORTH_WEST_INNER; // 8
+                    } else {
+                        getTile(x, y).tileIndex = NORTH_WALL; // 1
                     }
-                    else if(isFloor(N_DIR,x,y) && isFloor(NW_DIR,x,y)) {
-                        getTile(x,y).tileIndex = SOUTH_EAST_INNER; // 5
+
+
+                } else if (isFloor(W_DIR, x, y)) {
+                    if (isFloor(S_DIR, x, y) && isFloor(SW_DIR, x, y)) {
+                        getTile(x, y).tileIndex = NORTH_WEST_INNER; // 8
+                    } else if (isFloor(N_DIR, x, y) && isFloor(NW_DIR, x, y)) {
+                        getTile(x, y).tileIndex = SOUTH_EAST_INNER; // 5
+                    } else {
+                        getTile(x, y).tileIndex = EAST_WALL;
                     }
-                    else {
-                        getTile(x,y).tileIndex =EAST_WALL;
-                    }
-                }
-
-                else if(isFloor(SE_DIR,x,y)) {
-                    getTile(x,y).tileIndex = SOUTH_EAST_OUTER;
-                }
-
-                else if(isFloor(SW_DIR,x,y)) {
-                    getTile(x,y).tileIndex = SOUTH_WEST_OUTER;
-                }
-
-                else if(isFloor(NW_DIR,x,y)) {
-                    getTile(x,y).tileIndex = NORTH_WEST_OUTER;
-                }
-
-                else if(isFloor(NE_DIR,x,y)) {
-                    getTile(x,y).tileIndex = NORTH_EAST_OUTER;
+                } else if (isFloor(SE_DIR, x, y)) {
+                    getTile(x, y).tileIndex = SOUTH_EAST_OUTER;
+                } else if (isFloor(SW_DIR, x, y)) {
+                    getTile(x, y).tileIndex = SOUTH_WEST_OUTER;
+                } else if (isFloor(NW_DIR, x, y)) {
+                    getTile(x, y).tileIndex = NORTH_WEST_OUTER;
+                } else if (isFloor(NE_DIR, x, y)) {
+                    getTile(x, y).tileIndex = NORTH_EAST_OUTER;
                 }
 
 
@@ -862,13 +835,14 @@ public class RandomLevelGenerator {
 
     /**
      * Checks whether an adjacent tile is a floor tile.
+     *
      * @param direction direction in which the check is performed
-     * @param x x position
-     * @param y y position
+     * @param x         x position
+     * @param y         y position
      * @return
      */
     private boolean isFloor(Vector2 direction, int x, int y) {
-        return getTile(new Vector2(x,y).add(direction)).getType() == FLOOR;
+        return getTile(new Vector2(x, y).add(direction)).getType() == FLOOR;
     }
 
     private void placePlayer() {
@@ -876,7 +850,7 @@ public class RandomLevelGenerator {
         Room home = rooms.get(homeRoomID);
         Gdx.app.log("HOME ROOM", home.toString() + "\n CENTER:" + home.getCenter().toString());
         player = new Player(home.getCenter());
-        entities.put(player.getID(),player);
+        entities.put(player.getID(), player);
         Gdx.app.log("NUMBER OF ROOMS", Integer.toString(rooms.size()));
         Gdx.app.log("-------------------", "-----------------------");
         Gdx.app.log("NUMBER OF TINY ROOMS", Integer.toString(tinyRooms));
@@ -934,7 +908,7 @@ public class RandomLevelGenerator {
      *
      * @param start start position
      */
-    public void generateMaze(Vector2 start) {
+    private void generateMaze(Vector2 start) {
 
         LinkedList<Vector2> cells = new LinkedList<>();
         setLevelData(new Tile(start.cpy(), Tile.TileType.FLOOR, true));
@@ -1060,11 +1034,8 @@ public class RandomLevelGenerator {
 
 
     private boolean tooCloseToBounds(Vector2 position) {
-        if (position.x - MIN_BOUNDS_DISTANCE < 0 || position.x + MIN_BOUNDS_DISTANCE > levelWidth
-                || position.y - MIN_BOUNDS_DISTANCE < 0 || position.y + MIN_BOUNDS_DISTANCE > levelHeight) {
-            return true;
-        }
-        return false;
+        return (position.x - MIN_BOUNDS_DISTANCE < 0 || position.x + MIN_BOUNDS_DISTANCE > levelWidth
+                || position.y - MIN_BOUNDS_DISTANCE < 0 || position.y + MIN_BOUNDS_DISTANCE > levelHeight);
 
     }
 
@@ -1177,8 +1148,6 @@ public class RandomLevelGenerator {
     public int getRegion(Vector2 position) {
         return getRegion(position.x, position.y);
     }
-
-
 
 
 }

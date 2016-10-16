@@ -94,9 +94,6 @@ public class RenderingEngine extends Renderer {
 
 
     // DEBUG & STRINGS
-
-
-
     private enum DEBUG_CONSTANTS {
         DE_ACCELERATION,
         DE_VELOCITY,
@@ -114,12 +111,11 @@ public class RenderingEngine extends Renderer {
         DE_MOBILE_ENTITY_COUNT,
         DE_LIVING_ENTITY_COUNT,
         DE_LOGGING
-
     }
 
 
     public static EnumMap<DEBUG_CONSTANTS,String> debugStrings;
-    private final int CONSOLE_LINE_HEIGHT = 32;
+    private final int CONSOLE_LINE_HEIGHT = 24;
     ShapeRenderer shapeRenderer = new ShapeRenderer();
 
 
@@ -475,7 +471,7 @@ public class RenderingEngine extends Renderer {
         debugBatch.begin();
         int i = 0;
         for (DEBUG_CONSTANTS c : debugStrings.keySet()) {
-            debugFont.draw(debugBatch, debugStrings.get(c), 14, CONSOLE_LINE_HEIGHT * i);
+            debugFont.draw(debugBatch, debugStrings.get(c), 14, debugCam.viewportHeight - CONSOLE_LINE_HEIGHT * (i+1));
             i++;
         }
         debugBatch.end();
@@ -493,7 +489,7 @@ public class RenderingEngine extends Renderer {
         debugStrings.put(DEBUG_CONSTANTS.DE_POSITION, "POS: " + player.getPosition());
         debugStrings.put(DEBUG_CONSTANTS.DE_POSITION_OFFSET, "PAO: " + player.getBody().getBounds().getPositionAndOffset());
 
-        builder.append("CAM:    ").append(printVec(camera.position.x, camera.position.y));
+        builder.append("CAM: ").append(printVec(camera.position.x, camera.position.y));
         builder.append("CAM PX: ").append(printVec(new Vector2(camera.position.cpy().x * ppuX, camera.position.cpy().y * ppuY)));
 
         debugStrings.put(DEBUG_CONSTANTS.DE_CAMERA_POSITION, builder.toString());
