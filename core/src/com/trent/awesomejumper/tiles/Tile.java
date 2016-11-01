@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
+import com.trent.awesomejumper.utils.Utilities;
 
 import java.util.HashSet;
 
@@ -175,5 +176,9 @@ public class Tile {
         return collisionBox.getCenter();
     }
 
+    @Override
+    public String toString() {
+        return Utilities.printVec(position);
+    }
 
 }

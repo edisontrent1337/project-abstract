@@ -622,9 +622,6 @@ public class CollisionController {
      */
     private boolean projectileCollisionDetection(Projectile projectile, Tile tile) {
 
-
-
-
         float dst = sub(projectile.getPosition(), tile.getPosition()).len();
         float framesTillImpact = dst / projectile.getVelocity().len();
 

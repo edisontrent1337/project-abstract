@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.trent.awesomejumper.utils.Utilities;
 
 import static com.trent.awesomejumper.utils.Utilities.getNormal;
 import static com.trent.awesomejumper.utils.Utilities.sub;
@@ -66,6 +67,7 @@ public class CollisionBox {
 
     // TESTING
     private float damageCoefficient;
+    private Color color = Utilities.color();
 
     // CONSTRUCTORS
     // ---------------------------------------------------------------------------------------------
@@ -192,6 +194,7 @@ public class CollisionBox {
         // DRAW OUTER BOUNDING BOX
         renderer.set(ShapeRenderer.ShapeType.Line);
         renderer.setAutoShapeType(true);
+        renderer.setColor(this.color);
 
         // DRAW NORMALS & EDGES
         for (int i = 0; i < edges.size; i++) {

@@ -4,12 +4,11 @@ import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.controller.collision.CollisionController;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.models.projectile.Projectile;
-import com.trent.awesomejumper.models.weapons.Weapon;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import static com.trent.awesomejumper.utils.PhysicalConstants.*;
+import static com.trent.awesomejumper.utils.PhysicalConstants.MIN_WALKING_SPEED;
 
 /**
  * Created by Sinthu on 12.06.2015.
@@ -31,7 +30,7 @@ public class WorldController {
 
     public WorldController(WorldContainer worldContainer) {
         this.worldContainer = worldContainer;
-        this.collisionController = new com.trent.awesomejumper.controller.collision.CollisionController(worldContainer);
+        this.collisionController = new CollisionController(worldContainer);
     }
 
 
@@ -61,6 +60,7 @@ public class WorldController {
 
         /**
          * Resolve entity/world collisions.
+         * Affected entities: all.
          */
         for (Entity e : worldContainer.getEntities()) {
             if (!e.isAlive() || !e.getBody().isCollisionDetectionEnabled())
@@ -71,6 +71,7 @@ public class WorldController {
 
         /**
          * Resolve entity/entity collisions.
+         * Affected entities: only those who can move.
          */
         for (Entity e : worldContainer.getMobileEntities()) {
             if (!e.isAlive() || !e.getBody().isCollisionDetectionEnabled())
@@ -89,9 +90,8 @@ public class WorldController {
         }
 
         worldContainer.garbageRemoval();
-
+        worldContainer.updateSpatialHashingData();
         addImpulses();
-
         manageEntitySpeed();
 
         for (Entity e : worldContainer.getEntities()) {

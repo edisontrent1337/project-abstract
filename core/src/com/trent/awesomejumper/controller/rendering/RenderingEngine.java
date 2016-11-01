@@ -27,6 +27,7 @@ import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.SkyBox;
 import com.trent.awesomejumper.tiles.Tile;
+import com.trent.awesomejumper.utils.Utilities;
 
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -114,7 +115,7 @@ public class RenderingEngine extends Renderer {
     }
 
 
-    public static EnumMap<DEBUG_CONSTANTS,String> debugStrings;
+    public static EnumMap<DEBUG_CONSTANTS, String> debugStrings;
     private final int CONSOLE_LINE_HEIGHT = 24;
     ShapeRenderer shapeRenderer = new ShapeRenderer();
 
@@ -144,7 +145,7 @@ public class RenderingEngine extends Renderer {
         this.allTextures = new TextureAtlas();
         this.debugStrings = new EnumMap<>(DEBUG_CONSTANTS.class);
         for (DEBUG_CONSTANTS c : DEBUG_CONSTANTS.values()) {
-            debugStrings.put(c,"");
+            debugStrings.put(c, "");
         }
 
         /**
@@ -268,7 +269,7 @@ public class RenderingEngine extends Renderer {
         debugCam.update();
         moveCamera(player.getPosition().x, player.getPosition().y);
 
-        unprojectedMousePosition.set(Gdx.input.getX(),Gdx.input.getY(),0f);
+        unprojectedMousePosition.set(Gdx.input.getX(), Gdx.input.getY(), 0f);
         camera.unproject(unprojectedMousePosition);
 
         camPositionInPx.set(camera.position.x * ppuX, camera.position.y * ppuY);
@@ -471,7 +472,7 @@ public class RenderingEngine extends Renderer {
         debugBatch.begin();
         int i = 0;
         for (DEBUG_CONSTANTS c : debugStrings.keySet()) {
-            debugFont.draw(debugBatch, debugStrings.get(c), 14, debugCam.viewportHeight - CONSOLE_LINE_HEIGHT * (i+1));
+            debugFont.draw(debugBatch, debugStrings.get(c), 14, debugCam.viewportHeight - CONSOLE_LINE_HEIGHT * (i + 1));
             i++;
         }
         debugBatch.end();
@@ -490,7 +491,7 @@ public class RenderingEngine extends Renderer {
         debugStrings.put(DEBUG_CONSTANTS.DE_POSITION_OFFSET, "PAO: " + player.getBody().getBounds().getPositionAndOffset());
 
         builder.append("CAM: ").append(printVec(camera.position.x, camera.position.y));
-        builder.append("CAM PX: ").append(printVec(new Vector2(camera.position.cpy().x * ppuX, camera.position.cpy().y * ppuY)));
+        builder.append(" CAM PX: ").append(printVec(new Vector2(camera.position.cpy().x * ppuX, camera.position.cpy().y * ppuY)));
 
         debugStrings.put(DEBUG_CONSTANTS.DE_CAMERA_POSITION, builder.toString());
         builder.setLength(0);
@@ -502,14 +503,14 @@ public class RenderingEngine extends Renderer {
         debugStrings.put(DEBUG_CONSTANTS.DE_ENTITY_COUNT, builder.toString());
         builder.setLength(0);
 
-        builder.append(Gdx.graphics.getWidth()).append("*").append(Gdx.graphics.getHeight());
-        builder.append("ZOOM: ").append(camera.zoom).append(", FPS: ").append(Gdx.graphics.getFramesPerSecond());
+        builder.append(Gdx.graphics.getWidth()).append(" * ").append(Gdx.graphics.getHeight());
+        builder.append(" ZOOM: ").append(camera.zoom).append(", FPS: ").append(Gdx.graphics.getFramesPerSecond());
 
         debugStrings.put(DEBUG_CONSTANTS.DE_RESOLUTION, builder.toString());
         builder.setLength(0);
 
-        builder.append(InputHandler.getCursorPostion()).append(" PIXEL: ").append(printVec(Gdx.input.getX(),Gdx.input.getY()));
-        builder.append(" UNPRO: ").append(printVec(unprojectedMousePosition.x,unprojectedMousePosition.y));
+        builder.append(InputHandler.getCursorPostion()).append(" PIXEL: ").append(printVec(Gdx.input.getX(), Gdx.input.getY()));
+        builder.append(" UNPRO: ").append(printVec(unprojectedMousePosition.x, unprojectedMousePosition.y));
 
 
         debugStrings.put(DEBUG_CONSTANTS.DE_CURSOR_POSITION, builder.toString());
@@ -585,10 +586,23 @@ public class RenderingEngine extends Renderer {
         // DRAW SPATIAL HASHING CELLS
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         {
-            shapeRenderer.setColor(Color.PINK);
-                for(Vector2 v : worldContainer.getSpatialHashingData().keySet())
+            for (Vector2 v : worldContainer.getSpatialHashingData().keySet()) {
+
+                int numberOfEntities = worldContainer.getSpatialHashingData().get(v).size();
+
+                if (numberOfEntities != 0) {
+                    if (numberOfEntities == 1)
+                        shapeRenderer.setColor(Color.RED);
+                    else if (numberOfEntities == 2)
+                        shapeRenderer.setColor(Color.GREEN);
+                    else if (numberOfEntities == 3)
+                        shapeRenderer.setColor(Color.BLUE);
+                    else if (numberOfEntities > 3)
+                        shapeRenderer.setColor(Color.PINK);
                     shapeRenderer.rect(v.x, v.y, worldContainer.getSpatialFactor(), worldContainer.getSpatialFactor());
-                    //Utilities.log(String.format("%1d|%2d|%3d%4d", x*spatialSize,y*spatialSize, worldContainer.getSpatialFactor(), worldContainer.getSpatialFactor()));
+                }
+            }
+            //Utilities.log(String.format("%1d|%2d|%3d%4d", x*spatialSize,y*spatialSize, worldContainer.getSpatialFactor(), worldContainer.getSpatialFactor()));
         }
         shapeRenderer.end();
 

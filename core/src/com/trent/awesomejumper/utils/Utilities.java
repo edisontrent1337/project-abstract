@@ -189,6 +189,10 @@ public class Utilities {
     public static Color color(int r, int g ,int b, float a) {
         return new Color(r/256f, g/256f, b/256f, a);
     }
+    // Random color
+    public static Color color() {
+        return new Color((float)Math.random(),(float)Math.random(),(float)Math.random(),1f);
+    }
 
     // LOGGING
     // ---------------------------------------------------------------------------------------------

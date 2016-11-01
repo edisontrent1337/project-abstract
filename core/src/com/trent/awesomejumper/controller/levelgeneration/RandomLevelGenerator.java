@@ -11,8 +11,10 @@ import com.trent.awesomejumper.models.weapons.Weapon;
 import com.trent.awesomejumper.tiles.DefaultTile;
 import com.trent.awesomejumper.tiles.Tile;
 import com.trent.awesomejumper.utils.Interval;
+import com.trent.awesomejumper.utils.Utilities;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -324,13 +326,11 @@ public class RandomLevelGenerator {
             totalRegions++;
 
             Pistol p = new Pistol(r.getCenter());
-            Pistol q = new Pistol(r.getCenter().cpy().add(1, 1));
-            Pistol s = new Pistol(r.getCenter().cpy().add(1, 2));
+            Pistol q = new Pistol(r.getCenter().cpy().add(1, 0.5f));
+            Pistol s = new Pistol(r.getCenter().cpy().add(1, -0.15f));
             Pistol t = new Pistol(r.getCenter().cpy().add(2, 1));
             Lootable c = new Lootable(r.getCenter().cpy().add(3, 1));
 
-            /*entities.add(p);
-            entities.add(c);*/
 
             entities.put(p.getID(), p);
             entities.put(q.getID(), q);
@@ -849,6 +849,8 @@ public class RandomLevelGenerator {
         int homeRoomID = random.nextInt(rooms.size());
         Room home = rooms.get(homeRoomID);
         Gdx.app.log("HOME ROOM", home.toString() + "\n CENTER:" + home.getCenter().toString());
+        /*Pistol p = new Pistol(home.getCenter().cpy().add(0.5f,0.5f));
+        entities.put(p.getID(),p);*/
         player = new Player(home.getCenter());
         entities.put(player.getID(), player);
         Gdx.app.log("NUMBER OF ROOMS", Integer.toString(rooms.size()));
@@ -1139,7 +1141,8 @@ public class RandomLevelGenerator {
         try {
             return regions[(int) x][(int) y];
         } catch (ArrayIndexOutOfBoundsException e) {
-            // Gdx.app.log("ERROR", e.toString());
+            Utilities.log("INDEX OUT OF BOUNDS WHILE TRYING TO GATHER THE REGION OF THE FOLLOWING TILE",
+                    Utilities.printVec(x,y));
         }
 
         return -1;
@@ -1149,5 +1152,17 @@ public class RandomLevelGenerator {
         return getRegion(position.x, position.y);
     }
 
+
+    public ArrayList<Tile> getCollidableTiles() {
+        ArrayList<Tile> result = new ArrayList<>();
+        for(Tile[] partList: levelData) {
+
+            for(Tile t : partList) {
+                if(!t.isPassable())
+                result.add(t);
+            }
+        }
+        return result;
+    }
 
 }

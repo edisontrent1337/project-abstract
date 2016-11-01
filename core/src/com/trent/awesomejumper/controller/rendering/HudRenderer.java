@@ -21,16 +21,6 @@ public class HudRenderer extends Renderer {
 
     private final String NO_WEAPON = "NO WEAPON";
 
-    private final int WEAPON_OFFSET_X = 200;
-    private final int WEAPON_OFFSET_Y = 100;
-    private final int SHADOW_OFFSET = 4;
-
-    private static final int XY_PADDING = 100;
-
-    // private OrthographicCamera hudCam;
-    // private SpriteBatch hudBatch;
-
-
     // FONTS:
     private BitmapFont hudFont;
     private FreeTypeFontParameter hudFontParams;
@@ -132,6 +122,8 @@ public class HudRenderer extends Renderer {
 
     }
 
+
+    //TODO: implement those.
     private void drawHealthAndExp() {
 
     }

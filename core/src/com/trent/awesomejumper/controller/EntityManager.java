@@ -72,7 +72,6 @@ public class EntityManager {
      * @param weapon
      */
     public void registerEntity(Weapon weapon) {
-        Gdx.app.log("EVENT", "REGISTRED WEAPON");
         worldContainer.registerEntity(weapon);
         worldContainer.getWeaponDrops().add(weapon);
         worldContainer.getMobileEntities().add(weapon);
