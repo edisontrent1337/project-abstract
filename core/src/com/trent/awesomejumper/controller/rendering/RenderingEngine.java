@@ -19,6 +19,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.StringBuilder;
 import com.trent.awesomejumper.controller.WorldContainer;
+import com.trent.awesomejumper.controller.collision.CollisionController;
 import com.trent.awesomejumper.controller.input.InputHandler;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
@@ -111,7 +112,9 @@ public class RenderingEngine extends Renderer {
         DE_WEAPON_DROP_COUNT,
         DE_MOBILE_ENTITY_COUNT,
         DE_LIVING_ENTITY_COUNT,
-        DE_LOGGING
+        DE_LOGGING,
+        DE_COLLISION_CHECKS,
+        DE_NUMBER_OF_TILES
     }
 
 
@@ -527,6 +530,8 @@ public class RenderingEngine extends Renderer {
         builder.setLength(0);
 
         debugStrings.put(DEBUG_CONSTANTS.DE_LOGGING, "LOGGING: " + Boolean.toString(AwesomeJumperMain.onLogging()));
+        debugStrings.put(DEBUG_CONSTANTS.DE_COLLISION_CHECKS, "COLLISION CHECKS PER FRAME " + Float.toString(CollisionController.calledPerFrame));
+        debugStrings.put(DEBUG_CONSTANTS.DE_NUMBER_OF_TILES, "NUMBER OF TILES " + Integer.toString(worldContainer.getCollisionTiles().size()));
     }
 
     // HITBOXES
@@ -588,7 +593,7 @@ public class RenderingEngine extends Renderer {
         {
             for (Vector2 v : worldContainer.getSpatialHashingData().keySet()) {
 
-                int numberOfEntities = worldContainer.getSpatialHashingData().get(v).size();
+                int numberOfEntities = worldContainer.getSpatialHashingData().get(v).entit;
 
                 if (numberOfEntities != 0) {
                     if (numberOfEntities == 1)

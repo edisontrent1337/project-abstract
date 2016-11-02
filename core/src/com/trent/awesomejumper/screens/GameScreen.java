@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.trent.awesomejumper.controller.EntityManager;
 import com.trent.awesomejumper.controller.WorldContainer;
 import com.trent.awesomejumper.controller.assets.AssetLoader;
+import com.trent.awesomejumper.controller.collision.CollisionController;
 import com.trent.awesomejumper.controller.input.InputHandler;
 import com.trent.awesomejumper.controller.rendering.RenderingEngine;
 import com.trent.awesomejumper.controller.WorldController;
@@ -68,6 +69,7 @@ public class GameScreen implements Screen, InputProcessor{
         inputHandler.update();
         controller.update(delta);
         renderingEngine.render();
+        CollisionController.calledPerFrame = 0;
     }
 
     @Override

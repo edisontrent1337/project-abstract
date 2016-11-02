@@ -21,6 +21,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import javafx.util.Pair;
+
 import static com.trent.awesomejumper.engine.modelcomponents.ModelComponent.ComponentID.GRAPHICS;
 import static com.trent.awesomejumper.utils.Utilities.sub;
 
@@ -54,7 +56,8 @@ public class WorldContainer {
     private HashMap<Integer, Entity> entities = new HashMap<>();
 
     // Map for spatial hashing
-    private HashMap<Vector2, Set<Object>> spatialHashingData = new HashMap<>();
+  //  private HashMap<Vector2, Set<Object>> spatialHashingData = new HashMap<>();
+    private HashMap<Vector2, EntityTileContainer> spatialHashingData = new HashMap<>();
     private final int SPATIAL_HASH_GRID_SIZE = 3;
 
     // Subset containing all projectiles
@@ -99,15 +102,19 @@ public class WorldContainer {
     // SPATIAL HASHING METHODS
     // ---------------------------------------------------------------------------------------------
 
+
+
     /**
      * Clears the spatial hashing data structure.
      */
-    public void clearSpatialHashData() {
+    private void clearSpatialHashData() {
 
-        spatialHashingData.clear();
+       // spatialHashingData.clear();
         for (int x = 0; x < SPATIAL_WIDTH; x++) {
             for (int y = 0; y < SPATIAL_HEIGHT; y++) {
-                spatialHashingData.put(new Vector2(x * SPATIAL_HASH_GRID_SIZE, y * SPATIAL_HASH_GRID_SIZE), new HashSet<Object>());
+                //spatialHashingData.put(new Vector2(x*SPATIAL_HASH_GRID_SIZE, y*SPATIAL_HASH_GRID_SIZE), new HashSet<Object>());
+                sp
+                spatialHashingData.put(new Vector2(x*SPATIAL_HASH_GRID_SIZE, y*SPATIAL_HASH_GRID_SIZE), new EntityTileContainer());
             }
         }
     }
@@ -119,13 +126,15 @@ public class WorldContainer {
      */
     private void addEntityToSpatialHashingData(Entity entity) {
 
-        HashSet<Vector2> hashIndexes = getKeyPositions(entity);
-        for (Vector2 index : hashIndexes) {
-            if (spatialHashingData.containsKey(index))
-                spatialHashingData.get(index).add(entity);
-            else
+        HashSet<Vector2> spatialIndexes = getSpatialIndexes(entity);
+        for (Vector2 index : spatialIndexes) {
+            if (spatialHashingData.containsKey(index)) {
+                spatialHashingData.get(index).addEntity(entity);
+            }
+            else {
                 Utilities.log(String.format("ERROR ADDING THE FOLLOWING ENTITY TO THE LOCATION %1s" +
                         "IN THE SPATIAL HASHING DATA: %2s", index.toString(), entity.toString()));
+            }
         }
     }
 
@@ -134,13 +143,15 @@ public class WorldContainer {
      * @param t Tile to be added.
      */
     private void addTileToSpatialHashingData(Tile t) {
-        HashSet<Vector2> hashKeys = getKeyPositions(t);
+        HashSet<Vector2> hashKeys = getSpatialIndexes(t);
         for(Vector2 index : hashKeys) {
-            if(spatialHashingData.containsKey(index))
-                spatialHashingData.get(index).add(t);
-            else
+            if(spatialHashingData.containsKey(index)) {
+                spatialHashingData.get(index).addTile(t);
+            }
+            else {
                 Utilities.log(String.format("ERROR ADDING THE FOLLOWING TILE TO THE LOCATION %1s" +
                         "IN THE SPATIAL HASHING DATA: %2s", index.toString(), t.toString()));
+            }
         }
     }
 
@@ -158,7 +169,12 @@ public class WorldContainer {
          * Generate keys at valid Vector2 positions.
          * Every multiple of SPATIAL_HASH_GRID_SIZE is a valid key in the spatial hashing data structure.
          */
-        clearSpatialHashData();
+        for(int x = 0; x < SPATIAL_WIDTH; x++) {
+            for(int y = 0; y < SPATIAL_HEIGHT; y++) {
+                spatialHashingData.put(new Vector2(x*SPATIAL_HASH_GRID_SIZE, y*SPATIAL_HASH_GRID_SIZE), new EntityTileContainer());
+            }
+        }
+
 
         // DEBUG
         Utilities.log("LIST OF VALID SPATIAL INDEXES: \n");
@@ -210,21 +226,22 @@ public class WorldContainer {
         }
 
         for(Tile t: randomLevelGenerator.getCollidableTiles()) {
-           // addTileToSpatialHashingData(t);
+           addTileToSpatialHashingData(t);
         }
     }
 
     /**
-     * Gets a list of keys for the spatial data structure. The list of keys represent the
-     * quadrants and entity is positioned in.
+     * Gets a list of indexes for the spatial data structure. The list of indexes represent the
+     * quadrants an entity is positioned in.
+     * An entity can take up to 4 spatial indexes if its hitbox happens to overlap them all.
      *
      * @param x x position of the entity / tile
      * @param y y position of the entity / tile
      * @param w width of the entity / tile
-     * @param h hieght of the entity / tile
-     * @return
+     * @param h height of the entity / tile
+     * @return HashSet of Vector2 indexes
      */
-    public HashSet<Vector2> getKeyPositions(float x, float y, float w, float h) {
+    private HashSet<Vector2> getSpatialIndexes(float x, float y, float w, float h) {
 
         /*Utilities.log("ENTITY/TILE Position ", Utilities.printVec(x,y));
         Utilities.log("ENTITY/TILE Width ", Float.toString(w));
@@ -252,28 +269,48 @@ public class WorldContainer {
         result.add(new Vector2(spatialX, spatialHy));
         result.add(new Vector2(spatialWx, spatialHy));
 
-
-       //Utilities.log("GENERATED INDEXES");
-        int i = 0;
-        for (Vector2 v : result) {
-         //  Utilities.log("\tINDEX " + String.format("%03d", i++), v.toString());
-        }
-
-      //  Utilities.log("\n----------------------------" ,"");
-
         return result;
     }
 
-    public HashSet<Vector2> getKeyPositions(Entity e) {
-        return getKeyPositions(e.getPosition().cpy().x, e.getPosition().cpy().y, e.getWidth(), e.getHeight());
+    private HashSet<Vector2> getSpatialIndexes(Entity e) {
+        return getSpatialIndexes(e.getPosition().cpy().x, e.getPosition().cpy().y, e.getWidth(), e.getHeight());
     }
 
-    public HashSet<Vector2> getKeyPositions(Tile t) {
-        return getKeyPositions(t.getPosition().x, t.getPosition().y, t.getBounds().getWidth(), t.getBounds().getHeight());
+    private HashSet<Vector2> getSpatialIndexes(Tile t) {
+        return getSpatialIndexes(t.getPosition().x, t.getPosition().y, t.getBounds().getWidth(), t.getBounds().getHeight());
     }
 
 
 
+    /**
+     * Gathers all entities near a given entity e from the spatial hashing data structure.
+     * @param e entity whose neighbourhood we are interested in
+     * @return set of nearby entities.
+     */
+    public HashSet<Entity> getEntitiesNearby(Entity e) {
+
+        HashSet<Entity> result = new HashSet<>();
+        for(Vector2 index : getSpatialIndexes(e)) {
+            EntityTileContainer container = spatialHashingData.get(index);
+            result.addAll(container.entities);
+        }
+        return result;
+    }
+
+    /**
+     * Gathers all tiles near a given entity e from the spatial hashing data structure.
+     * @param e entity whose neighbourhood we are interested in
+     * @return set of nearby tiles.
+     */
+    public HashSet<Tile> getTilesNearby(Entity e) {
+        HashSet<Tile> result = new HashSet<>();
+        for(Vector2 index : getSpatialIndexes(e)) {
+            EntityTileContainer container = spatialHashingData.get(index);
+            result.addAll(container.tiles);
+
+        }
+        return result;
+    }
     /**
      * Registers all entities and puts them in their respective collection
      */
@@ -283,6 +320,7 @@ public class WorldContainer {
             e.register();
         }
     }
+
 
 
     // ---------------------------------------------------------------------------------------------
@@ -429,16 +467,6 @@ public class WorldContainer {
     // ENTITY NEIGHBOURHOOD MANAGEMENT
     // ---------------------------------------------------------------------------------------------
 
-    public class WeaponAndDistance {
-        Weapon weapon;
-        float distance;
-
-        public WeaponAndDistance(Weapon w, float distance) {
-            this.weapon = w;
-            this.distance = distance;
-        }
-
-    }
 
     /**
      * Updates the list of entities close to the specified entity e.
@@ -707,7 +735,32 @@ public class WorldContainer {
         return SPATIAL_HASH_GRID_SIZE;
     }
 
-    public HashMap<Vector2, Set<Object>> getSpatialHashingData() {
+    public HashMap<Vector2, EntityTileContainer> getSpatialHashingData() {
         return spatialHashingData;
     }
+
+
+    private class EntityTileContainer {
+
+        public HashSet<Tile> tiles;
+        public HashSet<Entity> entities;
+
+        public EntityTileContainer() {
+            this.tiles = new HashSet<>();
+            this.entities = new HashSet<>();
+        }
+
+        public void addEntity(Entity e) {
+            entities.add(e);
+        }
+
+        public void addTile(Tile t) {
+            tiles.add(t);
+        }
+
+    }
+
+
 }
+
+

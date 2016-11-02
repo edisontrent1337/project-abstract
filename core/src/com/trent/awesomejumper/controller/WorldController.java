@@ -105,7 +105,6 @@ public class WorldController {
         /*for (SkyBox s : level.getSkyBoxes()) {
             s.update(delta);
         }*/
-        collisionController.calledPerFrame = 0;
     }
 
 
