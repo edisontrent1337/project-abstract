@@ -19,10 +19,12 @@ import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.lootable.Lootable;
 import com.trent.awesomejumper.utils.Utilities;
 
+import java.awt.Color;
+
 /**
  * Created by Sinthu on 12.06.2015.
  */
-public class GameScreen implements Screen, InputProcessor{
+public class GameScreen implements Screen, InputProcessor {
 
     // MEMBERS & INSTANCES
     //----------------------------------------------------------------------------------------------
@@ -37,7 +39,7 @@ public class GameScreen implements Screen, InputProcessor{
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
-    public GameScreen (AwesomeJumperMain game) {
+    public GameScreen(AwesomeJumperMain game) {
         this.game = game;
         entityManager = EntityManager.createEntityManager();
     }
@@ -49,7 +51,7 @@ public class GameScreen implements Screen, InputProcessor{
         // TODO: move input processor to input handler.
         worldContainer = new WorldContainer();
         renderingEngine = new RenderingEngine(worldContainer, game);
-        entityManager.setControllers(worldContainer,renderingEngine);
+        entityManager.setControllers(worldContainer, renderingEngine);
 
         /**
          * Init all entity collections and sort all pre existing entities in their respective collections.
@@ -62,8 +64,9 @@ public class GameScreen implements Screen, InputProcessor{
 
     @Override
     public void render(float delta) {
-        delta = Math.min(delta, 1/60f);
-        Gdx.gl.glClearColor(1f, 247f / 255f, 178f / 255f, 1);
+        delta = Math.min(delta, 1 / 60f);
+        //Gdx.gl.glClearColor(1f, 247f / 255f, 178f / 255f, 1);
+        Gdx.gl.glClearColor(0.3f, 0.3f, 0.3f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         // TODO: add domain specific methods: input, graphics, network, ai, sound, physics
         inputHandler.update();
@@ -74,7 +77,7 @@ public class GameScreen implements Screen, InputProcessor{
 
     @Override
     public void resize(int width, int height) {
-        renderingEngine.resize(width,height);
+        renderingEngine.resize(width, height);
     }
 
     @Override
@@ -98,13 +101,10 @@ public class GameScreen implements Screen, InputProcessor{
     }
 
 
-
-
-
     @Override
     public boolean keyDown(int keycode) {
 
-        if(keycode == Keys.L)
+        if (keycode == Keys.L)
             game.toggleLogging();
 
         if (keycode == Keys.A) {
@@ -117,19 +117,19 @@ public class GameScreen implements Screen, InputProcessor{
             inputHandler.upPressed();
         }
 
-        if(keycode == Keys.S) {
+        if (keycode == Keys.S) {
             inputHandler.downPressed();
         }
 
-        if(keycode == Keys.X) {
+        if (keycode == Keys.X) {
             //TODO: EDIT THIS!!!!
             entityManager.reset();
             inputHandler.setPlayer(worldContainer.getPlayer());
             controller.setPlayer();
         }
 
-        if(keycode == Keys.U) {
-            Entity e = new Lootable(worldContainer.getPlayer().getPosition().cpy().add(1,2));
+        if (keycode == Keys.U) {
+            Entity e = new Lootable(worldContainer.getPlayer().getPosition().cpy().add(1, 2));
             e.register();
         }
 
@@ -140,41 +140,41 @@ public class GameScreen implements Screen, InputProcessor{
         if (keycode == Keys.T) {
             game.toggleDebugMode();
         }
-        if(keycode == Keys.P) {
+        if (keycode == Keys.P) {
             game.toggleEntities();
         }
-        if(keycode == Keys.H) {
+        if (keycode == Keys.H) {
             game.toggleHitboxes();
         }
-        if(keycode == Keys.I) {
+        if (keycode == Keys.I) {
             game.toggleInfo();
         }
-        if(keycode == Keys.B) {
+        if (keycode == Keys.B) {
             game.toggleBody();
         }
 
-        if(keycode == Keys.Q) {
+        if (keycode == Keys.Q) {
             inputHandler.dropPressed();
         }
 
-        if(keycode == Keys.E)
+        if (keycode == Keys.E)
             inputHandler.pickUpPressed();
 
-        if(keycode == Keys.R) {
+        if (keycode == Keys.R) {
             inputHandler.reload();
         }
 
-        if(keycode == Keys.B) {
-           worldContainer.getRandomLevelGenerator().connectRegions();
+        if (keycode == Keys.B) {
+            worldContainer.getRandomLevelGenerator().connectRegions();
         }
-        if(keycode == Keys.N) {
+        if (keycode == Keys.N) {
             worldContainer.getRandomLevelGenerator().removeExtraDoors();
         }
-        if(keycode == Keys.M) {
+        if (keycode == Keys.M) {
             worldContainer.getRandomLevelGenerator().removeDeadEnds();
         }
 
-        if(keycode == Keys.F11) {
+        if (keycode == Keys.F11) {
             Graphics.DisplayMode mode = Gdx.graphics.getDisplayMode();
             Gdx.graphics.setFullscreenMode(mode);
         }
@@ -194,15 +194,15 @@ public class GameScreen implements Screen, InputProcessor{
         if (keycode == Keys.W) {
             inputHandler.upReleased();
         }
-        if(keycode == Keys.S) {
+        if (keycode == Keys.S) {
             inputHandler.downReleased();
         }
 
-        if(keycode == Keys.Q) {
+        if (keycode == Keys.Q) {
             inputHandler.dropReleased();
             inputHandler.pickUpReleased();
         }
-        if(keycode == Keys.E)
+        if (keycode == Keys.E)
             inputHandler.pickUpReleased();
 
         return false;
@@ -219,7 +219,7 @@ public class GameScreen implements Screen, InputProcessor{
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 
 
-        if(button == Input.Buttons.LEFT) {
+        if (button == Input.Buttons.LEFT) {
            /* Gdx.app.log("PLAYER:","");
             Gdx.app.log("MOUSE:", inputHandler.mouse.toString());
             Gdx.app.log("POSICENTER:", worldContainer.getPlayer().getBody().getCenter().toString());

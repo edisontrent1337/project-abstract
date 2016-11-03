@@ -64,8 +64,9 @@ public class CollisionController {
 
     /**
      * Detects and resolves any occurring collisions between entities in the world.
-     *
-     * @param delta time which has passed since the last update frame
+     * @param entity entity whose collisions should be resolved.
+     * @param others any set implenentation containing any entities.
+     * @param delta  time which has passed since the last update frame
      */
     public void resolveEntityCollisions(Entity entity, Set<? extends Entity> others, float delta) {
 
@@ -184,6 +185,9 @@ public class CollisionController {
     // ENTITY / WORLD COLLISION
     // ---------------------------------------------------------------------------------------------
 
+    //TODO: world collision does not have to be split by horizontal or vertical cd.
+    //TODO: remove all aspects that have to do with a cd split by horizontal or vertical cd
+    //TODO: because spatial hashing works!!!
     public void resolveWorldCollisions(Entity entity, float delta) {
 
 
@@ -211,7 +215,8 @@ public class CollisionController {
         // Create array of tiles surrounding the entity which are covered by the collision detection
         worldContainer.fillCollideableTiles(cdStartX, cdStartY, cdEndX, cdEndY);
 
-        for (Tile tile : worldContainer.getCollisionTiles()) {
+        // USING NOW HASH DS
+        for (Tile tile : worldContainer.getTilesNearby(entity)) {
 
             CollisionBox entityCollisionBox = entity.getBounds();
             CollisionBox tileBox = tile.getCollisionBox();
@@ -284,7 +289,7 @@ public class CollisionController {
         // Create array of tiles surrounding the player which are covered by the collision detection
         worldContainer.fillCollideableTiles(cdStartX, cdStartY, cdEndX, cdEndY);
 
-        for (Tile tile : worldContainer.getCollisionTiles()) {
+        for (Tile tile : worldContainer.getTilesNearby(entity)) {
 
             CollisionBox entityCollisionBox = entity.getBounds();
             CollisionBox tileBox = tile.getCollisionBox();
@@ -560,7 +565,7 @@ public class CollisionController {
             float step = 0.05f;
             float numberOfSteps = dst / step;
             Utilities.log("NUMBER OF STEPS", Float.toString(numberOfSteps));
-            for(float i = 0f; i <= numberOfSteps; i++) {
+            for (float i = 0f; i <= numberOfSteps; i++) {
                 Vector2 projectilePosition = projectile.getPosition();
                 Vector2 frameStep = deltaVelocity.cpy().nor().scl(step);
                 Utilities.log("OLD POSITION", projectilePosition.toString());
@@ -569,7 +574,7 @@ public class CollisionController {
                 Utilities.log("NEW POSITION", projectilePosition.toString());
                 projectile.setPosition(projectilePosition);
 
-                if(checkCollision(projectile.getBounds(), entityBounds)) {
+                if (checkCollision(projectile.getBounds(), entityBounds)) {
                     Utilities.log("Collision detected.");
                     break;
                 }
@@ -630,7 +635,7 @@ public class CollisionController {
             float step = 0.0125f;
             float numberOfSteps = dst / step;
             Utilities.log("NUMBER OF STEPS", Float.toString(numberOfSteps));
-            for(float i = 0f; i <= numberOfSteps; i++) {
+            for (float i = 0f; i <= numberOfSteps; i++) {
                 Vector2 projectilePosition = projectile.getPosition();
                 Vector2 frameStep = projectile.getVelocity().cpy().nor().scl(step);
                 Utilities.log("OLD POSITION", projectilePosition.toString());
@@ -639,7 +644,7 @@ public class CollisionController {
                 Utilities.log("NEW POSITION", projectilePosition.toString());
                 projectile.setPosition(projectilePosition);
 
-                if(checkCollision(projectile.getBounds(), tile.getCollisionBox())) {
+                if (checkCollision(projectile.getBounds(), tile.getCollisionBox())) {
                     Utilities.log("Collision detected.");
                     return true;
                 }

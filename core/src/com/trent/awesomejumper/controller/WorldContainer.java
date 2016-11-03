@@ -18,6 +18,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -58,7 +59,7 @@ public class WorldContainer {
     // Map for spatial hashing
   //  private HashMap<Vector2, Set<Object>> spatialHashingData = new HashMap<>();
     private HashMap<Vector2, EntityTileContainer> spatialHashingData = new HashMap<>();
-    private final int SPATIAL_HASH_GRID_SIZE = 3;
+    private final int SPATIAL_HASH_GRID_SIZE = 2;
 
     // Subset containing all projectiles
     private HashSet<Projectile> projectiles = new HashSet<>();
@@ -102,18 +103,19 @@ public class WorldContainer {
     // SPATIAL HASHING METHODS
     // ---------------------------------------------------------------------------------------------
 
-
-
+    // DS MANAGEMENT
+    // ---------------------------------------------------------------------------------------------
     /**
      * Clears the spatial hashing data structure.
      */
     private void clearSpatialHashData() {
 
-       // spatialHashingData.clear();
+        spatialHashingData.clear();
         for (int x = 0; x < SPATIAL_WIDTH; x++) {
             for (int y = 0; y < SPATIAL_HEIGHT; y++) {
                 //spatialHashingData.put(new Vector2(x*SPATIAL_HASH_GRID_SIZE, y*SPATIAL_HASH_GRID_SIZE), new HashSet<Object>());
-                sp
+                //TODO: only clear entities hashset and test performance.
+                //TODO: count number of hashing ds updates.
                 spatialHashingData.put(new Vector2(x*SPATIAL_HASH_GRID_SIZE, y*SPATIAL_HASH_GRID_SIZE), new EntityTileContainer());
             }
         }
@@ -156,7 +158,8 @@ public class WorldContainer {
     }
 
     /**
-     * Initializes the spatial data structure. Adds an empty HashSet to each cell.
+     * Initializes the spatial data structure. Adds an empty EntityTileContainer to each cell.
+     * @link EntityTileContainer
      */
     private void initSpatialData() {
 
@@ -218,6 +221,11 @@ public class WorldContainer {
         }*/
     }
 
+    /**
+     * Updates the spatial hashing ds. Iterates through all entities and tiles,
+     * calculates their place in the hashing ds and adds them to their respective
+     * collection / HashSet.
+     */
     public void updateSpatialHashingData() {
         clearSpatialHashData();
 
@@ -272,11 +280,16 @@ public class WorldContainer {
         return result;
     }
 
-    private HashSet<Vector2> getSpatialIndexes(Entity e) {
-        return getSpatialIndexes(e.getPosition().cpy().x, e.getPosition().cpy().y, e.getWidth(), e.getHeight());
+    public HashSet<Vector2> getSpatialIndexes(Entity e) {
+        /**
+         * Needs to use the position and offset of the entities bounding hitbox to generate
+         * correct results.
+         */
+        Vector2 positionAndOffset = e.getBody().getBounds().getPositionAndOffset().cpy();
+        return getSpatialIndexes(positionAndOffset.x, positionAndOffset.y, e.getWidth(), e.getHeight());
     }
 
-    private HashSet<Vector2> getSpatialIndexes(Tile t) {
+    public HashSet<Vector2> getSpatialIndexes(Tile t) {
         return getSpatialIndexes(t.getPosition().x, t.getPosition().y, t.getBounds().getWidth(), t.getBounds().getHeight());
     }
 
@@ -311,6 +324,45 @@ public class WorldContainer {
         }
         return result;
     }
+
+    public HashSet<Entity> getEntitiesForCell(Vector2 index) {
+        return spatialHashingData.get(index).getEntities();
+    }
+
+    public HashSet<Tile> getTilesForCell(Vector2 index) {
+        return spatialHashingData.get(index).getTiles();
+    }
+
+
+    /**
+     * Returns a list of passed hash cells from a starting point in a direction to the closest
+     * wall.
+     * @param start
+     * @param direction
+     * @return
+     */
+
+    //TODO: EDIT THIS!
+    public Vector2 getCrossedIndexes(Vector2 start, Vector2 direction) {
+        Vector2 dir = direction.cpy().nor();
+
+        float startX = start.x;
+        float startY = start.y;
+
+        float deltaX = dir.x;
+        float deltaY = dir.y;
+
+        int signX = deltaX > 0 ? 1 : -1;
+        int signY = deltaY > 0 ? 1 : -1;
+
+        float endX = startX + signX*SPATIAL_HASH_GRID_SIZE;
+        float endY = startY + signY*SPATIAL_HASH_GRID_SIZE;
+
+        return new Vector2(endX,endY);
+    }
+
+
+
     /**
      * Registers all entities and puts them in their respective collection
      */
@@ -658,6 +710,7 @@ public class WorldContainer {
     }
 
 
+    //TODO: fix the reset feature
     public void reset() {
         entities.clear();
         player.destroy();
@@ -714,6 +767,7 @@ public class WorldContainer {
         return randomLevelGenerator;
     }
 
+
     public Entity getEntityByID(int id) {
         Entity e = entities.get(id);
         if (e == null) {
@@ -739,11 +793,15 @@ public class WorldContainer {
         return spatialHashingData;
     }
 
+    public int getHashCellSize(Vector2 index) {
+        return spatialHashingData.get(index).getEntities().size() +
+                spatialHashingData.get(index).getTiles().size();
+    }
 
     private class EntityTileContainer {
 
-        public HashSet<Tile> tiles;
-        public HashSet<Entity> entities;
+        private HashSet<Tile> tiles;
+        private HashSet<Entity> entities;
 
         public EntityTileContainer() {
             this.tiles = new HashSet<>();
@@ -757,6 +815,14 @@ public class WorldContainer {
         public void addTile(Tile t) {
             tiles.add(t);
         }
+
+        public HashSet<Entity> getEntities() {
+            return entities;
+        }
+        public HashSet<Tile> getTiles() {
+            return tiles;
+        }
+
 
     }
 

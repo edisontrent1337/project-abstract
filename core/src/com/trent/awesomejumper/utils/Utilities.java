@@ -206,5 +206,11 @@ public class Utilities {
         log("EVENT", message);
     }
 
+    public static void log(String title, Vector2 v) {
+        log(title, printVec(v));
+    }
 
+    public static void log(String title, float f) {
+        log(title,Float.toString(f));
+    }
 }

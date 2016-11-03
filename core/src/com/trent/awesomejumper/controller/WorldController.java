@@ -76,7 +76,7 @@ public class WorldController {
         for (Entity e : worldContainer.getMobileEntities()) {
             if (!e.isAlive() || !e.getBody().isCollisionDetectionEnabled())
                 continue;
-            collisionController.resolveEntityCollisions(e, worldContainer.updatedEntityNeighbourHood(e), delta);
+            collisionController.resolveEntityCollisions(e, worldContainer.getEntitiesNearby(e), delta);
         }
 
         /**
@@ -105,6 +105,7 @@ public class WorldController {
         /*for (SkyBox s : level.getSkyBoxes()) {
             s.update(delta);
         }*/
+
     }
 
 

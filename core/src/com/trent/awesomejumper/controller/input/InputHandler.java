@@ -296,8 +296,8 @@ public class InputHandler {
         this.player = player;
     }
 
-    public static String getCursorPostion() {
-        return printVec(Math.floor(mouse.x), Math.floor(mouse.y)) + " | " + printVec(mouse);
+    public static Vector2 getCursorPosition() {
+        return new Vector2((float)Math.floor(mouse.x), (float)Math.floor(mouse.y));
     }
 
 }
