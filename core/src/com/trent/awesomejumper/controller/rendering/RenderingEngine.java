@@ -63,6 +63,8 @@ public class RenderingEngine extends Renderer {
     private final float LERP_FACTOR = 0.075f;
     private final float ZOOM = 0.6f;
 
+    private final float BOX_SIZE = 0.1f;
+
     protected static Vector2 camPositionInPx;
     private Vector3 unprojectedMousePosition;
 
@@ -567,7 +569,7 @@ public class RenderingEngine extends Renderer {
         setDebugTag(DE_ENTITIES_NEARBY, worldContainer.getEntitiesNearby(player).size());
 
         // NEARBY TILES IN THE SAME HASH CELL
-        for(Tile t: worldContainer.getTilesNearby(player)) {
+        for (Tile t : worldContainer.getTilesNearby(player)) {
             builder.append(t.getPosition());
         }
 
@@ -576,7 +578,7 @@ public class RenderingEngine extends Renderer {
 
         // HASH CELLS FOR THE CURRENT CURSOR POSITION
 
-        for(Vector2 index : worldContainer.getSpatialIndexes(worldContainer.getRandomLevelGenerator().getTile(InputHandler.getCursorPosition()))) {
+        for (Vector2 index : worldContainer.getSpatialIndexes(worldContainer.getRandomLevelGenerator().getTile(InputHandler.getCursorPosition()))) {
             builder.append(Utilities.printVec(index));
         }
         setDebugTag(DE_HASH_CELLS_FOR_SELECTION, builder.toString());
@@ -589,7 +591,7 @@ public class RenderingEngine extends Renderer {
 
         setDebugTag(DE_RAY_DIRECTION, "" + worldContainer.getPlayer().getBody().getOrientation());
 
-        setDebugTag(DE_RAY_END, ""+worldContainer.getCrossedIndexes(worldContainer.getPlayer().getPosition(), worldContainer.getPlayer().getBody().getOrientation()));
+        // setDebugTag(DE_RAY_END, ""+worldContainer.getCrossedIndexes(worldContainer.getPlayer().getWeaponInventory().getSelectedWeapon().getBody().getCenter().cpy(), worldContainer.getPlayer().getBody().getOrientation().cpy()));
 
 
         // LOGGING
@@ -605,7 +607,7 @@ public class RenderingEngine extends Renderer {
      * @param s   additional information in form of a String
      */
     private void setDebugTag(DEBUG_TAGS tag, String s) {
-        String prefixTag = String.format("%-4s", tag.tag+":");
+        String prefixTag = String.format("%-4s", tag.tag + ":");
         debugTags.put(tag, prefixTag + s);
     }
 
@@ -659,7 +661,7 @@ public class RenderingEngine extends Renderer {
         {
             shapeRenderer.setColor(Color.GREEN);
             if (player.getWeaponInventory().isHoldingAWeapon())
-                shapeRenderer.line(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter(), player.getWeaponInventory().getSelectedWeapon().getBody().getAimReference());
+                shapeRenderer.line(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter().cpy(), player.getWeaponInventory().getSelectedWeapon().getBody().getAimReference().cpy());
 
             /**
              * Drawing a line to all entities in the neighbourhood.
@@ -668,6 +670,14 @@ public class RenderingEngine extends Renderer {
             for (Entity e : player.getBody().getEntityNeighbourHood()) {
                 shapeRenderer.line(player.getBody().getCenter(), e.getBody().getCenter());
             }
+        }
+        shapeRenderer.end();
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(Color.RED);
+        for (Vector2 pos : worldContainer.getCrossedIndexes(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter().cpy(), player.getWeaponInventory().getSelectedWeapon().getBody().getOrientation().cpy())) {
+
+            shapeRenderer.rect(pos.x - BOX_SIZE / 2f, pos.y - BOX_SIZE / 2f, BOX_SIZE, BOX_SIZE);
         }
         shapeRenderer.end();
 
@@ -680,7 +690,7 @@ public class RenderingEngine extends Renderer {
                 int numberOfTiles = worldContainer.getTilesForCell(index).size();
 
 
-                if (numberOfTiles > 0) {
+                if (numberOfTiles >= 0) {
                     if (numberOfTiles == 1)
                         shapeRenderer.setColor(Color.RED);
                     else if (numberOfTiles == 2)
