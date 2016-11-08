@@ -587,11 +587,11 @@ public class RenderingEngine extends Renderer {
 
 
         // RAY CASTING
-        setDebugTag(DE_RAY_START, "" + worldContainer.getPlayer().getBody().getCenter());
+        setDebugTag(DE_RAY_START, "" + worldContainer.getPlayer().getWeaponInventory().getSelectedWeapon().getBody().getCenter());
 
-        setDebugTag(DE_RAY_DIRECTION, "" + worldContainer.getPlayer().getBody().getOrientation());
+        setDebugTag(DE_RAY_DIRECTION, "" + worldContainer.getPlayer().getBody().getOrientation().cpy().nor());
 
-        // setDebugTag(DE_RAY_END, ""+worldContainer.getCrossedIndexes(worldContainer.getPlayer().getWeaponInventory().getSelectedWeapon().getBody().getCenter().cpy(), worldContainer.getPlayer().getBody().getOrientation().cpy()));
+        // setDebugTag(DE_RAY_END, ""+worldContainer.generateCrossedIndexes(worldContainer.getPlayer().getWeaponInventory().getSelectedWeapon().getBody().getCenter().cpy(), worldContainer.getPlayer().getBody().getOrientation().cpy()));
 
 
         // LOGGING
@@ -654,6 +654,12 @@ public class RenderingEngine extends Renderer {
         }
         shapeRenderer.end();
 
+
+        drawPenetrationPoints();
+
+
+
+
         /**
          * Drawing a line to the point of aim.
          */
@@ -673,13 +679,6 @@ public class RenderingEngine extends Renderer {
         }
         shapeRenderer.end();
 
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(Color.RED);
-        for (Vector2 pos : worldContainer.getCrossedIndexes(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter().cpy(), player.getWeaponInventory().getSelectedWeapon().getBody().getOrientation().cpy())) {
-
-            shapeRenderer.rect(pos.x - BOX_SIZE / 2f, pos.y - BOX_SIZE / 2f, BOX_SIZE, BOX_SIZE);
-        }
-        shapeRenderer.end();
 
         // DRAW SPATIAL HASHING CELLS
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
@@ -733,6 +732,35 @@ public class RenderingEngine extends Renderer {
         Gdx.gl.glDisable(GL20.GL_BLEND);
     }
 
+
+    private void drawPenetrationPoints() {
+
+        worldContainer.generateCrossedIndexes(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter().cpy(),
+                player.getWeaponInventory().getSelectedWeapon().getBody().getOrientation().cpy());
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        if(player.getWeaponInventory().isHoldingAWeapon()) {
+            shapeRenderer.setColor(1f,0,0,0.33f);
+            for (Vector2 index : worldContainer.getCoveredIndexes()) {
+
+                //shapeRenderer.rect(index.x - BOX_SIZE / 2f, index.y - BOX_SIZE / 2f, BOX_SIZE, BOX_SIZE);
+                shapeRenderer.rect(index.x, index.y, worldContainer.getSpatialFactor(), worldContainer.getSpatialFactor());
+            }
+
+            shapeRenderer.setColor(0,1f,0,1f);
+            for (Vector2 index : worldContainer.getPenetrationPoints()) {
+
+                shapeRenderer.rect(index.x - BOX_SIZE / 2f, index.y - BOX_SIZE / 2f, BOX_SIZE, BOX_SIZE);
+                //shapeRenderer.rect(index.x, index.y, worldContainer.getSpatialFactor(), worldContainer.getSpatialFactor());
+            }
+
+        }
+
+
+        shapeRenderer.end();
+        Gdx.gl.glDisable(GL20.GL_BLEND);
+    }
 
     public void resize(int w, int h) {
         debugCam = new OrthographicCamera(w, h);

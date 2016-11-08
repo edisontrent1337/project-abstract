@@ -126,7 +126,8 @@ public class RandomLevelGenerator {
         /**
          * Init seed and level size. The level dimensions must be odd.
          */
-        seed = System.currentTimeMillis();
+       // seed = System.currentTimeMillis();
+        seed = 1478304103000l;
         random = new Random(seed);
         levelWidth = MIN_LEVEL_WIDTH + random.nextInt((MAX_LEVEL_WIDTH - MIN_LEVEL_WIDTH) / 2) * 2 + 1;
         levelHeight = MIN_LEVEL_HEIGHT + random.nextInt((MAX_LEVEL_HEIGHT - MIN_LEVEL_HEIGHT) / 2) * 2 + 1;

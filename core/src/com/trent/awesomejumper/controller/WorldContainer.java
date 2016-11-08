@@ -3,7 +3,9 @@ package com.trent.awesomejumper.controller;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.controller.levelgeneration.RandomLevelGenerator;
+import com.trent.awesomejumper.controller.rendering.PopUpRenderer;
 import com.trent.awesomejumper.engine.entity.Entity;
+import com.trent.awesomejumper.engine.modelcomponents.popups.Message;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.pickups.Pickup;
@@ -86,6 +88,13 @@ public class WorldContainer {
 
     private RandomLevelGenerator randomLevelGenerator;
 
+
+    // SPATIAL HASHING DEBUG
+
+
+    private ArrayList<Vector2> coveredIndexes = new ArrayList<>();
+    private ArrayList<Vector2> penetrationPoints = new ArrayList<>();
+    boolean draw = false;
 
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
@@ -354,67 +363,116 @@ public class WorldContainer {
      */
 
     //TODO: EDIT THIS!
-    public List<Vector2> getCrossedIndexes(Vector2 start, Vector2 direction) {
+    //TODO: PROBLEM: INTERSECTIONS IN THE FIRST CELL ARE NOT RECOGNIZED IN NEGATIVE DIRECTIONS
+    public List<Vector2> generateCrossedIndexes(Vector2 start, Vector2 direction) {
         Vector2 dir = direction.cpy().nor();
         Vector2 startCell = getSpatialIndex(start.x, start.y);
 
         Vector2 currentCell = startCell;
 
         ArrayList<Vector2> result = new ArrayList<>();
+        coveredIndexes.clear();
+        penetrationPoints.clear();
 
         float deltaX = dir.x;
         float deltaY = dir.y;
-        result.add(start);
+        //result.add(start);
 
-        // while (getTilesForCell(currentCell).isEmpty()) {
-        do {
-            float startX = result.get(result.size() - 1).x;
-            float startY = result.get(result.size() - 1).y;
+        coveredIndexes.add(startCell);
+        penetrationPoints.add(start);
+        int signX = deltaX > 0 ? 1 : -1;
+        int signY = deltaY > 0 ? 1 : -1;
 
-            int signX = deltaX > 0 ? 1 : -1;
-            int signY = deltaY > 0 ? 1 : -1;
+        while (getTilesForCell(currentCell).isEmpty()) {
+            //do {
+            float startX = penetrationPoints.get(penetrationPoints.size() - 1).x;
+            // float startX = result.get(result.size() - 1).x;
+            float startY = penetrationPoints.get(penetrationPoints.size() - 1).y;
+            //float startY = result.get(result.size() - 1).y;
 
-           if (currentCell == startCell) {
+
+
+            /*if (currentCell == startCell) {
                 if (signX < 0)
                     signX = 0;
                 if (signY < 0)
                     signY = 0;
-            }
+            }*/
 
 
             Vector2 nextXCell = getSpatialIndex(currentCell.x + signX * SPATIAL_HASH_GRID_SIZE, currentCell.y);
             Vector2 nextYCell = getSpatialIndex(currentCell.x, currentCell.y + signY * SPATIAL_HASH_GRID_SIZE);
 
-            float tX = (nextXCell.x - startX) / deltaX;
-            float tY = (nextYCell.y - startY) / deltaY;
+            float tNextX = (nextXCell.x - startX) / deltaX;
+            float tNextY = (nextYCell.y - startY) / deltaY;
+
+            float tCurrentX, tCurrentY;
+
+            if (currentCell.x == startX) {
+                tCurrentX = tNextX;
+            } else {
+                tCurrentX = (currentCell.x - startX) / deltaX;
+            }
+
+            if (currentCell.y == startY) {
+                tCurrentY = tNextY;
+            } else {
+                tCurrentY = (currentCell.y - startY) / deltaY;
+            }
+
+           /*float tCurrentX = (currentCell.x == startX)  ? (currentCell.x + signX*SPATIAL_HASH_GRID_SIZE) / deltaX : (currentCell.x - startX) / deltaX;
+            float tCurrentY = (currentCell.y == startY)  ? (currentCell.y + signY*SPATIAL_HASH_GRID_SIZE) / deltaY : (currentCell.y - startY) / deltaY;*/
 
             //x axis will be intersected first
-            if (Math.abs(tX) < Math.abs(tY)) {
+            Vector2 penetrationPoint;
+            int time = (int) WorldController.worldTime;
+            /*if (Math.abs(tNextX) < Math.abs(tNextY)) {
 
-                result.add(new Vector2(startX + tX * deltaX, startY + tX * deltaY));
+                penetrationPoint = new Vector2(startX + tNextX * deltaX, startY + tNextX * deltaY);
+
+                // result.add(new Vector2(startX + tNextX * deltaX, startY + tNextX * deltaY));
+                penetrationPoints.add(penetrationPoint);
+                //if(time % 5 == 0)
+                  //  PopUpRenderer.getInstance().addMessageToCategory(PopUpRenderer.PopUpCategories.HEAL, new Message(penetrationPoint.toString(), penetrationPoint, time, 5));
+                coveredIndexes.add(nextXCell);
+                // result.add(currentCell);
                 currentCell = nextXCell;
             } else {
-                result.add(new Vector2(startX + tY * deltaX, startY + tY * deltaY));
+                //result.add(new Vector2(startX + tNextY * deltaX, startY + tNextY * deltaY));
+                penetrationPoint = new Vector2(startX + tNextY * deltaX, startY + tNextY * deltaY);
+                penetrationPoints.add(penetrationPoint);
+               // if(time % 5 == 0)
+                 //   PopUpRenderer.getInstance().addMessageToCategory(PopUpRenderer.PopUpCategories.HEAL, new Message(penetrationPoint.toString(), penetrationPoint, time,5));
+                coveredIndexes.add(nextYCell);
+                //result.add(currentCell);
+                currentCell = nextYCell;
+            }*/
+
+
+            //float closestIntersection = Math.min(Math.min(Math.abs(tCurrentX), Math.abs(tCurrentY)), Math.min(Math.abs(tNextX), Math.abs(tNextY)));
+            float closestIntersection = Math.min(Math.abs(tNextX),Math.abs(tNextY));
+
+
+            penetrationPoint = new Vector2(startX + closestIntersection * deltaX, startY + closestIntersection * deltaY);
+            penetrationPoints.add(penetrationPoint);
+            if (time % 5 == 0) {
+
+                PopUpRenderer.getInstance().addMessageToCategory(PopUpRenderer.PopUpCategories.HEAL, new Message(penetrationPoint.toString(), penetrationPoint, time, 5));
+            }
+
+            if (closestIntersection == tCurrentX) {
+            } else if (closestIntersection == tCurrentY) {
+            } else if (closestIntersection == tNextX) {
+                coveredIndexes.add(nextXCell);
+                currentCell = nextXCell;
+            } else {
+                coveredIndexes.add(nextYCell);
                 currentCell = nextYCell;
             }
+
+
         }
-        while (getTilesForCell(currentCell).isEmpty());
 
-       /* if(Math.abs(deltaX) > Math.abs(deltaY)) {
-            return getSpatialIndex(startCell.x + signX*SPATIAL_HASH_GRID_SIZE, startCell.y);
-        }
-        else  {
-            return getSpatialIndex(startCell.x, startCell.y + signY*SPATIAL_HASH_GRID_SIZE);
-        }*/
-
-        // x coordinate for the next cell
-        // float nextHashCellX = startX + signX * SPATIAL_HASH_GRID_SIZE - ((startX + SPATIAL_HASH_GRID_SIZE) % SPATIAL_HASH_GRID_SIZE);
-
-        // y coordinate for the next cell
-        // float nextHashCellY = startY + signY * SPATIAL_HASH_GRID_SIZE - ((startY + SPATIAL_HASH_GRID_SIZE) % SPATIAL_HASH_GRID_SIZE);
-
-
-        //return startCell;
         return result;
     }
 
@@ -880,6 +938,15 @@ public class WorldContainer {
         }
 
 
+    }
+
+
+    public ArrayList<Vector2> getCoveredIndexes() {
+        return coveredIndexes;
+    }
+
+    public ArrayList<Vector2> getPenetrationPoints() {
+        return penetrationPoints;
     }
 
 

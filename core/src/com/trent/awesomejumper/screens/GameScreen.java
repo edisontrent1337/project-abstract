@@ -253,8 +253,8 @@ public class GameScreen implements Screen, InputProcessor {
 
     @Override
     public boolean scrolled(int amount) {
-        //renderingEngine.setZoom(amount);
-        inputHandler.changeWeapon(amount);
+        renderingEngine.setZoom(amount);
+        //inputHandler.changeWeapon(amount);
         return false;
     }
 
