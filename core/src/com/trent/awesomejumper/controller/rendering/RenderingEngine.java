@@ -119,7 +119,7 @@ public class RenderingEngine extends Renderer {
         DE_ENTITIES_NEARBY("ENTITIES NEARBY"),
         DE_TILES_NEARBY("TILES NEARBY"),
         DE_HASH_CELLS_FOR_SELECTION("HASH CELLS FOR MOUSE POSITION"),
-
+        DE_HASH_CELLS_FOR_RAY("HASH CELLS FOR AIM DIRECTION"),
         DE_RAY_DIRECTION("RAY DIRECTION"),
         DE_RAY_START("RAY START"),
         DE_RAY_END("RAY_END"),
@@ -516,27 +516,23 @@ public class RenderingEngine extends Renderer {
         // CAMERA POSITION
         builder.append(printVec(camera.position.x, camera.position.y));
         builder.append(" CAM PX: ").append(printVec(new Vector2(camera.position.cpy().x * ppuX, camera.position.cpy().y * ppuY)));
-        setDebugTag(DE_CAMERA_POSITION, builder.toString());
-        builder.setLength(0);
+        setDebugTag(DE_CAMERA_POSITION, builder);
 
         // ENTITY COUNT
         builder.append(Entity.entityCount);
         builder.append(" REGISTERED: ").append(WorldContainer.registeredNodes);
         builder.append(" DRAWN: ").append(WorldContainer.renderNodes);
-        setDebugTag(DE_ENTITY_COUNT, builder.toString());
-        builder.setLength(0);
+        setDebugTag(DE_ENTITY_COUNT, builder);
 
         // RESOLUTION, ZOOM & FPS
         builder.append(Gdx.graphics.getWidth()).append(" * ").append(Gdx.graphics.getHeight());
         builder.append(" ZOOM: ").append(camera.zoom).append(", FPS: ").append(Gdx.graphics.getFramesPerSecond());
-        setDebugTag(DE_RESOLUTION, builder.toString());
-        builder.setLength(0);
+        setDebugTag(DE_RESOLUTION, builder);
 
         // CURSOR POSITION
         builder.append(InputHandler.getCursorPosition()).append(" PIXEL: ").append(printVec(Gdx.input.getX(), Gdx.input.getY()));
         builder.append(" UNPRO: ").append(printVec(unprojectedMousePosition.x, unprojectedMousePosition.y));
-        setDebugTag(DE_CURSOR_POSITION, builder.toString());
-        builder.setLength(0);
+        setDebugTag(DE_CURSOR_POSITION, builder);
 
         // ROOM REGION
         setDebugTag(DE_ROOM_REGION, worldContainer.getRandomLevelGenerator().getRegion(InputHandler.mouse));
@@ -551,8 +547,7 @@ public class RenderingEngine extends Renderer {
         // WEAPON DROPS AND EQUIPPED WEAPONS
         builder.append(worldContainer.getWeaponDrops().size());
         builder.append(" EQUIPPED: ").append(player.getWeaponInventory().getWeaponsEquipped());
-        setDebugTag(DE_WEAPON_DROP_COUNT, builder.toString());
-        builder.setLength(0);
+        setDebugTag(DE_WEAPON_DROP_COUNT, builder);
 
         // NUMBER OF COLLISION CHECKS PER FRAME
         setDebugTag(DE_COLLISION_CHECKS, Float.toString(CollisionController.calledPerFrame));
@@ -562,8 +557,13 @@ public class RenderingEngine extends Renderer {
         for (Vector2 index : worldContainer.getSpatialIndexes(player)) {
             builder.append(Utilities.printVec(index)).append(worldContainer.getHashCellSize(index));
         }
-        setDebugTag(DE_CURRENT_HASH_CELL, builder.toString());
-        builder.setLength(0);
+        setDebugTag(DE_CURRENT_HASH_CELL, builder);
+
+        // CURRENT HASH CELLS COVERED BY THE AIM RAY
+        for(Vector2 index: worldContainer.generateCrossedIndexes(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter().cpy(),player.getWeaponInventory().getSelectedWeapon().getBody().getOrientation().cpy() )) {
+            builder.append(printVec(index));
+        }
+        setDebugTag(DE_HASH_CELLS_FOR_RAY, builder);
 
         // NEARBY ENTITIES IN SAME HASH CELL
         setDebugTag(DE_ENTITIES_NEARBY, worldContainer.getEntitiesNearby(player).size());
@@ -573,16 +573,14 @@ public class RenderingEngine extends Renderer {
             builder.append(t.getPosition());
         }
 
-        setDebugTag(DE_TILES_NEARBY, builder.toString());
-        builder.setLength(0);
+        setDebugTag(DE_TILES_NEARBY, builder);
 
         // HASH CELLS FOR THE CURRENT CURSOR POSITION
 
         for (Vector2 index : worldContainer.getSpatialIndexes(worldContainer.getRandomLevelGenerator().getTile(InputHandler.getCursorPosition()))) {
             builder.append(Utilities.printVec(index));
         }
-        setDebugTag(DE_HASH_CELLS_FOR_SELECTION, builder.toString());
-        builder.setLength(0);
+        setDebugTag(DE_HASH_CELLS_FOR_SELECTION, builder);
 //        setDebugTag(DE_TILES_NEARBY, worldContainer.getTilesNearby(player).size());
 
 
@@ -617,6 +615,11 @@ public class RenderingEngine extends Renderer {
 
     private void setDebugTag(DEBUG_TAGS tag, Float f) {
         setDebugTag(tag, Float.toString(f));
+    }
+
+    private void setDebugTag(DEBUG_TAGS tag, StringBuilder builder) {
+        setDebugTag(tag, builder.toString());
+        builder.setLength(0);
     }
 
     // HITBOXES

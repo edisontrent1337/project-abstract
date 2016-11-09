@@ -640,6 +640,7 @@ public class WorldContainer {
      *
      * @param e entity
      * @return modified HashSet with neighbours
+     * @deprecated
      */
 
     public HashSet<Entity> updatedEntityNeighbourHood(Entity e) {
