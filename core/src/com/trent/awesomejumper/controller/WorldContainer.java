@@ -363,109 +363,73 @@ public class WorldContainer {
      */
 
     //TODO: EDIT THIS!
-    //TODO: PROBLEM: INTERSECTIONS IN THE FIRST CELL ARE NOT RECOGNIZED IN NEGATIVE DIRECTIONS
+    //TODO : public List<Vector2> generateCrossedIndexes(Ray ray) {
+    //
     public List<Vector2> generateCrossedIndexes(Vector2 start, Vector2 direction) {
         Vector2 dir = direction.cpy().nor();
         Vector2 startCell = getSpatialIndex(start.x, start.y);
 
         Vector2 currentCell = startCell;
 
-        ArrayList<Vector2> result = new ArrayList<>();
         coveredIndexes.clear();
         penetrationPoints.clear();
 
         float deltaX = dir.x;
         float deltaY = dir.y;
-        //result.add(start);
 
-        coveredIndexes.add(startCell);
-        penetrationPoints.add(start);
+
         int signX = deltaX > 0 ? 1 : -1;
         int signY = deltaY > 0 ? 1 : -1;
 
+
+        coveredIndexes.add(startCell);
+        penetrationPoints.add(start);
+
         while (getTilesForCell(currentCell).isEmpty()) {
-            //do {
+            List<Float> coefficients = new ArrayList<>();
             float startX = penetrationPoints.get(penetrationPoints.size() - 1).x;
-            // float startX = result.get(result.size() - 1).x;
             float startY = penetrationPoints.get(penetrationPoints.size() - 1).y;
-            //float startY = result.get(result.size() - 1).y;
-
-
-
-            /*if (currentCell == startCell) {
-                if (signX < 0)
-                    signX = 0;
-                if (signY < 0)
-                    signY = 0;
-            }*/
-
 
             Vector2 nextXCell = getSpatialIndex(currentCell.x + signX * SPATIAL_HASH_GRID_SIZE, currentCell.y);
             Vector2 nextYCell = getSpatialIndex(currentCell.x, currentCell.y + signY * SPATIAL_HASH_GRID_SIZE);
 
+            float tCurrentX = (currentCell.x == startX)  ? (currentCell.x + signX*SPATIAL_HASH_GRID_SIZE) / deltaX : (currentCell.x - startX) / deltaX;
+            float tCurrentY = (currentCell.y == startY)  ? (currentCell.y + signY*SPATIAL_HASH_GRID_SIZE) / deltaY : (currentCell.y - startY) / deltaY;
             float tNextX = (nextXCell.x - startX) / deltaX;
             float tNextY = (nextYCell.y - startY) / deltaY;
 
-            float tCurrentX, tCurrentY;
+            //Penetration points behind the player are not what we are looking for
+            if(tCurrentX > 0)
+                coefficients.add(tCurrentX);
+            if(tCurrentY > 0)
+                coefficients.add(tCurrentY);
 
-            if (currentCell.x == startX) {
-                tCurrentX = tNextX;
-            } else {
-                tCurrentX = (currentCell.x - startX) / deltaX;
+            coefficients.add(tNextX);
+            coefficients.add(tNextY);
+
+            float closestIntersection = Float.MAX_VALUE;
+
+            for(float f : coefficients) {
+                if(Math.abs(f) < Math.abs(closestIntersection)) {
+                    closestIntersection = f;
+                }
             }
 
-            if (currentCell.y == startY) {
-                tCurrentY = tNextY;
-            } else {
-                tCurrentY = (currentCell.y - startY) / deltaY;
-            }
 
-           /*float tCurrentX = (currentCell.x == startX)  ? (currentCell.x + signX*SPATIAL_HASH_GRID_SIZE) / deltaX : (currentCell.x - startX) / deltaX;
-            float tCurrentY = (currentCell.y == startY)  ? (currentCell.y + signY*SPATIAL_HASH_GRID_SIZE) / deltaY : (currentCell.y - startY) / deltaY;*/
-
-            //x axis will be intersected first
             Vector2 penetrationPoint;
             int time = (int) WorldController.worldTime;
-            /*if (Math.abs(tNextX) < Math.abs(tNextY)) {
-
-                penetrationPoint = new Vector2(startX + tNextX * deltaX, startY + tNextX * deltaY);
-
-                // result.add(new Vector2(startX + tNextX * deltaX, startY + tNextX * deltaY));
-                penetrationPoints.add(penetrationPoint);
-                //if(time % 5 == 0)
-                  //  PopUpRenderer.getInstance().addMessageToCategory(PopUpRenderer.PopUpCategories.HEAL, new Message(penetrationPoint.toString(), penetrationPoint, time, 5));
-                coveredIndexes.add(nextXCell);
-                // result.add(currentCell);
-                currentCell = nextXCell;
-            } else {
-                //result.add(new Vector2(startX + tNextY * deltaX, startY + tNextY * deltaY));
-                penetrationPoint = new Vector2(startX + tNextY * deltaX, startY + tNextY * deltaY);
-                penetrationPoints.add(penetrationPoint);
-               // if(time % 5 == 0)
-                 //   PopUpRenderer.getInstance().addMessageToCategory(PopUpRenderer.PopUpCategories.HEAL, new Message(penetrationPoint.toString(), penetrationPoint, time,5));
-                coveredIndexes.add(nextYCell);
-                //result.add(currentCell);
-                currentCell = nextYCell;
-            }*/
-
-
-            //float closestIntersection = Math.min(Math.min(Math.abs(tCurrentX), Math.abs(tCurrentY)), Math.min(Math.abs(tNextX), Math.abs(tNextY)));
-            float closestIntersection = Math.min(Math.abs(tNextX),Math.abs(tNextY));
-
 
             penetrationPoint = new Vector2(startX + closestIntersection * deltaX, startY + closestIntersection * deltaY);
             penetrationPoints.add(penetrationPoint);
             if (time % 5 == 0) {
 
-                PopUpRenderer.getInstance().addMessageToCategory(PopUpRenderer.PopUpCategories.HEAL, new Message(penetrationPoint.toString(), penetrationPoint, time, 5));
+                // PopUpRenderer.getInstance().addMessageToCategory(PopUpRenderer.PopUpCategories.HEAL, new Message(penetrationPoint.toString(), penetrationPoint, time, 5));
             }
 
-            if (closestIntersection == tCurrentX) {
-            } else if (closestIntersection == tCurrentY) {
-            } else if (closestIntersection == tNextX) {
+            if (closestIntersection == tNextX || closestIntersection == tCurrentX) {
                 coveredIndexes.add(nextXCell);
                 currentCell = nextXCell;
-            } else {
+            } else if (closestIntersection == tNextY || closestIntersection == tCurrentY){
                 coveredIndexes.add(nextYCell);
                 currentCell = nextYCell;
             }
@@ -473,7 +437,7 @@ public class WorldContainer {
 
         }
 
-        return result;
+        return coveredIndexes;
     }
 
 

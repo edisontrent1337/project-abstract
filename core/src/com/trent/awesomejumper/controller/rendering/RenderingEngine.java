@@ -560,7 +560,8 @@ public class RenderingEngine extends Renderer {
         setDebugTag(DE_CURRENT_HASH_CELL, builder);
 
         // CURRENT HASH CELLS COVERED BY THE AIM RAY
-        for(Vector2 index: worldContainer.generateCrossedIndexes(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter().cpy(),player.getWeaponInventory().getSelectedWeapon().getBody().getOrientation().cpy() )) {
+        //for(Vector2 index: worldContainer.generateCrossedIndexes(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter().cpy(),player.getWeaponInventory().getSelectedWeapon().getBody().getOrientation().cpy() )) {
+        for(Vector2 index : player.getBody().getBounds().getEdges()) {
             builder.append(printVec(index));
         }
         setDebugTag(DE_HASH_CELLS_FOR_RAY, builder);
