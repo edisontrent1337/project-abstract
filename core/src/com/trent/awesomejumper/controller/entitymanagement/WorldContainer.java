@@ -1,18 +1,20 @@
-package com.trent.awesomejumper.controller;
+package com.trent.awesomejumper.controller.entitymanagement;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
+import com.trent.awesomejumper.controller.WorldController;
 import com.trent.awesomejumper.controller.levelgeneration.RandomLevelGenerator;
 import com.trent.awesomejumper.controller.rendering.PopUpRenderer;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.popups.Message;
+import com.trent.awesomejumper.engine.physics.Ray;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.pickups.Pickup;
 import com.trent.awesomejumper.models.projectile.Projectile;
 import com.trent.awesomejumper.models.weapons.Weapon;
 import com.trent.awesomejumper.tiles.Tile;
-import com.trent.awesomejumper.utils.Utilities;
+import com.trent.awesomejumper.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,17 +26,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javafx.util.Pair;
-
 import static com.trent.awesomejumper.engine.modelcomponents.ModelComponent.ComponentID.GRAPHICS;
-import static com.trent.awesomejumper.utils.Utilities.sub;
+import static com.trent.awesomejumper.utils.Utils.sub;
 
 /**
  * Created by Sinthu on 12.06.2015.
  * Holds the player, the level with its environmental items such as random paths of dirt,
  * rocks, flowers etc. and also items, collectables and enemies.
  * Holds a list of all entities and manages all specific lists of entities needed by the controllers.
- * This class is managed by the {@link EntityManager}.
+ * This class is managed by the {@link com.trent.awesomejumper.controller.entitymanagement.EntityManager}.
  */
 public class WorldContainer {
 
@@ -65,6 +65,8 @@ public class WorldContainer {
 
     // Subset containing all projectiles
     private HashSet<Projectile> projectiles = new HashSet<>();
+
+    private HashSet<Ray> rays = new HashSet<>();
 
     // Subset containing all pickups (ammo, medikits,...)
     private HashSet<Pickup> pickups = new HashSet<>();
@@ -137,13 +139,13 @@ public class WorldContainer {
      * @param entity Entity to be added.
      */
     private void addEntityToSpatialHashingData(Entity entity) {
-
+        // generating a list of all spatial indexes the current entity covers
         HashSet<Vector2> spatialIndexes = getSpatialIndexes(entity);
         for (Vector2 index : spatialIndexes) {
             if (spatialHashingData.containsKey(index)) {
                 spatialHashingData.get(index).addEntity(entity);
             } else {
-                Utilities.log(String.format("ERROR ADDING THE FOLLOWING ENTITY TO THE LOCATION %1s" +
+                Utils.log(String.format("ERROR ADDING THE FOLLOWING ENTITY TO THE LOCATION %1s" +
                         "IN THE SPATIAL HASHING DATA: %2s", index.toString(), entity.toString()));
             }
         }
@@ -155,12 +157,13 @@ public class WorldContainer {
      * @param t Tile to be added.
      */
     private void addTileToSpatialHashingData(Tile t) {
-        HashSet<Vector2> hashKeys = getSpatialIndexes(t);
-        for (Vector2 index : hashKeys) {
+        // generating a list of all spatial indexes the current tile covers
+        HashSet<Vector2> spatialIndexes = getSpatialIndexes(t);
+        for (Vector2 index : spatialIndexes) {
             if (spatialHashingData.containsKey(index)) {
                 spatialHashingData.get(index).addTile(t);
             } else {
-                Utilities.log(String.format("ERROR ADDING THE FOLLOWING TILE TO THE LOCATION %1s" +
+                Utils.log(String.format("ERROR ADDING THE FOLLOWING TILE TO THE LOCATION %1s" +
                         "IN THE SPATIAL HASHING DATA: %2s", index.toString(), t.toString()));
             }
         }
@@ -176,7 +179,7 @@ public class WorldContainer {
         SPATIAL_WIDTH = (randomLevelGenerator.getLevelWidth() / SPATIAL_HASH_GRID_SIZE) + 1;
         SPATIAL_HEIGHT = (randomLevelGenerator.getLevelHeight() / SPATIAL_HASH_GRID_SIZE) + 1;
 
-        Utilities.log("SPATIAL DIMENSIONS:  " + Integer.toString(SPATIAL_WIDTH) + " :   " + Integer.toString(SPATIAL_HEIGHT));
+        Utils.log("SPATIAL DIMENSIONS:  " + Integer.toString(SPATIAL_WIDTH) + " :   " + Integer.toString(SPATIAL_HEIGHT));
 
         /**
          * Generate keys at valid Vector2 positions.
@@ -190,10 +193,10 @@ public class WorldContainer {
 
 
         // DEBUG
-        Utilities.log("LIST OF VALID SPATIAL INDEXES: \n");
+        Utils.log("LIST OF VALID SPATIAL INDEXES: \n");
         int i = 0;
         for (Vector2 v : spatialHashingData.keySet()) {
-            Utilities.log("VALID INDEX " + String.format("%05d", i), v.toString());
+            Utils.log("VALID INDEX " + String.format("%05d", i), v.toString());
             i++;
         }
 
@@ -209,32 +212,13 @@ public class WorldContainer {
             addTileToSpatialHashingData(t);
         }
 
-        /*for (Map.Entry<Vector2, Set<Entity>> entry : spatialHashingData.entrySet()) {
-
-            if (!entry.getValue().isEmpty()) {
-                Vector2 key = entry.getKey();
-                Interval x = new Interval(key.x, (key.x + SPATIAL_HASH_GRID_SIZE));
-                Interval y = new Interval(key.y, (key.y + SPATIAL_HASH_GRID_SIZE));
-                Utilities.log("KEY POSITION AND VALUES", entry.getKey().toString());
-                Utilities.log("VALID ENTITY X POSITIONS FOR THIS KEY", x.toString());
-                Utilities.log("VALID ENTITY Y POSITIONS FOR THIS KEY", y.toString());
-
-
-                for (Entity e : entry.getValue()) {
-                    Utilities.log(e.toString());
-                    if (!x.contains(e.getPosition().x))
-                        Utilities.log("ENTITY IS OUT OF BOUNDS FOR THIS KEY ON X AXIS");
-                    if (!y.contains(e.getPosition().y))
-                        Utilities.log("ENTITY IS OUT OF BOUNDS FOR THIS KEY ON Y AXIS");
-                }
-            }
-        }*/
     }
 
     /**
      * Updates the spatial hashing ds. Iterates through all entities and tiles,
      * calculates their place in the hashing ds and adds them to their respective
      * collection / HashSet.
+     * TODO: might be optimized by only considering entities that moved during the last frame.
      */
     public void updateSpatialHashingData() {
         clearSpatialHashData();
@@ -251,7 +235,7 @@ public class WorldContainer {
     /**
      * Gets a list of indexes for the spatial data structure. The list of indexes represent the
      * quadrants an entity is positioned in.
-     * An entity can take up to 4 spatial indexes if its hitbox happens to overlap them all.
+     * An entity can take up to 4 spatial indexes if its hitbox happens to overlap all of them.
      *
      * @param x x position of the entity / tile
      * @param y y position of the entity / tile
@@ -261,19 +245,19 @@ public class WorldContainer {
      */
     private HashSet<Vector2> getSpatialIndexes(float x, float y, float w, float h) {
 
-        /*Utilities.log("ENTITY/TILE Position ", Utilities.printVec(x,y));
-        Utilities.log("ENTITY/TILE Width ", Float.toString(w));
-        Utilities.log("ENTITY/TILE Height ", Float.toString(h));*/
+        /*Utils.log("ENTITY/TILE Position ", Utils.printVec(x,y));
+        Utils.log("ENTITY/TILE Width ", Float.toString(w));
+        Utils.log("ENTITY/TILE Height ", Float.toString(h));*/
 
         int spatialX = (int) Math.floor(x);
         int spatialY = (int) Math.floor(y);
         int spatialWx = (int) Math.floor(x + w);
         int spatialHy = (int) Math.floor(y + h);
 
-        /*Utilities.log("SPATIAL LOWER X BOUND", Integer.toString(spatialX));
-        Utilities.log("SPATIAL LOWER Y BOUND", Integer.toString(spatialY));
-        Utilities.log("SPATIAL HIGHER X BOUND", Integer.toString(spatialWx));
-        Utilities.log("SPATIAL HIGHER Y BOUND", Integer.toString(spatialHy));*/
+        /*Utils.log("SPATIAL LOWER X BOUND", Integer.toString(spatialX));
+        Utils.log("SPATIAL LOWER Y BOUND", Integer.toString(spatialY));
+        Utils.log("SPATIAL HIGHER X BOUND", Integer.toString(spatialWx));
+        Utils.log("SPATIAL HIGHER Y BOUND", Integer.toString(spatialHy));*/
 
         spatialX -= spatialX % SPATIAL_HASH_GRID_SIZE;
         spatialY -= spatialY % SPATIAL_HASH_GRID_SIZE;
@@ -377,7 +361,7 @@ public class WorldContainer {
         float deltaX = dir.x;
         float deltaY = dir.y;
 
-
+        // Leading sign of the ray direction. Used to find next adjacent hashing cell
         int signX = deltaX > 0 ? 1 : -1;
         int signY = deltaY > 0 ? 1 : -1;
 
@@ -385,20 +369,28 @@ public class WorldContainer {
         coveredIndexes.add(startCell);
         penetrationPoints.add(start);
 
+        /**
+         * As long as no solid world tiles like walls have been found,
+         * the ray continues to travel.
+         */
         while (getTilesForCell(currentCell).isEmpty()) {
             List<Float> coefficients = new ArrayList<>();
+            // Choose the last penetration point as the starting point
             float startX = penetrationPoints.get(penetrationPoints.size() - 1).x;
             float startY = penetrationPoints.get(penetrationPoints.size() - 1).y;
 
+            // get the indices for the next hashing cells adjacent to the current one with regards to the ray direction.
             Vector2 nextXCell = getSpatialIndex(currentCell.x + signX * SPATIAL_HASH_GRID_SIZE, currentCell.y);
             Vector2 nextYCell = getSpatialIndex(currentCell.x, currentCell.y + signY * SPATIAL_HASH_GRID_SIZE);
 
+            // if we start from an x position on the hash grid,
+            //TODO: ADD nextXCell instead of long expression
             float tCurrentX = (currentCell.x == startX)  ? (currentCell.x + signX*SPATIAL_HASH_GRID_SIZE) / deltaX : (currentCell.x - startX) / deltaX;
             float tCurrentY = (currentCell.y == startY)  ? (currentCell.y + signY*SPATIAL_HASH_GRID_SIZE) / deltaY : (currentCell.y - startY) / deltaY;
             float tNextX = (nextXCell.x - startX) / deltaX;
             float tNextY = (nextYCell.y - startY) / deltaY;
 
-            //Penetration points behind the player are not what we are looking for
+            //Penetration points in ray direction, but behind the player are not what we are looking for
             if(tCurrentX > 0)
                 coefficients.add(tCurrentX);
             if(tCurrentY > 0)
@@ -423,7 +415,7 @@ public class WorldContainer {
             penetrationPoints.add(penetrationPoint);
             if (time % 5 == 0) {
 
-                // PopUpRenderer.getInstance().addMessageToCategory(PopUpRenderer.PopUpCategories.HEAL, new Message(penetrationPoint.toString(), penetrationPoint, time, 5));
+                PopUpRenderer.getInstance().addMessageToCategory(PopUpRenderer.PopUpCategories.HEAL, new Message(penetrationPoint.toString(), penetrationPoint, time, 5));
             }
 
             if (closestIntersection == tNextX || closestIntersection == tCurrentX) {
@@ -755,12 +747,12 @@ public class WorldContainer {
 
         Vector2 destination = position.cpy();
         if (randomLevelGenerator.getTile(position).getType().equals(Tile.TileType.WALL)) {
-            Utilities.log("WEAPON OUT OF BOUNDS", entity.getPosition().toString());
-            Utilities.log("INSIDE TILE", randomLevelGenerator.getTile(position).getPosition().toString());
-            Utilities.log("NEIGHBOURHOOD SIZE", Float.toString(randomLevelGenerator.getTile(position).getNeighbourHood().size()));
+            Utils.log("WEAPON OUT OF BOUNDS", entity.getPosition().toString());
+            Utils.log("INSIDE TILE", randomLevelGenerator.getTile(position).getPosition().toString());
+            Utils.log("NEIGHBOURHOOD SIZE", Float.toString(randomLevelGenerator.getTile(position).getNeighbourHood().size()));
             float minDst = Float.MAX_VALUE;
             for (Tile t : randomLevelGenerator.getTile(position).getNeighbourHood()) {
-                Utilities.log("NEIGHBOUR TILE", t.getPosition().toString());
+                Utils.log("NEIGHBOUR TILE", t.getPosition().toString());
 
                 float dst;
 
@@ -771,18 +763,18 @@ public class WorldContainer {
 
                 if (dst < minDst) {
                     minDst = dst;
-                    Utilities.log("NEW MINIMAL DST", Float.toString(minDst));
-                    Utilities.log("NEW CENTER", t.getCollisionBox().getCenter().toString());
+                    Utils.log("NEW MINIMAL DST", Float.toString(minDst));
+                    Utils.log("NEW CENTER", t.getCollisionBox().getCenter().toString());
                     destination = t.getCollisionBox().getCenter().cpy();
 
                 }
 
             }
-            Utilities.log(destination.toString());
+            Utils.log(destination.toString());
         }
         entity.setPosition(destination);
 
-        Utilities.log(entity.getPosition().toString());
+        Utils.log(entity.getPosition().toString());
 
         return false;
     }

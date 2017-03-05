@@ -3,7 +3,7 @@ package com.trent.awesomejumper.models;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-import com.trent.awesomejumper.controller.EntityManager;
+import com.trent.awesomejumper.controller.entitymanagement.EntityManager;
 import com.trent.awesomejumper.controller.input.InputHandler;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.entity.LivingEntity;
@@ -13,8 +13,8 @@ import com.trent.awesomejumper.engine.modelcomponents.Health;
 import com.trent.awesomejumper.engine.modelcomponents.WeaponInventory;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
 
-import static com.trent.awesomejumper.utils.Utilities.angle;
-import static com.trent.awesomejumper.utils.Utilities.sub;
+import static com.trent.awesomejumper.utils.Utils.angle;
+import static com.trent.awesomejumper.utils.Utils.sub;
 
 /**
  * Created by Sinthu on 12.06.2015.

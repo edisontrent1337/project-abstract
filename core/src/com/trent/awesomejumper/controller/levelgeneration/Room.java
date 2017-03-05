@@ -3,7 +3,7 @@ package com.trent.awesomejumper.controller.levelgeneration;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.trent.awesomejumper.utils.Interval;
-import com.trent.awesomejumper.utils.Utilities;
+import com.trent.awesomejumper.utils.Utils;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -103,7 +103,7 @@ public class Room {
      * @return
      */
     public boolean overlaps(Room other) {
-        return (Utilities.overlaps(xDimensionsAndDistance, other.getxDimensionsAndDistance()) && Utilities.overlaps(yDimensionsAndDistance, other.getyDimensionsAndDistance()));
+        return (Utils.overlaps(xDimensionsAndDistance, other.getxDimensionsAndDistance()) && Utils.overlaps(yDimensionsAndDistance, other.getyDimensionsAndDistance()));
     }
 
     @Override

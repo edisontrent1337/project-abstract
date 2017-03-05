@@ -37,7 +37,7 @@ public class Pistol extends Weapon {
     public Pistol(Vector2 position) {
         this.body = new Body(this, WIDTH, HEIGHT);
         this.graphics = new Graphics(this, 0f, "fiveseven", SPRITE_WIDTH, SPRITE_HEIGHT);
-        this.gunComponent = new GunComponent(this, "FIVE-SEVEN");
+        this.gunComponent = new GunComponent(this, "FIVE-SEVEN",1);
 
 
         body.setMass(MASS);

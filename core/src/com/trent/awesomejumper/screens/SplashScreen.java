@@ -14,7 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
-import com.trent.awesomejumper.utils.Utilities;
+import com.trent.awesomejumper.utils.Utils;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeIn;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.delay;
@@ -73,10 +73,10 @@ public class SplashScreen implements Screen, InputProcessor {
         loading = new Image(loadingBar);
 
         //INIT IMAGE OPACITY TO 0
-        Utilities.resetOpacity(splashImage);
-        Utilities.resetOpacity(awesome);
-        Utilities.resetOpacity(jumper);
-        Utilities.resetOpacity(tap);
+        Utils.resetOpacity(splashImage);
+        Utils.resetOpacity(awesome);
+        Utils.resetOpacity(jumper);
+        Utils.resetOpacity(tap);
 
         // INIT SOUNDS
         confirmationSound = Gdx.audio.newSound(Gdx.files.internal("sound/test.mp3"));
@@ -137,8 +137,8 @@ public class SplashScreen implements Screen, InputProcessor {
 
         // 800 * 480 UPSCALING
 
-        screenScalingX = (float) Gdx.graphics.getWidth() / Utilities.WIDTH;
-        screenScalingY = (float) Gdx.graphics.getHeight() / Utilities.HEIGHT;
+        screenScalingX = (float) Gdx.graphics.getWidth() / Utils.WIDTH;
+        screenScalingY = (float) Gdx.graphics.getHeight() / Utils.HEIGHT;
         splashImage.setScale(screenScalingX,screenScalingY);
         float titleScale =1f;
 

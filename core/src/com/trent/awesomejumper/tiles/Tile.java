@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
-import com.trent.awesomejumper.utils.Utilities;
+import com.trent.awesomejumper.utils.Utils;
 
 import java.util.HashSet;
 
@@ -178,7 +178,7 @@ public class Tile {
 
     @Override
     public String toString() {
-        return Utilities.printVec(position);
+        return Utils.printVec(position);
     }
 
 }

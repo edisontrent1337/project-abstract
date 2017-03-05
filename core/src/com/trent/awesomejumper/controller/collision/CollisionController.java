@@ -4,30 +4,28 @@ package com.trent.awesomejumper.controller.collision;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.trent.awesomejumper.controller.WorldContainer;
+import com.trent.awesomejumper.controller.entitymanagement.WorldContainer;
 import com.trent.awesomejumper.controller.rendering.PopUpRenderer;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.popups.Message;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
-import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.projectile.Projectile;
 import com.trent.awesomejumper.models.weapons.Weapon;
 import com.trent.awesomejumper.tiles.Tile;
 import com.trent.awesomejumper.utils.Interval;
-import com.trent.awesomejumper.utils.Utilities;
+import com.trent.awesomejumper.utils.Utils;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import static com.trent.awesomejumper.controller.rendering.PopUpRenderer.PopUpCategories.MISC;
 import static com.trent.awesomejumper.engine.modelcomponents.ModelComponent.ComponentID.HEALTH;
 import static com.trent.awesomejumper.utils.PhysicalConstants.FRICTIONAL_COEFFICIENT;
-import static com.trent.awesomejumper.utils.Utilities.dot;
-import static com.trent.awesomejumper.utils.Utilities.getOverlap;
-import static com.trent.awesomejumper.utils.Utilities.getProjection;
-import static com.trent.awesomejumper.utils.Utilities.overlaps;
-import static com.trent.awesomejumper.utils.Utilities.sub;
+import static com.trent.awesomejumper.utils.Utils.dot;
+import static com.trent.awesomejumper.utils.Utils.getOverlap;
+import static com.trent.awesomejumper.utils.Utils.getProjection;
+import static com.trent.awesomejumper.utils.Utils.overlaps;
+import static com.trent.awesomejumper.utils.Utils.sub;
 
 /**
  * Collision controller. Resolves any relevant physical collisions between all entity types.
@@ -187,7 +185,7 @@ public class CollisionController {
 
     //TODO: world collision does not have to be split by horizontal or vertical cd.
     //TODO: remove all aspects that have to do with a cd split by horizontal or vertical cd
-    //TODO: because spatial hashing works!!!
+    //TODO: because spatial hashing works!!! - not quite yet, noob :/
     public void resolveWorldCollisions(Entity entity, float delta) {
 
 
@@ -564,18 +562,18 @@ public class CollisionController {
         if (framesToImpact > 0 && framesToImpact < 1) {
             float step = 0.05f;
             float numberOfSteps = dst / step;
-            Utilities.log("NUMBER OF STEPS", Float.toString(numberOfSteps));
+            Utils.log("NUMBER OF STEPS", Float.toString(numberOfSteps));
             for (float i = 0f; i <= numberOfSteps; i++) {
                 Vector2 projectilePosition = projectile.getPosition();
                 Vector2 frameStep = deltaVelocity.cpy().nor().scl(step);
-                Utilities.log("OLD POSITION", projectilePosition.toString());
-                Utilities.log("FRAME STEP", frameStep.toString());
+                Utils.log("OLD POSITION", projectilePosition.toString());
+                Utils.log("FRAME STEP", frameStep.toString());
                 projectilePosition.add(frameStep);
-                Utilities.log("NEW POSITION", projectilePosition.toString());
+                Utils.log("NEW POSITION", projectilePosition.toString());
                 projectile.setPosition(projectilePosition);
 
                 if (checkCollision(projectile.getBounds(), entityBounds)) {
-                    Utilities.log("Collision detected.");
+                    Utils.log("Collision detected.");
                     break;
                 }
             }
@@ -634,18 +632,18 @@ public class CollisionController {
         if (framesTillImpact > 0 && framesTillImpact < 1) {
             float step = 0.0125f;
             float numberOfSteps = dst / step;
-            Utilities.log("NUMBER OF STEPS", Float.toString(numberOfSteps));
+            Utils.log("NUMBER OF STEPS", Float.toString(numberOfSteps));
             for (float i = 0f; i <= numberOfSteps; i++) {
                 Vector2 projectilePosition = projectile.getPosition();
                 Vector2 frameStep = projectile.getVelocity().cpy().nor().scl(step);
-                Utilities.log("OLD POSITION", projectilePosition.toString());
-                Utilities.log("FRAME STEP", frameStep.toString());
+                Utils.log("OLD POSITION", projectilePosition.toString());
+                Utils.log("FRAME STEP", frameStep.toString());
                 projectilePosition.add(frameStep);
-                Utilities.log("NEW POSITION", projectilePosition.toString());
+                Utils.log("NEW POSITION", projectilePosition.toString());
                 projectile.setPosition(projectilePosition);
 
                 if (checkCollision(projectile.getBounds(), tile.getCollisionBox())) {
-                    Utilities.log("Collision detected.");
+                    Utils.log("Collision detected.");
                     return true;
                 }
             }

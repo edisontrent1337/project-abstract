@@ -1,6 +1,5 @@
-package com.trent.awesomejumper.controller;
+package com.trent.awesomejumper.controller.entitymanagement;
 
-import com.badlogic.gdx.Gdx;
 import com.trent.awesomejumper.controller.rendering.RenderingEngine;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.models.Player;

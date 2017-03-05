@@ -3,8 +3,7 @@ package com.trent.awesomejumper.engine.entity;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.trent.awesomejumper.controller.EntityManager;
-import com.trent.awesomejumper.controller.WorldContainer;
+import com.trent.awesomejumper.controller.entitymanagement.EntityManager;
 import com.trent.awesomejumper.controller.WorldController;
 import com.trent.awesomejumper.engine.modelcomponents.Body;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
@@ -13,7 +12,6 @@ import com.trent.awesomejumper.engine.modelcomponents.WeaponInventory;
 import com.trent.awesomejumper.engine.modelcomponents.weapons.GunComponent;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
 
-import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicInteger;
 

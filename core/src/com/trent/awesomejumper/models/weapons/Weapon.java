@@ -1,9 +1,8 @@
 package com.trent.awesomejumper.models.weapons;
 
-import com.trent.awesomejumper.controller.EntityManager;
+import com.trent.awesomejumper.controller.entitymanagement.EntityManager;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.weapons.GunComponent;
-import com.trent.awesomejumper.engine.modelcomponents.weapons.WeaponComponent;
 
 /**
  * Created by Sinthu on 01.03.2016.

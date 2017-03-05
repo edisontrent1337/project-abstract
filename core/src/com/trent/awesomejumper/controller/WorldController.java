@@ -19,7 +19,7 @@ public class WorldController {
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
 
-    private WorldContainer worldContainer;
+    private com.trent.awesomejumper.controller.entitymanagement.WorldContainer worldContainer;
     private CollisionController collisionController;
 
     public static float worldTime = 0f;
@@ -28,7 +28,7 @@ public class WorldController {
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
 
-    public WorldController(WorldContainer worldContainer) {
+    public WorldController(com.trent.awesomejumper.controller.entitymanagement.WorldContainer worldContainer) {
         this.worldContainer = worldContainer;
         this.collisionController = new CollisionController(worldContainer);
     }
@@ -82,6 +82,7 @@ public class WorldController {
         /**
          * Resolve entity/projectile collisions.
          * Here, only living entities that can take damage are considered.
+         * TODO: not projectiles, but penetration points need to be addressed here.
          */
 
         for (Entity e : worldContainer.getLivingEntities()) {
@@ -123,6 +124,7 @@ public class WorldController {
 
     /**
      * Caps all entities movement speed at their maximum value.
+     * TODO: TIE MIN/MAX SPEED ON ENTITIES
      */
     private void manageEntitySpeed() {
         for (Entity entity : worldContainer.getEntities()) {
@@ -157,11 +159,6 @@ public class WorldController {
                 entity.setVelocityY(-entity.getMaxVelocity());
             }
 
-            // IF ENTITY FALLS OUT OF BOUNDS, IT IS PUT BACK TO THE START
-            /*if (!randomLevelGenerator.checkBounds((int) entity.getPosition().x, (int) entity.getPosition().y)) {
-                entity.setPosition(new Vector2(5f, 12f));
-                entity.update(delta);
-            }*/
 
 
         }

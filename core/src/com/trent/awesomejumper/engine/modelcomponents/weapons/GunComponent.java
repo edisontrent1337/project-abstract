@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.models.projectile.Projectile;
+import com.trent.awesomejumper.utils.Utils;
 
 /**
  * Weapon component class. Defines the behaviour and attributes of weapons in the game.
@@ -31,9 +32,14 @@ public class GunComponent extends WeaponComponent {
 
     private boolean isEquipped;
 
-    public GunComponent(Entity weapon, String name) {
+    private final int NUMBER_OF_RAYS;
+
+
+    public GunComponent(Entity weapon, String name, int rays) {
         this.entity = weapon;
         this.name = name;
+        this.NUMBER_OF_RAYS = rays;
+        this.TAG = "GUN COMPONENT";
         entity.enableComponent(ComponentID.WEAPON_COMPONENT);
     }
 
@@ -57,7 +63,7 @@ public class GunComponent extends WeaponComponent {
             Projectile projectile = new Projectile(entity.getBody().getCenter().cpy(), entity.getBody().getHeightZ());
             projectile.register();
           //  projectile.getBody().setVelocity(entity.getBody().getOrientation().cpy().nor().scl(speed));
-            Gdx.app.log("START",projectile.getPosition().toString());
+            Utils.log("INITIAL PROJECTILE POSITION: " + projectile.getPosition());
             Vector2 direction = entity.getOwner().getBody().getOrientation().cpy().nor();
             projectile.getBody().addImpulse(direction.scl(speed));
             Gdx.app.log("SCALED",projectile.getBody().getImpulses().getFirst().cpy().nor().scl(48f/60f).toString());

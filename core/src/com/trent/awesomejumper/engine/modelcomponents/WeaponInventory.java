@@ -1,22 +1,16 @@
 package com.trent.awesomejumper.engine.modelcomponents;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
-import com.trent.awesomejumper.controller.EntityManager;
-import com.trent.awesomejumper.controller.WorldController;
+import com.trent.awesomejumper.controller.entitymanagement.EntityManager;
 import com.trent.awesomejumper.controller.rendering.PopUpRenderer;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.popups.Message;
-import com.trent.awesomejumper.engine.physics.CollisionBox;
-import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.weapons.Weapon;
-import com.trent.awesomejumper.utils.Utilities;
+import com.trent.awesomejumper.utils.Utils;
 
 import static com.trent.awesomejumper.controller.rendering.PopUpRenderer.PopUpCategories.*;
 
 import java.util.ArrayList;
-
-import static com.trent.awesomejumper.utils.Utilities.angle;
 
 /**
  * Weapon inventory component for all entities that can carry weapons. Entities that want to attack in any
@@ -95,10 +89,10 @@ public class WeaponInventory extends ModelComponent {
      */
     public boolean equipWeapon(Weapon weapon) {
 
-       /* Utilities.log("EVENT", "START OF EQUIP");
-        Utilities.log("WEAPONS EQUIPPED", Integer.toString(weaponsEquipped));
-        Utilities.log("INVENTORY POINTER", Integer.toString(inventoryPointer));
-        Utilities.log("CURRENT WEAPON ID", Integer.toString(selectedWeaponID));*/
+       /* Utils.log("EVENT", "START OF EQUIP");
+        Utils.log("WEAPONS EQUIPPED", Integer.toString(weaponsEquipped));
+        Utils.log("INVENTORY POINTER", Integer.toString(inventoryPointer));
+        Utils.log("CURRENT WEAPON ID", Integer.toString(selectedWeaponID));*/
 
         /**
          * Every weapon picked up will have its collision detection disabled,
@@ -166,10 +160,10 @@ public class WeaponInventory extends ModelComponent {
             holdingAWeapon = true;
             weaponsEquipped++;
         }
-        /*Utilities.log("EVENT", "END OF EQUIP");
-        Utilities.log("WEAPONS EQUIPPED", Integer.toString(weaponsEquipped));
-        Utilities.log("INVENTORY POINTER", Integer.toString(inventoryPointer));
-        Utilities.log("CURRENT WEAPON ID", Integer.toString(selectedWeaponID));*/
+        /*Utils.log("EVENT", "END OF EQUIP");
+        Utils.log("WEAPONS EQUIPPED", Integer.toString(weaponsEquipped));
+        Utils.log("INVENTORY POINTER", Integer.toString(inventoryPointer));
+        Utils.log("CURRENT WEAPON ID", Integer.toString(selectedWeaponID));*/
 
         Message equipMessage = new Message(weapon.getName(), entity.getBody().getCenter(), entity.time, 1.00f);
         PopUpRenderer.getInstance().addMessageToCategory(MISC, equipMessage);
@@ -189,10 +183,10 @@ public class WeaponInventory extends ModelComponent {
      * @param direction positive means previous weapon, negative means next weapon.
      */
     public void changeWeapon(int direction) {
-        Utilities.log("EVENT", "START OF CHANGE");
-        Utilities.log("WEAPONS EQUIPPED", Integer.toString(weaponsEquipped));
-        Utilities.log("INVENTORY", Integer.toString(inventoryPointer));
-        Utilities.log("CURRENT WEAPON ID", Integer.toString(selectedWeaponID));
+        Utils.log("EVENT", "START OF CHANGE");
+        Utils.log("WEAPONS EQUIPPED", Integer.toString(weaponsEquipped));
+        Utils.log("INVENTORY", Integer.toString(inventoryPointer));
+        Utils.log("CURRENT WEAPON ID", Integer.toString(selectedWeaponID));
         if (direction < 0)
             direction = -1;
         else
@@ -226,10 +220,10 @@ public class WeaponInventory extends ModelComponent {
             selectedWeapon = null;
         }
 
-        /*Utilities.log("EVENT", "END OF CHANGE");
-        Utilities.log("WEAPONS EQUIPPED", Integer.toString(weaponsEquipped));
-        Utilities.log("INVENTORY POINTER", Integer.toString(inventoryPointer));
-        Utilities.log("CURRENT WEAPON ID", Integer.toString(selectedWeaponID));*/
+        /*Utils.log("EVENT", "END OF CHANGE");
+        Utils.log("WEAPONS EQUIPPED", Integer.toString(weaponsEquipped));
+        Utils.log("INVENTORY POINTER", Integer.toString(inventoryPointer));
+        Utils.log("CURRENT WEAPON ID", Integer.toString(selectedWeaponID));*/
 
     }
 
@@ -238,9 +232,9 @@ public class WeaponInventory extends ModelComponent {
             weapons.set(currentSlot, id);
 
         }
-        // Utilities.log("SAVED WEAPONS", "LIST");
+        // Utils.log("SAVED WEAPONS", "LIST");
         for (Integer i : weapons) {
-            // Utilities.log("WEAPON ID", Integer.toString(i));
+            // Utils.log("WEAPON ID", Integer.toString(i));
         }
 
     }
@@ -286,10 +280,10 @@ public class WeaponInventory extends ModelComponent {
          * We can only drop a weapon if we currently hold one.
          */
         if (selectedWeaponID != NO_WEAPON) {
-                /*Utilities.log("EVENT", "START OF DROP");
-                Utilities.log("NUMBER OF WEAPONS EQUIPPED", Integer.toString(weaponsEquipped));
-                Utilities.log("INVENTORY", Integer.toString(inventoryPointer));
-                Utilities.log("CURRENT WEAPON ID", Integer.toString(selectedWeaponID));*/
+                /*Utils.log("EVENT", "START OF DROP");
+                Utils.log("NUMBER OF WEAPONS EQUIPPED", Integer.toString(weaponsEquipped));
+                Utils.log("INVENTORY", Integer.toString(inventoryPointer));
+                Utils.log("CURRENT WEAPON ID", Integer.toString(selectedWeaponID));*/
 
             /**
              * Get the weapon to be dropped by the entity manager, un-equip it and drop it to the world.
@@ -310,10 +304,10 @@ public class WeaponInventory extends ModelComponent {
                 throw new NullPointerException("ERROR:  THE WEAPON WAS NOT FOUND BY THE ENTITY MANAGER.");
             }
 
-               /* Utilities.log("EVENT", "END OF DROP");
-                Utilities.log("NUMBER OF WEAPONS EQUIPPED", Integer.toString(weaponsEquipped));
-                Utilities.log("INVENTORY", Integer.toString(inventoryPointer));
-                Utilities.log("CURRENT WEAPON ID", Integer.toString(selectedWeaponID));*/
+               /* Utils.log("EVENT", "END OF DROP");
+                Utils.log("NUMBER OF WEAPONS EQUIPPED", Integer.toString(weaponsEquipped));
+                Utils.log("INVENTORY", Integer.toString(inventoryPointer));
+                Utils.log("CURRENT WEAPON ID", Integer.toString(selectedWeaponID));*/
             inventoryFull = false;
         }
 

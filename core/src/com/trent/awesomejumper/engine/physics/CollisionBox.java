@@ -5,10 +5,10 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.trent.awesomejumper.utils.Utilities;
+import com.trent.awesomejumper.utils.Utils;
 
-import static com.trent.awesomejumper.utils.Utilities.getNormal;
-import static com.trent.awesomejumper.utils.Utilities.sub;
+import static com.trent.awesomejumper.utils.Utils.getNormal;
+import static com.trent.awesomejumper.utils.Utils.sub;
 
     /**
      * min = lower left corner
@@ -67,7 +67,7 @@ public class CollisionBox {
 
     // TESTING
     private float damageCoefficient;
-    private Color color = Utilities.color();
+    private Color color = Utils.color();
 
     // CONSTRUCTORS
     // ---------------------------------------------------------------------------------------------

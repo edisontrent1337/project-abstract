@@ -10,7 +10,7 @@ import com.trent.awesomejumper.game.AwesomeJumperMain;
 /**
  * Created by Sinthu on 12.06.2015.
  */
-public class Utilities {
+public class Utils {
 
 
     public static final int WIDTH = 800;
@@ -212,5 +212,9 @@ public class Utilities {
 
     public static void log(String title, float f) {
         log(title,Float.toString(f));
+    }
+
+    public static void log(String title, int i) {
+        log(title, Integer.toString(i));
     }
 }

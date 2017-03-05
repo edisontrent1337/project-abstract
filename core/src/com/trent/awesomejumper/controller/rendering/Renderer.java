@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.trent.awesomejumper.utils.Utilities;
+import com.trent.awesomejumper.utils.Utils;
 
 /**
  * Created by Sinthu on 18.08.2016.
@@ -12,8 +12,8 @@ import com.trent.awesomejumper.utils.Utilities;
 public abstract class Renderer {
 
 
-    protected static final Color SHADOW_COLOR = Utilities.color(33,33,33,0.5f);
-    protected static final Color BORDER_COLOR = Utilities.color(50,50,50,0.77f);
+    protected static final Color SHADOW_COLOR = Utils.color(33,33,33,0.5f);
+    protected static final Color BORDER_COLOR = Utils.color(50,50,50,0.77f);
 
     protected SpriteBatch spriteBatch;
     protected OrthographicCamera camera;

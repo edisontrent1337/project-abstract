@@ -185,6 +185,7 @@ public class Graphics extends ModelComponent {
     }
 
 
+    //TODO: documentation !
     private void renderHealthBar(Matrix4 projectionMatrix) {
             Health health = entity.getHealth();
             if (health.getHp() == health.getMaxHp())

@@ -11,10 +11,9 @@ import com.trent.awesomejumper.models.weapons.Weapon;
 import com.trent.awesomejumper.tiles.DefaultTile;
 import com.trent.awesomejumper.tiles.Tile;
 import com.trent.awesomejumper.utils.Interval;
-import com.trent.awesomejumper.utils.Utilities;
+import com.trent.awesomejumper.utils.Utils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -45,6 +44,7 @@ public class RandomLevelGenerator {
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
 
+    private static final String TAG = "LEVEL GENERATOR";
     private Tile[][] levelData;
     private ArrayList<Room> rooms;
     private int levelWidth;
@@ -96,6 +96,9 @@ public class RandomLevelGenerator {
      */
     private final int MAX_INSERTION_TRIES = 1024;
 
+    /**
+     * Minimum distance from world bounds.
+     */
     private final int MIN_BOUNDS_DISTANCE = 11;
 
     /**
@@ -122,7 +125,8 @@ public class RandomLevelGenerator {
     // ---------------------------------------------------------------------------------------------
 
     public RandomLevelGenerator() {
-        Gdx.app.log("LEVEL", "START LOADING LEVEL");
+
+        Utils.log(TAG, "START LOADING LEVEL");
         /**
          * Init seed and level size. The level dimensions must be odd.
          */
@@ -132,8 +136,8 @@ public class RandomLevelGenerator {
         levelWidth = MIN_LEVEL_WIDTH + random.nextInt((MAX_LEVEL_WIDTH - MIN_LEVEL_WIDTH) / 2) * 2 + 1;
         levelHeight = MIN_LEVEL_HEIGHT + random.nextInt((MAX_LEVEL_HEIGHT - MIN_LEVEL_HEIGHT) / 2) * 2 + 1;
 
-        Gdx.app.log("LEVEL", "SEED: " + Long.toString(seed));
-        Gdx.app.log("LEVEL", "DIMENSIONS:" + "w: " + Integer.toString(levelWidth) + " h: "
+        Utils.log(TAG, "SEED: " + Long.toString(seed));
+        Utils.log(TAG, "DIMENSIONS:" +  "width : " + Integer.toString(levelWidth) + " height: "
                 + Integer.toString(levelHeight));
 
         this.levelData = new Tile[levelWidth][levelHeight];
@@ -158,8 +162,7 @@ public class RandomLevelGenerator {
             }
 
         }
-        Gdx.app.log("LEVEL", "INITIALISED LEVEL DATA.");
-
+        Utils.log(TAG, "INITIALISED LEVEL DATA.");
     }
 
 
@@ -1142,8 +1145,8 @@ public class RandomLevelGenerator {
         try {
             return regions[(int) x][(int) y];
         } catch (ArrayIndexOutOfBoundsException e) {
-            Utilities.log("INDEX OUT OF BOUNDS WHILE TRYING TO GATHER THE REGION OF THE FOLLOWING TILE",
-                    Utilities.printVec(x,y));
+            Utils.log("INDEX OUT OF BOUNDS WHILE TRYING TO GATHER THE REGION OF THE FOLLOWING TILE",
+                    Utils.printVec(x,y));
         }
 
         return -1;

@@ -9,6 +9,8 @@ public abstract class ModelComponent {
 
     protected Entity entity;
 
+    protected String TAG;
+
     /**
      * Enum used to identify components of entities.
      */

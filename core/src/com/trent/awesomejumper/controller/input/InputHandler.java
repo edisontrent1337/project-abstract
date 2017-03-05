@@ -8,16 +8,15 @@ import com.trent.awesomejumper.controller.WorldController;
 import com.trent.awesomejumper.controller.rendering.PopUpRenderer;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.entity.EntityInterface;
-import com.trent.awesomejumper.engine.modelcomponents.popups.Message;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.weapons.Weapon;
-import com.trent.awesomejumper.utils.Utilities;
+import com.trent.awesomejumper.utils.Utils;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static com.trent.awesomejumper.utils.PhysicalConstants.ACCELERATION;
-import static com.trent.awesomejumper.utils.Utilities.printVec;
+import static com.trent.awesomejumper.utils.Utils.printVec;
 
 /**
  * InputHandler class. Handles player input regarding the GameScreen.
@@ -122,14 +121,14 @@ public class InputHandler {
     public void dropPressed() {
         if (!keyMap.get(Keys.DROP))
             dropPressed = player.time;
-        Utilities.log("DROP PRESSED", Float.toString(dropPressed));
+        Utils.log("DROP PRESSED", Float.toString(dropPressed));
         keyMap.put(Keys.DROP, true);
 
 
     }
 
     public void dropReleased() {
-        Utilities.log("DROP RELEASED", Float.toString(WorldController.worldTime));
+        Utils.log("DROP RELEASED", Float.toString(WorldController.worldTime));
         dropPressed = 0f;
         keyMap.put(Keys.DROP, false);
     }
@@ -202,9 +201,10 @@ public class InputHandler {
 
         // DROP WEAPON
 
+        //TODO: ADD POPUP WHICH SHOWS TIMINGS FOR DROPPING THE WEAPON
         if (keyMap.get(Keys.DROP) && (WorldController.worldTime - dropPressed > DROP_THRESHOLD)) {
             if (player.getWeaponInventory().isHoldingAWeapon()) {
-                Utilities.log("DROPPED WEAPON");
+                Utils.log("DROPPED WEAPON");
                 player.getWeaponInventory().dropWeapon();
             }
         }

@@ -1,12 +1,13 @@
 package com.trent.awesomejumper.engine.physics;
 
 import com.badlogic.gdx.math.Vector2;
+import com.trent.awesomejumper.engine.entity.Entity;
 
 /**
  * Created by Sinthu on 12.11.2016.
  */
 
-public class Ray {
+public class Ray extends Entity {
 
     private Vector2 start;
     private Vector2 direction;
@@ -37,6 +38,9 @@ public class Ray {
         return direction;
     }
 
+    public void update() {
+
+    }
 
 
 }

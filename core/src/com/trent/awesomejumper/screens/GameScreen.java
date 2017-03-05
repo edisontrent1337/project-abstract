@@ -7,8 +7,8 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.trent.awesomejumper.controller.EntityManager;
-import com.trent.awesomejumper.controller.WorldContainer;
+import com.trent.awesomejumper.controller.entitymanagement.EntityManager;
+import com.trent.awesomejumper.controller.entitymanagement.WorldContainer;
 import com.trent.awesomejumper.controller.assets.AssetLoader;
 import com.trent.awesomejumper.controller.collision.CollisionController;
 import com.trent.awesomejumper.controller.input.InputHandler;
@@ -17,9 +17,6 @@ import com.trent.awesomejumper.controller.WorldController;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.lootable.Lootable;
-import com.trent.awesomejumper.utils.Utilities;
-
-import java.awt.Color;
 
 /**
  * Created by Sinthu on 12.06.2015.

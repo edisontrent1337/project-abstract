@@ -18,7 +18,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.StringBuilder;
-import com.trent.awesomejumper.controller.WorldContainer;
+import com.trent.awesomejumper.controller.entitymanagement.WorldContainer;
 import com.trent.awesomejumper.controller.collision.CollisionController;
 import com.trent.awesomejumper.controller.input.InputHandler;
 import com.trent.awesomejumper.engine.entity.Entity;
@@ -28,14 +28,14 @@ import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.SkyBox;
 import com.trent.awesomejumper.tiles.Tile;
-import com.trent.awesomejumper.utils.Utilities;
+import com.trent.awesomejumper.utils.Utils;
 
 import java.util.EnumMap;
 
 import static com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import static com.trent.awesomejumper.controller.rendering.RenderingEngine.DEBUG_TAGS.*;
 import static com.trent.awesomejumper.engine.modelcomponents.ModelComponent.ComponentID.GRAPHICS;
-import static com.trent.awesomejumper.utils.Utilities.printVec;
+import static com.trent.awesomejumper.utils.Utils.printVec;
 
 
 /**
@@ -104,9 +104,9 @@ public class RenderingEngine extends Renderer {
         DE_POSITION("POS"),
         DE_POS_OFFSET("PAO"),
         DE_CAMERA_POSITION("CAM POSITION"),
-        DE_ENTITY_COUNT("ENTITIY COUNT"),
+        DE_ENTITY_COUNT("ENTITY COUNT"),
         DE_RESOLUTION("RESOLUTION"),
-        DE_CURSOR_POSITION("CURSOUR POS"),
+        DE_CURSOR_POSITION("CURSOR POS"),
         DE_ROOM_REGION("ROOM REGION"),
         DE_ENTITY_INSTANCE_COUNT("ENTITY INSTANCES"),
         DE_PROJECTILE_COUNT("PROJECTILES"),
@@ -555,7 +555,7 @@ public class RenderingEngine extends Renderer {
 
         // CURRENT HASH CELLS OCCUPIED BY PLAYER AND THEIR SIZE
         for (Vector2 index : worldContainer.getSpatialIndexes(player)) {
-            builder.append(Utilities.printVec(index)).append(worldContainer.getHashCellSize(index));
+            builder.append(Utils.printVec(index)).append(worldContainer.getHashCellSize(index));
         }
         setDebugTag(DE_CURRENT_HASH_CELL, builder);
 
@@ -579,7 +579,7 @@ public class RenderingEngine extends Renderer {
         // HASH CELLS FOR THE CURRENT CURSOR POSITION
 
         for (Vector2 index : worldContainer.getSpatialIndexes(worldContainer.getRandomLevelGenerator().getTile(InputHandler.getCursorPosition()))) {
-            builder.append(Utilities.printVec(index));
+            builder.append(Utils.printVec(index));
         }
         setDebugTag(DE_HASH_CELLS_FOR_SELECTION, builder);
 //        setDebugTag(DE_TILES_NEARBY, worldContainer.getTilesNearby(player).size());
@@ -658,10 +658,10 @@ public class RenderingEngine extends Renderer {
         }
         shapeRenderer.end();
 
-
+        /**
+         * Drawing the debug penetration points of ray casting.
+         */
         drawPenetrationPoints();
-
-
 
 
         /**
@@ -705,7 +705,7 @@ public class RenderingEngine extends Renderer {
                     shapeRenderer.rect(index.x, index.y, worldContainer.getSpatialFactor(), worldContainer.getSpatialFactor());
                 }
             }
-            //Utilities.log(String.format("%1d|%2d|%3d%4d", x*spatialSize,y*spatialSize, worldContainer.getSpatialFactor(), worldContainer.getSpatialFactor()));
+            //Utils.log(String.format("%1d|%2d|%3d%4d", x*spatialSize,y*spatialSize, worldContainer.getSpatialFactor(), worldContainer.getSpatialFactor()));
         }
         shapeRenderer.end();
 
