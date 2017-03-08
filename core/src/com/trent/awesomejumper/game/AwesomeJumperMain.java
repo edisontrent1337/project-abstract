@@ -8,10 +8,10 @@ public class AwesomeJumperMain extends Game {
 
     private static boolean debugMode = false;
     private static boolean logging = true;
-    private boolean drawEntities = true;
-    private boolean drawHitboxes = false;
-    private boolean drawInfo = false;
-    private boolean drawBody = false;
+    private static boolean drawEntities = true;
+    private static boolean drawHitboxes = false;
+    private static boolean drawInfo = false;
+    private static boolean drawBody = false;
 
     public AssetManager assetManager = new AssetManager();
 
@@ -24,10 +24,10 @@ public class AwesomeJumperMain extends Game {
         return assetManager;
     }
 
-    public void toggleDebugMode() {debugMode = !debugMode;
+    public static void toggleDebugMode() {debugMode = !debugMode;
     }
 
-    public void toggleLogging() {
+    public static void toggleLogging() {
         logging = !logging;
     }
 
@@ -39,15 +39,15 @@ public class AwesomeJumperMain extends Game {
         return debugMode;
     }
 
-    public void toggleEntities() {
+    public static void toggleEntityDrawing() {
         drawEntities = !drawEntities;
     }
 
-    public void toggleHitboxes() {
+    public static void toggleHitboxDrawing() {
         drawHitboxes = !drawHitboxes;
     }
 
-    public void toggleInfo() {
+    public static void toggleInfoDrawing() {
         drawInfo = !drawInfo;
     }
 

@@ -55,8 +55,8 @@ public class GameScreen implements Screen, InputProcessor {
          */
         worldContainer.initAllEntities();
         controller = new WorldController(worldContainer);
-        inputHandler = new InputHandler(worldContainer.getPlayer(), renderingEngine.getGameCamera());
-        Gdx.input.setInputProcessor(this);
+        inputHandler = new InputHandler(worldContainer, renderingEngine);
+        //Gdx.input.setInputProcessor(this);
     }
 
     @Override
@@ -138,13 +138,13 @@ public class GameScreen implements Screen, InputProcessor {
             game.toggleDebugMode();
         }
         if (keycode == Keys.P) {
-            game.toggleEntities();
+            game.toggleEntityDrawing();
         }
         if (keycode == Keys.H) {
-            game.toggleHitboxes();
+            game.toggleHitboxDrawing();
         }
         if (keycode == Keys.I) {
-            game.toggleInfo();
+            game.toggleInfoDrawing();
         }
         if (keycode == Keys.B) {
             game.toggleBody();

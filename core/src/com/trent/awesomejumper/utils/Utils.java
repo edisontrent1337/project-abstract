@@ -217,4 +217,31 @@ public class Utils {
     public static void log(String title, int i) {
         log(title, Integer.toString(i));
     }
+
+
+    // TUPLE CLASS
+    // ---------------------------------------------------------------------------------------------
+
+    public static class Pair<L,R> {
+
+        private L l;
+        private R r;
+
+
+        public Pair(L l, R r) {
+            this.l = l;
+            this.r = r;
+        }
+
+        public L getL() {
+            return l;
+        }
+
+        public R getR() {
+            return r;
+        }
+
+    }
+
+
 }

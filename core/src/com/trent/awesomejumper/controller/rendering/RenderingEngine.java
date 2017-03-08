@@ -411,7 +411,7 @@ public class RenderingEngine extends Renderer {
 
             }
 
-            if (game.onDebugMode()) {
+            else if (game.onDebugMode()) {
                 spriteBatch.end();
                 shapeRenderer.setProjectionMatrix(camera.combined);
                 shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
@@ -794,5 +794,7 @@ public class RenderingEngine extends Renderer {
         ppuX = Gdx.graphics.getWidth() / (CAMERA_WIDTH * camera.zoom);
         ppuY = Gdx.graphics.getHeight() / (CAMERA_HEIGHT * camera.zoom);
     }
+
+
 
 }

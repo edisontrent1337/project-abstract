@@ -464,7 +464,7 @@ public class WorldContainer {
     public ArrayList<Tile> getTilesToBeRendered(Vector2 cameraPosition, float camW, float camH) {
 
         // GET CURRENT FOV COORDINATES AND ONLY RENDER WHAT THE PLAYER SEES
-        // BOTTOM LEFT CORNER
+        // BOTTOM MOVE_LEFT CORNER
         int fovStartX = (int) (cameraPosition.x - camW / 2 - 1);
         int fovStartY = (int) (cameraPosition.y - camH / 2 - 1);
 
