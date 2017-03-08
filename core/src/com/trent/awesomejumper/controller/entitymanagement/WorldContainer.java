@@ -376,19 +376,31 @@ public class WorldContainer {
         while (getTilesForCell(currentCell).isEmpty()) {
             List<Float> coefficients = new ArrayList<>();
             // Choose the last penetration point as the starting point
-            float startX = penetrationPoints.get(penetrationPoints.size() - 1).x;
-            float startY = penetrationPoints.get(penetrationPoints.size() - 1).y;
+            float lastPenetrationX = penetrationPoints.get(penetrationPoints.size() - 1).x;
+            float lastPenetrationY = penetrationPoints.get(penetrationPoints.size() - 1).y;
 
-            // get the indices for the next hashing cells adjacent to the current one with regards to the ray direction.
+            // Get the indices for the next hashing cells adjacent to the current one with regards
+            // to the ray direction.
             Vector2 nextXCell = getSpatialIndex(currentCell.x + signX * SPATIAL_HASH_GRID_SIZE, currentCell.y);
             Vector2 nextYCell = getSpatialIndex(currentCell.x, currentCell.y + signY * SPATIAL_HASH_GRID_SIZE);
 
-            // if we start from an x position on the hash grid,
-            //TODO: ADD nextXCell instead of long expression
-            float tCurrentX = (currentCell.x == startX)  ? (currentCell.x + signX*SPATIAL_HASH_GRID_SIZE) / deltaX : (currentCell.x - startX) / deltaX;
-            float tCurrentY = (currentCell.y == startY)  ? (currentCell.y + signY*SPATIAL_HASH_GRID_SIZE) / deltaY : (currentCell.y - startY) / deltaY;
-            float tNextX = (nextXCell.x - startX) / deltaX;
-            float tNextY = (nextYCell.y - startY) / deltaY;
+            // TODO: figure out how to get the edges of the bounding boxes to generate rays with
+            // the length of a specific edge.
+            Vector2 nextBounds = new Vector2();
+
+            /**
+             * Calculates the "steps" it takes to get from the last penetration point
+             * to the next neighbouring cell.
+             *
+             * If the last penetration point lays on the x/y position of the current cell,
+             * move to the next cell in x or y direction respectively. Otherwise, choose the
+             * current cell's x or y position to calculate the distance from the last penetration
+             * point.
+             **/
+            float tCurrentX = (currentCell.x == lastPenetrationX)  ? (nextXCell.x) / deltaX : (currentCell.x - lastPenetrationX) / deltaX;
+            float tCurrentY = (currentCell.y == lastPenetrationY)  ? (nextYCell.y) / deltaY : (currentCell.y - lastPenetrationY) / deltaY;
+            float tNextX = (nextXCell.x - lastPenetrationX) / deltaX;
+            float tNextY = (nextYCell.y - lastPenetrationY) / deltaY;
 
             //Penetration points in ray direction, but behind the player are not what we are looking for
             if(tCurrentX > 0)
@@ -399,23 +411,16 @@ public class WorldContainer {
             coefficients.add(tNextX);
             coefficients.add(tNextY);
 
-            float closestIntersection = Float.MAX_VALUE;
-
-            for(float f : coefficients) {
-                if(Math.abs(f) < Math.abs(closestIntersection)) {
-                    closestIntersection = f;
-                }
-            }
-
+            float closestIntersection = Collections.min(coefficients);
 
             Vector2 penetrationPoint;
             int time = (int) WorldController.worldTime;
 
-            penetrationPoint = new Vector2(startX + closestIntersection * deltaX, startY + closestIntersection * deltaY);
+            penetrationPoint = new Vector2(lastPenetrationX + closestIntersection * deltaX, lastPenetrationY + closestIntersection * deltaY);
             penetrationPoints.add(penetrationPoint);
             if (time % 5 == 0) {
 
-                PopUpRenderer.getInstance().addMessageToCategory(PopUpRenderer.PopUpCategories.HEAL, new Message(penetrationPoint.toString(), penetrationPoint, time, 5));
+                PopUpRenderer.getInstance().addMessageToCategory(PopUpRenderer.PopUpCategories.HEAL, new Message(penetrationPoint.toString(), penetrationPoint, time, PopUpRenderer.INFINITE_MESSAGE));
             }
 
             if (closestIntersection == tNextX || closestIntersection == tCurrentX) {

@@ -23,6 +23,7 @@ import static com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.*;
  * Does not depend on entity or event that creates the popup.
  * Better implementation than the previous popup component as the popup rendering was tied to the
  * existence of the entity.
+ * Implemented as a singleton with a static global access point for other classes.
  * TODO: GIVE POPUP ITS OWN FONT
  * Created by Sinthu on 30.03.2016.
  */
@@ -34,6 +35,7 @@ public class PopUpRenderer extends Renderer {
     private final float CRT_AMP = 12f;
     private final float CRT_FREQ = 25f;
 
+    public static final float INFINITE_MESSAGE = -1.0f;
 
     private static PopUpRenderer instance = null;
 
@@ -110,6 +112,14 @@ public class PopUpRenderer extends Renderer {
                 for (Iterator<Message> it = messageList.iterator(); it.hasNext(); ) {
                     Message message = it.next(); // get the current message
                     float progress = (time - message.getTimeStamp()) / message.getDuration();
+
+                    /**
+                     * If we want to display a message infinitely long, the progress wont change.
+                     * It will always stay at 0.
+                     */
+                    if(message.getDuration() == INFINITE_MESSAGE)
+                        progress = 0;
+
                     /**
                      * If the messages timeStamp is older than its duration, it will get removed
                      * from the message list.

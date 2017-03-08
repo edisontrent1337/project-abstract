@@ -115,7 +115,7 @@ public class RenderingEngine extends Renderer {
         DE_LIVING_ENTITY_COUNT("LIVING ENTITIES"),
         DE_COLLISION_CHECKS("CD CHECKS PER FRAME"),
         DE_NUMBER_OF_TILES("NUMBER OF LEVEL TILES"),
-        DE_CURRENT_HASH_CELL("CURRENT HASH CELL"),
+        DE_CURRENT_HASH_CELL("PLAYER CURRENT HASH CELLS"),
         DE_ENTITIES_NEARBY("ENTITIES NEARBY"),
         DE_TILES_NEARBY("TILES NEARBY"),
         DE_HASH_CELLS_FOR_SELECTION("HASH CELLS FOR MOUSE POSITION"),
@@ -123,7 +123,7 @@ public class RenderingEngine extends Renderer {
         DE_RAY_DIRECTION("RAY DIRECTION"),
         DE_RAY_START("RAY START"),
         DE_RAY_END("RAY_END"),
-
+        DE_TIME("TIME"),
         DE_LOGGING("LOGGING");
 
         private String tag;
@@ -164,6 +164,8 @@ public class RenderingEngine extends Renderer {
         camPositionInPx = new Vector2(0, 0);
         this.allTextures = new TextureAtlas();
         this.debugTags = new EnumMap<>(DEBUG_TAGS.class);
+
+        // init the debug tag enum map
         for (DEBUG_TAGS c : DEBUG_TAGS.values()) {
             debugTags.put(c, c.tag);
         }
@@ -582,15 +584,13 @@ public class RenderingEngine extends Renderer {
             builder.append(Utils.printVec(index));
         }
         setDebugTag(DE_HASH_CELLS_FOR_SELECTION, builder);
-//        setDebugTag(DE_TILES_NEARBY, worldContainer.getTilesNearby(player).size());
-
 
         // RAY CASTING
-        setDebugTag(DE_RAY_START, "" + worldContainer.getPlayer().getWeaponInventory().getSelectedWeapon().getBody().getCenter());
+        setDebugTag(DE_RAY_START, "" + player.getWeaponInventory().getSelectedWeapon().getBody().getCenter());
 
-        setDebugTag(DE_RAY_DIRECTION, "" + worldContainer.getPlayer().getBody().getOrientation().cpy().nor());
+        setDebugTag(DE_RAY_DIRECTION, "" + player.getBody().getOrientation().cpy().nor());
 
-        // setDebugTag(DE_RAY_END, ""+worldContainer.generateCrossedIndexes(worldContainer.getPlayer().getWeaponInventory().getSelectedWeapon().getBody().getCenter().cpy(), worldContainer.getPlayer().getBody().getOrientation().cpy()));
+        setDebugTag(DE_RAY_END, ""+ worldContainer.generateCrossedIndexes(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter().cpy(), player.getBody().getOrientation().cpy()));
 
 
         // LOGGING

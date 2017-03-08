@@ -12,8 +12,12 @@ import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.weapons.Weapon;
 import com.trent.awesomejumper.utils.Utils;
 
+import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import static com.trent.awesomejumper.utils.PhysicalConstants.ACCELERATION;
 import static com.trent.awesomejumper.utils.Utils.printVec;
@@ -35,23 +39,24 @@ public class InputHandler {
         MOUSE2,
         RELOAD,
         DROP,
+        CLEAR_MESSAGES,
         PICKUP
     }
 
     private Player player;
-    static Map<Keys, Boolean> keyMap = new HashMap<>();
+    static Map<Keys, Boolean> keyMap = new EnumMap<>(Keys.class);
 
+    /**
+     * Initialization of the keyMap in a static block so that it is immediately ready to use.
+     * All keys are set to false (not pressed) in the beginning.
+     */
     static {
-        keyMap.put(Keys.UP, false);
-        keyMap.put(Keys.DOWN, false);
-        keyMap.put(Keys.LEFT, false);
-        keyMap.put(Keys.RIGHT, false);
-        keyMap.put(Keys.MOUSE1, false);
-        keyMap.put(Keys.MOUSE2, false);
-        keyMap.put(Keys.RELOAD, false);
-        keyMap.put(Keys.DROP, false);
-        keyMap.put(Keys.PICKUP, false);
+        for(Keys k : Keys.values()) {
+            keyMap.put(k,false);
+        }
+
     }
+
 
 
     public static Vector2 mouse = new Vector2(0f, 0f);
@@ -85,6 +90,8 @@ public class InputHandler {
     // BUTTON PRESSING METHODS
     // ---------------------------------------------------------------------------------------------
 
+
+    //TODO: change this to one method. BETTER: move input processor to here!
     public void leftPressed() {
         keyMap.put(Keys.LEFT, true);
     }
@@ -101,7 +108,7 @@ public class InputHandler {
         keyMap.put(Keys.DOWN, true);
     }
 
-
+    //TODO: change these to one single method.
     public void leftReleased() {
         keyMap.put(Keys.LEFT, false);
     }
@@ -118,13 +125,28 @@ public class InputHandler {
         keyMap.put(Keys.DOWN, false);
     }
 
+    private boolean isPressed(Keys k) {
+        return keyMap.get(k);
+    }
+
+    //TODO: implement this.
+    public HashSet<Keys> getPressedKeys() {
+
+        HashSet<Keys> pressedKeys = new HashSet<>();
+
+        for(Keys key : Keys.values()) {
+            if(keyMap.get(key))
+                pressedKeys.add(key);
+        }
+       return pressedKeys;
+    }
+
     public void dropPressed() {
+        // Should only trigger once.
         if (!keyMap.get(Keys.DROP))
             dropPressed = player.time;
         Utils.log("DROP PRESSED", Float.toString(dropPressed));
         keyMap.put(Keys.DROP, true);
-
-
     }
 
     public void dropReleased() {
@@ -145,7 +167,7 @@ public class InputHandler {
         keyMap.put(Keys.PICKUP, false);
     }
 
-
+    //TODO: test and finish implementing this.
     public void changeWeapon(int direction) {
         // Resetting the drop pressed time prevents dropping weapons right after selecting them.
         dropPressed = player.time;

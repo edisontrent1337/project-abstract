@@ -54,6 +54,7 @@ public class EntityManager {
     /**
      * Adds the entity to all relevant collections. Decides with the help of the entities type
      * to which collections the entity should be added.
+     * Calls initGraphics on the rendering engine to initialize the entities graphics component.
      */
 
     /**
