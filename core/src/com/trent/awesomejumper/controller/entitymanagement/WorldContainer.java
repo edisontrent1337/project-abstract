@@ -2,11 +2,8 @@ package com.trent.awesomejumper.controller.entitymanagement;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
-import com.trent.awesomejumper.controller.WorldController;
 import com.trent.awesomejumper.controller.levelgeneration.RandomLevelGenerator;
-import com.trent.awesomejumper.controller.rendering.PopUpRenderer;
 import com.trent.awesomejumper.engine.entity.Entity;
-import com.trent.awesomejumper.engine.modelcomponents.popups.Message;
 import com.trent.awesomejumper.engine.physics.Ray;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.Player;
@@ -414,14 +411,8 @@ public class WorldContainer {
             float closestIntersection = Collections.min(coefficients);
 
             Vector2 penetrationPoint;
-            int time = (int) WorldController.worldTime;
-
             penetrationPoint = new Vector2(lastPenetrationX + closestIntersection * deltaX, lastPenetrationY + closestIntersection * deltaY);
             penetrationPoints.add(penetrationPoint);
-            if (time % 5 == 0) {
-
-                PopUpRenderer.getInstance().addMessageToCategory(PopUpRenderer.PopUpCategories.HEAL, new Message(penetrationPoint.toString(), penetrationPoint, time, PopUpRenderer.INFINITE_MESSAGE));
-            }
 
             if (closestIntersection == tNextX || closestIntersection == tCurrentX) {
                 coveredIndexes.add(nextXCell);

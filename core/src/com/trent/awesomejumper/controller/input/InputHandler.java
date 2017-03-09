@@ -1,16 +1,19 @@
 package com.trent.awesomejumper.controller.input;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.sun.org.apache.regexp.internal.RE;
 import com.trent.awesomejumper.controller.WorldController;
 import com.trent.awesomejumper.controller.entitymanagement.WorldContainer;
+import com.trent.awesomejumper.controller.rendering.PopUpRenderer;
 import com.trent.awesomejumper.controller.rendering.RenderingEngine;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.entity.EntityInterface;
+import com.trent.awesomejumper.engine.modelcomponents.popups.Message;
+import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.weapons.Weapon;
 import com.trent.awesomejumper.utils.Utils;
@@ -19,12 +22,25 @@ import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import static com.badlogic.gdx.Input.Buttons;
+import static com.badlogic.gdx.Input.Keys;
+import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.CLEAR_POPUPS;
+import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.DROP;
+import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.FULLSCREEN;
 import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.MOUSE1;
+import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.MOVE_DOWN;
+import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.MOVE_LEFT;
+import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.MOVE_RIGHT;
+import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.MOVE_UP;
+import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.PICKUP;
 import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.RELOAD;
+import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.SHOW_PENETRATION_POINTS;
+import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.TOGGLE_BODY_DRAWING;
+import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.TOGGLE_DEBUG;
+import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.TOGGLE_ENTITY_DRAWING;
+import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.TOGGLE_HITBOX_DRAWING;
+import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.TOGGLE_INFO_DRAWING;
 import static com.trent.awesomejumper.utils.PhysicalConstants.ACCELERATION;
-import static com.badlogic.gdx.Input.*;
-
-import static com.trent.awesomejumper.utils.Utils.printVec;
 
 /**
  * InputHandler class. Handles player input regarding the GameScreen.
@@ -43,24 +59,51 @@ public class InputHandler implements InputProcessor {
         MOVE_RIGHT(Keys.D),
         MOUSE1(Buttons.LEFT),
         MOUSE2(Buttons.RIGHT),
-        RELOAD(Keys.R),
-        DROP(Keys.Q),
-        CLEAR_MESSAGES(Keys.C),
+        RELOAD(Keys.R,true),
+        DROP(Keys.Q, true, 1.25f),
         PICKUP(Keys.SPACE),
+        FULLSCREEN(Keys.F11, true),
 
 
         //DEBUGGING KEYS
-        TOGGLE_DEBUG(Keys.T),
-        TOGGLE_ENTITY_DRAWING(Keys.P),
-        TOGGLE_HITBOX_DRAWING(Keys.H),
-        TOGGLE_INFO_DRAWING(Keys.I),
-        TOGGLE_BODY_DRAWING(Keys.B),
+        TOGGLE_DEBUG(Keys.T,true),
+        TOGGLE_ENTITY_DRAWING(Keys.P,true),
+        TOGGLE_HITBOX_DRAWING(Keys.H,true),
+        TOGGLE_INFO_DRAWING(Keys.I,true),
+        TOGGLE_BODY_DRAWING(Keys.B,true),
+        CLEAR_POPUPS(Keys.C, true),
+        TOGGLE_SPECIAL(Keys.U,true),
+        SHOW_PENETRATION_POINTS(Keys.V, true),
         ;
 
 
         public final int keyCode;
+        public final boolean isToggleBind;
+        public final boolean isHoldBind;
+        public float timePressed = 0f;
+        public float threshold = 1.00f;
         KeyBindings(int keyCode) {
             this.keyCode = keyCode;
+            this.isToggleBind = false;
+            this.isHoldBind = false;
+        }
+
+        // Constructor for keys that should act like toggle keys e.g. toggle certain functionality.
+        // Those bindings are only processed a single time per key press.
+        KeyBindings(int keyCode, boolean isToggleBind) {
+            this.keyCode = keyCode;
+            this.isToggleBind = isToggleBind;
+            this.isHoldBind = false;
+        }
+
+        // Constructor for keys that should act like keys that have to be held a certain amount
+        // of time to toggle certain functionality.
+        // Every frame, it is checked, whether or not the key was held long enough to trigger an action
+        KeyBindings(int keyCode, boolean isHoldBind, float threshold) {
+            this.keyCode = keyCode;
+            this.isToggleBind = false;
+            this.isHoldBind = isHoldBind;
+            this.threshold = threshold;
         }
     }
 
@@ -69,7 +112,6 @@ public class InputHandler implements InputProcessor {
     private RenderingEngine renderingEngine;
     static Map<KeyBindings, Boolean> pressedKeysMap = new EnumMap<>(KeyBindings.class);
 
-    //Utils.Pair<Integer, Boolean> p = new Utils.Pair(1,false);
     /**
      * Initialization of the pressedKeysMap in a static block so that it is immediately ready to use.
      * All keys are set to false (not pressed) in the beginning.
@@ -105,10 +147,8 @@ public class InputHandler implements InputProcessor {
         this.player = worldContainer.getPlayer();
         this.camera = renderingEngine.getGameCamera();
         this.mouse = new Vector2(0f, 0f);
-        player.getBody().setAimReference(mouse);
 
         temp = new Vector3();
-        Gdx.input.setInputProcessor(this);
     }
 
 
@@ -116,42 +156,12 @@ public class InputHandler implements InputProcessor {
     // ---------------------------------------------------------------------------------------------
 
 
-    //TODO: change this to one method. BETTER: move input processor to here!
-    public void leftPressed() {
-        pressedKeysMap.put(KeyBindings.MOVE_LEFT, true);
+    private boolean isPressed(KeyBindings binding) {
+        return pressedKeysMap.get(binding);
     }
 
-    public void upPressed() {
-        pressedKeysMap.put(KeyBindings.MOVE_UP, true);
-    }
-
-    public void rightPressed() {
-        pressedKeysMap.put(KeyBindings.MOVE_RIGHT, true);
-    }
-
-    public void downPressed() {
-        pressedKeysMap.put(KeyBindings.MOVE_DOWN, true);
-    }
-
-    //TODO: change these to one single method.
-    public void leftReleased() {
-        pressedKeysMap.put(KeyBindings.MOVE_LEFT, false);
-    }
-
-    public void upReleased() {
-        pressedKeysMap.put(KeyBindings.MOVE_UP, false);
-    }
-
-    public void rightReleased() {
-        pressedKeysMap.put(KeyBindings.MOVE_RIGHT, false);
-    }
-
-    public void downReleased() {
-        pressedKeysMap.put(KeyBindings.MOVE_DOWN, false);
-    }
-
-    private boolean isPressed(KeyBindings k) {
-        return pressedKeysMap.get(k);
+    private boolean isPressed(KeyBindings[] k) {
+        return false;
     }
 
     //TODO: implement this.
@@ -160,48 +170,19 @@ public class InputHandler implements InputProcessor {
         HashSet<KeyBindings> pressedKeys = new HashSet<>();
 
         for(KeyBindings key : KeyBindings.values()) {
-            if(pressedKeysMap.get(key))
+            if(isPressed(key))
                 pressedKeys.add(key);
         }
        return pressedKeys;
     }
 
-    public void dropPressed() {
-        // Should only trigger once.
-        if (!pressedKeysMap.get(KeyBindings.DROP))
-            dropPressed = player.time;
-        Utils.log("DROP PRESSED", Float.toString(dropPressed));
-        pressedKeysMap.put(KeyBindings.DROP, true);
-    }
 
-    public void dropReleased() {
-        Utils.log("DROP RELEASED", Float.toString(WorldController.worldTime));
-        dropPressed = 0f;
-        pressedKeysMap.put(KeyBindings.DROP, false);
-    }
-
-    public void fire() {
-        player.getWeaponInventory().fire();
-    }
-
-    public void pickUpPressed() {
-        pressedKeysMap.put(KeyBindings.PICKUP, true);
-    }
-
-    public void pickUpReleased() {
-        pressedKeysMap.put(KeyBindings.PICKUP, false);
-    }
 
     //TODO: test and finish implementing this.
     public void changeWeapon(int direction) {
         // Resetting the drop pressed time prevents dropping weapons right after selecting them.
         dropPressed = player.time;
         player.getWeaponInventory().changeWeapon(direction);
-    }
-
-
-    public void reload() {
-        player.getWeaponInventory().reload();
     }
 
 
@@ -219,12 +200,10 @@ public class InputHandler implements InputProcessor {
          *
          */
 
-        if(isPressed(RELOAD))
-            player.getWeaponInventory().reload();
 
-        // PICK MOVE_UP WEAPON
+        // PICK UP WEAPON
 
-        if (pressedKeysMap.get(KeyBindings.PICKUP)) {
+        if (isPressed(PICKUP)) {
 
             float mindst = Float.MAX_VALUE;
             float dst = 0;
@@ -253,7 +232,7 @@ public class InputHandler implements InputProcessor {
 
         //TODO: ADD POPUP WHICH SHOWS TIMINGS FOR DROPPING THE WEAPON
         //TODO: MOVE TIMINGS INTO dropWeapon() method
-        if (pressedKeysMap.get(KeyBindings.DROP) && (WorldController.worldTime - dropPressed > DROP_THRESHOLD)) {
+        if (isPressed(DROP) && (WorldController.worldTime - DROP.timePressed > DROP.threshold)) {
             if (player.getWeaponInventory().isHoldingAWeapon()) {
                 Utils.log("DROPPED WEAPON");
                 player.getWeaponInventory().dropWeapon();
@@ -266,30 +245,32 @@ public class InputHandler implements InputProcessor {
         mouse.x = temp.x;
         mouse.y = temp.y;
 
-        // WALKING MOVE_UP
+        // WALKING UP
 
-        if (pressedKeysMap.get(KeyBindings.MOVE_UP) & !(pressedKeysMap.get(KeyBindings.MOVE_DOWN) || pressedKeysMap.get(KeyBindings.MOVE_RIGHT) || pressedKeysMap.get(KeyBindings.MOVE_LEFT))) {
+        if (isPressed(MOVE_UP) & !(isPressed(MOVE_DOWN) || isPressed(MOVE_RIGHT) || isPressed(MOVE_LEFT))) {
             player.setState(Entity.State.WALKING);
             player.setAccelY(ACCELERATION);
             player.setAccelX(0f);
+            Utils.log("WALKING UP");
         }
+
         // WALKING MOVE_DOWN
-        else if (pressedKeysMap.get(KeyBindings.MOVE_DOWN) & !(pressedKeysMap.get(KeyBindings.MOVE_UP) || pressedKeysMap.get(KeyBindings.MOVE_RIGHT) || pressedKeysMap.get(KeyBindings.MOVE_LEFT))) {
+        else if (isPressed(MOVE_DOWN) & !(isPressed(MOVE_UP) || isPressed(MOVE_RIGHT) || isPressed(MOVE_LEFT))) {
             player.setState(Entity.State.WALKING);
             player.setAccelY(-ACCELERATION);
             player.setAccelX(0f);
         }
 
         // WALKING RIGHT
-        else if (pressedKeysMap.get(KeyBindings.MOVE_RIGHT) & !(pressedKeysMap.get(KeyBindings.MOVE_LEFT) || pressedKeysMap.get(KeyBindings.MOVE_UP) || pressedKeysMap.get(KeyBindings.MOVE_DOWN))) {
+        else if (isPressed(MOVE_RIGHT) &!(isPressed(MOVE_LEFT) || isPressed(MOVE_UP) || isPressed(MOVE_DOWN))) {
             player.setFacingL(false);
             player.setState(Entity.State.WALKING);
             player.setAccelX(ACCELERATION);
             player.setAccelY(0f);
         }
 
-        // WALKING MOVE_LEFT
-        else if (pressedKeysMap.get(KeyBindings.MOVE_LEFT) & !(pressedKeysMap.get(KeyBindings.MOVE_RIGHT) || pressedKeysMap.get(KeyBindings.MOVE_UP) || pressedKeysMap.get(KeyBindings.MOVE_DOWN))) {
+        // WALKING LEFT
+        else if (isPressed(MOVE_LEFT) &! (isPressed(MOVE_RIGHT) || isPressed(MOVE_UP) || isPressed(MOVE_DOWN))) {
             player.setFacingL(true);
             player.setState(Entity.State.WALKING);
             player.setAccelX(-ACCELERATION);
@@ -297,38 +278,37 @@ public class InputHandler implements InputProcessor {
 
         }
 
-        // WALKING MOVE_UP RIGHT
-        else if (pressedKeysMap.get(KeyBindings.MOVE_UP) && pressedKeysMap.get(KeyBindings.MOVE_RIGHT) & !(pressedKeysMap.get(KeyBindings.MOVE_DOWN) || pressedKeysMap.get(KeyBindings.MOVE_LEFT))) {
+        // WALKING UP RIGHT
+        else if (isPressed(MOVE_UP) && isPressed(MOVE_RIGHT) &!(isPressed(MOVE_DOWN) || isPressed(MOVE_LEFT))) {
             player.setFacingL(false);
             player.setState(Entity.State.WALKING);
             player.setAccelX(ACCELERATION);
             player.setAccelY(ACCELERATION);
         }
 
-        // WALKING MOVE_UP MOVE_LEFT
-        else if (pressedKeysMap.get(KeyBindings.MOVE_UP) && pressedKeysMap.get(KeyBindings.MOVE_LEFT) & !(pressedKeysMap.get(KeyBindings.MOVE_DOWN) || pressedKeysMap.get(KeyBindings.MOVE_RIGHT))) {
+        // WALKING UP LEFT
+        else if (isPressed(MOVE_UP) && isPressed(MOVE_LEFT) &!(isPressed(MOVE_DOWN) || isPressed(MOVE_RIGHT))) {
             player.setFacingL(true);
             player.setState(Entity.State.WALKING);
             player.setAccelX(-ACCELERATION);
             player.setAccelY(ACCELERATION);
         }
 
-        // WALKING MOVE_DOWN RIGHT
-        else if (pressedKeysMap.get(KeyBindings.MOVE_DOWN) && pressedKeysMap.get(KeyBindings.MOVE_RIGHT) & !(pressedKeysMap.get(KeyBindings.MOVE_UP) || pressedKeysMap.get(KeyBindings.MOVE_LEFT))) {
+        // WALKING DOWN RIGHT
+        else if (isPressed(MOVE_DOWN) && isPressed(MOVE_RIGHT) &!(isPressed(MOVE_UP) || isPressed(MOVE_LEFT))) {
             player.setFacingL(false);
             player.setState(Entity.State.WALKING);
             player.setAccelX(ACCELERATION);
             player.setAccelY(-ACCELERATION);
         }
 
-        // WALKING MOVE_DOWN MOVE_LEFT
-        else if (pressedKeysMap.get(KeyBindings.MOVE_DOWN) && pressedKeysMap.get(KeyBindings.MOVE_LEFT) & !(pressedKeysMap.get(KeyBindings.MOVE_UP) || pressedKeysMap.get(KeyBindings.MOVE_RIGHT))) {
+        // WALKING DOWN LEFT
+        else if (isPressed(MOVE_DOWN) && isPressed(MOVE_LEFT) &!(isPressed(MOVE_UP) || isPressed(MOVE_RIGHT))) {
             player.setFacingL(true);
             player.setState(Entity.State.WALKING);
             player.setAccelX(-ACCELERATION);
             player.setAccelY(-ACCELERATION);
         }
-
 
         // IDLE
         else {
@@ -336,7 +316,6 @@ public class InputHandler implements InputProcessor {
             player.setAccelX(0f);
             player.setAccelY(0f);
         }
-
     }
 
 
@@ -345,13 +324,37 @@ public class InputHandler implements InputProcessor {
      * is one that has been bound to do something. This will trigger a corresponding method in the
      * update() method.
      * @param keycode integer keyCode by libgdx
-     * @return false
+     * @return true, when the input was processed, false otherwise
      */
     @Override
     public boolean keyDown(int keycode) {
         for(KeyBindings binding : pressedKeysMap.keySet()) {
-            if(binding.keyCode == keycode)
-                pressedKeysMap.put(binding,true);
+            if(binding.keyCode == keycode) {
+                // If the binding is a key that toggles specific functionality,
+                // the toggling is triggered right here once, and not multiple
+                // times in the update loop.
+                if(binding.isToggleBind) {
+                    pressedKeysMap.put(binding, true);
+                    Utils.log("KEYS DOWN", pressedKeysMap.toString());
+                    processToggleInput();
+                    pressedKeysMap.put(binding,false);
+                    return true;
+                }
+
+                else if(binding.isHoldBind) {
+                    timeInputPressed(binding);
+                    Utils.log("KEYS DOWN", pressedKeysMap.toString());
+                    return true;
+
+                }
+                else {
+                    pressedKeysMap.put(binding, true);
+                    Utils.log("KEYS DOWN", pressedKeysMap.toString());
+                    return true;
+                }
+
+            }
+
         }
         return false;
     }
@@ -361,14 +364,20 @@ public class InputHandler implements InputProcessor {
      * is one that has been bound to do something. This will trigger a corresponding method in the
      * update() method.
      * @param keycode integer keyCode by libgdx
-     * @return false
+     * @return true, when the input was processed, false otherwise
      */
     @Override
     public boolean keyUp(int keycode) {
         for(KeyBindings binding : pressedKeysMap.keySet()) {
             if(binding.keyCode == keycode) {
-                pressedKeysMap.put(binding,false);
+                pressedKeysMap.put(binding, false);
+                Utils.log("KEYS UP", pressedKeysMap.toString());
+                if(binding.isHoldBind) {
+                    timeInputReleased(binding);
+                }
+
             }
+
         }
         return false;
     }
@@ -408,11 +417,76 @@ public class InputHandler implements InputProcessor {
 
     @Override
     public boolean scrolled(int amount) {
+
+        changeWeapon(amount);
         return false;
     }
 
 
+    /**
+     * Registers the point in time a button was pressed.
+     * @param binding key we are interested in.
+     */
+    private void timeInputPressed(KeyBindings binding) {
+        if(!isPressed(binding)) {
+            binding.timePressed = player.time;
+            PopUpRenderer.getInstance().addMessageToCategory(PopUpRenderer.PopUpCategories.HEAL, new Message(Float.toString(binding.timePressed), player.getPosition(), WorldController.worldTime, binding.threshold));
+            pressedKeysMap.put(binding,true);
+        }
+    }
 
+    /**
+     * Registers the point in time a button was released.
+     * @param binding key we are interested in.
+     */
+    private void timeInputReleased(KeyBindings binding) {
+        PopUpRenderer.getInstance().addMessageToCategory(PopUpRenderer.PopUpCategories.DMG, new Message(Float.toString(WorldController.worldTime), player.getPosition(), WorldController.worldTime, binding.threshold));
+        pressedKeysMap.put(binding,false);
+    }
+
+
+    /**
+     * Processes all input that has toggle character. That means single button presses
+     * which should only once trigger an action.
+     */
+    private void processToggleInput() {
+
+        // DEBUG TOGGLE BUTTONS
+        if(isPressed(TOGGLE_DEBUG))
+            AwesomeJumperMain.toggleDebugMode();
+        if(AwesomeJumperMain.onDebugMode()) {
+            if (isPressed(TOGGLE_ENTITY_DRAWING))
+                AwesomeJumperMain.toggleEntityDrawing();
+            if (isPressed(TOGGLE_BODY_DRAWING))
+                AwesomeJumperMain.toggleBodyDrawing();
+            if (isPressed(TOGGLE_HITBOX_DRAWING))
+                AwesomeJumperMain.toggleHitboxDrawing();
+            if (isPressed(TOGGLE_INFO_DRAWING))
+                AwesomeJumperMain.toggleHitboxDrawing();
+            if (isPressed(CLEAR_POPUPS))
+                PopUpRenderer.getInstance().clear();
+            if (isPressed(SHOW_PENETRATION_POINTS)) {
+                for (Vector2 penetrationPoint : worldContainer.getPenetrationPoints()) {
+                    PopUpRenderer.getInstance().addMessageToCategory(PopUpRenderer.PopUpCategories.HEAL, new Message(penetrationPoint.toString(), penetrationPoint, WorldController.worldTime, PopUpRenderer.INFINITE_MESSAGE));
+                }
+            }
+        }
+        // RELOAD
+        // acts like toggling a button, pressed once and processed only once
+        if(isPressed(RELOAD)) {
+            Utils.log("RELOADING.");
+            player.getWeaponInventory().reload();
+        }
+
+        if(isPressed(FULLSCREEN)) {
+            Graphics.DisplayMode mode = Gdx.graphics.getDisplayMode();
+            if(Gdx.graphics.isFullscreen())
+                Gdx.graphics.setWindowedMode(mode.width,mode.height);
+            else
+                Gdx.graphics.setFullscreenMode(mode);
+        }
+
+    }
 
     // GETTER & SETTER
     // ---------------------------------------------------------------------------------------------

@@ -739,8 +739,11 @@ public class RenderingEngine extends Renderer {
 
     private void drawPenetrationPoints() {
 
+        if(!player.getWeaponInventory().isHoldingAWeapon())
+            return;
+
         worldContainer.generateCrossedIndexes(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter().cpy(),
-                player.getWeaponInventory().getSelectedWeapon().getBody().getOrientation().cpy());
+                    player.getWeaponInventory().getSelectedWeapon().getBody().getOrientation().cpy());
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         Gdx.gl.glEnable(GL20.GL_BLEND);

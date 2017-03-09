@@ -15,7 +15,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
-import static com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.*;
+import static com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 
 /**
  * Manager class responsible for holding information about small messages ("popups") which have to be rendered.
@@ -195,7 +195,7 @@ public class PopUpRenderer extends Renderer {
     /**
      *
      */
-    public void loadTexturesAndFonts(FreeTypeFontGenerator generator) {
+    protected void loadTexturesAndFonts(FreeTypeFontGenerator generator) {
         FreeTypeFontParameter popUpParams = new FreeTypeFontParameter();
         popUpParams.size = 24;
         popUpParams.shadowColor = SHADOW_COLOR;
@@ -218,6 +218,16 @@ public class PopUpRenderer extends Renderer {
         result.y =(int) (position.y * RenderingEngine.ppuY );
         return result;
 
+    }
+
+    /**
+     * Clears all popups from the screen.
+     * Used for debugging.
+     */
+    public void clear() {
+        for (PopUpCategories category : messages.keySet()) {
+             messages.get(category).clear();
+        }
     }
 
 }

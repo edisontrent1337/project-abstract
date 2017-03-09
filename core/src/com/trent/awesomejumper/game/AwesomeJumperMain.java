@@ -51,7 +51,7 @@ public class AwesomeJumperMain extends Game {
         drawInfo = !drawInfo;
     }
 
-    public void toggleBody() {
+    public static void toggleBodyDrawing() {
         drawBody = !drawBody;
     }
 

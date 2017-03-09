@@ -21,7 +21,7 @@ import com.trent.awesomejumper.models.lootable.Lootable;
 /**
  * Created by Sinthu on 12.06.2015.
  */
-public class GameScreen implements Screen, InputProcessor {
+public class GameScreen implements Screen {
 
     // MEMBERS & INSTANCES
     //----------------------------------------------------------------------------------------------
@@ -56,7 +56,7 @@ public class GameScreen implements Screen, InputProcessor {
         worldContainer.initAllEntities();
         controller = new WorldController(worldContainer);
         inputHandler = new InputHandler(worldContainer, renderingEngine);
-        //Gdx.input.setInputProcessor(this);
+        Gdx.input.setInputProcessor(inputHandler);
     }
 
     @Override
@@ -98,162 +98,6 @@ public class GameScreen implements Screen, InputProcessor {
     }
 
 
-    @Override
-    public boolean keyDown(int keycode) {
-
-        if (keycode == Keys.L)
-            game.toggleLogging();
-
-        if (keycode == Keys.A) {
-            inputHandler.leftPressed();
-        }
-        if (keycode == Keys.D) {
-            inputHandler.rightPressed();
-        }
-        if (keycode == Keys.W) {
-            inputHandler.upPressed();
-        }
-
-        if (keycode == Keys.S) {
-            inputHandler.downPressed();
-        }
-
-        if (keycode == Keys.X) {
-            //TODO: EDIT THIS!!!!
-            entityManager.reset();
-            inputHandler.setPlayer(worldContainer.getPlayer());
-            controller.setPlayer();
-        }
-
-        if (keycode == Keys.U) {
-            Entity e = new Lootable(worldContainer.getPlayer().getPosition().cpy().add(1, 2));
-            e.register();
-        }
-
-        /**
-         * DEBUG KEYS
-         */
-
-        if (keycode == Keys.T) {
-            game.toggleDebugMode();
-        }
-        if (keycode == Keys.P) {
-            game.toggleEntityDrawing();
-        }
-        if (keycode == Keys.H) {
-            game.toggleHitboxDrawing();
-        }
-        if (keycode == Keys.I) {
-            game.toggleInfoDrawing();
-        }
-        if (keycode == Keys.B) {
-            game.toggleBody();
-        }
-
-        if (keycode == Keys.Q) {
-            inputHandler.dropPressed();
-        }
-
-        if (keycode == Keys.E)
-            inputHandler.pickUpPressed();
-
-        if (keycode == Keys.R) {
-            inputHandler.reload();
-        }
-
-        if (keycode == Keys.B) {
-            worldContainer.getRandomLevelGenerator().connectRegions();
-        }
-        if (keycode == Keys.N) {
-            worldContainer.getRandomLevelGenerator().removeExtraDoors();
-        }
-        if (keycode == Keys.M) {
-            worldContainer.getRandomLevelGenerator().removeDeadEnds();
-        }
-
-        if (keycode == Keys.F11) {
-            Graphics.DisplayMode mode = Gdx.graphics.getDisplayMode();
-            Gdx.graphics.setFullscreenMode(mode);
-        }
-
-
-        return false;
-    }
-
-    @Override
-    public boolean keyUp(int keycode) {
-        if (keycode == Keys.A) {
-            inputHandler.leftReleased();
-        }
-        if (keycode == Keys.D) {
-            inputHandler.rightReleased();
-        }
-        if (keycode == Keys.W) {
-            inputHandler.upReleased();
-        }
-        if (keycode == Keys.S) {
-            inputHandler.downReleased();
-        }
-
-        if (keycode == Keys.Q) {
-            inputHandler.dropReleased();
-            inputHandler.pickUpReleased();
-        }
-        if (keycode == Keys.E)
-            inputHandler.pickUpReleased();
-
-        return false;
-    }
-
-    @Override
-    public boolean keyTyped(char character) {
-
-
-        return false;
-    }
-
-    @Override
-    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-
-
-        if (button == Input.Buttons.LEFT) {
-           /* Gdx.app.log("PLAYER:","");
-            Gdx.app.log("MOUSE:", inputHandler.mouse.toString());
-            Gdx.app.log("POSICENTER:", worldContainer.getPlayer().getBody().getCenter().toString());
-            Gdx.app.log("ORIENTATION:", worldContainer.getPlayer().getBody().getOrientation().toString());
-            Gdx.app.log("ANGLE;", Float.toString(worldContainer.getPlayer().getBody().getAngleOfRotation()));
-            Gdx.app.log("SPEED", worldContainer.getPlayer().getBody().getOrientation().cpy().nor().scl(60).toString());
-            Gdx.app.log("-----------------------------------------------------","");*/
-            inputHandler.fire();
-
-        }
-
-        return true;
-    }
-
-    @Override
-    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        return true;
-    }
-
-    @Override
-    public boolean touchDragged(int screenX, int screenY, int pointer) {
-        return false;
-    }
-
-    @Override
-    public boolean mouseMoved(int screenX, int screenY) {
-
-        return false;
-    }
-
-
-    @Override
-    public boolean scrolled(int amount) {
-        renderingEngine.setZoom(amount);
-        //inputHandler.changeWeapon(amount);
-        return false;
-    }
 
 
 }

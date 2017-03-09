@@ -79,6 +79,7 @@ public class Player extends Entity implements LivingEntity{
         body.setElasticity(ELASTICITY);
         body.setMaxVelocity(MAX_SPEED);
 
+        body.setAimReference(InputHandler.mouse);
         body.setOrientation(sub(body.getCenter(), InputHandler.mouse));
         body.setAngleOfRotation(angle(body.getOrientation()));
 
