@@ -3,6 +3,8 @@ package com.trent.awesomejumper.controller.input;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.controllers.Controller;
+import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -135,6 +137,7 @@ public class InputHandler implements InputProcessor {
     private final float EQUIP_DISTANCE = 0.66f;
     private final float EQUIP_THRESHOLD = 0.33f;
 
+
     Vector3 temp;
 
     // CONSTRUCTOR
@@ -149,6 +152,9 @@ public class InputHandler implements InputProcessor {
         this.mouse = new Vector2(0f, 0f);
 
         temp = new Vector3();
+        for(Controller c : Controllers.getControllers()) {
+            Utils.log("CONTROLLER: ", c.getName());
+        }
     }
 
 

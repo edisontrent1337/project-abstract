@@ -370,15 +370,20 @@ public class WorldContainer {
          * As long as no solid world tiles like walls have been found,
          * the ray continues to travel.
          */
+        int i = 0;
         while (getTilesForCell(currentCell).isEmpty()) {
+
             List<Float> coefficients = new ArrayList<>();
+            float[] coefficientsDebug = new float[4];
             // Choose the last penetration point as the starting point
             float lastPenetrationX = penetrationPoints.get(penetrationPoints.size() - 1).x;
             float lastPenetrationY = penetrationPoints.get(penetrationPoints.size() - 1).y;
 
             // Get the indices for the next hashing cells adjacent to the current one with regards
             // to the ray direction.
+            // length = 2 (spatial_hash_grid_size), dir = (1,0)
             Vector2 nextXCell = getSpatialIndex(currentCell.x + signX * SPATIAL_HASH_GRID_SIZE, currentCell.y);
+            // length = 2 (spatial_hash_grid_size), dir = (0,1)
             Vector2 nextYCell = getSpatialIndex(currentCell.x, currentCell.y + signY * SPATIAL_HASH_GRID_SIZE);
 
             // TODO: figure out how to get the edges of the bounding boxes to generate rays with
@@ -394,19 +399,31 @@ public class WorldContainer {
              * current cell's x or y position to calculate the distance from the last penetration
              * point.
              **/
-            float tCurrentX = (currentCell.x == lastPenetrationX)  ? (nextXCell.x) / deltaX : (currentCell.x - lastPenetrationX) / deltaX;
-            float tCurrentY = (currentCell.y == lastPenetrationY)  ? (nextYCell.y) / deltaY : (currentCell.y - lastPenetrationY) / deltaY;
+            float tCurrentX = (currentCell.x == lastPenetrationX)  ? (nextXCell.x - lastPenetrationX) / deltaX : (currentCell.x - lastPenetrationX) / deltaX;
+            float tCurrentY = (currentCell.y == lastPenetrationY)  ? (nextYCell.y - lastPenetrationY) / deltaY : (currentCell.y - lastPenetrationY) / deltaY;
             float tNextX = (nextXCell.x - lastPenetrationX) / deltaX;
             float tNextY = (nextYCell.y - lastPenetrationY) / deltaY;
 
             //Penetration points in ray direction, but behind the player are not what we are looking for
-            if(tCurrentX > 0)
+            if(tCurrentX > 0) {
+                coefficientsDebug[0] = tCurrentX;
                 coefficients.add(tCurrentX);
-            if(tCurrentY > 0)
+            }
+            if(tCurrentY > 0) {
+                coefficientsDebug[1] = tCurrentY;
                 coefficients.add(tCurrentY);
+            }
 
             coefficients.add(tNextX);
+            coefficientsDebug[2] = tNextX;
             coefficients.add(tNextY);
+            coefficientsDebug[3] = tNextY;
+
+            if(i==0) {
+                Utils.log("COEFFICITENTS");
+                for(int x = 0; x < coefficientsDebug.length; x++)
+                    Utils.log(Integer.toString(x), coefficientsDebug[x]);
+            }
 
             float closestIntersection = Collections.min(coefficients);
 
@@ -421,6 +438,7 @@ public class WorldContainer {
                 coveredIndexes.add(nextYCell);
                 currentCell = nextYCell;
             }
+            i++;
 
 
         }

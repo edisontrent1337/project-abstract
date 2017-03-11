@@ -12,16 +12,26 @@ public class Ray extends Entity {
     private Vector2 start;
     private Vector2 direction;
 
+    public static final float INFINITE = -1.0f;
+
     private float length;
 
     public Ray() {
         this.start = new Vector2(0f,0f);
         this.direction = new Vector2(1f,0f);
+        this.length = INFINITE;
     }
 
     public Ray(Vector2 start, Vector2 direction) {
         this.start = start;
         this.direction = direction;
+        this.length = INFINITE;
+    }
+
+    public Ray(Vector2 start, Vector2 direction, float length) {
+        this.start = start;
+        this.direction = direction;
+        this.length = length;
     }
 
 
