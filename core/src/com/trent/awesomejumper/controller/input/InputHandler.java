@@ -15,6 +15,7 @@ import com.trent.awesomejumper.controller.rendering.RenderingEngine;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.entity.EntityInterface;
 import com.trent.awesomejumper.engine.modelcomponents.popups.Message;
+import com.trent.awesomejumper.engine.physics.Ray;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.weapons.Weapon;
@@ -42,6 +43,7 @@ import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.
 import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.TOGGLE_ENTITY_DRAWING;
 import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.TOGGLE_HITBOX_DRAWING;
 import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.TOGGLE_INFO_DRAWING;
+import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.TOGGLE_SPECIAL;
 import static com.trent.awesomejumper.utils.PhysicalConstants.ACCELERATION;
 
 /**
@@ -244,6 +246,8 @@ public class InputHandler implements InputProcessor {
                 player.getWeaponInventory().dropWeapon();
             }
         }
+
+
 
         temp.set(Gdx.input.getX(), Gdx.input.getY(), 0);
         camera.unproject(temp);
@@ -491,6 +495,15 @@ public class InputHandler implements InputProcessor {
             else
                 Gdx.graphics.setFullscreenMode(mode);
         }
+
+        if(isPressed(TOGGLE_SPECIAL)) {
+            Ray r = new Ray(0,4,10,-4,20);
+            Ray s = new Ray(0,-2,3,2,5.23f);
+
+            Ray.Intersection i = r.getIntersection(s);
+            Utils.log(i.toString());
+        }
+
 
     }
 

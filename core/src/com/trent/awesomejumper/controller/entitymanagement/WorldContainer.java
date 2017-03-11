@@ -420,9 +420,9 @@ public class WorldContainer {
             coefficientsDebug[3] = tNextY;
 
             if(i==0) {
-                Utils.log("COEFFICITENTS");
-                for(int x = 0; x < coefficientsDebug.length; x++)
-                    Utils.log(Integer.toString(x), coefficientsDebug[x]);
+               // Utils.log("COEFFICITENTS");
+                for(int x = 0; x < coefficientsDebug.length; x++);
+                 //   Utils.log(Integer.toString(x), coefficientsDebug[x]);
             }
 
             float closestIntersection = Collections.min(coefficients);
