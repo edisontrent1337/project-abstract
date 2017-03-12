@@ -342,8 +342,7 @@ public class WorldContainer {
      * Returns a list of passed hash cells from a starting point in a direction to the closest
      * wall.
      *
-     * @param start
-     * @param direction
+
      * @return
      */
 
@@ -356,17 +355,10 @@ public class WorldContainer {
     }*/
 
     public List<Vector2> generateCrossedIndexes(Ray ray) {
-        /*Vector2 dir = direction.cpy().nor();
-        Vector2 startCell = getSpatialIndex(start.x, start.y);*/
         Vector2 startCell = getSpatialIndex(ray.getStart());
-
         Vector2 currentCell = startCell;
-
         coveredIndexes.clear();
         penetrationPoints.clear();
-
-        /*float deltaX = dir.x;
-        float deltaY = dir.y;*/
 
         float deltaX = ray.getDir().x;
         float deltaY = ray.getDir().y;
@@ -383,16 +375,15 @@ public class WorldContainer {
          * As long as no solid world tiles like walls have been found,
          * the ray continues to travel.
          */
-        int i = 0;
+        Utils.log("START OF RAYCASTING!");
         while (getTilesForCell(currentCell).isEmpty()) {
 
             List<Ray> rays = new ArrayList<>();
             List<Ray.Intersection> intersections = new ArrayList<>();
-            List<Float> coefficients = new ArrayList<>();
-            float[] coefficientsDebug = new float[4];
             // Choose the last penetration point as the starting point
             float lastPenetrationX = penetrationPoints.get(penetrationPoints.size() - 1).x;
             float lastPenetrationY = penetrationPoints.get(penetrationPoints.size() - 1).y;
+            ray = new Ray(lastPenetrationX, lastPenetrationY, deltaX,deltaY,Ray.INFINITE);
 
             // Get the indices for the next hashing cells adjacent to the current one with regards
             // to the ray direction.
@@ -401,76 +392,69 @@ public class WorldContainer {
             // length = 2 (spatial_hash_grid_size), dir = (0,1)
             Vector2 nextYCell = getSpatialIndex(currentCell.x, currentCell.y + signY * SPATIAL_HASH_GRID_SIZE);
 
-            //TODO: CONTINUE HERE
-            // create Rays from next hash cells
-            Ray xAxisFromCurrent;
-            Ray yAxisFromCurrent;
+            /**
+             * Creating rays from the current hash cell.
+             */
+            Ray currentXAxis = new Ray(currentCell.x, currentCell.y, 1, 0, Ray.INFINITE);
+            Ray currentYAxis = new Ray(currentCell.x, currentCell.y, 0, 1, Ray.INFINITE);
+            Ray nextYCellXAxis = new Ray(nextYCell.x, nextYCell.y,1,0, Ray.INFINITE);
+            Ray nextXCellYAxis = new Ray(nextXCell.x, nextXCell.y,0,1, Ray.INFINITE);
+
+            rays.add(currentXAxis);
+            rays.add(currentYAxis);
+            rays.add(nextYCellXAxis);
+            rays.add(nextXCellYAxis);
+
+            for(Ray r : rays) {
+                Ray.Intersection intersection = ray.getIntersection(r);
+                if(intersection.intersect && intersection.distance > 0 )
+                    intersections.add(ray.getIntersection(r));
+            }
 
 
+            Ray.Intersection closestIntersection = Collections.min(intersections, new Comparator<Ray.Intersection>() {
+                @Override
+                public int compare(Ray.Intersection o1, Ray.Intersection o2) {
+                    return Float.compare(Math.abs(o1.distance), Math.abs(o2.distance));
+                }
+            });
 
-            Ray xAxisFromNextY = new Ray(nextYCell.x, nextYCell.y, 1f, 0, Ray.INFINITE);
-            Ray yAxisFromNextX = new Ray(nextXCell.x, nextXCell.y, 0, 1f, Ray.INFINITE);
-
-
-            if(currentCell.x == lastPenetrationX)
-                yAxisFromCurrent = new Ray(nextXCell.x, nextXCell.y, 0, 1f, Ray.INFINITE);
-            else
-                yAxisFromCurrent = new Ray(currentCell.x, currentCell.y, 0, 1f, Ray.INFINITE);
-
-            if(currentCell.y == lastPenetrationY)
-                xAxisFromCurrent = new Ray(nextYCell.x, nextYCell.y, 1f, 0, Ray.INFINITE);
-            else
-                xAxisFromCurrent = new Ray(currentCell.x, currentCell.y, 1f, 0, Ray.INFINITE);
-
-
-            Ray.Intersection xAxisNextY = ray.getIntersection(xAxisFromNextY);
-            Ray.Intersection yAxisNextX = ray.getIntersection(yAxisFromNextX);
-            Ray.Intersection xAxisCurrent = ray.getIntersection(xAxisFromCurrent);
-            Ray.Intersection yAxisCurrent = ray.getIntersection(yAxisFromCurrent);
-
-            rays.add(xAxisFromCurrent);
-            rays.add(yAxisFromCurrent);
-            rays.add(xAxisFromNextY);
-            rays.add(yAxisFromNextX);
-            Vector2 penetrationPoint = new Vector2();
-            Vector2 nextCell = currentCell;
-            float closestIntersection = Float.MAX_VALUE;
-            for(Ray other : rays) {
-                if(ray.getIntersection(other).intersect) {
-                    intersections.add(ray.getIntersection(other));
-                    //Ray.Intersection intersection = ray.getIntersection(other);
-                    //coefficients.add(intersection.distance);
-
-                    /*if(intersection.distance < closestIntersection && intersection.distance > 0) {
-                        penetrationPoint = intersection.result.cpy();
-                        closestIntersection = intersection.distance;
-                       // nextCell = getSpatialIndex(penetrationPoint);
-                    }*/
+            float minDst = Float.MAX_VALUE;
+            for(Ray.Intersection intersection : intersections) {
+                if(Math.abs(intersection.distance) < Math.abs(minDst)) {
+                    closestIntersection = intersection;
+                    minDst = intersection.distance;
                 }
             }
 
-
-            /*coveredIndexes.add(nextCell);
-            currentCell = nextCell;*/
-
-            for(Ray.Intersection intersection : intersections) {
-                
-            }
-
-            /*if(xAxis.distance < yAxis.distance) {
-                penetrationPoint = xAxis.result.cpy();
-                closestIntersection = xAxis.distance;
-            }
-            else {
-                penetrationPoint = yAxis.result.cpy();
-                closestIntersection = yAxis.distance;
-            }*/
-
+            Vector2 penetrationPoint = closestIntersection.result;
             penetrationPoints.add(penetrationPoint);
+
+
+            Utils.log("OLD CURRENT CELL: ", currentCell.toString());
+            if(closestIntersection.origin == currentXAxis || closestIntersection.origin == nextYCellXAxis) {
+                coveredIndexes.add(nextYCell);
+                currentCell = nextYCell;
+            }
+
+            else if(closestIntersection.origin == currentYAxis || closestIntersection.origin == nextXCellYAxis) {
+                coveredIndexes.add(nextXCell);
+                currentCell = nextXCell;
+            }
+
+            Utils.log("ALL INTERSECTIONS", intersections.toString());
+            Utils.log("CLOSEST INTERSECTION", closestIntersection.toString());
+            Utils.log("CURRENT X AXIS", currentXAxis.toString());
+            Utils.log("CURRENT Y AXIS", currentYAxis.toString());
+            Utils.log("NEXT Y CELL X AXIS", nextYCellXAxis.toString());
+            Utils.log("NEXT X CELL Y AXIS", nextXCellYAxis.toString());
+            Utils.log("NEW CURRENT CELL: ", currentCell.toString());
+            Utils.log("----------------------------------------------");
+
+
 
             // TODO: figure out how to get the edges of the bounding boxes to generate rays with
             // the length of a specific edge.
-            Vector2 nextBounds = new Vector2();
 
             /**
              * Calculates the "steps" it takes to get from the last penetration point
@@ -521,14 +505,14 @@ public class WorldContainer {
                 currentCell = nextYCell;
             }*/
 
-            if(closestIntersection == xAxisNextY.distance || closestIntersection == xAxisCurrent.distance) {
+            /*if(closestIntersection == xAxisNextY.distance || closestIntersection == xAxisCurrent.distance) {
                 coveredIndexes.add(nextYCell);
                 currentCell = nextYCell;
             }
             else if(closestIntersection == yAxisNextX.distance || closestIntersection == yAxisCurrent.distance) {
                 coveredIndexes.add(nextXCell);
                 currentCell = nextXCell;
-            }
+            }*/
 
 
         }

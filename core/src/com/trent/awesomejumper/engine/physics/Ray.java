@@ -50,7 +50,7 @@ public class Ray {
     public Intersection getIntersection(Ray other) {
         // If the two rays are parallel, no intersection can occur.
         if(xDir == other.xDir && yDir == other.yDir)
-            return new Intersection(null, false, Float.MAX_VALUE);
+            return new Intersection(null, false, Float.MAX_VALUE, other);
 
         // Calculate the coefficient for the other ray.
         float b = (xDir*(other.startY-startY) + yDir*(startX-other.startX)) / (other.xDir*yDir-other.yDir*xDir);
@@ -65,7 +65,7 @@ public class Ray {
             intersect = true;
         }
 
-        return new Intersection(result,intersect,a);
+        return new Intersection(result,intersect,a, other);
     }
 
 
@@ -73,6 +73,9 @@ public class Ray {
         return start;
     }
 
+    public void setStart(Vector2 start) {
+        this.start = start;
+    }
     public Vector2 getDir() {
         return dir;
     }
@@ -81,15 +84,23 @@ public class Ray {
         return length;
     }
 
+    @Override
+    public String toString() {
+        return "START: " + start.toString() + "DIR: " + dir.toString();
+    }
+
+
     public class Intersection {
         public final Vector2 result;
         public final boolean intersect;
         public final String summary;
         public final float distance;
-        public Intersection(Vector2 result, boolean intersect, float distance) {
+        public final Ray origin;
+        public Intersection(Vector2 result, boolean intersect, float distance, Ray origin) {
             this.result = result;
             this.intersect = intersect;
             this.distance = distance;
+            this.origin = origin;
             if(intersect && result!=null)
                 this.summary = "INTERSECTION AT: " + Utils.printVec(result) + " DST: " + distance;
             else
@@ -101,6 +112,7 @@ public class Ray {
         public String toString() {
             return this.summary;
         }
+
 
     }
 
