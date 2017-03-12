@@ -184,13 +184,13 @@ public class RandomLevelGenerator {
      */
     public HashMap<Integer, Entity> load() {
         Room.Type baseRoomType; // holds the general size of the room. Random rectangularity is added later.
-        /**
-         * First phase: generate rooms and store them in an array.
+        /*
+          First phase: generate rooms and store them in an array.
          */
         Room room;
-        /**
-         * Adding one legit room to the array to start the for-loop below. This do-while loop is
-         * executed as long as the created room is not legit / is out of bounds or too close to the bounds.
+        /*
+          Adding one legit room to the array to start the for-loop below. This do-while loop is
+          executed as long as the created room is not legit / is out of bounds or too close to the bounds.
          */
         do {
 
@@ -403,9 +403,9 @@ public class RandomLevelGenerator {
      * Sorts the room array by the rooms coordinates.
      */
     private void sortRoomList() {
-        /**
-         * The rooms are sorted by their coordinates. Lower x and higher y coordinates are located
-         * higher in the list. A custom comparator is used.
+        /*
+          The rooms are sorted by their coordinates. Lower x and higher y coordinates are located
+          higher in the list. A custom comparator is used.
          */
         Collections.sort(rooms, new Comparator<Room>() {
             @Override
@@ -636,10 +636,10 @@ public class RandomLevelGenerator {
              */
             openRegions.removeAll(regionList);
 
-            /**
-             * Now we collect all the region numbers left that are connected by the current
-             * connector position. This is done by getting the original region numbers
-             * and then collect all region numbers that are left after merging in a set.
+            /*
+              Now we collect all the region numbers left that are connected by the current
+              connector position. This is done by getting the original region numbers
+              and then collect all region numbers that are left after merging in a set.
              */
             Collection<Integer> originalRegions = connectors.get(connectorPosition).values();
             HashSet<Integer> regionsLeft = new HashSet<>();

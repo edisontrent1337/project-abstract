@@ -341,27 +341,20 @@ public class WorldContainer {
     /**
      * Returns a list of passed hash cells from a starting point in a direction to the closest
      * wall.
-     *
-
      * @return
      */
 
-    //TODO: EDIT THIS!
-    //TODO : public List<Vector2> generateCrossedIndexes(Ray ray) {
-    //
 
-    /*public List<Vector2> generateCrossedIndexes(Ray ray) {
-        return null;
-    }*/
 
-    public List<Vector2> generateCrossedIndexes(Ray ray) {
-        Vector2 startCell = getSpatialIndex(ray.getStart());
+
+    public List<Vector2> generateCrossedIndexes(Ray aim) {
+        Vector2 startCell = getSpatialIndex(aim.getStart());
         Vector2 currentCell = startCell;
         coveredIndexes.clear();
         penetrationPoints.clear();
 
-        float deltaX = ray.getDir().x;
-        float deltaY = ray.getDir().y;
+        float deltaX = aim.getDir().x;
+        float deltaY = aim.getDir().y;
 
         // Leading sign of the ray direction. Used to find next adjacent hashing cell
         int signX = deltaX > 0 ? 1 : -1;
@@ -369,7 +362,7 @@ public class WorldContainer {
 
 
         coveredIndexes.add(startCell);
-        penetrationPoints.add(ray.getStart());
+        penetrationPoints.add(aim.getStart());
 
         /**
          * As long as no solid world tiles like walls have been found,
@@ -383,7 +376,7 @@ public class WorldContainer {
             // Choose the last penetration point as the starting point
             float lastPenetrationX = penetrationPoints.get(penetrationPoints.size() - 1).x;
             float lastPenetrationY = penetrationPoints.get(penetrationPoints.size() - 1).y;
-            ray = new Ray(lastPenetrationX, lastPenetrationY, deltaX,deltaY,Ray.INFINITE);
+            aim = new Ray(lastPenetrationX, lastPenetrationY, deltaX,deltaY,Ray.INFINITE);
 
             // Get the indices for the next hashing cells adjacent to the current one with regards
             // to the ray direction.
@@ -392,23 +385,33 @@ public class WorldContainer {
             // length = 2 (spatial_hash_grid_size), dir = (0,1)
             Vector2 nextYCell = getSpatialIndex(currentCell.x, currentCell.y + signY * SPATIAL_HASH_GRID_SIZE);
 
-            /**
-             * Creating rays from the current hash cell.
+            /*
+             * Creating rays from the current hash cell:
+             * One for the x axis of the current cell.
+             * One for the y axis of the current cell.
+             * One for the x axis of the next cell in y direction.
+             * One for the y axis of the next cell in x direction.
              */
             Ray currentXAxis = new Ray(currentCell.x, currentCell.y, 1, 0, Ray.INFINITE);
             Ray currentYAxis = new Ray(currentCell.x, currentCell.y, 0, 1, Ray.INFINITE);
             Ray nextYCellXAxis = new Ray(nextYCell.x, nextYCell.y,1,0, Ray.INFINITE);
             Ray nextXCellYAxis = new Ray(nextXCell.x, nextXCell.y,0,1, Ray.INFINITE);
 
+            /*
+             * Add all of these rays to the ray list.
+             */
             rays.add(currentXAxis);
             rays.add(currentYAxis);
             rays.add(nextYCellXAxis);
             rays.add(nextXCellYAxis);
 
+            /*
+             * Calculation of the intersection for all surrounding hash cell rays with the aim ray.
+             */
             for(Ray r : rays) {
-                Ray.Intersection intersection = ray.getIntersection(r);
+                Ray.Intersection intersection = aim.getIntersection(r);
                 if(intersection.intersect && intersection.distance > 0 )
-                    intersections.add(ray.getIntersection(r));
+                    intersections.add(aim.getIntersection(r));
             }
 
 
@@ -452,69 +455,6 @@ public class WorldContainer {
             Utils.log("----------------------------------------------");
 
 
-
-            // TODO: figure out how to get the edges of the bounding boxes to generate rays with
-            // the length of a specific edge.
-
-            /**
-             * Calculates the "steps" it takes to get from the last penetration point
-             * to the next neighbouring cell.
-             *
-             * If the last penetration point lays on the x/y position of the current cell,
-             * move to the next cell in x or y direction respectively. Otherwise, choose the
-             * current cell's x or y position to calculate the distance from the last penetration
-             * point.
-             **/
-           /* float tCurrentX = (currentCell.x == lastPenetrationX)  ? (nextXCell.x - lastPenetrationX) / deltaX : (currentCell.x - lastPenetrationX) / deltaX;
-            float tCurrentY = (currentCell.y == lastPenetrationY)  ? (nextYCell.y - lastPenetrationY) / deltaY : (currentCell.y - lastPenetrationY) / deltaY;
-            float tNextX = (nextXCell.x - lastPenetrationX) / deltaX;
-            float tNextY = (nextYCell.y - lastPenetrationY) / deltaY;
-
-            //Penetration points in ray direction, but behind the player are not what we are looking for
-            if(tCurrentX > 0) {
-                coefficientsDebug[0] = tCurrentX;
-                coefficients.add(tCurrentX);
-            }
-            if(tCurrentY > 0) {
-                coefficientsDebug[1] = tCurrentY;
-                coefficients.add(tCurrentY);
-            }
-
-            coefficients.add(tNextX);
-            coefficientsDebug[2] = tNextX;
-            coefficients.add(tNextY);
-            coefficientsDebug[3] = tNextY;
-
-            if(i==0) {
-               // Utils.log("COEFFICITENTS");
-                for(int x = 0; x < coefficientsDebug.length; x++);
-                 //   Utils.log(Integer.toString(x), coefficientsDebug[x]);
-            }
-
-            float closestIntersection = Collections.min(coefficients);
-
-            Vector2 penetrationPoint;
-            penetrationPoint = new Vector2(lastPenetrationX + closestIntersection * deltaX, lastPenetrationY + closestIntersection * deltaY);
-            penetrationPoints.add(penetrationPoint);*/
-
-            /*if (closestIntersection == tNextX || closestIntersection == tCurrentX) {
-                coveredIndexes.add(nextXCell);
-                currentCell = nextXCell;
-            } else if (closestIntersection == tNextY || closestIntersection == tCurrentY){
-                coveredIndexes.add(nextYCell);
-                currentCell = nextYCell;
-            }*/
-
-            /*if(closestIntersection == xAxisNextY.distance || closestIntersection == xAxisCurrent.distance) {
-                coveredIndexes.add(nextYCell);
-                currentCell = nextYCell;
-            }
-            else if(closestIntersection == yAxisNextX.distance || closestIntersection == yAxisCurrent.distance) {
-                coveredIndexes.add(nextXCell);
-                currentCell = nextXCell;
-            }*/
-
-
         }
 
         return coveredIndexes;
@@ -537,12 +477,12 @@ public class WorldContainer {
     // ---------------------------------------------------------------------------------------------
 
     /**
-     * returns an ordererd list of entities currently in view.
+     * Returns an ordered list of entities currently in view.
      *
      * @param cameraPosition position of the game camera
      * @param camW           camera width
      * @param camH           camera height
-     * @return
+     * @return list of entities
      */
     public ArrayList<Tile> getTilesToBeRendered(Vector2 cameraPosition, float camW, float camH) {
 

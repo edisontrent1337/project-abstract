@@ -99,8 +99,8 @@ public class Room {
      * Checks whether two rooms overlap. Uses the overlaps() method from the utility class.
      * Uses Intervals with added padding (MIN_ROOM_DISTANCE)
      *
-     * @param other
-     * @return
+     * @param other other room
+     * @return true if an overlap occurs.
      */
     public boolean overlaps(Room other) {
         return (Utils.overlaps(xDimensionsAndDistance, other.getxDimensionsAndDistance()) && Utils.overlaps(yDimensionsAndDistance, other.getyDimensionsAndDistance()));
