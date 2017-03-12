@@ -24,6 +24,7 @@ import com.trent.awesomejumper.controller.input.InputHandler;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
+import com.trent.awesomejumper.engine.physics.Ray;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.SkyBox;
@@ -590,7 +591,8 @@ public class RenderingEngine extends Renderer {
 
         setDebugTag(DE_RAY_DIRECTION, "" + player.getBody().getOrientation().cpy().nor());
 
-        setDebugTag(DE_RAY_END, ""+ worldContainer.generateCrossedIndexes(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter().cpy(), player.getBody().getOrientation().cpy()));
+        //setDebugTag(DE_RAY_END, ""+ worldContainer.generateCrossedIndexes(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter().cpy(), player.getBody().getOrientation().cpy()));
+        setDebugTag(DE_RAY_END, ""+ worldContainer.generateCrossedIndexes(new Ray(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter().cpy(), player.getBody().getOrientation().cpy(), Ray.INFINITE)));
 
 
         // LOGGING
@@ -742,8 +744,11 @@ public class RenderingEngine extends Renderer {
         if(!player.getWeaponInventory().isHoldingAWeapon())
             return;
 
-        worldContainer.generateCrossedIndexes(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter().cpy(),
-                    player.getWeaponInventory().getSelectedWeapon().getBody().getOrientation().cpy());
+        //worldContainer.generateCrossedIndexes(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter().cpy(),
+        //            player.getWeaponInventory().getSelectedWeapon().getBody().getOrientation().cpy());
+
+        Ray r = new Ray(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter().cpy(),player.getWeaponInventory().getSelectedWeapon().getBody().getOrientation().cpy(), Ray.INFINITE);
+        worldContainer.generateCrossedIndexes(r);
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         Gdx.gl.glEnable(GL20.GL_BLEND);

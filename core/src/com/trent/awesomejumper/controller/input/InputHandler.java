@@ -472,7 +472,7 @@ public class InputHandler implements InputProcessor {
             if (isPressed(TOGGLE_HITBOX_DRAWING))
                 AwesomeJumperMain.toggleHitboxDrawing();
             if (isPressed(TOGGLE_INFO_DRAWING))
-                AwesomeJumperMain.toggleHitboxDrawing();
+                AwesomeJumperMain.toggleInfoDrawing();
             if (isPressed(CLEAR_POPUPS))
                 PopUpRenderer.getInstance().clear();
             if (isPressed(SHOW_PENETRATION_POINTS)) {
@@ -498,7 +498,7 @@ public class InputHandler implements InputProcessor {
 
         if(isPressed(TOGGLE_SPECIAL)) {
             Ray r = new Ray(0,4,10,-4,20);
-            Ray s = new Ray(0,-2,3,2,5.23f);
+            Ray s = new Ray(0,-2,3,2,23f);
 
             Ray.Intersection i = r.getIntersection(s);
             Utils.log(i.toString());
