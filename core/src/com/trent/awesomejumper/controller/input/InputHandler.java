@@ -43,6 +43,7 @@ import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.
 import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.TOGGLE_ENTITY_DRAWING;
 import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.TOGGLE_HITBOX_DRAWING;
 import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.TOGGLE_INFO_DRAWING;
+import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.TOGGLE_LOGGING;
 import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.TOGGLE_SPECIAL;
 import static com.trent.awesomejumper.utils.PhysicalConstants.ACCELERATION;
 
@@ -78,6 +79,7 @@ public class InputHandler implements InputProcessor {
         CLEAR_POPUPS(Keys.C, true),
         TOGGLE_SPECIAL(Keys.U,true),
         SHOW_PENETRATION_POINTS(Keys.V, true),
+        TOGGLE_LOGGING(Keys.L, true)
         ;
 
 
@@ -480,6 +482,9 @@ public class InputHandler implements InputProcessor {
                     PopUpRenderer.getInstance().addMessageToCategory(PopUpRenderer.PopUpCategories.HEAL, new Message(penetrationPoint.toString(), penetrationPoint, WorldController.worldTime, PopUpRenderer.INFINITE_MESSAGE));
                 }
             }
+
+            if(isPressed(TOGGLE_LOGGING))
+                AwesomeJumperMain.toggleLogging();
         }
         // RELOAD
         // acts like toggling a button, pressed once and processed only once
@@ -504,6 +509,8 @@ public class InputHandler implements InputProcessor {
             Utils.log(worldContainer.getClosestIntersection(rays,r).toString());
 
         }
+
+
 
 
     }

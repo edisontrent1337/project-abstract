@@ -74,7 +74,7 @@ public class Ray {
         boolean intersect = false;
         // Only if b and a are smaller than the lengths of the two rays, the intersection lays on
         // both rays.
-        if(b <= other.length && a <= length) {
+        if(Math.abs(b) <= other.length && Math.abs(a) <= length) {
             result = origin.cpy().add(dir.cpy().scl(a));
             intersect = true;
         }

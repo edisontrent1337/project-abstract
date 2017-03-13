@@ -17,6 +17,7 @@ public class Utils {
     public static final int HEIGHT = 480;
 
 
+
     // RESET OPACITY OF AN IMAGE
     // ---------------------------------------------------------------------------------------------
     public static void resetOpacity(Image image) {

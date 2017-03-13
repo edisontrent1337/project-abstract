@@ -382,13 +382,26 @@ public class WorldContainer {
 
 
             HashSet<Entity> entities = getEntitiesForCell(currentCell);
+            Utils.log("ENTITIES SIZE", rays.size());
 
             for(Entity e : entities) {
                 rays.addAll(e.getBody().getBounds().getRays());
             }
 
-            Ray.Intersection closestEntity = Collections.min(getIntersections(rays,aim));
+            Utils.log("RAYS SIZE", rays.size());
 
+            if(rays.size() > 0) {
+                HashSet<Ray.Intersection> entityIntersections = getIntersections(rays, aim);
+
+                if(entityIntersections.size() > 0) {
+                    Ray.Intersection closestIntersection = Collections.min(entityIntersections);
+                    penetrationPoints.add(closestIntersection.result);
+                    //continue;
+                }
+            }
+            //Ray.Intersection closestEntity = Collections.min(getIntersections(rays,aim));
+
+            rays.clear();
 
 
             // Get the indices for the next hashing cells adjacent to the current one with regards
@@ -428,7 +441,7 @@ public class WorldContainer {
             }
 
 
-            Ray.Intersection closestIntersection = Collections.min(intersections, new Comparator<Ray.Intersection>() {
+            /*Ray.Intersection closestIntersection = Collections.min(intersections, new Comparator<Ray.Intersection>() {
                 @Override
                 public int compare(Ray.Intersection o1, Ray.Intersection o2) {
                     return Float.compare(Math.abs(o1.distance), Math.abs(o2.distance));
@@ -441,8 +454,9 @@ public class WorldContainer {
                     closestIntersection = intersection;
                     minDst = intersection.distance;
                 }
-            }
+            }*/
 
+            Ray.Intersection closestIntersection = Collections.min(intersections);
             Vector2 penetrationPoint = closestIntersection.result;
             penetrationPoints.add(penetrationPoint);
 
@@ -458,14 +472,14 @@ public class WorldContainer {
                 currentCell = nextXCell;
             }
 
-            Utils.log("ALL INTERSECTIONS", intersections.toString());
+            /*Utils.log("ALL INTERSECTIONS", intersections.toString());
             Utils.log("CLOSEST INTERSECTION", closestIntersection.toString());
             Utils.log("CURRENT X AXIS", currentXAxis.toString());
             Utils.log("CURRENT Y AXIS", currentYAxis.toString());
             Utils.log("NEXT Y CELL X AXIS", nextYCellXAxis.toString());
             Utils.log("NEXT X CELL Y AXIS", nextXCellYAxis.toString());
             Utils.log("NEW CURRENT CELL: ", currentCell.toString());
-            Utils.log("----------------------------------------------");
+            Utils.log("----------------------------------------------");*/
 
 
         }
