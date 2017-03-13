@@ -59,7 +59,7 @@ public class WorldContainer {
     // Map for spatial hashing
     //  private HashMap<Vector2, Set<Object>> spatialHashingData = new HashMap<>();
     private HashMap<Vector2, EntityTileContainer> spatialHashingData = new HashMap<>();
-    private final int SPATIAL_HASH_GRID_SIZE = 2;
+    private final int SPATIAL_HASH_GRID_SIZE = 4;
 
     // Subset containing all projectiles
     private HashSet<Projectile> projectiles = new HashSet<>();

@@ -23,8 +23,8 @@ public class Lootable extends Entity implements LivingEntity {
 
     private final int SPRITE_SIZE = 24;
 
-    private final float WIDTH = 0.3725f;               //  24 pixel
-    private final float HEIGHT = 0.21875f;            //  19 Pixel - 5 Pixel "behind space
+    private final float WIDTH = 0.3725f*3;               //  24 pixel
+    private final float HEIGHT = 0.21875f*3;            //  19 Pixel - 5 Pixel "behind space
     private final float MASS = 0.4f;
     private final float FRICTION = 0.895f;
     private final float ELASTICITY = 0.45f;

@@ -506,7 +506,7 @@ public class InputHandler implements InputProcessor {
             Utils.log(rays.toString());
             Ray r = new Ray(player.getPosition().cpy().add(1,1), new Vector2(-1,1), Ray.INFINITE);
 
-            Utils.log(worldContainer.getClosestIntersection(rays,r).toString());
+            //Utils.log(worldContainer.getClosestIntersection(rays,r).toString());
 
         }
 
