@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.controller.levelgeneration.RandomLevelGenerator;
 import com.trent.awesomejumper.engine.entity.Entity;
+import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.engine.physics.Ray;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.Player;
@@ -371,7 +372,8 @@ public class WorldContainer {
         Utils.log("START OF RAYCASTING!");
         while (getTilesForCell(currentCell).isEmpty()) {
 
-            List<Ray> rays = new ArrayList<>();
+            //List<Ray> rays = new ArrayList<>();
+            HashSet<Ray> rays = new HashSet<>();
             List<Ray.Intersection> intersections = new ArrayList<>();
             // Choose the last penetration point as the starting point
             float lastPenetrationX = penetrationPoints.get(penetrationPoints.size() - 1).x;
@@ -384,6 +386,9 @@ public class WorldContainer {
             for(Entity e : entities) {
                 rays.addAll(e.getBody().getBounds().getRays());
             }
+
+            Ray.Intersection closestEntity = Collections.min(getIntersections(rays,aim));
+
 
 
             // Get the indices for the next hashing cells adjacent to the current one with regards
@@ -481,6 +486,17 @@ public class WorldContainer {
         return closest;
     }
 
+
+    public HashSet<Ray.Intersection> getIntersections(HashSet<Ray>hitboxRays, Ray toBeTested) {
+        HashSet<Ray.Intersection> intersections = new HashSet<>();
+        for(Ray other : hitboxRays) {
+            Ray.Intersection i = toBeTested.getIntersection(other);
+
+            if(i.intersect && i.distance > 0)
+                intersections.add(i);
+        }
+        return intersections;
+    }
 
     /**
      * Registers all entities and puts them in their respective collection
