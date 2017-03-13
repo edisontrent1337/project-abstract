@@ -348,7 +348,7 @@ public class WorldContainer {
 
 
     public List<Vector2> generateCrossedIndexes(Ray aim) {
-        Vector2 startCell = getSpatialIndex(aim.getStart());
+        Vector2 startCell = getSpatialIndex(aim.getOrigin());
         Vector2 currentCell = startCell;
         coveredIndexes.clear();
         penetrationPoints.clear();
@@ -362,7 +362,7 @@ public class WorldContainer {
 
 
         coveredIndexes.add(startCell);
-        penetrationPoints.add(aim.getStart());
+        penetrationPoints.add(aim.getOrigin());
 
         /**
          * As long as no solid world tiles like walls have been found,
@@ -377,6 +377,14 @@ public class WorldContainer {
             float lastPenetrationX = penetrationPoints.get(penetrationPoints.size() - 1).x;
             float lastPenetrationY = penetrationPoints.get(penetrationPoints.size() - 1).y;
             aim = new Ray(lastPenetrationX, lastPenetrationY, deltaX,deltaY,Ray.INFINITE);
+
+
+            HashSet<Entity> entities = getEntitiesForCell(currentCell);
+
+            for(Entity e : entities) {
+                rays.addAll(e.getBody().getBounds().getRays());
+            }
+
 
             // Get the indices for the next hashing cells adjacent to the current one with regards
             // to the ray direction.
@@ -458,6 +466,19 @@ public class WorldContainer {
         }
 
         return coveredIndexes;
+    }
+
+    public Ray.Intersection getClosestIntersection(HashSet<Ray>testRays, Ray toBeTested) {
+
+        ArrayList<Ray.Intersection> intersections = new ArrayList<>();
+        for(Ray other : testRays) {
+            Ray.Intersection i = toBeTested.getIntersection(other);
+                if(i.intersect && i.distance > 0)
+                    intersections.add(i);
+        }
+         Ray.Intersection closest = Collections.min(intersections);
+
+        return closest;
     }
 
 
@@ -896,6 +917,21 @@ public class WorldContainer {
                 spatialHashingData.get(index).getTiles().size();
     }
 
+
+    public ArrayList<Vector2> getCoveredIndexes() {
+
+        return coveredIndexes;
+    }
+
+    public ArrayList<Vector2> getPenetrationPoints() {
+        return penetrationPoints;
+    }
+
+
+    /**
+     * Inner class that manages entities and tiles for a given hashcell.
+     * Each hash cell contains an EntityTileContainer.
+     */
     private class EntityTileContainer {
 
         private HashSet<Tile> tiles;
@@ -923,15 +959,6 @@ public class WorldContainer {
         }
 
 
-    }
-
-
-    public ArrayList<Vector2> getCoveredIndexes() {
-        return coveredIndexes;
-    }
-
-    public ArrayList<Vector2> getPenetrationPoints() {
-        return penetrationPoints;
     }
 
 

@@ -497,11 +497,12 @@ public class InputHandler implements InputProcessor {
         }
 
         if(isPressed(TOGGLE_SPECIAL)) {
-            Ray r = new Ray(0,4,10,-4,20);
-            Ray s = new Ray(0,-2,3,2,23f);
+            HashSet<Ray> rays = player.getBody().getBounds().getRays();
+            Utils.log(rays.toString());
+            Ray r = new Ray(player.getPosition().cpy().add(-1,-1), new Vector2(1,1), Ray.INFINITE);
 
-            Ray.Intersection i = r.getIntersection(s);
-            Utils.log(i.toString());
+            Utils.log(worldContainer.getClosestIntersection(rays,r).toString());
+
         }
 
 

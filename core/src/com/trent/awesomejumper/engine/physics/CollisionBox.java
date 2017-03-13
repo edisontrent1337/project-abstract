@@ -7,6 +7,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.trent.awesomejumper.utils.Utils;
 
+import java.util.HashSet;
+
 import static com.trent.awesomejumper.utils.Utils.getNormal;
 import static com.trent.awesomejumper.utils.Utils.sub;
 
@@ -37,6 +39,7 @@ import static com.trent.awesomejumper.utils.Utils.sub;
  */
 public class CollisionBox {
 
+    // ---------------------------------------------------------------------------------------------
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
 
@@ -69,6 +72,7 @@ public class CollisionBox {
     private float damageCoefficient;
     private Color color = Utils.color();
 
+    // ---------------------------------------------------------------------------------------------
     // CONSTRUCTORS
     // ---------------------------------------------------------------------------------------------
 
@@ -167,6 +171,7 @@ public class CollisionBox {
 
 
 
+    // ---------------------------------------------------------------------------------------------
     // METHODS & FUNCTIONS
     // ---------------------------------------------------------------------------------------------
 
@@ -185,7 +190,7 @@ public class CollisionBox {
     }
 
     // DRAW
-    // ----------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------
     /** Draws the outline, the vertices and the normals of the collisionBox
      * @param renderer Instance of the libGdx ShapeRenderer Class used to draw the CollisionBox
      */
@@ -261,6 +266,24 @@ public class CollisionBox {
 
     }
 
+
+    public HashSet<Ray> getRays() {
+
+        HashSet<Ray> result = new HashSet<>();
+        Ray ray;
+        for(int i = 0; i < vertices.size; i++) {
+            Vector2 origin = vertices.get(i).cpy();
+            Vector2 direction = edges.get(i).cpy().nor();
+            float length = edges.get(i).len();
+            ray = new Ray(origin, direction,length);
+            Utils.log("GENERATED RAY: ", ray.toString());
+            result.add(ray);
+        }
+
+        return result;
+    }
+
+    // ---------------------------------------------------------------------------------------------
     // GETTER & SETTER
     // ---------------------------------------------------------------------------------------------
 
