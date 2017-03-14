@@ -345,9 +345,6 @@ public class WorldContainer {
      * @return
      */
 
-
-
-
     public List<Vector2> generateCrossedIndexes(Ray aim) {
         Vector2 startCell = getSpatialIndex(aim.getOrigin());
         Vector2 currentCell = startCell;
@@ -365,12 +362,15 @@ public class WorldContainer {
         coveredIndexes.add(startCell);
         penetrationPoints.add(aim.getOrigin());
 
+        boolean foundWall = false;
+
         /**
          * As long as no solid world tiles like walls have been found,
          * the ray continues to travel.
          */
         Utils.log("START OF RAYCASTING!");
-        while (getTilesForCell(currentCell).isEmpty()) {
+       // while (getTilesForCell(currentCell).isEmpty()) {
+        while (!foundWall) {
 
             //List<Ray> rays = new ArrayList<>();
             HashSet<Ray> rays = new HashSet<>();
@@ -378,28 +378,53 @@ public class WorldContainer {
             // Choose the last penetration point as the starting point
             float lastPenetrationX = penetrationPoints.get(penetrationPoints.size() - 1).x;
             float lastPenetrationY = penetrationPoints.get(penetrationPoints.size() - 1).y;
+
+            // Set the aim ray to start at the last penetration point
             aim = new Ray(lastPenetrationX, lastPenetrationY, deltaX,deltaY,Ray.INFINITE);
 
 
+
+            Utils.log("CURRENT CELL", currentCell.toString());
+            Utils.log("RAY START:", aim.toString());
             HashSet<Entity> entities = getEntitiesForCell(currentCell);
-            Utils.log("ENTITIES SIZE", rays.size());
+            Utils.log("ENTITIES SIZE", entities.size());
 
+
+            // Iterating over all entities in the current hash cell to gather all intersections.
+            // For each entity, collect the rays that describe the bounding box of the entity.
             for(Entity e : entities) {
+                Utils.log("-------------ENTITIES-----------------");
+                Utils.log("CURRENT ENTITY ",e.toString());
                 rays.addAll(e.getBody().getBounds().getRays());
-            }
-
-            Utils.log("RAYS SIZE", rays.size());
-
-            if(rays.size() > 0) {
-                HashSet<Ray.Intersection> entityIntersections = getIntersections(rays, aim);
-
-                if(entityIntersections.size() > 0) {
-                    Ray.Intersection closestIntersection = Collections.min(entityIntersections);
-                    penetrationPoints.add(closestIntersection.result);
-                    //continue;
+                Utils.log("NUM OF RAYS", rays.size());
+                // If rays were generated, determine all intersections with the aim ray.
+                if(rays.size() > 0) {
+                    HashSet<Ray.Intersection> entityIntersections = getIntersections(rays, aim);
+                    Utils.log("GENERATED INTERSECTIONS ", entityIntersections.toString());
+                    // If intersections were found, choose the closest intersection and add its
+                    // penetration point to the list of current penetration points.
+                    if(entityIntersections.size() > 0) {
+                        Ray.Intersection closestIntersection = Collections.min(entityIntersections);
+                        Utils.log("CLOSEST INTERSECTION FOR ENTITY", closestIntersection.toString());
+                        penetrationPoints.add(closestIntersection.result);
+                    }
                 }
+                Utils.log("----------------------------------------" + "\n");
+                // After we finished with one entity, the set has to be cleared for the next one.
+                rays.clear();
+
             }
+
+            Utils.log("FINISHED ENTITY RAY CASTING FOR CURRENT CELL " + currentCell.toString());
+
+
+
+
+
             //Ray.Intersection closestEntity = Collections.min(getIntersections(rays,aim));
+
+            //TODO: add something like: if(aim.penetrationpower <= 0): break
+            //TODO: if the ray has no punch left, break this loop early.
 
             rays.clear();
 
@@ -441,45 +466,45 @@ public class WorldContainer {
             }
 
 
-            /*Ray.Intersection closestIntersection = Collections.min(intersections, new Comparator<Ray.Intersection>() {
-                @Override
-                public int compare(Ray.Intersection o1, Ray.Intersection o2) {
-                    return Float.compare(Math.abs(o1.distance), Math.abs(o2.distance));
-                }
-            });
 
-            float minDst = Float.MAX_VALUE;
-            for(Ray.Intersection intersection : intersections) {
-                if(Math.abs(intersection.distance) < Math.abs(minDst)) {
-                    closestIntersection = intersection;
-                    minDst = intersection.distance;
-                }
-            }*/
-
-            Ray.Intersection closestIntersection = Collections.min(intersections);
-            Vector2 penetrationPoint = closestIntersection.result;
+            Ray.Intersection closestHashCellIntersection = Collections.min(intersections);
+            Vector2 penetrationPoint = closestHashCellIntersection.result;
             penetrationPoints.add(penetrationPoint);
+
+            rays.clear();
+
+
+            //TODO: FIND THE CLOSEST INTERSECTION ON THE WALL TILES
+            for(Tile t: getTilesForCell(currentCell)) {
+                rays.addAll(t.getCollisionBox().getRays());
+            }
+
+            if(rays.size() > 0) {
+                HashSet<Ray.Intersection> tileIntersections = getIntersections(rays, aim);
+
+                if(tileIntersections.size() > 0) {
+                    Ray.Intersection closestIntersection = Collections.min(tileIntersections);
+                    Utils.log("CLOSEST INTERSECTION FOR TILE", closestIntersection.toString());
+                    penetrationPoints.add(closestIntersection.result);
+                    foundWall = true;
+                }
+
+            }
+
+
+            rays.clear();
 
 
             Utils.log("OLD CURRENT CELL: ", currentCell.toString());
-            if(closestIntersection.origin == currentXAxis || closestIntersection.origin == nextYCellXAxis) {
+            if(closestHashCellIntersection.origin == currentXAxis || closestHashCellIntersection.origin == nextYCellXAxis) {
                 coveredIndexes.add(nextYCell);
                 currentCell = nextYCell;
             }
 
-            else if(closestIntersection.origin == currentYAxis || closestIntersection.origin == nextXCellYAxis) {
+            else if(closestHashCellIntersection.origin == currentYAxis || closestHashCellIntersection.origin == nextXCellYAxis) {
                 coveredIndexes.add(nextXCell);
                 currentCell = nextXCell;
             }
-
-            /*Utils.log("ALL INTERSECTIONS", intersections.toString());
-            Utils.log("CLOSEST INTERSECTION", closestIntersection.toString());
-            Utils.log("CURRENT X AXIS", currentXAxis.toString());
-            Utils.log("CURRENT Y AXIS", currentYAxis.toString());
-            Utils.log("NEXT Y CELL X AXIS", nextYCellXAxis.toString());
-            Utils.log("NEXT X CELL Y AXIS", nextXCellYAxis.toString());
-            Utils.log("NEW CURRENT CELL: ", currentCell.toString());
-            Utils.log("----------------------------------------------");*/
 
 
         }
@@ -500,13 +525,20 @@ public class WorldContainer {
         return closest;
     }
 
-
-    public HashSet<Ray.Intersection> getIntersections(HashSet<Ray>hitboxRays, Ray toBeTested) {
+    /**
+     * Generates all intersection objects for a given reference ray against a set of othertest rays.
+     * Can be used to get the intersections of an aim ray against the rays of a collision box.
+     * @param otherRays Set containing rays.
+     * @param reference Reference ray that should collide with the set of other rays.
+     * @return
+     */
+    public HashSet<Ray.Intersection> getIntersections(HashSet<Ray>otherRays, Ray reference) {
         HashSet<Ray.Intersection> intersections = new HashSet<>();
-        for(Ray other : hitboxRays) {
-            Ray.Intersection i = toBeTested.getIntersection(other);
-
-            if(i.intersect && i.distance > 0)
+        for(Ray other : otherRays) {
+            Ray.Intersection i = reference.getIntersection(other);
+            // If the intersection object says, that an intersecton occurs, the current intersection
+            // is added to the result set.
+            if(i.intersect)
                 intersections.add(i);
         }
         return intersections;

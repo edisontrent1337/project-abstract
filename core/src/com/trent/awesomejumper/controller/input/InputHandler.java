@@ -36,6 +36,7 @@ import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.
 import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.MOVE_RIGHT;
 import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.MOVE_UP;
 import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.PICKUP;
+import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.RAY_CASTING;
 import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.RELOAD;
 import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.SHOW_PENETRATION_POINTS;
 import static com.trent.awesomejumper.controller.input.InputHandler.KeyBindings.TOGGLE_BODY_DRAWING;
@@ -79,7 +80,8 @@ public class InputHandler implements InputProcessor {
         CLEAR_POPUPS(Keys.C, true),
         TOGGLE_SPECIAL(Keys.U,true),
         SHOW_PENETRATION_POINTS(Keys.V, true),
-        TOGGLE_LOGGING(Keys.L, true)
+        TOGGLE_LOGGING(Keys.L, true),
+        RAY_CASTING(Keys.X, true),
         ;
 
 
@@ -482,9 +484,14 @@ public class InputHandler implements InputProcessor {
                     PopUpRenderer.getInstance().addMessageToCategory(PopUpRenderer.PopUpCategories.HEAL, new Message(penetrationPoint.toString(), penetrationPoint, WorldController.worldTime, PopUpRenderer.INFINITE_MESSAGE));
                 }
             }
-
             if(isPressed(TOGGLE_LOGGING))
                 AwesomeJumperMain.toggleLogging();
+            if(isPressed(RAY_CASTING)) {
+                if(!player.getWeaponInventory().isHoldingAWeapon())
+                    return;
+                Ray r = new Ray(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter(), player.getWeaponInventory().getSelectedWeapon().getBody().getOrientation().cpy(), Ray.INFINITE);
+                worldContainer.generateCrossedIndexes(r);
+            }
         }
         // RELOAD
         // acts like toggling a button, pressed once and processed only once

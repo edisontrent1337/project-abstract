@@ -1,6 +1,9 @@
 package com.trent.awesomejumper.engine.physics;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.StringBuilder;
+import com.trent.awesomejumper.engine.entity.Entity;
+import com.trent.awesomejumper.utils.Interval;
 import com.trent.awesomejumper.utils.Utils;
 
 /**
@@ -20,10 +23,12 @@ public class Ray {
     public static final float INFINITE = Float.MAX_VALUE;       // static constant for infinite length
     private float length = 0f;                                  // default length is 0
 
+    private Entity owner;
+
     // ---------------------------------------------------------------------------------------------
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
-    public Ray() {
+    public Ray(Entity owner) {
         this.origin = new Vector2(0f,0f);
         this.dir = new Vector2(1f,0f);
         this.originX = origin.x;
@@ -31,15 +36,17 @@ public class Ray {
         this.xDir = dir.cpy().nor().x;
         this.yDir = dir.cpy().nor().y;
         this.length = INFINITE;
+        this.owner = owner;
     }
 
-    public Ray(float startX, float startY, float xDir, float yDir, float length) {
-        this(new Vector2(startX,startY), new Vector2(xDir,yDir), length);
+    public Ray(float originX, float originY, float xDir, float yDir, float length) {
+        this(new Vector2(originX,originY), new Vector2(xDir,yDir), length);
+
     }
-    public Ray(Vector2 start, Vector2 direction) {
-        this.origin = start;
-        this.originX = start.x;
-        this.originY = start.y;
+    public Ray(Vector2 origin, Vector2 direction) {
+        this.origin = origin;
+        this.originX = origin.x;
+        this.originY = origin.y;
         this.dir = direction.cpy().nor();
         this.xDir = dir.x;
         this.yDir = dir.y;
@@ -48,7 +55,11 @@ public class Ray {
 
     public Ray(Vector2 start, Vector2 direction, float length) {
         this(start,direction);
-        this.length = length;
+        if(length < 0)
+            throw new IllegalArgumentException("THE LENGTH OF A RAY MUST BE GREATER THAN 0");
+        else {
+            this.length = length;
+        }
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -67,19 +78,28 @@ public class Ray {
             return new Intersection(null, false, Float.MAX_VALUE, other);
 
         // Calculate the coefficient for the other ray.
-        float b = (xDir*(other.originY - originY) + yDir*(originX -other.originX)) / (other.xDir*yDir-other.yDir*xDir);
+        float otherCoefficient = (xDir*(other.originY - originY) + yDir*(originX -other.originX)) / (other.xDir*yDir-other.yDir*xDir);
         // Calculate the coefficient for this ray.
-        float a = (other.originX + b*other.xDir- originX) / xDir;
+        float originCoefficient = (other.originX + otherCoefficient*other.xDir- originX) / xDir;
         Vector2 result = null;
-        boolean intersect = false;
-        // Only if b and a are smaller than the lengths of the two rays, the intersection lays on
-        // both rays.
-        if(Math.abs(b) <= other.length && Math.abs(a) <= length) {
-            result = origin.cpy().add(dir.cpy().scl(a));
-            intersect = true;
+
+        Utils.log("THIS RAY", this.toString());
+        Utils.log("GENERATED COEFFICIENT FOR THIS",originCoefficient);
+        Utils.log("ORIGIN LENGTH",this.length);
+        Utils.log("OTHER RAY", other.toString());
+        Utils.log("GENERATED COEFFICIENT FOR OTHER",otherCoefficient);
+        Utils.log("OTHERS LENGTH",other.length);
+        Utils.log("-------NEXT RAY--------" + "\n");
+
+        // Only if b and a are smaller than the lengths of the two rays and both positive, the intersection lays on
+        // both rays on the desired direction.
+        //(if(Math.abs(otherCoefficient) <= other.length && Math.abs(originCoefficient) <= length && otherCoefficient > 0 && originCoefficient > 0) {
+        if(otherCoefficient <= other.length && originCoefficient <= length && otherCoefficient > 0 && originCoefficient > 0) {
+            result = origin.cpy().add(dir.cpy().scl(originCoefficient));
+            return new Intersection(result,true,originCoefficient,other);
         }
 
-        return new Intersection(result,intersect,a, other);
+        return new Intersection(result,false,originCoefficient, other);
     }
 
 
@@ -127,7 +147,7 @@ public class Ray {
             this.distance = distance;
             this.origin = origin;
             if(intersect && result!=null)
-                this.summary = "INTERSECTION AT: " + Utils.printVec(result) + " DST: " + distance;
+                this.summary = "INTERSECTION AT: " + Utils.printVec(result) + " DST: " + distance + "RESPONS. RAY: " + origin.toString();
             else
                 this.summary = "NO INTERSECTION FOUND.";
         }

@@ -64,7 +64,7 @@ public class RenderingEngine extends Renderer {
     private final float LERP_FACTOR = 0.075f;
     private final float ZOOM = 0.6f;
 
-    private final float BOX_SIZE = 0.1f;
+    private final float BOX_SIZE = 0.05f;
 
     protected static Vector2 camPositionInPx;
     private Vector3 unprojectedMousePosition;
@@ -642,9 +642,9 @@ public class RenderingEngine extends Renderer {
                 shapeRenderer.setColor(1, 0, 0, 1);
                 e.getBounds().draw(shapeRenderer);
                 if (game.bodyEnabled()) {
-                    for (CollisionBox r : e.getBodyHitboxes()) {
+                    for (CollisionBox box : e.getBodyHitboxes()) {
                         shapeRenderer.setColor(Color.YELLOW);
-                        r.draw(shapeRenderer);
+                        box.draw(shapeRenderer);
                     }
                 }
 
@@ -660,10 +660,8 @@ public class RenderingEngine extends Renderer {
         }
         shapeRenderer.end();
 
-        /**
-         * Drawing the debug penetration points of ray casting.
-         */
-        drawPenetrationPoints();
+
+
 
 
         /**
@@ -671,7 +669,7 @@ public class RenderingEngine extends Renderer {
          */
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         {
-            shapeRenderer.setColor(Color.GREEN);
+            shapeRenderer.setColor(Color.BLUE);
             if (player.getWeaponInventory().isHoldingAWeapon())
                 shapeRenderer.line(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter().cpy(), player.getWeaponInventory().getSelectedWeapon().getBody().getAimReference().cpy());
 
@@ -709,7 +707,12 @@ public class RenderingEngine extends Renderer {
             }
             //Utils.log(String.format("%1d|%2d|%3d%4d", x*spatialSize,y*spatialSize, worldContainer.getSpatialFactor(), worldContainer.getSpatialFactor()));
         }
+
+        /**
+         * Drawing the debug penetration points of ray casting.
+         */
         shapeRenderer.end();
+        drawPenetrationPoints();
 
 
         // HITBOXES OF TILES AFFECTED BY COLLISION DETECTION
@@ -744,11 +747,6 @@ public class RenderingEngine extends Renderer {
         if(!player.getWeaponInventory().isHoldingAWeapon())
             return;
 
-        //worldContainer.generateCrossedIndexes(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter().cpy(),
-        //            player.getWeaponInventory().getSelectedWeapon().getBody().getOrientation().cpy());
-
-        Ray r = new Ray(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter().cpy(),player.getWeaponInventory().getSelectedWeapon().getBody().getOrientation().cpy(), Ray.INFINITE);
-        worldContainer.generateCrossedIndexes(r);
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         Gdx.gl.glEnable(GL20.GL_BLEND);
@@ -760,7 +758,7 @@ public class RenderingEngine extends Renderer {
                 shapeRenderer.rect(index.x, index.y, worldContainer.getSpatialFactor(), worldContainer.getSpatialFactor());
             }
 
-            shapeRenderer.setColor(0,1f,0,1f);
+            shapeRenderer.setColor(1,1f,0,1f);
             for (Vector2 index : worldContainer.getPenetrationPoints()) {
 
                 shapeRenderer.rect(index.x - BOX_SIZE / 2f, index.y - BOX_SIZE / 2f, BOX_SIZE, BOX_SIZE);

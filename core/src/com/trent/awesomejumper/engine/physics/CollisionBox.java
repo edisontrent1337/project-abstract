@@ -70,7 +70,7 @@ public class CollisionBox {
 
     // TESTING
     private float damageCoefficient;
-    private Color color = Utils.color();
+    private Color color = Color.RED;
 
     // ---------------------------------------------------------------------------------------------
     // CONSTRUCTORS
@@ -227,7 +227,7 @@ public class CollisionBox {
         }
 
         renderer.set(ShapeRenderer.ShapeType.Filled);
-        renderer.setColor(Color.GREEN);
+        renderer.setColor(Color.GRAY);
         for (Vector2 v : vertices) {
             renderer.rect(v.x - VHALF, v.y - VHALF, VSIZE, VSIZE);
         }
@@ -274,7 +274,7 @@ public class CollisionBox {
         for(int i = 0; i < vertices.size; i++) {
             Vector2 origin = vertices.get(i).cpy();
             Vector2 direction = edges.get(i).cpy().nor();
-            float length = edges.get(i).len();
+            float length = edges.get(i).cpy().len();
             ray = new Ray(origin, direction,length);
             Utils.log("GENERATED RAY: ", ray.toString());
             result.add(ray);
