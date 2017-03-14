@@ -18,6 +18,7 @@ import com.trent.awesomejumper.engine.modelcomponents.popups.Message;
 import com.trent.awesomejumper.engine.physics.Ray;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.Player;
+import com.trent.awesomejumper.models.lootable.Lootable;
 import com.trent.awesomejumper.models.weapons.Weapon;
 import com.trent.awesomejumper.utils.Utils;
 
@@ -509,10 +510,9 @@ public class InputHandler implements InputProcessor {
         }
 
         if(isPressed(TOGGLE_SPECIAL)) {
-            HashSet<Ray> rays = player.getBody().getBounds().getRays();
-            Utils.log(rays.toString());
-            Ray r = new Ray(player.getPosition().cpy().add(1,1), new Vector2(-1,1), Ray.INFINITE);
 
+            Lootable l = new Lootable(mouse.cpy());
+            l.register();
             //Utils.log(worldContainer.getClosestIntersection(rays,r).toString());
 
         }

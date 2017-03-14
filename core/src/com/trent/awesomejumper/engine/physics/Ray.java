@@ -94,7 +94,7 @@ public class Ray {
         // Only if b and a are smaller than the lengths of the two rays and both positive, the intersection lays on
         // both rays on the desired direction.
         //(if(Math.abs(otherCoefficient) <= other.length && Math.abs(originCoefficient) <= length && otherCoefficient > 0 && originCoefficient > 0) {
-        if(otherCoefficient <= other.length && originCoefficient <= length && otherCoefficient > 0 && originCoefficient > 0) {
+        if(otherCoefficient <= other.length && originCoefficient <= length && otherCoefficient > 0 && originCoefficient >= 0) {
             result = origin.cpy().add(dir.cpy().scl(originCoefficient));
             return new Intersection(result,true,originCoefficient,other);
         }

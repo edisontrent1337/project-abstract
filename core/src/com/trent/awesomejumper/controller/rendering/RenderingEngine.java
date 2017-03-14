@@ -592,7 +592,7 @@ public class RenderingEngine extends Renderer {
         setDebugTag(DE_RAY_DIRECTION, "" + player.getBody().getOrientation().cpy().nor());
 
         //setDebugTag(DE_RAY_END, ""+ worldContainer.generateCrossedIndexes(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter().cpy(), player.getBody().getOrientation().cpy()));
-        setDebugTag(DE_RAY_END, ""+ worldContainer.generateCrossedIndexes(new Ray(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter().cpy(), player.getBody().getOrientation().cpy(), Ray.INFINITE)));
+        setDebugTag(DE_RAY_END, "");//+ worldContainer.generateCrossedIndexes(new Ray(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter().cpy(), player.getBody().getOrientation().cpy(), Ray.INFINITE)));
 
 
         // LOGGING
@@ -692,8 +692,8 @@ public class RenderingEngine extends Renderer {
                 int numberOfEntities = worldContainer.getEntitiesForCell(index).size();
                 int numberOfTiles = worldContainer.getTilesForCell(index).size();
 
-
-                if (numberOfTiles >= 0) {
+                    if(numberOfTiles == 0)
+                        shapeRenderer.setColor(Color.YELLOW);
                     if (numberOfTiles == 1)
                         shapeRenderer.setColor(Color.RED);
                     else if (numberOfTiles == 2)
@@ -703,7 +703,6 @@ public class RenderingEngine extends Renderer {
                     else if (numberOfTiles > 3)
                         shapeRenderer.setColor(Color.PINK);
                     shapeRenderer.rect(index.x, index.y, worldContainer.getSpatialFactor(), worldContainer.getSpatialFactor());
-                }
             }
             //Utils.log(String.format("%1d|%2d|%3d%4d", x*spatialSize,y*spatialSize, worldContainer.getSpatialFactor(), worldContainer.getSpatialFactor()));
         }
