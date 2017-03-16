@@ -362,6 +362,30 @@ public class WorldContainer {
 
 
     /**
+     * Returns all entities for a set of hash cells.
+     * This method is used to
+     *
+     * @param hashIndexes set of hash cells.
+     * @return set of entities.
+     */
+    private HashSet<Entity> gatherEntities(HashSet<Vector2> hashIndexes) {
+        HashSet<Entity> result = new HashSet<>();
+        for(Vector2 index : hashIndexes) {
+
+            result.addAll(getEntitiesForCell(index));
+
+        }
+
+        return result;
+    }
+
+    private HashSet<Vector2> getEntityPenetrationPoints(Ray aim, HashSet<Entity> entities) {
+
+
+        return null;
+    }
+
+    /**
      * Returns a list of passed hash cells from a starting point in a direction to the closest
      * wall.
      * @return
@@ -433,7 +457,9 @@ public class WorldContainer {
                         Utils.log("CLOSEST INTERSECTION FOR ENTITY", closestIntersection.toString());
                         Vector2 p = closestIntersection.result.cpy();
                         penetrationPoints.add(p);
+                        // setting the aim ray
                         aim = new Ray(p.x, p.y, deltaX, deltaY, Ray.INFINITE);
+                        // adding the spatial index of the calculated penetration point
                         if(!coveredIndexes.contains(p))
                             coveredIndexes.add(getSpatialIndex(p));
                     }
@@ -464,6 +490,7 @@ public class WorldContainer {
             Utils.log("TILES SIZE", tiles.size());
 
             //TODO: FIND THE CLOSEST INTERSECTION ON THE WALL TILES
+            // IF THERE ARE ANY TILES IN THE CURRENT CELL
             for (Tile t : getTilesForCell(currentCell)) {
                 Utils.log("", "-------------TILE------------:" + t.toString());
                 rays.addAll(t.getCollisionBox().getRays());
