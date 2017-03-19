@@ -98,7 +98,10 @@ public class WorldContainer {
     //private ArrayList<Vector2> coveredIndexes = new ArrayList<>();
     private ArrayList<Vector2> coveredIndexes = new ArrayList<>();
 
+    private HashSet<Vector2> coveredHashCells = new HashSet<>();
+
     private ArrayList<Vector2> penetrationPoints = new ArrayList<>();
+    private ArrayList<Vector2> entityPenetrationPoints = new ArrayList<>();
     boolean draw = false;
 
     // CONSTRUCTOR
@@ -379,11 +382,20 @@ public class WorldContainer {
         return result;
     }
 
+
+    public void rayCast(Ray ray) {
+        // get all hash cells the ray covers
+        // get the final tile the ray touches
+        // get all entities from the touched hash cells
+        //
+    }
+
     private HashSet<Vector2> getEntityPenetrationPoints(Ray aim, HashSet<Entity> entities) {
 
 
         return null;
     }
+
 
     /**
      * Returns a list of passed hash cells from a starting point in a direction to the closest
