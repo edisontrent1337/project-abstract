@@ -6,6 +6,8 @@ import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.utils.Interval;
 import com.trent.awesomejumper.utils.Utils;
 
+import java.util.HashSet;
+
 /**
  * Ray class used to resolve entity / projectile collisions and world / projectile collisions.
  * Created by Sinthu on 12.11.2016.
@@ -24,6 +26,12 @@ public class Ray {
     private float length = 0f;                                  // default length is 0
 
     private Entity owner;
+
+    private HashSet<Integer> penetratedEntities = new HashSet<>();
+
+    private HashSet<Vector2> hitHashCells = new HashSet<>();
+    private HashSet<Vector2> entityPenetrationPoins = new HashSet<>();
+
 
     // ---------------------------------------------------------------------------------------------
     // CONSTRUCTOR
@@ -83,26 +91,40 @@ public class Ray {
         float originCoefficient = (other.originX + otherCoefficient*other.xDir- originX) / xDir;
         Vector2 result = null;
 
+
         Utils.log("THIS RAY", this.toString());
         Utils.log("GENERATED COEFFICIENT FOR THIS",originCoefficient);
         Utils.log("ORIGIN LENGTH",this.length);
         Utils.log("OTHER RAY", other.toString());
         Utils.log("GENERATED COEFFICIENT FOR OTHER",otherCoefficient);
         Utils.log("OTHERS LENGTH",other.length);
-        Utils.log("-------NEXT RAY--------" + "\n");
 
         // Only if b and a are smaller than the lengths of the two rays and both positive, the intersection lays on
         // both rays on the desired direction.
         //(if(Math.abs(otherCoefficient) <= other.length && Math.abs(originCoefficient) <= length && otherCoefficient > 0 && originCoefficient > 0) {
         if(otherCoefficient <= other.length && originCoefficient <= length && otherCoefficient > 0 && originCoefficient >= 0) {
+
             result = origin.cpy().add(dir.cpy().scl(originCoefficient));
+
+            result.x = Math.round(result.x*10000.0f)/10000f;
+            result.y = Math.round(result.y*10000.0f)/10000f;
             return new Intersection(result,true,originCoefficient,other);
         }
 
-        return new Intersection(result,false,originCoefficient, other);
+        return new Intersection(result,false, originCoefficient, other);
     }
 
+    public void addHitHashCell(Vector2 index) {
+        hitHashCells.add(index);
+    }
 
+    public void addEntityPenetrationPoint(Vector2 point) {
+        entityPenetrationPoins.add(point);
+    }
+
+    public void addPenetratedEntity(int id) {
+        penetratedEntities.add(id);
+    }
     // ---------------------------------------------------------------------------------------------
     // GETTER & SETTER
     // ---------------------------------------------------------------------------------------------

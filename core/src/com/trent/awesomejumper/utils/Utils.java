@@ -219,6 +219,8 @@ public class Utils {
         log(title, Integer.toString(i));
     }
 
-
+    public static void log(String title, double d) {
+        log(title, Double.toString(d));
+    }
 
 }

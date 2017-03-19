@@ -24,7 +24,6 @@ import com.trent.awesomejumper.controller.input.InputHandler;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
-import com.trent.awesomejumper.engine.physics.Ray;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.SkyBox;
@@ -751,10 +750,15 @@ public class RenderingEngine extends Renderer {
         Gdx.gl.glEnable(GL20.GL_BLEND);
         if(player.getWeaponInventory().isHoldingAWeapon()) {
             shapeRenderer.setColor(1f,0,0,0.33f);
-            for (Vector2 index : worldContainer.getCoveredIndexes()) {
+            for (Vector2 index : worldContainer.getHitHashCells()) {
 
                 //shapeRenderer.rect(index.x - BOX_SIZE / 2f, index.y - BOX_SIZE / 2f, BOX_SIZE, BOX_SIZE);
                 shapeRenderer.rect(index.x, index.y, worldContainer.getSpatialFactor(), worldContainer.getSpatialFactor());
+            }
+            shapeRenderer.setColor(1f,0f,1f,1f);
+            for(Vector2 point : worldContainer.getEntityPenetrationPoints()) {
+                shapeRenderer.rect(point.x - BOX_SIZE / 2f, point.y - BOX_SIZE / 2f, BOX_SIZE, BOX_SIZE);;
+
             }
 
             shapeRenderer.setColor(1,1f,0,1f);

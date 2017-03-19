@@ -491,7 +491,7 @@ public class InputHandler implements InputProcessor {
                 if(!player.getWeaponInventory().isHoldingAWeapon())
                     return;
                 Ray r = new Ray(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter(), player.getWeaponInventory().getSelectedWeapon().getBody().getOrientation().cpy(), Ray.INFINITE);
-                worldContainer.generateCrossedIndexes(r);
+                worldContainer.rayCast(r);
             }
         }
         // RELOAD
