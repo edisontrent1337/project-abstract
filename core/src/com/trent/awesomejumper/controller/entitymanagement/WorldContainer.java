@@ -131,9 +131,6 @@ public class WorldContainer {
         spatialHashingData.clear();
         for (int x = 0; x < SPATIAL_WIDTH; x++) {
             for (int y = 0; y < SPATIAL_HEIGHT; y++) {
-                //spatialHashingData.put(new Vector2(x*SPATIAL_HASH_GRID_SIZE, y*SPATIAL_HASH_GRID_SIZE), new HashSet<Object>());
-                //TODO: only clear entities hashset and test performance.
-                //TODO: count number of hashing ds updates.
                 spatialHashingData.put(new Vector2(x * SPATIAL_HASH_GRID_SIZE, y * SPATIAL_HASH_GRID_SIZE), new EntityTileContainer());
             }
         }
@@ -477,7 +474,6 @@ public class WorldContainer {
          * the ray continues to travel.
          */
         Utils.log("START OF RAYCASTING!");
-       // while (getTilesForCell(currentCell).isEmpty()) {
 
         while (!foundWall && validHashIndexes.contains(currentCell)) {
 
@@ -511,8 +507,6 @@ public class WorldContainer {
             Utils.log("START OF TILE RAY CASTING");
             Utils.log("TILES SIZE", tiles.size());
 
-            //TODO: FIND THE CLOSEST INTERSECTION ON THE WALL TILES
-            // IF THERE ARE ANY TILES IN THE CURRENT CELL
             for (Tile t : getTilesForCell(currentCell)) {
                 Utils.log("", "-------------TILE------------:" + t.toString());
                 rays.addAll(t.getCollisionBox().getRays());

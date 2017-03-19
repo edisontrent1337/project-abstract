@@ -177,7 +177,6 @@ public class InputHandler implements InputProcessor {
         return false;
     }
 
-    //TODO: implement this.
     public HashSet<KeyBindings> getPressedKeys() {
 
         HashSet<KeyBindings> pressedKeys = new HashSet<>();
@@ -243,7 +242,6 @@ public class InputHandler implements InputProcessor {
 
         // DROP WEAPON
 
-        //TODO: ADD POPUP WHICH SHOWS TIMINGS FOR DROPPING THE WEAPON
         //TODO: MOVE TIMINGS INTO dropWeapon() method
         if (isPressed(DROP) && (WorldController.worldTime - DROP.timePressed > DROP.threshold)) {
             if (player.getWeaponInventory().isHoldingAWeapon()) {

@@ -195,23 +195,6 @@ public class CollisionController {
         entity.getVelocity().scl(delta);
         entity.getBody().setCollidedWithWorld(false);
 
-        // -----------------------------------------------------------------------------------------
-        // VERTICAL COLLISION DETECTION
-        // -----------------------------------------------------------------------------------------
-
-        cdStartX = (int) (entity.getBounds().getPositionAndOffset().x);
-        cdEndX = (int) (entity.getBounds().getPositionAndOffset().x + entity.getBounds().getWidth());
-
-        /**
-         * Cover tiles which might be in the range of the entities intended movement.
-         */
-        if (entity.getVelocity().y <= 0)
-            cdStartY = cdEndY = (int) Math.floor(entity.getBounds().getPositionAndOffset().y + entity.getVelocity().y);
-        else
-            cdStartY = cdEndY = (int) Math.floor(entity.getBounds().getPositionAndOffset().y + entity.getBounds().getHeight() + entity.getVelocity().y);
-
-        // Create array of tiles surrounding the entity which are covered by the collision detection
-        worldContainer.fillCollideableTiles(cdStartX, cdStartY, cdEndX, cdEndY);
 
         // USING NOW HASH DS
         for (Tile tile : worldContainer.getTilesNearby(entity)) {
@@ -267,66 +250,6 @@ public class CollisionController {
         resolutionVector.x = 0f;
         resolutionVector.y = 0f;
 
-        // -----------------------------------------------------------------------------------------
-        // HORIZONTAL COLLISION DETECTION
-        // -----------------------------------------------------------------------------------------
-
-        cdStartY = (int) (entity.getBounds().getPositionAndOffset().y);
-        cdEndY = (int) (entity.getBounds().getPositionAndOffset().y + entity.getBounds().getHeight());
-
-        /**
-         * Cover tiles which might be in the range of the entities intended movement.
-         */
-
-        if (entity.getVelocity().x <= 0) {
-            cdStartX = cdEndX = (int) Math.floor(entity.getBounds().getPositionAndOffset().x + entity.getVelocity().x);
-        } else {
-            cdStartX = cdEndX = (int) Math.floor(entity.getBounds().getPositionAndOffset().x + entity.getBounds().getWidth() + entity.getVelocity().x);
-        }
-
-        // Create array of tiles surrounding the player which are covered by the collision detection
-        worldContainer.fillCollideableTiles(cdStartX, cdStartY, cdEndX, cdEndY);
-
-        for (Tile tile : worldContainer.getTilesNearby(entity)) {
-
-            CollisionBox entityCollisionBox = entity.getBounds();
-            CollisionBox tileBox = tile.getCollisionBox();
-
-            /**
-             * If the entity is a projectile, projectile/world collision has to be resolved.
-             */
-            if (entity.getClass() == Projectile.class) {
-                if (projectileCollisionDetection((Projectile) entity, tile))
-                    return;     // exit collision routine
-                else
-                    continue; // continue with next tile
-            }
-            /**
-             * If a collision occurs between a solid world tile and the entity the corresponding entities
-             * velocity component will be reset to 0 and the resolutionVector is added to the entities
-             * position to resolve the conflict.
-             * Also, an orthogonal impulse is created and added to the entities list of impulses.
-             */
-            if (checkCollision(tileBox, entityCollisionBox) & !tile.isPassable()) {
-                entity.getBody().setCollidedWithWorld(true);
-                if (!entity.equals(player)) {
-                    entity.getBody().getImpulses().clear();
-                    entity.getBody().addImpulse(createReflectionImpulse(entity.getVelocity().cpy().scl(1 / delta),
-                            resolutionVector.cpy().nor(),
-                            entity.getBody().getElasticity()));
-                }
-                if (resolutionVector.x != 0f)
-                    entity.setVelocityX(0f);
-
-                if (resolutionVector.y != 0f)
-                    entity.setVelocityY(0f);
-
-                entity.getPosition().add(resolutionVector);
-                entity.getVelocity().scl(1 / delta);
-                return;
-
-            }
-        }
 
 
         entity.getVelocity().scl(1 / delta);

@@ -101,12 +101,9 @@ public class Ray {
 
         // Only if b and a are smaller than the lengths of the two rays and both positive, the intersection lays on
         // both rays on the desired direction.
-        //(if(Math.abs(otherCoefficient) <= other.length && Math.abs(originCoefficient) <= length && otherCoefficient > 0 && originCoefficient > 0) {
-
         if(otherCoefficient <= other.length && originCoefficient <= length && otherCoefficient > 0 && originCoefficient >= 0) {
-
             result = origin.cpy().add(dir.cpy().scl(originCoefficient));
-
+            // result is rounded to avoid errors
             result.x = Math.round(result.x*10000.0f)/10000f;
             result.y = Math.round(result.y*10000.0f)/10000f;
             return new Intersection(result,true,originCoefficient,other);
