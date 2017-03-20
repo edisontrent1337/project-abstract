@@ -454,33 +454,31 @@ public class WorldContainer {
      * @param ray ray that has to be processed
      * @param entities Set of entities previously calculated in
      * @link getHitHashCells()
-     * TODO: DEBUG THIS METHOD.
+     * TODO: implement penetration power based rays.
      */
     private void penetrateEntities(Ray ray, ArrayList<Entity> entities) {
-        HashSet<Ray> hitboxRays = new HashSet<>();
         entityPenetrationPoints.clear();
 
         for(Entity e : entities) {
-            hitboxRays.clear();
+            HashSet<Ray> hitboxRays = new HashSet<>();
+            // If the current entity does not support collision, skip it.
             if(!e.getBody().isCollisionDetectionEnabled())
                 continue;
-            hitboxRays.addAll(e.getBody().getBounds().getRays());
+            // Gather all rays from the hitbox of the entity
+            hitboxRays.addAll(e.getBounds().getRays());
 
-
+            // If there are hit box rays present, calculate intersections.
             if(!hitboxRays.isEmpty()) {
                 HashSet<Ray.Intersection> intersections = getIntersections(ray, hitboxRays);
                 if(!intersections.isEmpty()) {
+                    // Get the minimum intersection and add the penetration point to all relevant
+                    // collections.
                     Ray.Intersection i = Collections.min(intersections);
                     Vector2 point = i.result.cpy();
                     entityPenetrationPoints.add(point);
                     ray.getPenetrations().add(point);
                     ray.getPenetratedEntities().put(e.getID(),point);
                 }
-
-                /*for(Ray.Intersection i : intersections) {
-
-                }*/
-
 
             }
         }
