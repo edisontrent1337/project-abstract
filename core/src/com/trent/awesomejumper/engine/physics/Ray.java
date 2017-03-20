@@ -1,10 +1,11 @@
 package com.trent.awesomejumper.engine.physics;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.StringBuilder;
 import com.trent.awesomejumper.engine.entity.Entity;
-import com.trent.awesomejumper.utils.Interval;
 import com.trent.awesomejumper.utils.Utils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
 
@@ -28,10 +29,10 @@ public class Ray {
     private Entity owner;
 
 
-    private HashSet<Integer> penetratedEntities = new HashSet<>();
+    private HashMap<Integer, Vector2> penetratedEntities = new HashMap<>();
 
-    private HashSet<Vector2> hitHashCells = new HashSet<>();
-    private HashSet<Vector2> entityPenetrationPoins = new HashSet<>();
+    private ArrayList<Vector2> hitHashCells = new ArrayList<>();
+    private ArrayList<Vector2> penetrations = new ArrayList<>();
 
     // ---------------------------------------------------------------------------------------------
     // CONSTRUCTOR
@@ -117,11 +118,11 @@ public class Ray {
     }
 
     public void addEntityPenetrationPoint(Vector2 point) {
-        entityPenetrationPoins.add(point);
+        penetrations.add(point);
     }
 
-    public void addPenetratedEntity(int id) {
-        penetratedEntities.add(id);
+    public void addPenetratedEntity(int id, Vector2 point) {
+        penetratedEntities.put(id,point);
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -142,6 +143,16 @@ public class Ray {
         return length;
     }
 
+    public ArrayList<Vector2> getHitHashCells() {
+        return hitHashCells;
+    }
+    public ArrayList<Vector2> getPenetrations() {
+        return penetrations;
+    }
+
+    public HashMap<Integer,Vector2> getPenetratedEntities() {
+        return penetratedEntities;
+    }
     @Override
     public String toString() {
         return "START: " + origin.toString() + "DIR: " + dir.toString() + "LENGTH: " + length;

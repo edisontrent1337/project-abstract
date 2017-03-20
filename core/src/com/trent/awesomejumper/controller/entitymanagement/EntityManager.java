@@ -64,6 +64,7 @@ public class EntityManager {
     public void registerEntity(Projectile projectile) {
         worldContainer.registerEntity(projectile);
         worldContainer.getProjectiles().add(projectile);
+        worldContainer.getRays().add(projectile.getRay());
         renderingEngine.initGraphics(projectile);
     }
 
