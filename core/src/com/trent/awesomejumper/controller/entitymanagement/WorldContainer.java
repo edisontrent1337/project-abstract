@@ -461,6 +461,7 @@ public class WorldContainer {
         entityPenetrationPoints.clear();
 
         for(Entity e : entities) {
+            hitboxRays.clear();
             if(!e.getBody().isCollisionDetectionEnabled())
                 continue;
             hitboxRays.addAll(e.getBody().getBounds().getRays());
