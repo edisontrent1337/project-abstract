@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.trent.awesomejumper.controller.entitymanagement.EntityManager;
 import com.trent.awesomejumper.engine.entity.Entity;
-import com.trent.awesomejumper.engine.entity.ILivingEntity;
+import com.trent.awesomejumper.engine.entity.LivingEntity;
 import com.trent.awesomejumper.engine.modelcomponents.Body;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.engine.modelcomponents.Health;
@@ -18,7 +18,7 @@ import com.trent.awesomejumper.engine.physics.CollisionBox;
 /**
  * Created by Sinthu on 10.12.2015.
  */
-public class Lootable extends Entity implements ILivingEntity {
+public class Lootable extends Entity implements LivingEntity {
 
 
     private final int SPRITE_SIZE = 24;
@@ -31,7 +31,6 @@ public class Lootable extends Entity implements ILivingEntity {
     private final float SPRITE_WIDTH = 0.5625f;           // 32 px width
     private final float SPRITE_HEIGHT = 0.75f;          // 32 px height
     private final float MAX_SPEED = 5f;
-    private final float DENSITY = 0.75f;
     //private final Vector2 OFFSET = new Vector2(0.125f, 0); // 4 px space in chest sprite
     private final Vector2 OFFSET = new Vector2(0f, 0); // 4 px space in chest sprite
 

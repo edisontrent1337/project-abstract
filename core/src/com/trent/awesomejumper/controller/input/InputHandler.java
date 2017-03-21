@@ -18,7 +18,6 @@ import com.trent.awesomejumper.engine.modelcomponents.popups.Message;
 import com.trent.awesomejumper.engine.physics.Ray;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.Player;
-import com.trent.awesomejumper.models.lootable.Lootable;
 import com.trent.awesomejumper.models.weapons.Weapon;
 import com.trent.awesomejumper.utils.Utils;
 
@@ -177,6 +176,7 @@ public class InputHandler implements InputProcessor {
         return false;
     }
 
+    //TODO: implement this.
     public HashSet<KeyBindings> getPressedKeys() {
 
         HashSet<KeyBindings> pressedKeys = new HashSet<>();
@@ -242,6 +242,7 @@ public class InputHandler implements InputProcessor {
 
         // DROP WEAPON
 
+        //TODO: ADD POPUP WHICH SHOWS TIMINGS FOR DROPPING THE WEAPON
         //TODO: MOVE TIMINGS INTO dropWeapon() method
         if (isPressed(DROP) && (WorldController.worldTime - DROP.timePressed > DROP.threshold)) {
             if (player.getWeaponInventory().isHoldingAWeapon()) {
@@ -489,8 +490,7 @@ public class InputHandler implements InputProcessor {
                 if(!player.getWeaponInventory().isHoldingAWeapon())
                     return;
                 Ray r = new Ray(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter(), player.getWeaponInventory().getSelectedWeapon().getBody().getOrientation().cpy(), Ray.INFINITE);
-
-                worldContainer.rayCast(r);
+                worldContainer.generateCrossedIndexes(r);
             }
         }
         // RELOAD
@@ -509,8 +509,11 @@ public class InputHandler implements InputProcessor {
         }
 
         if(isPressed(TOGGLE_SPECIAL)) {
-            Lootable l = new Lootable(mouse.cpy());
-            l.register();
+            HashSet<Ray> rays = player.getBody().getBounds().getRays();
+            Utils.log(rays.toString());
+            Ray r = new Ray(player.getPosition().cpy().add(1,1), new Vector2(-1,1), Ray.INFINITE);
+
+            //Utils.log(worldContainer.getClosestIntersection(rays,r).toString());
 
         }
 

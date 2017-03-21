@@ -40,11 +40,10 @@ public class Body extends ModelComponent {
     private boolean collisionDetectionEnabled;
 
     // Physical parameters
-    private float mass;             // mass of the body
-    private float friction;         // frictional coefficient
-    private float elasticity;       // coefficient for elasticity
-    private float maxVelocity;      // maximum travel velocity
-    private float density;          // material density
+    private float mass;
+    private float friction;
+    private float elasticity;
+    private float maxVelocity;
 
 
     // Hitboxes
@@ -291,7 +290,7 @@ public class Body extends ModelComponent {
         collidedWithWorld = bool;
     }
 
-    // MASS, FRICTION, ELASTICITY, DENSITY
+    // MASS, FRICTION, ELASTICITY
     public float getMass() {
         return mass;
     }
@@ -314,14 +313,6 @@ public class Body extends ModelComponent {
 
     public void setElasticity(float elasticity) {
         this.elasticity = elasticity;
-    }
-
-    public float getDensity() {
-        return density;
-    }
-
-    public void setDensity(float density) {
-        return density;
     }
 
     // COLLISION DETECTION

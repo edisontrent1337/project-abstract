@@ -60,17 +60,16 @@ public class GunComponent extends WeaponComponent {
 
         if (currentClip != 0) {
             currentClip--;
-            Vector2 direction = entity.getOwner().getBody().getOrientation().cpy().nor();
-            Projectile projectile = new Projectile(entity.getBody().getCenter().cpy(),direction, entity.getBody().getHeightZ());
+            Projectile projectile = new Projectile(entity.getBody().getCenter().cpy(), entity.getBody().getHeightZ());
+            projectile.register();
           //  projectile.getBody().setVelocity(entity.getBody().getOrientation().cpy().nor().scl(speed));
             Utils.log("INITIAL PROJECTILE POSITION: " + projectile.getPosition());
+            Vector2 direction = entity.getOwner().getBody().getOrientation().cpy().nor();
             projectile.getBody().addImpulse(direction.scl(speed));
             Gdx.app.log("SCALED",projectile.getBody().getImpulses().getFirst().cpy().nor().scl(48f/60f).toString());
             projectile.getBody().getPosition().sub(projectile.getBody().getImpulses().get(0).cpy().scl(1/60f));
             projectile.getBody().setAngleOfRotation(entity.getBody().getAngleOfRotation());
             projectile.setOwner(entity.getOwner().getOwner());
-            projectile.register();
-
             timeFired = entity.time;
         }
 

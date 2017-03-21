@@ -24,6 +24,7 @@ import com.trent.awesomejumper.controller.input.InputHandler;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
+import com.trent.awesomejumper.engine.physics.Ray;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.SkyBox;
@@ -591,9 +592,7 @@ public class RenderingEngine extends Renderer {
         setDebugTag(DE_RAY_DIRECTION, "" + player.getBody().getOrientation().cpy().nor());
 
         //setDebugTag(DE_RAY_END, ""+ worldContainer.generateCrossedIndexes(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter().cpy(), player.getBody().getOrientation().cpy()));
-
-        setDebugTag(DE_RAY_END, "");//+ worldContainer.generateCrossedIndexes(new Ray(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter().cpy(), player.getBody().getOrientation().cpy(), Ray.INFINITE)));
-
+        setDebugTag(DE_RAY_END, ""+ worldContainer.generateCrossedIndexes(new Ray(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter().cpy(), player.getBody().getOrientation().cpy(), Ray.INFINITE)));
 
 
         // LOGGING
@@ -694,12 +693,7 @@ public class RenderingEngine extends Renderer {
                 int numberOfTiles = worldContainer.getTilesForCell(index).size();
 
 
-
                 if (numberOfTiles >= 0) {
-
-                    if(numberOfTiles == 0)
-                        shapeRenderer.setColor(Color.YELLOW);
-
                     if (numberOfTiles == 1)
                         shapeRenderer.setColor(Color.RED);
                     else if (numberOfTiles == 2)
@@ -709,9 +703,7 @@ public class RenderingEngine extends Renderer {
                     else if (numberOfTiles > 3)
                         shapeRenderer.setColor(Color.PINK);
                     shapeRenderer.rect(index.x, index.y, worldContainer.getSpatialFactor(), worldContainer.getSpatialFactor());
-
                 }
-
             }
             //Utils.log(String.format("%1d|%2d|%3d%4d", x*spatialSize,y*spatialSize, worldContainer.getSpatialFactor(), worldContainer.getSpatialFactor()));
         }
@@ -760,18 +752,10 @@ public class RenderingEngine extends Renderer {
         Gdx.gl.glEnable(GL20.GL_BLEND);
         if(player.getWeaponInventory().isHoldingAWeapon()) {
             shapeRenderer.setColor(1f,0,0,0.33f);
-
-            for (Vector2 index : worldContainer.getHitHashCells()) {
-
+            for (Vector2 index : worldContainer.getCoveredIndexes()) {
 
                 //shapeRenderer.rect(index.x - BOX_SIZE / 2f, index.y - BOX_SIZE / 2f, BOX_SIZE, BOX_SIZE);
                 shapeRenderer.rect(index.x, index.y, worldContainer.getSpatialFactor(), worldContainer.getSpatialFactor());
-            }
-
-            shapeRenderer.setColor(1f,0f,1f,1f);
-            for(Vector2 point : worldContainer.getEntityPenetrationPoints()) {
-                shapeRenderer.rect(point.x - BOX_SIZE / 2f, point.y - BOX_SIZE / 2f, BOX_SIZE, BOX_SIZE);;
-
             }
 
             shapeRenderer.setColor(1,1f,0,1f);

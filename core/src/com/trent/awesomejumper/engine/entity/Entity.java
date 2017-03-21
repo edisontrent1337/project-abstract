@@ -44,7 +44,7 @@ public class Entity implements EntityInterface {
     protected GunComponent gunComponent;
 
 
-    protected Entity owner;
+    private Entity owner;
 
 
     protected Type type;

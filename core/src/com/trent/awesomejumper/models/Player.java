@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.controller.entitymanagement.EntityManager;
 import com.trent.awesomejumper.controller.input.InputHandler;
 import com.trent.awesomejumper.engine.entity.Entity;
-import com.trent.awesomejumper.engine.entity.ILivingEntity;
+import com.trent.awesomejumper.engine.entity.LivingEntity;
 import com.trent.awesomejumper.engine.modelcomponents.Body;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.engine.modelcomponents.Health;
@@ -19,7 +19,7 @@ import static com.trent.awesomejumper.utils.Utils.sub;
 /**
  * Created by Sinthu on 12.06.2015.
  */
-public class Player extends Entity implements ILivingEntity {
+public class Player extends Entity implements LivingEntity{
 
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------

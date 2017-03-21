@@ -220,9 +220,5 @@ public class Utils {
     }
 
 
-    public static void log(String title, double d) {
-        log(title, Double.toString(d));
-    }
-
 
 }

@@ -3,7 +3,6 @@ package com.trent.awesomejumper.controller;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.controller.collision.CollisionController;
 import com.trent.awesomejumper.engine.entity.Entity;
-import com.trent.awesomejumper.engine.physics.Ray;
 import com.trent.awesomejumper.models.projectile.Projectile;
 
 import java.util.Iterator;
@@ -91,11 +90,6 @@ public class WorldController {
                 collisionController.projectileCollisionDetection(e, p, delta);
         }
 
-
-        for(Ray r : worldContainer.getRays()) {
-
-        }
-        
         worldContainer.garbageRemoval();
         worldContainer.updateSpatialHashingData();
         addImpulses();
