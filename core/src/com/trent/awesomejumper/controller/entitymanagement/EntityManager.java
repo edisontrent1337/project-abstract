@@ -2,6 +2,7 @@ package com.trent.awesomejumper.controller.entitymanagement;
 
 import com.trent.awesomejumper.controller.rendering.RenderingEngine;
 import com.trent.awesomejumper.engine.entity.Entity;
+import com.trent.awesomejumper.engine.physics.Ray;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.lootable.Lootable;
 import com.trent.awesomejumper.models.projectile.Projectile;
@@ -122,6 +123,8 @@ public class EntityManager {
         renderingEngine.initGraphics(worldContainer.getPlayer());
         renderingEngine.setPlayer(worldContainer.getPlayer());
     }
+
+
 
     public Entity getEntityByID(int id) {
         return worldContainer.getEntityByID(id);

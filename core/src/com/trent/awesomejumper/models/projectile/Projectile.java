@@ -10,7 +10,7 @@ import com.trent.awesomejumper.engine.physics.CollisionBox;
 import com.trent.awesomejumper.engine.physics.Ray;
 
 
-/**
+/** Projectile class. Soon to be changed or deprecated completely.
  * Created by Sinthu on 20.12.2015.
  */
 public class Projectile extends Entity {
@@ -28,6 +28,7 @@ public class Projectile extends Entity {
 
     // Destination of this projectile.
     private Vector2 destination = new Vector2();
+    // Penetration power of the projectile.
     private float penetrationPower = 100;
 
     //TESTING
@@ -56,12 +57,14 @@ public class Projectile extends Entity {
         body.setMaxVelocity(MAX_SPEED);
         state = State.IDLE;
         type = Type.PROJECTILE_ENTITY;
+        // per default, every entity is its own owner.
         setOwner(this);
         body.add(projectileBox);
 
 
         graphics.enableRotations();
     }
+
 
     @Override
     public void render(SpriteBatch spriteBatch) {

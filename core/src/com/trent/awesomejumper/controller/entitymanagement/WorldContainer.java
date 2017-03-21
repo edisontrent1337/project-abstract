@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.trent.awesomejumper.engine.modelcomponents.ModelComponent.ComponentID.GRAPHICS;
+import static com.trent.awesomejumper.engine.modelcomponents.ModelComponent.ComponentID.HEALTH;
 import static com.trent.awesomejumper.utils.Utils.sub;
 
 /**
@@ -443,10 +444,6 @@ public class WorldContainer {
         }
 
         penetrateEntities(ray, entitiesFromCells);
-        // get all hash cells the ray covers
-        // get the final tile the ray touches
-        // get all entities from the touched hash cells
-        //
     }
 
     /**
@@ -483,11 +480,11 @@ public class WorldContainer {
             }
         }
 
+
         Utils.log("--------PENETRATED ENTITY LIST--------");
         for(Map.Entry<Integer,Vector2> entry : ray.getPenetratedEntities().entrySet()) {
             Utils.log("ID: " + entry.getKey() + " , POINT: " + entry.getValue());
         }
-
     }
 
 
@@ -922,7 +919,13 @@ public class WorldContainer {
             }
         }
 
+        /**
+         * Remove rays from raycasting.
+         */
 
+        /**
+         * Remove 'dead' weapons.
+         */
         for (Iterator<Weapon> it = weaponDrops.iterator(); it.hasNext(); ) {
             if (!it.next().isAlive())
                 it.remove();
@@ -936,7 +939,9 @@ public class WorldContainer {
                 it.remove();
         }
 
-
+        /**
+         * Remove dead living entities.
+         */
         for (Iterator<Entity> it = livingEntities.iterator(); it.hasNext(); ) {
             if (!it.next().isAlive())
                 it.remove();

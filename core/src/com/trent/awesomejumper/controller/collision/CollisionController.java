@@ -454,6 +454,7 @@ public class CollisionController {
             Gdx.app.log("WEAPON", "COLLIDED WITH PROJECTILE");
         }
 
+        // No collisions should occur between a projectile and its owner
         if (projectile.getOwner().equals(entity))
             return false;
 
