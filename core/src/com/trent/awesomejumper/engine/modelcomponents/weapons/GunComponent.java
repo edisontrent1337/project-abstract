@@ -43,6 +43,7 @@ public class GunComponent extends WeaponComponent {
         entity.enableComponent(ComponentID.WEAPON_COMPONENT);
     }
 
+    // ---------------------------------------------------------------------------------------------
     // METHODS & FUNCTIONS
     // ---------------------------------------------------------------------------------------------
 

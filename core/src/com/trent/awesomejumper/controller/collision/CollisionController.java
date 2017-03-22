@@ -276,7 +276,7 @@ public class CollisionController {
         /**
          * The minimal overlap is initialized with a very large value.
          */
-        float minOverlap = 10000f;
+        float minOverlap = Float.MAX_VALUE;
 
         // Get normals of each shape
         Array<Vector2> normalsA = aBox.getNormals();
@@ -473,9 +473,10 @@ public class CollisionController {
         Vector2 deltaVelocity = sub(projectileVelocity, entityVelocity);
         Vector2 collisionNormal = resolutionVector.cpy().nor();
         float force = projectile.getBody().getMass() * projectileVelocity.cpy().scl(1 / delta).len() * (1 / entity.getBody().getMass());
+        Utils.log("FORCE", force);
 
         Vector2 impulse = createReflectionImpulse(deltaVelocity, collisionNormal, entity.getBody().getElasticity());
-        impulse.scl(force * force);
+        impulse.scl(force * force * 1.5f);
 
 
         /**

@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.controller.levelgeneration.RandomLevelGenerator;
 import com.trent.awesomejumper.engine.entity.Entity;
+import com.trent.awesomejumper.engine.physics.ProjectileRay;
 import com.trent.awesomejumper.engine.physics.Ray;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.Player;
@@ -411,7 +412,7 @@ public class WorldContainer {
      * that a given ray produces.
      * @param ray Ray to be processed
      */
-    public void rayCast(final Ray ray) {
+    public void projectileRayCast(final ProjectileRay ray) {
         generateCrossedIndexes(ray);
         ArrayList<Entity> entitiesFromCells = gatherEntitiesFromCells(ray.getHitHashCells());
 
@@ -457,7 +458,7 @@ public class WorldContainer {
      * @link getHitHashCells()
      * TODO: implement penetration power based rays.
      */
-    private void penetrateEntities(Ray ray, ArrayList<Entity> entities) {
+    private void penetrateEntities(ProjectileRay ray, ArrayList<Entity> entities) {
         entityPenetrationPoints.clear();
 
         for(Entity e : entities) {
@@ -479,8 +480,10 @@ public class WorldContainer {
                     entityPenetrationPoints.add(point);
                     ray.getPenetrations().add(point);
                     ray.getPenetratedEntities().put(e.getID(),point);
-                    if(e.has(HEALTH))
-                        e.getHealth().takeDamage(100);
+                    if(e.has(HEALTH)) {
+                        int damage = ray.dealDamage(e.getBounds(), e.getBody());
+                        e.getHealth().takeDamage(damage);
+                    }
                 }
 
             }

@@ -23,14 +23,14 @@ public class Lootable extends Entity implements LivingEntity {
 
     private final int SPRITE_SIZE = 24;
 
-    private final float WIDTH = 0.3725f;               //  24 pixel
-    private final float HEIGHT = 0.21875f;            //  19 Pixel - 5 Pixel "behind space
-    private final float MASS = 0.4f;
+    private final float WIDTH = 0.5625f;               //  32 pixel
+    private final float HEIGHT = 13f/32f;            //  24 Pixel
+    private final float MASS = 1.5f;
     private final float FRICTION = 0.895f;
-    private final float ELASTICITY = 0.45f;
-    private final float SPRITE_WIDTH = 0.5625f;           // 32 px width
-    private final float SPRITE_HEIGHT = 0.75f;          // 32 px height
-    private final float MAX_SPEED = 5f;
+    private final float ELASTICITY = 0.2f;// 0.45f;
+    private final float SPRITE_WIDTH = 0.5625f;           // 18/32 px width
+    private final float SPRITE_HEIGHT = 0.75f;          // 24/32 px height
+    private final float MAX_SPEED = 25f;
     //private final Vector2 OFFSET = new Vector2(0.125f, 0); // 4 px space in chest sprite
     private final Vector2 OFFSET = new Vector2(0f, 0); // 4 px space in chest sprite
 
@@ -52,7 +52,7 @@ public class Lootable extends Entity implements LivingEntity {
                 .maxVelocity(MAX_SPEED)
                 .offset(OFFSET)
                 .bodyBuild();
-        body.getBounds().setDamageCoefficient(0.5f);
+        body.getBounds().setDamageCoefficient(0.85f);
         graphics = new Graphics(this, 0f,"wood_chest", SPRITE_WIDTH,SPRITE_HEIGHT);
         health = new Health(this, 1000);
         CollisionBox box = new CollisionBox(position.cpy(), WIDTH, HEIGHT);
@@ -67,6 +67,7 @@ public class Lootable extends Entity implements LivingEntity {
     @Override
     public void update(float delta) {
         super.update(delta);
+        getVelocity().add(0.2f,0f);
     }
 
     @Override

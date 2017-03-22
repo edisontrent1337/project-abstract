@@ -394,7 +394,7 @@ public class Body extends ModelComponent {
         collidedWithWorld = bool;
     }
 
-    // MASS, FRICTION, ELASTICITY
+    // MASS, FRICTION, ELASTICITY, DENSITY
     public float getMass() {
         return mass;
     }
@@ -417,6 +417,16 @@ public class Body extends ModelComponent {
 
     public void setElasticity(float elasticity) {
         this.elasticity = elasticity;
+    }
+
+    public float getDensity() {
+        return density;
+    }
+
+    public void setDensity(float density) {
+        if(density < 0 || density > 1)
+            throw new IllegalArgumentException("DENSITY MUST BE BETWEEN 0 AND 1, WAS: " + density);
+        this.density = density;
     }
 
     // COLLISION DETECTION

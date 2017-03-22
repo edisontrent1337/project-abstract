@@ -15,7 +15,7 @@ import com.trent.awesomejumper.controller.rendering.RenderingEngine;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.entity.EntityInterface;
 import com.trent.awesomejumper.engine.modelcomponents.popups.Message;
-import com.trent.awesomejumper.engine.physics.Ray;
+import com.trent.awesomejumper.engine.physics.ProjectileRay;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.lootable.Lootable;
@@ -404,8 +404,9 @@ public class InputHandler implements InputProcessor {
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         if(button == MOUSE1.keyCode) {
             pressedKeysMap.put(MOUSE1, true);
-            player.getWeaponInventory().fire();
-
+            //player.getWeaponInventory().fire();
+            ProjectileRay r = new ProjectileRay(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter(), player.getWeaponInventory().getSelectedWeapon().getBody().getOrientation().cpy(), 100f, 600f, 12f);
+            worldContainer.projectileRayCast(r);
         }
         return false;
     }
@@ -488,9 +489,11 @@ public class InputHandler implements InputProcessor {
             if(isPressed(RAY_CASTING)) {
                 if(!player.getWeaponInventory().isHoldingAWeapon())
                     return;
-                Ray r = new Ray(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter(), player.getWeaponInventory().getSelectedWeapon().getBody().getOrientation().cpy(), Ray.INFINITE);
+               // Weapon w = player.getWeaponInventory().getSelectedWeapon();
+                //TODO Move this code to the weapon class and let it return a ray.
+                ProjectileRay r = new ProjectileRay(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter(), player.getWeaponInventory().getSelectedWeapon().getBody().getOrientation().cpy(), 100f, 200f, 12f);
 
-                worldContainer.rayCast(r);
+                worldContainer.projectileRayCast(r);
             }
         }
         // RELOAD

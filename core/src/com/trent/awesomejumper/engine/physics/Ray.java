@@ -21,15 +21,15 @@ public class Ray {
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
 
-    private Vector2 origin;                                     // start of the ray
-    private Vector2 dir;                                        // direction the ray travels
-    private float originX, originY, xDir, yDir;                 // atomic components
+    protected Vector2 origin;                                   // start of the ray
+    protected Vector2 dir;                                      // direction the ray travels
+    protected float originX, originY, xDir, yDir;               // atomic components
     public static final float INFINITE = Float.MAX_VALUE;       // static constant for infinite length
-    private float length = 0f;                                  // default length is 0
+    protected float length = 0f;                                // default length is 0
 
-    private HashMap<Integer, Vector2> penetratedEntities = new HashMap<>();
-    private ArrayList<Vector2> hitHashCells = new ArrayList<>();
-    private ArrayList<Vector2> penetrations = new ArrayList<>();
+    protected HashMap<Integer, Vector2> penetratedEntities = new HashMap<>();
+    protected ArrayList<Vector2> hitHashCells = new ArrayList<>();
+    protected ArrayList<Vector2> penetrations = new ArrayList<>();
 
     // ---------------------------------------------------------------------------------------------
     // CONSTRUCTOR
@@ -88,12 +88,12 @@ public class Ray {
         float originCoefficient = (other.originX + otherCoefficient*other.xDir- originX) / xDir;
         Vector2 result = null;
 
-        Utils.log("THIS RAY", this.toString());
+        /*Utils.log("THIS RAY", this.toString());
         Utils.log("GENERATED COEFFICIENT FOR THIS",originCoefficient);
         Utils.log("ORIGIN LENGTH",this.length);
         Utils.log("OTHER RAY", other.toString());
         Utils.log("GENERATED COEFFICIENT FOR OTHER",otherCoefficient);
-        Utils.log("OTHERS LENGTH",other.length);
+        Utils.log("OTHERS LENGTH",other.length);*/
 
 
         // Only if b and a are smaller than the lengths of the two rays and both positive, the intersection lays on
