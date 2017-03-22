@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.controller.levelgeneration.RandomLevelGenerator;
 import com.trent.awesomejumper.engine.entity.Entity;
-import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.engine.physics.Ray;
 import com.trent.awesomejumper.game.AwesomeJumperMain;
 import com.trent.awesomejumper.models.Player;
@@ -59,7 +58,10 @@ public class WorldContainer {
     // Map for spatial hashing
     //  private HashMap<Vector2, Set<Object>> spatialHashingData = new HashMap<>();
     private HashMap<Vector2, EntityTileContainer> spatialHashingData = new HashMap<>();
-    private final int SPATIAL_HASH_GRID_SIZE = 4;
+
+    private HashSet<Vector2> validHashIndexes = new HashSet<>();
+    private final int SPATIAL_HASH_GRID_SIZE = 2;
+
 
     // Subset containing all projectiles
     private HashSet<Projectile> projectiles = new HashSet<>();
@@ -81,7 +83,7 @@ public class WorldContainer {
 
     private Player player;
 
-    private ArrayList<Tile> renderTileList = new ArrayList();
+    private ArrayList<Tile> renderTileList = new ArrayList<>();
     private ArrayList<Entity> entitiesToBeDrawn = new ArrayList<>();
     private ArrayList<Tile> collisionTiles = new ArrayList<>();
 
@@ -91,9 +93,11 @@ public class WorldContainer {
 
     // SPATIAL HASHING DEBUG
 
+    private HashSet<Vector2> hitHashCells = new HashSet<>();
 
-    private ArrayList<Vector2> coveredIndexes = new ArrayList<>();
     private ArrayList<Vector2> penetrationPoints = new ArrayList<>();
+    private ArrayList<Vector2> entityPenetrationPoints = new ArrayList<>();
+
     boolean draw = false;
 
     // CONSTRUCTOR
@@ -123,9 +127,6 @@ public class WorldContainer {
         spatialHashingData.clear();
         for (int x = 0; x < SPATIAL_WIDTH; x++) {
             for (int y = 0; y < SPATIAL_HEIGHT; y++) {
-                //spatialHashingData.put(new Vector2(x*SPATIAL_HASH_GRID_SIZE, y*SPATIAL_HASH_GRID_SIZE), new HashSet<Object>());
-                //TODO: only clear entities hashset and test performance.
-                //TODO: count number of hashing ds updates.
                 spatialHashingData.put(new Vector2(x * SPATIAL_HASH_GRID_SIZE, y * SPATIAL_HASH_GRID_SIZE), new EntityTileContainer());
             }
         }
@@ -188,6 +189,10 @@ public class WorldContainer {
                 spatialHashingData.put(new Vector2(x * SPATIAL_HASH_GRID_SIZE, y * SPATIAL_HASH_GRID_SIZE), new EntityTileContainer());
             }
         }
+
+
+        // REGISTER ALL VALID HASH INDEXES
+        validHashIndexes.addAll(spatialHashingData.keySet());
 
 
         // DEBUG
@@ -269,6 +274,19 @@ public class WorldContainer {
         result.add(new Vector2(spatialX, spatialHy));
         result.add(new Vector2(spatialWx, spatialHy));
 
+
+        /**
+         * Check, if the generated indexes in the result set are valid.
+         * Removes all invalid indexes from the result.
+         */
+        for(Iterator<Vector2> iterator = result.iterator(); iterator.hasNext();) {
+            Vector2 index = iterator.next();
+            if(!validHashIndexes.contains(index)) {
+                iterator.remove();
+            }
+        }
+
+
         return result;
     }
 
@@ -281,8 +299,24 @@ public class WorldContainer {
         return getSpatialIndexes(positionAndOffset.x, positionAndOffset.y, e.getWidth(), e.getHeight());
     }
 
+
+    /**
+     * Returns a set containing one spatial hash cell index for a given tile t.
+     * @param t tile
+     * @return hash cell index of the tile.
+     */
     public HashSet<Vector2> getSpatialIndexes(Tile t) {
-        return getSpatialIndexes(t.getPosition().x, t.getPosition().y, t.getBounds().getWidth(), t.getBounds().getHeight());
+
+        float x = t.getPosition().x;
+        float y = t.getPosition().y;
+        int spatialX = (int) Math.floor(x);
+        int spatialY = (int) Math.floor(y);
+        spatialX -= spatialX % SPATIAL_HASH_GRID_SIZE;
+        spatialY -= spatialY % SPATIAL_HASH_GRID_SIZE;
+        HashSet<Vector2> result = new HashSet<>();
+        result.add(new Vector2(spatialX, spatialY));
+        return result;
+
     }
 
     private Vector2 getSpatialIndex(float x, float y) {
@@ -331,36 +365,156 @@ public class WorldContainer {
     }
 
     public HashSet<Entity> getEntitiesForCell(Vector2 index) {
+
+        if(!validHashIndexes.contains(index)) {
+
+            throw new IllegalArgumentException("THE INDEX " + index + "IS INVALID " +
+                    "THE FOLLOWING INDEXES ARE VALID:" + validHashIndexes.toString());
+
+        }
+
         return spatialHashingData.get(index).getEntities();
     }
 
     public HashSet<Tile> getTilesForCell(Vector2 index) {
+
+        if(!validHashIndexes.contains(index)) {
+
+            throw new IllegalArgumentException("THE INDEX " + index + "IS INVALID " +
+                    "THE FOLLOWING INDEXES ARE VALID:" + validHashIndexes.toString());
+
+        }
+
         return spatialHashingData.get(index).getTiles();
     }
 
 
     /**
+     * Returns all entities for a set of hash cells.
+     * This method is used to
+     *
+     * @param hashIndexes set of hash cells.
+     * @return set of entities.
+     */
+    private ArrayList<Entity> gatherEntitiesFromCells(ArrayList<Vector2> hashIndexes) {
+        // Using a set to eliminate duplicates
+        HashSet<Entity> result = new HashSet<>();
+        for(Vector2 index : hashIndexes) {
+            result.addAll(getEntitiesForCell(index));
+        }
+        return new ArrayList<>(result);
+    }
+
+    /**
+     * Casts a ray through the hash cell structure, calculating all collisions and penetration points
+     * that a given ray produces.
+     * @param ray Ray to be processed
+     */
+    public void rayCast(final Ray ray) {
+        generateCrossedIndexes(ray);
+        ArrayList<Entity> entitiesFromCells = gatherEntitiesFromCells(ray.getHitHashCells());
+
+        // Sort all entities in order of distance from the rays origin
+        Collections.sort(entitiesFromCells, new Comparator<Entity>() {
+            @Override
+            public int compare(Entity a, Entity b) {
+                float dst1 = a.getBody().getBounds().getCenter().dst(ray.getOrigin());
+                float dst2 = b.getBody().getBounds().getCenter().dst(ray.getOrigin());
+
+                if(dst1 > dst2)
+                    return 1;
+                if(dst1 < dst2)
+                    return -1;
+                else
+                    return 0;
+            }
+        });
+
+        Utils.log("RAY START: ", ray.getOrigin());
+        Utils.log("------HIT HASH CELLS------");
+        for(Vector2 i : ray.getHitHashCells()) {
+            Utils.log("INDEX: ", i);
+        }
+
+        Utils.log("-------ENTITIES SORTED BY DISTANCE------");
+        for(Entity e: entitiesFromCells) {
+            Utils.log("ENTITY: (DST =" + e.getBody().getBounds().getCenter().dst(ray.getOrigin())
+                    + ")", e.toString());
+        }
+
+        penetrateEntities(ray, entitiesFromCells);
+        // get all hash cells the ray covers
+        // get the final tile the ray touches
+        // get all entities from the touched hash cells
+        //
+    }
+
+    /**
+     * Method that calculates damage caused by a ray sent through the scene.
+     * @param ray ray that has to be processed
+     * @param entities Set of entities previously calculated in
+     * @link getHitHashCells()
+     * TODO: implement penetration power based rays.
+     */
+    private void penetrateEntities(Ray ray, ArrayList<Entity> entities) {
+        entityPenetrationPoints.clear();
+
+        for(Entity e : entities) {
+            HashSet<Ray> hitboxRays = new HashSet<>();
+            // If the current entity does not support collision, skip it.
+            if(!e.getBody().isCollisionDetectionEnabled())
+                continue;
+            // Gather all rays from the hitbox of the entity
+            hitboxRays.addAll(e.getBounds().getRays());
+
+            // If there are hit box rays present, calculate intersections.
+            if(!hitboxRays.isEmpty()) {
+                HashSet<Ray.Intersection> intersections = getIntersections(ray, hitboxRays);
+                if(!intersections.isEmpty()) {
+                    // Get the minimum intersection and add the penetration point to all relevant
+                    // collections.
+                    Ray.Intersection i = Collections.min(intersections);
+                    Vector2 point = i.result.cpy();
+                    entityPenetrationPoints.add(point);
+                    ray.getPenetrations().add(point);
+                    ray.getPenetratedEntities().put(e.getID(),point);
+                }
+
+            }
+        }
+
+        Utils.log("--------PENETRATED ENTITY LIST--------");
+        for(Map.Entry<Integer,Vector2> entry : ray.getPenetratedEntities().entrySet()) {
+            Utils.log("ID: " + entry.getKey() + " , POINT: " + entry.getValue());
+        }
+
+    }
+
+
+    /**
      * Returns a list of passed hash cells from a starting point in a direction to the closest
-     * wall.
+     * wall. The list returned is in the order the ray passes through the hash cells.
+     * This is important to later calculate damage induced by rays.
      * @return
      */
+    public ArrayList<Vector2> generateCrossedIndexes(Ray ray) {
 
-    public List<Vector2> generateCrossedIndexes(Ray aim) {
-        Vector2 startCell = getSpatialIndex(aim.getOrigin());
+        Vector2 startCell = getSpatialIndex(ray.getOrigin());
         Vector2 currentCell = startCell;
-        coveredIndexes.clear();
-        penetrationPoints.clear();
 
-        float deltaX = aim.getDir().x;
-        float deltaY = aim.getDir().y;
+        ArrayList<Vector2> rayHashCells = ray.getHitHashCells();
+        ArrayList<Vector2> rayPenetrations = ray.getPenetrations();
+
+        float deltaX = ray.getDir().x;
+        float deltaY = ray.getDir().y;
 
         // Leading sign of the ray direction. Used to find next adjacent hashing cell
         int signX = deltaX > 0 ? 1 : -1;
         int signY = deltaY > 0 ? 1 : -1;
 
 
-        coveredIndexes.add(startCell);
-        penetrationPoints.add(aim.getOrigin());
+        rayHashCells.add(startCell);
+        rayPenetrations.add(ray.getOrigin());
 
         boolean foundWall = false;
 
@@ -369,64 +523,69 @@ public class WorldContainer {
          * the ray continues to travel.
          */
         Utils.log("START OF RAYCASTING!");
-       // while (getTilesForCell(currentCell).isEmpty()) {
-        while (!foundWall) {
+
+        while (!foundWall && validHashIndexes.contains(currentCell)) {
+
 
             //List<Ray> rays = new ArrayList<>();
             HashSet<Ray> rays = new HashSet<>();
             List<Ray.Intersection> intersections = new ArrayList<>();
             // Choose the last penetration point as the starting point
-            float lastPenetrationX = penetrationPoints.get(penetrationPoints.size() - 1).x;
-            float lastPenetrationY = penetrationPoints.get(penetrationPoints.size() - 1).y;
+            float lastPenetrationX = rayPenetrations.get(rayPenetrations.size() - 1).x;
+            float lastPenetrationY = rayPenetrations.get(rayPenetrations.size() - 1).y;
 
             // Set the aim ray to start at the last penetration point
-            aim = new Ray(lastPenetrationX, lastPenetrationY, deltaX,deltaY,Ray.INFINITE);
 
+            ray = new Ray(lastPenetrationX, lastPenetrationY, deltaX, deltaY, Ray.INFINITE);
 
-
-            Utils.log("CURRENT CELL", currentCell.toString());
-            Utils.log("RAY START:", aim.toString());
-            HashSet<Entity> entities = getEntitiesForCell(currentCell);
-            Utils.log("ENTITIES SIZE", entities.size());
-
-
-            // Iterating over all entities in the current hash cell to gather all intersections.
-            // For each entity, collect the rays that describe the bounding box of the entity.
-            for(Entity e : entities) {
-                Utils.log("-------------ENTITIES-----------------");
-                Utils.log("CURRENT ENTITY ",e.toString());
-                rays.addAll(e.getBody().getBounds().getRays());
-                Utils.log("NUM OF RAYS", rays.size());
-                // If rays were generated, determine all intersections with the aim ray.
-                if(rays.size() > 0) {
-                    HashSet<Ray.Intersection> entityIntersections = getIntersections(rays, aim);
-                    Utils.log("GENERATED INTERSECTIONS ", entityIntersections.toString());
-                    // If intersections were found, choose the closest intersection and add its
-                    // penetration point to the list of current penetration points.
-                    if(entityIntersections.size() > 0) {
-                        Ray.Intersection closestIntersection = Collections.min(entityIntersections);
-                        Utils.log("CLOSEST INTERSECTION FOR ENTITY", closestIntersection.toString());
-                        penetrationPoints.add(closestIntersection.result);
-                    }
-                }
-                Utils.log("----------------------------------------" + "\n");
-                // After we finished with one entity, the set has to be cleared for the next one.
-                rays.clear();
-
-            }
-
-            Utils.log("FINISHED ENTITY RAY CASTING FOR CURRENT CELL " + currentCell.toString());
-
-
-
-
-
-            //Ray.Intersection closestEntity = Collections.min(getIntersections(rays,aim));
+            Utils.log("-------CURRENT CELL--------", currentCell.toString());
+            Utils.log("RAY START:", ray.toString());
+            HashSet<Tile> tiles = getTilesForCell(currentCell);
 
             //TODO: add something like: if(aim.penetrationpower <= 0): break
             //TODO: if the ray has no punch left, break this loop early.
 
             rays.clear();
+
+
+            // -------------------------------------------------------------------------------------
+            // TILE / RAY COLLISION DETECTION
+            // -------------------------------------------------------------------------------------
+
+            Utils.log("CURRENT CELL", currentCell);
+            Utils.log("START OF TILE RAY CASTING");
+            Utils.log("TILES SIZE", tiles.size());
+
+            for (Tile t : getTilesForCell(currentCell)) {
+                Utils.log("", "-------------TILE------------:" + t.toString());
+                rays.addAll(t.getCollisionBox().getRays());
+            }
+
+            Utils.log("RAYS SIZE (SHOULD BE MULTIPLE OF 4)", rays.size());
+
+            if (rays.size() > 0) {
+                HashSet<Ray.Intersection> tileIntersections = getIntersections(ray, rays);
+                Utils.log("GENERATED INTERSECTIONS", tileIntersections.toString());
+                if (tileIntersections.size() > 0) {
+                    Ray.Intersection closestIntersection = Collections.min(tileIntersections);
+                    Utils.log("CLOSEST INTERSECTION FOR TILE", closestIntersection.toString());
+                    rayPenetrations.add(closestIntersection.result);
+                    break;
+                }
+
+            }
+            else {
+                Utils.log("NO TILE INTERSECTION FOR: " + currentCell);
+            }
+
+            Vector2 lastPen = rayPenetrations.get(rayPenetrations.size()-1);
+            ray = new Ray(lastPen.x,lastPen.y, deltaX, deltaY, Ray.INFINITE);
+            rays.clear();
+
+
+            // -------------------------------------------------------------------------------------
+            // HASH CELL / RAY COLLISION DETECTION
+            // -------------------------------------------------------------------------------------
 
 
             // Get the indices for the next hashing cells adjacent to the current one with regards
@@ -435,6 +594,11 @@ public class WorldContainer {
             Vector2 nextXCell = getSpatialIndex(currentCell.x + signX * SPATIAL_HASH_GRID_SIZE, currentCell.y);
             // length = 2 (spatial_hash_grid_size), dir = (0,1)
             Vector2 nextYCell = getSpatialIndex(currentCell.x, currentCell.y + signY * SPATIAL_HASH_GRID_SIZE);
+
+
+            Utils.log("-----------HASH CELL CD START----------");
+            Utils.log("NEXT X CELL: ", nextXCell);
+            Utils.log("NEXT Y CELL: ", nextYCell);
 
             /*
              * Creating rays from the current hash cell:
@@ -445,8 +609,10 @@ public class WorldContainer {
              */
             Ray currentXAxis = new Ray(currentCell.x, currentCell.y, 1, 0, Ray.INFINITE);
             Ray currentYAxis = new Ray(currentCell.x, currentCell.y, 0, 1, Ray.INFINITE);
-            Ray nextYCellXAxis = new Ray(nextYCell.x, nextYCell.y,1,0, Ray.INFINITE);
-            Ray nextXCellYAxis = new Ray(nextXCell.x, nextXCell.y,0,1, Ray.INFINITE);
+
+            Ray nextYCellXAxis = new Ray(nextYCell.x, nextYCell.y, 1, 0, Ray.INFINITE);
+            Ray nextXCellYAxis = new Ray(nextXCell.x, nextXCell.y, 0, 1, Ray.INFINITE);
+
 
             /*
              * Add all of these rays to the ray list.
@@ -456,73 +622,65 @@ public class WorldContainer {
             rays.add(nextYCellXAxis);
             rays.add(nextXCellYAxis);
 
+
+            Utils.log("NUMBER OF NEIGHBOUR HASH CELL RAYS (SHOULD BE 4)", rays.size());
+
+            for(Ray r : rays) {
+                Utils.log("RAY FOR HASH CD: ", r.toString());
+            }
+
             /*
              * Calculation of the intersection for all surrounding hash cell rays with the aim ray.
              */
-            for(Ray r : rays) {
-                Ray.Intersection intersection = aim.getIntersection(r);
-                if(intersection.intersect && intersection.distance > 0 )
-                    intersections.add(aim.getIntersection(r));
+            for (Ray r : rays) {
+                Ray.Intersection inter = ray.getIntersection(r);
+                // We do not want to collide with the hash cell itself, so the distance has to be > 0
+                if (inter.intersect && inter.distance > 0)
+                    intersections.add(inter);
+                Utils.log("-------NEXT RAY--------" + "\n");
             }
 
 
+            if(intersections.size() > 0) {
+                Utils.log("THERE WERE INTERSECTIONS WITH THE PROPOSED HASH CELLS");
+                Ray.Intersection closestHashCellIntersection = Collections.min(intersections);
+                Vector2 penetrationPoint = closestHashCellIntersection.result;
+                rayPenetrations.add(penetrationPoint);
+                //}
 
-            Ray.Intersection closestHashCellIntersection = Collections.min(intersections);
-            Vector2 penetrationPoint = closestHashCellIntersection.result;
-            penetrationPoints.add(penetrationPoint);
-
-            rays.clear();
+                //TODO: reset aim is broken
+                rays.clear();
 
 
-            //TODO: FIND THE CLOSEST INTERSECTION ON THE WALL TILES
-            for(Tile t: getTilesForCell(currentCell)) {
-                rays.addAll(t.getCollisionBox().getRays());
-            }
-
-            if(rays.size() > 0) {
-                HashSet<Ray.Intersection> tileIntersections = getIntersections(rays, aim);
-
-                if(tileIntersections.size() > 0) {
-                    Ray.Intersection closestIntersection = Collections.min(tileIntersections);
-                    Utils.log("CLOSEST INTERSECTION FOR TILE", closestIntersection.toString());
-                    penetrationPoints.add(closestIntersection.result);
-                    foundWall = true;
+                if (closestHashCellIntersection.origin == currentXAxis || closestHashCellIntersection.origin == nextYCellXAxis) {
+                    if(!rayHashCells.contains(nextYCell) && validHashIndexes.contains(nextYCell)) {
+                        rayHashCells.add(nextYCell);
+                        currentCell = nextYCell;
+                    }
+                } else if (closestHashCellIntersection.origin == currentYAxis || closestHashCellIntersection.origin == nextXCellYAxis) {
+                    if(!rayHashCells.contains(nextXCell) && validHashIndexes.contains(nextXCell)) {
+                        rayHashCells.add(nextXCell);
+                        currentCell = nextXCell;
+                    }
                 }
 
+
             }
-
-
-            rays.clear();
-
-
-            Utils.log("OLD CURRENT CELL: ", currentCell.toString());
-            if(closestHashCellIntersection.origin == currentXAxis || closestHashCellIntersection.origin == nextYCellXAxis) {
-                coveredIndexes.add(nextYCell);
-                currentCell = nextYCell;
-            }
-
-            else if(closestHashCellIntersection.origin == currentYAxis || closestHashCellIntersection.origin == nextXCellYAxis) {
-                coveredIndexes.add(nextXCell);
-                currentCell = nextXCell;
-            }
-
-
+            /*else {
+                break;
+            }*/
         }
+        hitHashCells.addAll(rayHashCells);
+        penetrationPoints.addAll(rayPenetrations);
 
-        return coveredIndexes;
+        // restore origin of ray
+
+        return rayHashCells;
+
     }
 
-    public Ray.Intersection getClosestIntersection(HashSet<Ray>testRays, Ray toBeTested) {
-
-        ArrayList<Ray.Intersection> intersections = new ArrayList<>();
-        for(Ray other : testRays) {
-            Ray.Intersection i = toBeTested.getIntersection(other);
-                if(i.intersect && i.distance > 0)
-                    intersections.add(i);
-        }
-         Ray.Intersection closest = Collections.min(intersections);
-
-        return closest;
+    public Ray.Intersection getClosestIntersection(Ray reference, HashSet<Ray>otherRays) {
+        return Collections.min(getIntersections(reference, otherRays));
     }
 
     /**
@@ -532,7 +690,9 @@ public class WorldContainer {
      * @param reference Reference ray that should collide with the set of other rays.
      * @return
      */
-    public HashSet<Ray.Intersection> getIntersections(HashSet<Ray>otherRays, Ray reference) {
+
+    public HashSet<Ray.Intersection> getIntersections(Ray reference, HashSet<Ray>otherRays) {
+
         HashSet<Ray.Intersection> intersections = new HashSet<>();
         for(Ray other : otherRays) {
             Ray.Intersection i = reference.getIntersection(other);
@@ -607,33 +767,7 @@ public class WorldContainer {
 
     }
 
-    // ---------------------------------------------------------------------------------------------
-    // LIST OF TILES FOR COLLISION DETECTION
-    // ---------------------------------------------------------------------------------------------
 
-    /**
-     * Fills collisionTiles with all tile objects that are in the specified ranges.
-     *
-     * @param sx x starting point
-     * @param sy y starting point
-     * @param ex x endpoint
-     * @param ey y endpoint
-     */
-    public void fillCollideableTiles(int sx, int sy, int ex, int ey) {
-        collisionTiles.clear();
-        for (int x = sx; x <= ex; x++) {
-            for (int y = sy; y <= ey; y++) {
-                // CHECK WHETHER TILE IS IN LEVEL BOUNDS
-                if (randomLevelGenerator.checkBounds(x, y)) {
-                    if (randomLevelGenerator.getTile(x, y) != null) {
-                        if (!randomLevelGenerator.getTile(x, y).isPassable())
-                            collisionTiles.add(randomLevelGenerator.getTile(x, y));
-                    }
-                }
-            }
-        }
-
-    }
 
     // ---------------------------------------------------------------------------------------------
     // ORDERED LIST OF ENTITIES TO BE DRAWN
@@ -808,9 +942,11 @@ public class WorldContainer {
                 it.remove();
         }
 
+        /**
+         * Remove penetration points from ray casting
+         */
 
     }
-
 
     public void garbageRemoval(Set<? extends Entity> entities) {
         for (Iterator<? extends Entity> it = entities.iterator(); it.hasNext(); ) {
@@ -825,7 +961,6 @@ public class WorldContainer {
     // ---------------------------------------------------------------------------------------------
 
     public void registerEntity(Entity entity) {
-
 
         entities.put(entity.getID(), entity);
         entity.registerTime = entity.time;
@@ -915,7 +1050,6 @@ public class WorldContainer {
         return collisionTiles;
     }
 
-
     public HashSet<Entity> getEntities() {
         return new HashSet<>(entities.values());
     }
@@ -946,6 +1080,11 @@ public class WorldContainer {
 
     public RandomLevelGenerator getRandomLevelGenerator() {
         return randomLevelGenerator;
+    }
+
+
+    public HashSet<Ray> getRays() {
+        return rays;
     }
 
 
@@ -980,13 +1119,19 @@ public class WorldContainer {
     }
 
 
-    public ArrayList<Vector2> getCoveredIndexes() {
 
-        return coveredIndexes;
+    public HashSet<Vector2> getHitHashCells() {
+
+        return hitHashCells;
+
     }
 
     public ArrayList<Vector2> getPenetrationPoints() {
         return penetrationPoints;
+    }
+
+    public ArrayList<Vector2> getEntityPenetrationPoints() {
+        return entityPenetrationPoints;
     }
 
 
@@ -999,24 +1144,24 @@ public class WorldContainer {
         private HashSet<Tile> tiles;
         private HashSet<Entity> entities;
 
-        public EntityTileContainer() {
+        EntityTileContainer() {
             this.tiles = new HashSet<>();
             this.entities = new HashSet<>();
         }
 
-        public void addEntity(Entity e) {
+        void addEntity(Entity e) {
             entities.add(e);
         }
 
-        public void addTile(Tile t) {
+        void addTile(Tile t) {
             tiles.add(t);
         }
 
-        public HashSet<Entity> getEntities() {
+        HashSet<Entity> getEntities() {
             return entities;
         }
 
-        public HashSet<Tile> getTiles() {
+        HashSet<Tile> getTiles() {
             return tiles;
         }
 

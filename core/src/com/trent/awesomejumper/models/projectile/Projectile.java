@@ -7,6 +7,7 @@ import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.Body;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
+import com.trent.awesomejumper.engine.physics.Ray;
 
 
 /**
@@ -24,20 +25,24 @@ public class Projectile extends Entity {
     private final float SPRITE_HEIGHT = 0.09375f*0.8f;
     private final float FRAME_DURATION = 0.066f;
     private final float MAX_SPEED = 128f; // fastest projectile ingame
-    private final float TORQUE = 50f;
+
+    // Destination of this projectile.
+    private Vector2 destination = new Vector2();
+    private float penetrationPower = 100;
 
     //TESTING
     private final int baseDamage = 635;
     private CollisionBox projectileBox;
 
+    private Ray ray;
 
-
-    public Projectile(Vector2 position, float z) {
+    public Projectile(Vector2 position, Vector2 direction, float z) {
         this.body = new Body(this, WIDTH_X, WIDTH_Y);
         this.graphics = new Graphics(this,FRAME_DURATION,"projectile", SPRITE_WIDTH, SPRITE_HEIGHT);
 
         body.setBounds(new CollisionBox(position, WIDTH_X, WIDTH_Y));
         body.setPosition(position);
+        this.ray = new Ray(body.getBounds().getCenter(), direction, Ray.INFINITE);
 
         projectileBox = new CollisionBox(position,WIDTH_X,WIDTH_Y);
         projectileBox.setOffset(0, z);
@@ -87,6 +92,9 @@ public class Projectile extends Entity {
     }
 
 
+    public Ray getRay() {
+        return ray;
+    }
 
 
 }
