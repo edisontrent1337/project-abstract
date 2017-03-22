@@ -3,6 +3,7 @@ package com.trent.awesomejumper.engine.modelcomponents;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.sun.scenario.effect.impl.state.LinearConvolveKernel;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
 import com.trent.awesomejumper.models.projectile.Projectile;
@@ -11,46 +12,45 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 /**
- * Created by Sinthu on 09.12.2015.
+ * Created by edisontrent1337 on 09.12.2015.
  * Body component implementation. Holds information about position (x,y,zOffset) , acceleration, velocity and
  * dimensions of entities. Also holds the hitbox skeleton used to calculate damage.
  * Also holds information about the entity neighbourhood of the entity that holds this very body.
  */
 public class Body extends ModelComponent {
 
+    // ---------------------------------------------------------------------------------------------
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
 
-
     // Movement & Locality
-    private Vector2 position;        // position contains the x/y grid
     private float heightZ;           // height of entity in z direction
     private float zOffset = 0;       // z position over the floor. By default 0
+    private Vector2 position;        // position contains the x/y grid
     private Vector2 velocity;        // velocity on the xy grid
     private Vector2 acceleration;    // acceleration on the xy grid
     private Vector2 center;          // center of the body position
-    private Vector2 aimReference;    // reference position of the object the entity wants to look at
-    private Vector2 orientation;     // direction in which the entity currently looks
-    private float angleOfRotation;   // angle which belongs towards the orientation for rendering
+    private CollisionBox bounds;     // bounding box
 
-    private CollisionBox bounds;
-
-    private boolean collidedWithWorld;
-
-    private boolean collisionDetectionEnabled;
+    // PRE-DEFINED VALUES
+    private Vector2 aimReference = new Vector2(0f,0f);      // reference position of the object the entity wants to look at
+    private Vector2 orientation = new Vector2(0f,0f);       // direction in which the entity currently looks
+    private float angleOfRotation = 0f;                     // angle which belongs towards the orientation for rendering
+    private boolean collidedWithWorld = false;              // has the entity collided with the world in the previous frame?
+    private boolean collisionDetectionEnabled = true;       // is cd enabled?
+    private Array<CollisionBox> hitboxSkeleton = new Array<>();     // hitboxes
+    private LinkedList<Vector2> impulses = new LinkedList<>();      // impulse list
+    private HashSet<Entity> entityNeighbourHood = new HashSet<>();  // entity neighbourhood
 
     // Physical parameters
     private float mass;
     private float friction;
+    private float density;
+    private float armor;
     private float elasticity;
     private float maxVelocity;
 
-
-    // Hitboxes
-    private Array<CollisionBox> hitboxSkeleton = new Array<>();
-    private LinkedList<Vector2> impulses;
-    private HashSet<Entity> entityNeighbourHood = new HashSet<>();
-
+    // ---------------------------------------------------------------------------------------------
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
 
@@ -87,6 +87,24 @@ public class Body extends ModelComponent {
         entity.enableComponent(ComponentID.BODY);
     }
 
+    // BUILDER CONSTRUCTOR
+    private Body(BodyBuilder builder) {
+        this.entity = builder.entity;
+        this.position = builder.position;
+        this.velocity = builder.velocity;
+        this.acceleration = builder.acceleration;
+        this.mass = builder.mass;
+        this.elasticity = builder.elasticity;
+        this.density = builder.density;
+        this.friction = builder.friction;
+        this.center = new Vector2(position.x + builder.width / 2f, position.y + builder.height / 2f);
+        this.maxVelocity = builder.maxVelocity;
+
+        this.bounds = new CollisionBox(position,builder.width, builder.height);
+        entity.enableComponent(ComponentID.BODY);
+
+    }
+
 
     public void update(float delta) {
 
@@ -117,6 +135,86 @@ public class Body extends ModelComponent {
     }
 
 
+    // ---------------------------------------------------------------------------------------------
+    // BUILDER
+    // ---------------------------------------------------------------------------------------------
+
+    /**
+     * We need a body builder as the body class has too many arguements... (pun intended)
+     */
+    public static class BodyBuilder {
+        // Movement & Locality
+        private Vector2 position = new Vector2(0f,0f);        // position contains the x/y grid
+        private Vector2 velocity = new Vector2(0f,0f);        // velocity on the xy grid
+        private Vector2 acceleration = new Vector2(0f,0f);    // acceleration on the xy grid
+        // Entity
+        private Entity entity;
+        // Physical parameters
+        private float width, height;
+        private float mass = 0;
+        private float friction = 0;
+        private float elasticity = 0;
+        private float maxVelocity = 0;
+        private float armor = 0;
+        private float density = 1;
+
+        public BodyBuilder(Entity entity) {
+            this.entity = entity;
+        }
+
+        public BodyBuilder position(Vector2 position) {
+            this.position = position;
+            return this;
+        }
+
+        public BodyBuilder width(float width) {
+            this.width = width;
+            return this;
+        }
+
+        public BodyBuilder height(float height) {
+            this.height = height;
+            return this;
+        }
+
+        public BodyBuilder mass(float mass) {
+            this.mass = mass;
+            return this;
+        }
+
+        public BodyBuilder friction(float friction) {
+            this.friction = friction;
+            return this;
+        }
+
+        public BodyBuilder elasticity(float elasticity) {
+            this.elasticity = elasticity;
+            return this;
+        }
+
+        public BodyBuilder maxVelocity(float maxVelocity) {
+            this.maxVelocity = maxVelocity;
+            return this;
+        }
+
+        public BodyBuilder density(float density) {
+            this.density = density;
+            return this;
+        }
+
+        public BodyBuilder armor(float armor) {
+            this.armor = armor;
+            return this;
+        }
+
+        public Body bodyBuild() {
+            return new Body(this);
+        }
+
+    }
+
+
+    // ---------------------------------------------------------------------------------------------
     // GETTER AND SETTER
     // ---------------------------------------------------------------------------------------------
 
