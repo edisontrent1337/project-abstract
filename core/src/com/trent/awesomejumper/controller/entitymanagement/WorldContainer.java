@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.trent.awesomejumper.engine.modelcomponents.ModelComponent.ComponentID.GRAPHICS;
+import static com.trent.awesomejumper.engine.modelcomponents.ModelComponent.ComponentID.HEALTH;
 import static com.trent.awesomejumper.utils.Utils.sub;
 
 /**
@@ -478,6 +479,8 @@ public class WorldContainer {
                     entityPenetrationPoints.add(point);
                     ray.getPenetrations().add(point);
                     ray.getPenetratedEntities().put(e.getID(),point);
+                    if(e.has(HEALTH))
+                        e.getHealth().takeDamage(100);
                 }
 
             }

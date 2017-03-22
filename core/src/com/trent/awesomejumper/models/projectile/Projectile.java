@@ -8,7 +8,7 @@ import com.trent.awesomejumper.engine.modelcomponents.Body;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
 import com.trent.awesomejumper.engine.physics.Ray;
-
+import static com.trent.awesomejumper.engine.modelcomponents.Body.BodyBuilder;
 
 /**
  * Created by Sinthu on 20.12.2015.
@@ -37,19 +37,28 @@ public class Projectile extends Entity {
     private Ray ray;
 
     public Projectile(Vector2 position, Vector2 direction, float z) {
-        this.body = new Body(this, WIDTH_X, WIDTH_Y);
+
+        this.body = new BodyBuilder(this)
+                .position(position)
+                .width(WIDTH_X)
+                .height(WIDTH_Y)
+                .mass(MASS)
+                .friction(FRICTION)
+                .elasticity(ELASTICITY)
+                .maxVelocity(MAX_SPEED)
+                .bodyBuild();
+
         this.graphics = new Graphics(this,FRAME_DURATION,"projectile", SPRITE_WIDTH, SPRITE_HEIGHT);
 
-        body.setBounds(new CollisionBox(position, WIDTH_X, WIDTH_Y));
-        body.setPosition(position);
         this.ray = new Ray(body.getBounds().getCenter(), direction, Ray.INFINITE);
 
         projectileBox = new CollisionBox(position,WIDTH_X,WIDTH_Y);
         projectileBox.setOffset(0, z);
+
+        this.body = new Body(this, WIDTH_X, WIDTH_Y);
         body.setZOffset(z);
-
-
-
+        body.setBounds(new CollisionBox(position, WIDTH_X, WIDTH_Y));
+        body.setPosition(position);
         body.setMass(MASS);
         body.setFriction(FRICTION);
         body.setElasticity(ELASTICITY);
@@ -84,6 +93,12 @@ public class Projectile extends Entity {
         float coeff = 0.90f + (float)(Math.random() * 0.2f);
         //Gdx.app.log("Coefficient", Float.toString(coeff));
         return (int) (coeff * baseDamage);
+    }
+
+    public void reducePenetrationPower(float density) {
+        penetrationPower-= density*penetrationPower;
+        if(penetrationPower < 0)
+            penetrationPower = 0;
     }
 
     @Override

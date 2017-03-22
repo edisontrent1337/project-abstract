@@ -2,6 +2,7 @@ package com.trent.awesomejumper.engine.physics;
 
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.entity.Entity;
+import com.trent.awesomejumper.models.projectile.Projectile;
 import com.trent.awesomejumper.utils.Utils;
 
 import java.util.ArrayList;
@@ -26,18 +27,14 @@ public class Ray {
     public static final float INFINITE = Float.MAX_VALUE;       // static constant for infinite length
     private float length = 0f;                                  // default length is 0
 
-    private Entity owner;
-
-
     private HashMap<Integer, Vector2> penetratedEntities = new HashMap<>();
-
     private ArrayList<Vector2> hitHashCells = new ArrayList<>();
     private ArrayList<Vector2> penetrations = new ArrayList<>();
 
     // ---------------------------------------------------------------------------------------------
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
-    public Ray(Entity owner) {
+    public Ray() {
         this.origin = new Vector2(0f,0f);
         this.dir = new Vector2(1f,0f);
         this.originX = origin.x;
@@ -45,7 +42,6 @@ public class Ray {
         this.xDir = dir.cpy().nor().x;
         this.yDir = dir.cpy().nor().y;
         this.length = INFINITE;
-        this.owner = owner;
     }
 
     public Ray(float originX, float originY, float xDir, float yDir, float length) {
@@ -62,8 +58,8 @@ public class Ray {
         this.length = INFINITE;
     }
 
-    public Ray(Vector2 start, Vector2 direction, float length) {
-        this(start,direction);
+    public Ray(Vector2 origin, Vector2 direction, float length) {
+        this(origin,direction);
         if(length < 0)
             throw new IllegalArgumentException("THE LENGTH OF A RAY MUST BE GREATER THAN 0");
         else {

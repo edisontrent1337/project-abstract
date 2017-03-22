@@ -14,7 +14,7 @@ import com.trent.awesomejumper.engine.modelcomponents.Graphics;
 import com.trent.awesomejumper.engine.modelcomponents.Health;
 import com.trent.awesomejumper.engine.modelcomponents.ModelComponent;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
-
+import static com.trent.awesomejumper.engine.modelcomponents.Body.BodyBuilder;
 /**
  * Created by Sinthu on 10.12.2015.
  */
@@ -23,8 +23,8 @@ public class Lootable extends Entity implements LivingEntity {
 
     private final int SPRITE_SIZE = 24;
 
-    private final float WIDTH = 0.3725f*3;               //  24 pixel
-    private final float HEIGHT = 0.21875f*3;            //  19 Pixel - 5 Pixel "behind space
+    private final float WIDTH = 0.3725f;               //  24 pixel
+    private final float HEIGHT = 0.21875f;            //  19 Pixel - 5 Pixel "behind space
     private final float MASS = 0.4f;
     private final float FRICTION = 0.895f;
     private final float ELASTICITY = 0.45f;
@@ -41,17 +41,20 @@ public class Lootable extends Entity implements LivingEntity {
 
     public Lootable(Vector2 position) {
 
-        body = new Body(this, WIDTH,HEIGHT);
+        body = new BodyBuilder(this)
+                .position(position)
+                .width(WIDTH)
+                .height(HEIGHT)
+                .density(0.9f)
+                .mass(MASS)
+                .friction(FRICTION)
+                .elasticity(ELASTICITY)
+                .maxVelocity(MAX_SPEED)
+                .offset(OFFSET)
+                .bodyBuild();
+        body.getBounds().setDamageCoefficient(0.5f);
         graphics = new Graphics(this, 0f,"wood_chest", SPRITE_WIDTH,SPRITE_HEIGHT);
         health = new Health(this, 1000);
-        body.setPosition(position);
-        body.setMass(MASS);
-        body.setFriction(FRICTION);
-        body.setElasticity(ELASTICITY);
-        body.setBounds(new CollisionBox(position, WIDTH, HEIGHT));
-        body.getBounds().setOffset(OFFSET);
-        body.getBounds().setDamageCoefficient(0.5f);
-        body.setMaxVelocity(MAX_SPEED);
         CollisionBox box = new CollisionBox(position.cpy(), WIDTH, HEIGHT);
         box.setOffset(OFFSET);
         box.setDamageCoefficient(0.5f);

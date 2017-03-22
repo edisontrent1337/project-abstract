@@ -195,11 +195,10 @@ public class CollisionBox {
      * @param renderer Instance of the libGdx ShapeRenderer Class used to draw the CollisionBox
      */
     public void draw(ShapeRenderer renderer) {
-        Color color = renderer.getColor();
         // DRAW OUTER BOUNDING BOX
         renderer.set(ShapeRenderer.ShapeType.Line);
         renderer.setAutoShapeType(true);
-        renderer.setColor(this.color);
+        renderer.setColor(color);
 
         // DRAW NORMALS & EDGES
         for (int i = 0; i < edges.size; i++) {

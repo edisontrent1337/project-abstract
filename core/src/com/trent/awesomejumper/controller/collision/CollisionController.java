@@ -486,7 +486,7 @@ public class CollisionController {
             float step = 0.05f;
             float numberOfSteps = dst / step;
             Utils.log("NUMBER OF STEPS", Float.toString(numberOfSteps));
-            for (float i = 0f; i <= numberOfSteps; i++) {
+            for (float i = 0f; i <= numberOfSteps; i+=step) {
                 Vector2 projectilePosition = projectile.getPosition();
                 Vector2 frameStep = deltaVelocity.cpy().nor().scl(step);
                 Utils.log("OLD POSITION", projectilePosition.toString());
@@ -556,7 +556,7 @@ public class CollisionController {
             float step = 0.0125f;
             float numberOfSteps = dst / step;
             Utils.log("NUMBER OF STEPS", Float.toString(numberOfSteps));
-            for (float i = 0f; i <= numberOfSteps; i++) {
+            for (float i = 0f; i <= numberOfSteps; i+=step) {
                 Vector2 projectilePosition = projectile.getPosition();
                 Vector2 frameStep = projectile.getVelocity().cpy().nor().scl(step);
                 Utils.log("OLD POSITION", projectilePosition.toString());

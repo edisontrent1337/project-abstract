@@ -147,6 +147,7 @@ public class Body extends ModelComponent {
         private Vector2 position = new Vector2(0f,0f);        // position contains the x/y grid
         private Vector2 velocity = new Vector2(0f,0f);        // velocity on the xy grid
         private Vector2 acceleration = new Vector2(0f,0f);    // acceleration on the xy grid
+        private Vector2 offset = new Vector2(0f,0f);
         // Entity
         private Entity entity;
         // Physical parameters
@@ -204,6 +205,11 @@ public class Body extends ModelComponent {
 
         public BodyBuilder armor(float armor) {
             this.armor = armor;
+            return this;
+        }
+
+        public BodyBuilder offset(Vector2 offset) {
+            this.offset = offset;
             return this;
         }
 
