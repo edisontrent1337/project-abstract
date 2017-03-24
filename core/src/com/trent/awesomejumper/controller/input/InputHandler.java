@@ -518,8 +518,6 @@ public class InputHandler implements InputProcessor {
         }
 
 
-
-
     }
 
     // GETTER & SETTER

@@ -9,6 +9,8 @@ import com.trent.awesomejumper.controller.rendering.PopUpRenderer;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.popups.Message;
 import com.trent.awesomejumper.engine.physics.CollisionBox;
+import com.trent.awesomejumper.engine.physics.ProjectileRay;
+import com.trent.awesomejumper.engine.physics.Ray;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.projectile.Projectile;
 import com.trent.awesomejumper.models.weapons.Weapon;
@@ -16,8 +18,15 @@ import com.trent.awesomejumper.tiles.Tile;
 import com.trent.awesomejumper.utils.Interval;
 import com.trent.awesomejumper.utils.Utils;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import static com.trent.awesomejumper.controller.entitymanagement.WorldContainer.SPATIAL_HASH_GRID_SIZE;
 import static com.trent.awesomejumper.controller.rendering.PopUpRenderer.PopUpCategories.MISC;
 import static com.trent.awesomejumper.engine.modelcomponents.ModelComponent.ComponentID.HEALTH;
 import static com.trent.awesomejumper.utils.PhysicalConstants.FRICTIONAL_COEFFICIENT;
@@ -589,6 +598,301 @@ public class CollisionController {
             return true;
         }
         return false;
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // PROJECTILE / RAY CASTING
+    // ---------------------------------------------------------------------------------------------
+
+
+    /**
+     * Casts a projectile ray through the scene in three steps:
+     * 1) Gather an ordered list of hash cells the ray hits.
+     * 2) Gather all entities from those hash cells and sort them by distance from the rays origin
+     * 3) Execute penetration tests against the list of entities gathered in step 2.
+     * @param ray
+     */
+    public void projectileRayCast(final ProjectileRay ray) {
+        ArrayList<Vector2> spatialIndexes = generateCrossedIndexes(ray);
+        ArrayList<Entity> entitiesFromCells = worldContainer.gatherEntitiesFromCells(spatialIndexes);
+
+
+        // Sort all entities in order of distance from the rays origin
+        Collections.sort(entitiesFromCells, new Comparator<Entity>() {
+            @Override
+            public int compare(Entity a, Entity b) {
+                float dst1 = a.getBody().getBounds().getCenter().dst(ray.getOrigin());
+                float dst2 = b.getBody().getBounds().getCenter().dst(ray.getOrigin());
+
+                if(dst1 > dst2)
+                    return 1;
+                if(dst1 < dst2)
+                    return -1;
+                else
+                    return 0;
+            }
+        });
+
+        Utils.log("RAY START: ", ray.getOrigin());
+        Utils.log("------HIT HASH CELLS------");
+        for(Vector2 i : ray.getHitHashCells()) {
+            Utils.log("INDEX: ", i);
+        }
+
+        Utils.log("-------ENTITIES SORTED BY DISTANCE------");
+        for(Entity e: entitiesFromCells) {
+            Utils.log("ENTITY: (DST =" + e.getBody().getBounds().getCenter().dst(ray.getOrigin())
+                    + ")", e.toString());
+        }
+
+        penetrateEntities(ray,entitiesFromCells);
+    }
+
+
+    /**
+     * Returns a list of passed hash cells from a starting point in a direction to the closest
+     * wall. The list returned is in the order the ray passes through the hash cells.
+     * This is important to later calculate damage induced by rays.
+     * @return
+     */
+    public ArrayList<Vector2> generateCrossedIndexes(Ray ray) {
+
+        Vector2 startCell = worldContainer.getSpatialIndex(ray.getOrigin());
+        Vector2 currentCell = startCell;
+
+        ArrayList<Vector2> rayHashCells = ray.getHitHashCells();
+        ArrayList<Vector2> rayPenetrations = ray.getPenetrations();
+
+        float deltaX = ray.getDir().x;
+        float deltaY = ray.getDir().y;
+
+        // Leading sign of the ray direction. Used to find next adjacent hashing cell
+        int signX = deltaX > 0 ? 1 : -1;
+        int signY = deltaY > 0 ? 1 : -1;
+
+        rayHashCells.add(startCell);
+        rayPenetrations.add(ray.getOrigin());
+
+        boolean foundWall = false;
+
+        /**
+         * As long as no solid world tiles like walls have been found,
+         * the ray continues to travel.
+         */
+        Utils.log("START OF RAYCASTING!");
+
+        while (!foundWall && worldContainer.isValid(currentCell)) {
+
+            HashSet<Ray> rays = new HashSet<>();
+            List<Ray.Intersection> intersections = new ArrayList<>();
+            // Choose the last penetration point as the starting point
+            float lastPenetrationX = rayPenetrations.get(rayPenetrations.size() - 1).x;
+            float lastPenetrationY = rayPenetrations.get(rayPenetrations.size() - 1).y;
+
+            // Set the aim ray to start at the last penetration point
+
+            ray = new Ray(lastPenetrationX, lastPenetrationY, deltaX, deltaY, Ray.INFINITE);
+
+            Utils.log("-------CURRENT CELL--------", currentCell.toString());
+            Utils.log("RAY START:", ray.toString());
+            HashSet<Tile> tiles = worldContainer.getTilesForCell(currentCell);
+
+            //TODO: add something like: if(aim.penetrationpower <= 0): break
+            //TODO: if the ray has no punch left, break this loop early.
+
+            rays.clear();
+
+
+            // -------------------------------------------------------------------------------------
+            // TILE / RAY COLLISION DETECTION
+            // -------------------------------------------------------------------------------------
+
+            Utils.log("CURRENT CELL", currentCell);
+            Utils.log("START OF TILE RAY CASTING");
+            Utils.log("TILES SIZE", tiles.size());
+
+            for (Tile t : tiles) {
+                Utils.log("", "-------------TILE------------:" + t.toString());
+                rays.addAll(t.getCollisionBox().getRays());
+            }
+
+            Utils.log("RAYS SIZE (SHOULD BE MULTIPLE OF 4)", rays.size());
+
+            if (rays.size() > 0) {
+                HashSet<Ray.Intersection> tileIntersections = getIntersections(ray, rays);
+                Utils.log("GENERATED INTERSECTIONS", tileIntersections.toString());
+                if (tileIntersections.size() > 0) {
+                    Ray.Intersection closestIntersection = Collections.min(tileIntersections);
+                    Utils.log("CLOSEST INTERSECTION FOR TILE", closestIntersection.toString());
+                    rayPenetrations.add(closestIntersection.result);
+                    break;
+                }
+
+            }
+            else {
+                Utils.log("NO TILE INTERSECTION FOR: " + currentCell);
+            }
+
+            Vector2 lastPen = rayPenetrations.get(rayPenetrations.size()-1);
+            ray = new Ray(lastPen.x,lastPen.y, deltaX, deltaY, Ray.INFINITE);
+            rays.clear();
+
+
+            // -------------------------------------------------------------------------------------
+            // HASH CELL / RAY COLLISION DETECTION
+            // -------------------------------------------------------------------------------------
+
+
+            // Get the indices for the next hashing cells adjacent to the current one with regards
+            // to the ray direction.
+            // length = 2 (spatial_hash_grid_size), dir = (1,0)
+            Vector2 nextXCell = worldContainer.getSpatialIndex(currentCell.x + signX * SPATIAL_HASH_GRID_SIZE, currentCell.y);
+            // length = 2 (spatial_hash_grid_size), dir = (0,1)
+            Vector2 nextYCell = worldContainer.getSpatialIndex(currentCell.x, currentCell.y + signY * SPATIAL_HASH_GRID_SIZE);
+
+
+            Utils.log("-----------HASH CELL CD START----------");
+            Utils.log("NEXT X CELL: ", nextXCell);
+            Utils.log("NEXT Y CELL: ", nextYCell);
+
+            /*
+             * Creating rays from the current hash cell:
+             * One for the x axis of the current cell.
+             * One for the y axis of the current cell.
+             * One for the x axis of the next cell in y direction.
+             * One for the y axis of the next cell in x direction.
+             */
+            Ray currentXAxis = new Ray(currentCell.x, currentCell.y, 1, 0, Ray.INFINITE);
+            Ray currentYAxis = new Ray(currentCell.x, currentCell.y, 0, 1, Ray.INFINITE);
+
+            Ray nextYCellXAxis = new Ray(nextYCell.x, nextYCell.y, 1, 0, Ray.INFINITE);
+            Ray nextXCellYAxis = new Ray(nextXCell.x, nextXCell.y, 0, 1, Ray.INFINITE);
+
+
+            /*
+             * Add all of these rays to the ray list.
+             */
+            rays.add(currentXAxis);
+            rays.add(currentYAxis);
+            rays.add(nextYCellXAxis);
+            rays.add(nextXCellYAxis);
+
+
+            Utils.log("NUMBER OF NEIGHBOUR HASH CELL RAYS (SHOULD BE 4)", rays.size());
+
+            for(Ray r : rays) {
+                Utils.log("RAY FOR HASH CD: ", r.toString());
+            }
+
+            /*
+             * Calculation of the intersection for all surrounding hash cell rays with the aim ray.
+             */
+            for (Ray r : rays) {
+                Ray.Intersection inter = ray.getIntersection(r);
+                // We do not want to collide with the hash cell itself, so the distance has to be > 0
+                if (inter.intersect && inter.distance > 0)
+                    intersections.add(inter);
+                Utils.log("-------NEXT RAY--------" + "\n");
+            }
+
+
+            if(intersections.size() > 0) {
+                Utils.log("THERE WERE INTERSECTIONS WITH THE PROPOSED HASH CELLS");
+                Ray.Intersection closestHashCellIntersection = Collections.min(intersections);
+                Vector2 penetrationPoint = closestHashCellIntersection.result;
+                rayPenetrations.add(penetrationPoint);
+
+                //TODO: reset aim is broken
+                rays.clear();
+
+
+                if (closestHashCellIntersection.origin == currentXAxis || closestHashCellIntersection.origin == nextYCellXAxis) {
+                    if(!rayHashCells.contains(nextYCell) && worldContainer.isValid(nextYCell)) {
+                        rayHashCells.add(nextYCell);
+                        currentCell = nextYCell;
+                    }
+                } else if (closestHashCellIntersection.origin == currentYAxis || closestHashCellIntersection.origin == nextXCellYAxis) {
+                    if(!rayHashCells.contains(nextXCell) && worldContainer.isValid(nextXCell)) {
+                        rayHashCells.add(nextXCell);
+                        currentCell = nextXCell;
+                    }
+                }
+
+
+            }
+        }
+        /*
+        hitHashCells.addAll(rayHashCells);
+        penetrationPoints.addAll(rayPenetrations);*/
+
+        return rayHashCells;
+    }
+
+
+
+    /**
+     * Responsible for ray penetration of entities in the scene. Calculates for a given set of
+     * entities penetration points and, if applicable, triggers damage dealing.
+     * @param ray ray that has to be processed
+     * @param entities Set of entities previously calculated in
+     * @link getHitHashCells()
+     */
+    private void penetrateEntities(ProjectileRay ray, ArrayList<Entity> entities) {
+
+        for(Entity e : entities) {
+            HashSet<Ray> hitboxRays = new HashSet<>();
+            // If the current entity does not support collision, skip it.
+            if(!e.getBody().isCollisionDetectionEnabled())
+                continue;
+            // Gather all rays from the hitbox of the entity
+            hitboxRays.addAll(e.getBounds().getRays());
+
+            // If there are hit box rays present, calculate intersections.
+            if(!hitboxRays.isEmpty()) {
+                HashSet<Ray.Intersection> intersections = getIntersections(ray, hitboxRays);
+                if(!intersections.isEmpty()) {
+                    // Get the minimum intersection and add the penetration point to all relevant
+                    // collections.
+                    Ray.Intersection i = Collections.min(intersections);
+                    Vector2 point = i.result.cpy();
+                    ray.getPenetrations().add(point);
+                    ray.getPenetratedEntities().put(e.getID(),point);
+                    if(e.has(HEALTH)) {
+                        int damage = ray.dealDamage(e.getBounds(), e.getBody());
+                        e.getHealth().takeDamage(damage);
+                    }
+                }
+
+            }
+        }
+
+        Utils.log("--------PENETRATED ENTITY LIST--------");
+        for(Map.Entry<Integer,Vector2> entry : ray.getPenetratedEntities().entrySet()) {
+            Utils.log("ID: " + entry.getKey() + " , POINT: " + entry.getValue());
+        }
+
+    }
+
+
+    /**
+     * Generates all intersection objects for a given reference ray against a set of other test rays.
+     * Can be used to get the intersections of an aim ray against the rays of a collision box.
+     * @param otherRays Set containing rays.
+     * @param reference Reference ray that should collide with the set of other rays.
+     * @return
+     */
+
+    public HashSet<Ray.Intersection> getIntersections(Ray reference, HashSet<Ray>otherRays) {
+
+        HashSet<Ray.Intersection> intersections = new HashSet<>();
+        for(Ray other : otherRays) {
+            Ray.Intersection i = reference.getIntersection(other);
+            // If the intersection object says, that an intersecton occurs, the current intersection
+            // is added to the result set.
+            if(i.intersect)
+                intersections.add(i);
+        }
+        return intersections;
     }
 
     //TODO: change this.

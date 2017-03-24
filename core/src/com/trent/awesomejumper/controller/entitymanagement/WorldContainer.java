@@ -62,7 +62,7 @@ public class WorldContainer {
     private HashMap<Vector2, EntityTileContainer> spatialHashingData = new HashMap<>();
 
     private HashSet<Vector2> validHashIndexes = new HashSet<>();
-    private final int SPATIAL_HASH_GRID_SIZE = 2;
+    public static final int SPATIAL_HASH_GRID_SIZE = 2;
 
 
     // Subset containing all projectiles
@@ -321,7 +321,7 @@ public class WorldContainer {
 
     }
 
-    private Vector2 getSpatialIndex(float x, float y) {
+    public Vector2 getSpatialIndex(float x, float y) {
         int spatialX = (int) Math.floor(x);
         int spatialY = (int) Math.floor(y);
 
@@ -330,7 +330,7 @@ public class WorldContainer {
         return new Vector2(spatialX, spatialY);
     }
 
-    private Vector2 getSpatialIndex(Vector2 v) {
+    public Vector2 getSpatialIndex(Vector2 v) {
         return getSpatialIndex(v.x,v.y);
     }
 
@@ -398,7 +398,7 @@ public class WorldContainer {
      * @param hashIndexes set of hash cells.
      * @return set of entities.
      */
-    private ArrayList<Entity> gatherEntitiesFromCells(ArrayList<Vector2> hashIndexes) {
+    public ArrayList<Entity> gatherEntitiesFromCells(ArrayList<Vector2> hashIndexes) {
         // Using a set to eliminate duplicates
         HashSet<Entity> result = new HashSet<>();
         for(Vector2 index : hashIndexes) {
@@ -456,7 +456,6 @@ public class WorldContainer {
      * @param ray ray that has to be processed
      * @param entities Set of entities previously calculated in
      * @link getHitHashCells()
-     * TODO: implement penetration power based rays.
      */
     private void penetrateEntities(ProjectileRay ray, ArrayList<Entity> entities) {
         entityPenetrationPoints.clear();
@@ -672,17 +671,11 @@ public class WorldContainer {
 
 
             }
-            /*else {
-                break;
-            }*/
         }
         hitHashCells.addAll(rayHashCells);
         penetrationPoints.addAll(rayPenetrations);
 
-        // restore origin of ray
-
         return rayHashCells;
-
     }
 
     public Ray.Intersection getClosestIntersection(Ray reference, HashSet<Ray>otherRays) {
@@ -708,6 +701,15 @@ public class WorldContainer {
                 intersections.add(i);
         }
         return intersections;
+    }
+
+    /**
+     * Returns, whether or not a given vector is a valid hash cell key.
+     * @param i index
+     * @return true, if the key exists, false otherwise.
+     */
+    public boolean isValid(Vector2 i) {
+        return validHashIndexes.contains(i);
     }
 
     /**
