@@ -2,6 +2,8 @@ package com.trent.awesomejumper.controller.entitymanagement;
 
 import com.trent.awesomejumper.controller.rendering.RenderingEngine;
 import com.trent.awesomejumper.engine.entity.Entity;
+import com.trent.awesomejumper.engine.physics.ProjectileRay;
+import com.trent.awesomejumper.engine.physics.Ray;
 import com.trent.awesomejumper.models.Player;
 import com.trent.awesomejumper.models.lootable.Lootable;
 import com.trent.awesomejumper.models.projectile.Projectile;
@@ -115,6 +117,13 @@ public class EntityManager {
         renderingEngine.initGraphics(entity);
     }
 
+    public void  registerRay(Ray ray) {
+
+    }
+
+    public void registerRay(ProjectileRay ray) {
+
+    }
 
     public void reset() {
         worldContainer.reset();

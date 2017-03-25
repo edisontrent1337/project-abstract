@@ -1,6 +1,7 @@
 package com.trent.awesomejumper.engine.physics;
 
 import com.badlogic.gdx.math.Vector2;
+import com.trent.awesomejumper.controller.entitymanagement.EntityManager;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.models.projectile.Projectile;
 import com.trent.awesomejumper.utils.Utils;
@@ -120,6 +121,11 @@ public class Ray {
     public void addPenetratedEntity(int id, Vector2 point) {
         penetratedEntities.put(id,point);
     }
+
+    public void register() {
+        EntityManager.getInstance().registerRay(this);
+    }
+
 
     // ---------------------------------------------------------------------------------------------
     // GETTER & SETTER

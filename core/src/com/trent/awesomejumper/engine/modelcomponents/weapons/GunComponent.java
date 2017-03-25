@@ -3,7 +3,9 @@ package com.trent.awesomejumper.engine.modelcomponents.weapons;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.entity.Entity;
+import com.trent.awesomejumper.engine.physics.ProjectileRay;
 import com.trent.awesomejumper.models.projectile.Projectile;
+import com.trent.awesomejumper.models.weapons.Weapon;
 import com.trent.awesomejumper.utils.Utils;
 
 /**
@@ -17,6 +19,10 @@ import com.trent.awesomejumper.utils.Utils;
 public class GunComponent extends WeaponComponent {
 
 
+    private static final int DEFAULT_DMG = 100;             // default damage
+    private static final float DEFAULT_PN_POW = 100;        // default penetration power
+    private static final int DEFAULT_NUM_OF_RAYS = 1;       // default number of rays
+
     // TODO: implement recoil with a vertex shader.
     private int ammo;
     private int clipSize;
@@ -24,6 +30,8 @@ public class GunComponent extends WeaponComponent {
     private int currentClip;
     private float recoverTime, reloadTime;
     private float speed;
+    private int baseDamage;
+    private float penetrationPower;
     private float timeFired = 0f;
     private float timeReloaded = 0f;
 
@@ -34,6 +42,9 @@ public class GunComponent extends WeaponComponent {
 
     private final int NUMBER_OF_RAYS;
 
+    // ---------------------------------------------------------------------------------------------
+    // CONSTRUCTOR
+    // ---------------------------------------------------------------------------------------------
 
     public GunComponent(Entity weapon, String name, int rays) {
         this.entity = weapon;
@@ -41,6 +52,18 @@ public class GunComponent extends WeaponComponent {
         this.NUMBER_OF_RAYS = rays;
         this.TAG = "GUN COMPONENT";
         entity.enableComponent(ComponentID.WEAPON_COMPONENT);
+    }
+
+    public GunComponent(GunBuilder builder) {
+        this.entity = builder.weapon;
+        this.name = builder.name;
+        this.ammo = builder.ammo;
+        this.clipSize = builder.clipSize;
+        this.recoverTime = builder.recoverTime;
+        this.reloadTime = builder.reloadTime;
+        this.baseDamage = builder.baseDamage;
+        this.penetrationPower = builder.penetrationPower;
+        this.NUMBER_OF_RAYS = builder.rays;
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -61,6 +84,7 @@ public class GunComponent extends WeaponComponent {
 
         if (currentClip != 0) {
             currentClip--;
+           // ProjectileRay ray = new ProjectileRay()
             Vector2 direction = entity.getOwner().getBody().getOrientation().cpy().nor();
             Projectile projectile = new Projectile(entity.getBody().getCenter().cpy(),direction, entity.getBody().getHeightZ());
           //  projectile.getBody().setVelocity(entity.getBody().getOrientation().cpy().nor().scl(speed));
@@ -102,7 +126,7 @@ public class GunComponent extends WeaponComponent {
 
     public void setAmmoAndClips(int ammo, int CLIP_SIZE) {
         if (ammo % CLIP_SIZE != 0) {
-            throw new IllegalArgumentException("Ammo is not a multiple of clipsize");
+            throw new IllegalArgumentException("Ammo is not a multiple of clipSize");
         }
         this.ammo = ammo - CLIP_SIZE;
         this.clipSize = CLIP_SIZE;
@@ -135,5 +159,64 @@ public class GunComponent extends WeaponComponent {
         return currentClipString + "/" + ammoString;
     }
 
+
+    public class GunBuilder {
+        public int ammo, clipSize;
+        public float recoverTime, reloadTime;
+        public int baseDamage, penetrationPower = 100;
+        public String name;
+        public int rays;
+
+        private Weapon weapon;
+
+        public GunBuilder(Weapon weapon) {
+            this.weapon = weapon;
+        }
+
+        public GunBuilder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public GunBuilder ammo(int ammo) {
+            this.ammo = ammo;
+            return this;
+        }
+
+        public GunBuilder clipSize(int clipSize) {
+            this.clipSize = clipSize;
+            return this;
+        }
+
+        public GunBuilder recoverTime(float recoverTime) {
+            this.recoverTime = recoverTime;
+            return this;
+        }
+
+        public GunBuilder reloadTime(float reloadTime) {
+            this.reloadTime = reloadTime;
+            return this;
+        }
+
+        public GunBuilder baseDamage(int baseDamage) {
+            this.baseDamage = baseDamage;
+            return this;
+        }
+
+        public GunBuilder penetrationPower(int penetrationPower) {
+            this.penetrationPower = penetrationPower;
+            return this;
+        }
+
+        public GunBuilder rays(int rays) {
+            this.rays = rays;
+            return this;
+        }
+
+        public GunComponent assemble() {
+            return new GunComponent(this);
+        }
+
+    }
 
 }

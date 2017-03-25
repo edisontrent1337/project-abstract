@@ -37,7 +37,6 @@ public class Projectile extends Entity {
     private Ray ray;
 
     public Projectile(Vector2 position, Vector2 direction, float z) {
-
         this.body = new BodyBuilder(this)
                 .position(position)
                 .width(WIDTH_X)
@@ -49,20 +48,12 @@ public class Projectile extends Entity {
                 .bodyBuild();
 
         this.graphics = new Graphics(this,FRAME_DURATION,"projectile", SPRITE_WIDTH, SPRITE_HEIGHT);
-
         this.ray = new Ray(body.getBounds().getCenter(), direction, Ray.INFINITE);
 
         projectileBox = new CollisionBox(position,WIDTH_X,WIDTH_Y);
         projectileBox.setOffset(0, z);
 
-        this.body = new Body(this, WIDTH_X, WIDTH_Y);
-        body.setZOffset(z);
-        body.setBounds(new CollisionBox(position, WIDTH_X, WIDTH_Y));
-        body.setPosition(position);
-        body.setMass(MASS);
-        body.setFriction(FRICTION);
-        body.setElasticity(ELASTICITY);
-        body.setMaxVelocity(MAX_SPEED);
+
         state = State.IDLE;
         type = Type.PROJECTILE_ENTITY;
         setOwner(this);

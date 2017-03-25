@@ -28,6 +28,8 @@ public class Pistol extends Weapon {
 
     private final int AMMO = 100;
     private final int CLIP_SIZE = 25;
+    private final int BASE_DMG = 100;
+    private final float PENETRATION_POWER = 100;
     private final float PROJECTILE_SPEED = 48f;
     private final float RECOVER_TIME = 0.2f; // 400 RPM
     private final float RELOAD_TIME = 2.25f;
