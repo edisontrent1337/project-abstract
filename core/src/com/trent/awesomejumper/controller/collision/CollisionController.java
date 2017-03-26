@@ -840,6 +840,7 @@ public class CollisionController {
     private void penetrateEntities(ProjectileRay ray, ArrayList<Entity> entities) {
 
         for(Entity e : entities) {
+
             HashSet<Ray> hitboxRays = new HashSet<>();
             // If the current entity does not support collision, skip it.
             if(!e.getBody().isCollisionDetectionEnabled())
@@ -857,9 +858,10 @@ public class CollisionController {
                     Vector2 point = i.result.cpy();
                     ray.getPenetrations().add(point);
                     ray.getPenetratedEntities().put(e.getID(),point);
-                    if(e.has(HEALTH)) {
+                    if(e.has(HEALTH) && ray.getRemainingPower() > 0) {
                         int damage = ray.dealDamage(e.getBounds(), e.getBody());
-                        e.getHealth().takeDamage(damage);
+                        if(damage > 0)
+                            e.getHealth().takeDamage(damage);
                     }
                 }
 

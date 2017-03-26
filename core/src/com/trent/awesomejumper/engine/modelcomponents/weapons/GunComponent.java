@@ -32,6 +32,7 @@ public class GunComponent extends WeaponComponent {
     private float speed;
     private float baseDamage;
     private float penetrationPower;
+    private float pentrationDmgScale;
     private float timeFired = 0f;
     private float timeReloaded = 0f;
     private float knockBack = 1f;
@@ -70,6 +71,7 @@ public class GunComponent extends WeaponComponent {
         this.penetrationPower = builder.penetrationPower;
         this.knockBack = builder.knockback;
         this.NUMBER_OF_RAYS = builder.rays;
+        this.pentrationDmgScale = builder.penetrationDmgScale;
         setAmmoAndClips(ammo,clipSize);
     }
 
@@ -91,20 +93,9 @@ public class GunComponent extends WeaponComponent {
 
         if (currentClip != 0) {
             currentClip--;
-           // ProjectileRay ray = new ProjectileRay()
-           /* Vector2 direction = entity.getOwner().getBody().getOrientation().cpy().nor();
-            Projectile projectile = new Projectile(entity.getBody().getCenter().cpy(),direction, entity.getBody().getHeightZ());
-          //  projectile.getBody().setVelocity(entity.getBody().getOrientation().cpy().nor().scl(speed));
-            Utils.log("INITIAL PROJECTILE POSITION: " + projectile.getPosition());
-            projectile.getBody().addImpulse(direction.scl(speed));
-            Gdx.app.log("SCALED",projectile.getBody().getImpulses().getFirst().cpy().nor().scl(48f/60f).toString());
-            projectile.getBody().getPosition().sub(projectile.getBody().getImpulses().get(0).cpy().scl(1/60f));
-            projectile.getBody().setAngleOfRotation(entity.getBody().getAngleOfRotation());
-            projectile.setOwner(entity.getOwner().getOwner());
-            projectile.register();*/
             Vector2 origin = entity.getBody().getCenter().cpy();
             Vector2 direction = entity.getOwner().getBody().getOrientation().cpy().nor();
-            ProjectileRay ray = new ProjectileRay(origin, direction, penetrationPower, baseDamage, knockBack);
+            ProjectileRay ray = new ProjectileRay(origin, direction, penetrationPower, pentrationDmgScale, baseDamage, knockBack);
             ray.register();
 
             timeFired = entity.time;
@@ -131,6 +122,10 @@ public class GunComponent extends WeaponComponent {
 
     }
 
+
+    public void modifyPenetrationPower(float increase) {
+        penetrationPower += increase;
+    }
     // ---------------------------------------------------------------------------------------------
     // GETTER AND SETTER
     // ---------------------------------------------------------------------------------------------
@@ -175,6 +170,7 @@ public class GunComponent extends WeaponComponent {
         int ammo, clipSize;
         float recoverTime, reloadTime;
         float baseDamage, penetrationPower = 100;
+        float penetrationDmgScale = 1f;
         float knockback = 1f;
         public String name;
         int rays;
@@ -217,6 +213,11 @@ public class GunComponent extends WeaponComponent {
 
         public GunBuilder penetrationPower(float penetrationPower) {
             this.penetrationPower = penetrationPower;
+            return this;
+        }
+
+        public GunBuilder penetrationDmgScale(float penetrationDmgScale){
+            this.penetrationDmgScale = penetrationDmgScale;
             return this;
         }
 

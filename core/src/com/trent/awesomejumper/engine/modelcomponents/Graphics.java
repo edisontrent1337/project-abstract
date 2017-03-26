@@ -247,7 +247,7 @@ public class Graphics extends ModelComponent {
             float progress = (time - tookDamageAt) / 1f;
             if(progress <= 1) {
                 hpRenderer.rect(x + width, y, (1-progress*progress*progress) * (health.getLastDamage() / health.getMaxHp()), HEALTH_BAR_HEIGHT);
-                Gdx.app.log("PRO", Double.toString(((float) Math.pow(2, -progress*progress)) * (health.getLastDamage() / health.getMaxHp())));
+                //Gdx.app.log("PRO", Double.toString(((float) Math.pow(2, -progress*progress)) * (health.getLastDamage() / health.getMaxHp())));
             }
 
             hpRenderer.end();

@@ -55,7 +55,7 @@ import static com.trent.awesomejumper.utils.PhysicalConstants.ACCELERATION;
  */
 public class InputHandler implements InputProcessor {
 
-
+    private static final boolean TOGGLE = true;
 
     // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
@@ -66,23 +66,24 @@ public class InputHandler implements InputProcessor {
         MOVE_RIGHT(Keys.D),
         MOUSE1(Buttons.LEFT),
         MOUSE2(Buttons.RIGHT),
-        RELOAD(Keys.R,true),
-        DROP(Keys.Q, true, 1.25f),
+        RELOAD(Keys.R, TOGGLE),
+        DROP(Keys.Q, TOGGLE, 1.25f),
         PICKUP(Keys.SPACE),
-        FULLSCREEN(Keys.F11, true),
+        FULLSCREEN(Keys.F11, TOGGLE),
 
 
         //DEBUGGING KEYS
-        TOGGLE_DEBUG(Keys.T,true),
-        TOGGLE_ENTITY_DRAWING(Keys.P,true),
-        TOGGLE_HITBOX_DRAWING(Keys.H,true),
-        TOGGLE_INFO_DRAWING(Keys.I,true),
-        TOGGLE_BODY_DRAWING(Keys.B,true),
-        CLEAR_POPUPS(Keys.C, true),
-        TOGGLE_SPECIAL(Keys.U,true),
-        SHOW_PENETRATION_POINTS(Keys.V, true),
-        TOGGLE_LOGGING(Keys.L, true),
-        RAY_CASTING(Keys.X, true),
+        TOGGLE_DEBUG(Keys.T,TOGGLE),
+        TOGGLE_ENTITY_DRAWING(Keys.P,TOGGLE),
+        TOGGLE_HITBOX_DRAWING(Keys.H,TOGGLE),
+        TOGGLE_INFO_DRAWING(Keys.I,TOGGLE),
+        TOGGLE_BODY_DRAWING(Keys.B,TOGGLE),
+        CLEAR_POPUPS(Keys.C, TOGGLE),
+        TOGGLE_SPECIAL(Keys.U,TOGGLE),
+        SHOW_PENETRATION_POINTS(Keys.V, TOGGLE),
+        TOGGLE_LOGGING(Keys.L, TOGGLE),
+        RAY_CASTING(Keys.X, TOGGLE),
+        INC_PEN(Keys.PLUS, TOGGLE)
         ;
 
 
@@ -487,8 +488,8 @@ public class InputHandler implements InputProcessor {
             if(isPressed(RAY_CASTING)) {
                 if(!player.getWeaponInventory().isHoldingAWeapon())
                     return;
-                ProjectileRay r = new ProjectileRay(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter(), player.getWeaponInventory().getSelectedWeapon().getBody().getOrientation().cpy(), 100f, 200f, 12f);
-                worldContainer.projectileRayCast(r);
+                ProjectileRay r = new ProjectileRay(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter(), player.getWeaponInventory().getSelectedWeapon().getBody().getOrientation().cpy(), 100f, 4f, 200f, 12f);
+                r.register();
             }
         }
         // RELOAD
@@ -509,6 +510,7 @@ public class InputHandler implements InputProcessor {
         if(isPressed(TOGGLE_SPECIAL)) {
             Lootable l = new Lootable(mouse.cpy());
             l.register();
+
 
         }
 

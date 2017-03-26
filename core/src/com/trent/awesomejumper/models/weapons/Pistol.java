@@ -8,6 +8,8 @@ import com.trent.awesomejumper.engine.modelcomponents.weapons.GunComponent;
 import com.trent.awesomejumper.engine.modelcomponents.weapons.GunComponent.GunBuilder;
 
 import static com.trent.awesomejumper.engine.modelcomponents.Body.BodyBuilder;
+import static com.trent.awesomejumper.engine.physics.ProjectileRay.PENETRATION_LOSS;
+
 /**
  * TODO: implement range
  * Pistol entity class. Has a body and a sprite component to represent pistol as pickup or as an
@@ -29,10 +31,12 @@ public class Pistol extends Weapon {
     private final int AMMO = 100;
     private final int CLIP_SIZE = 25;
     private final int BASE_DMG = 100;
-    private final int PENETRATION_POWER = 100;
+    private final int PENETRATION_POWER = PENETRATION_LOSS * 6; // 4 chests
+    private final float PENETRATION_DMG_SCALE = 2f; // Damage factor for multiple enemy penetration
     private final float PROJECTILE_SPEED = 48f;
     private final float RECOVER_TIME = 0.2f; // 400 RPM
     private final float RELOAD_TIME = 2.25f;
+    private final int KNOCKBACK = 3;
 
 
     public Pistol(Vector2 position) {
@@ -59,7 +63,8 @@ public class Pistol extends Weapon {
                 .reloadTime(RELOAD_TIME)
                 .baseDamage(BASE_DMG)
                 .penetrationPower(PENETRATION_POWER)
-                .knockBack(12.0f)
+                .penetrationDmgScale(PENETRATION_DMG_SCALE)
+                .knockBack(KNOCKBACK)
                 .assemble();
         state = State.IDLE;
         type = Type.DROPPED_WEAPON_ENTITY;
@@ -78,7 +83,11 @@ public class Pistol extends Weapon {
     }
 
 
+    // TESTING
 
+    public void increasePenetrationPower() {
+        gunComponent.modifyPenetrationPower(0.1f);
+    }
 
 
 

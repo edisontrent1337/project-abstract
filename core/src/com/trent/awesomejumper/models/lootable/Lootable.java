@@ -33,7 +33,7 @@ public class Lootable extends Entity implements LivingEntity {
     private final float MAX_SPEED = 25f;
     //private final Vector2 OFFSET = new Vector2(0.125f, 0); // 4 px space in chest sprite
     private final Vector2 OFFSET = new Vector2(0f, 0); // 4 px space in chest sprite
-
+    Vector2 vel = new Vector2(0f, 0f);
     private final float FRAME_DURATION = 0.066f;
 
     JsonValue test = new JsonReader().parse(Gdx.files.internal("data/entities/lootable.json"));
@@ -67,7 +67,11 @@ public class Lootable extends Entity implements LivingEntity {
     @Override
     public void update(float delta) {
         super.update(delta);
-        getVelocity().add(0.2f,0f);
+
+        if(body.isCollidedWithWorld())
+            vel.x = -vel.x;
+        getVelocity().add(vel);
+
     }
 
     @Override
