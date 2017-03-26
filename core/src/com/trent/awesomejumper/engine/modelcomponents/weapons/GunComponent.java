@@ -30,10 +30,11 @@ public class GunComponent extends WeaponComponent {
     private int currentClip;
     private float recoverTime, reloadTime;
     private float speed;
-    private int baseDamage;
+    private float baseDamage;
     private float penetrationPower;
     private float timeFired = 0f;
     private float timeReloaded = 0f;
+    private float knockBack = 1f;
 
     private String name;
     private String weaponDesc;
@@ -54,7 +55,11 @@ public class GunComponent extends WeaponComponent {
         entity.enableComponent(ComponentID.WEAPON_COMPONENT);
     }
 
-    public GunComponent(GunBuilder builder) {
+    /**
+     * Constructor that can only be accessed via a gun builder.
+     * @param builder gun builder
+     */
+    private GunComponent(GunBuilder builder) {
         this.entity = builder.weapon;
         this.name = builder.name;
         this.ammo = builder.ammo;
@@ -63,7 +68,9 @@ public class GunComponent extends WeaponComponent {
         this.reloadTime = builder.reloadTime;
         this.baseDamage = builder.baseDamage;
         this.penetrationPower = builder.penetrationPower;
+        this.knockBack = builder.knockback;
         this.NUMBER_OF_RAYS = builder.rays;
+        setAmmoAndClips(ammo,clipSize);
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -85,7 +92,7 @@ public class GunComponent extends WeaponComponent {
         if (currentClip != 0) {
             currentClip--;
            // ProjectileRay ray = new ProjectileRay()
-            Vector2 direction = entity.getOwner().getBody().getOrientation().cpy().nor();
+           /* Vector2 direction = entity.getOwner().getBody().getOrientation().cpy().nor();
             Projectile projectile = new Projectile(entity.getBody().getCenter().cpy(),direction, entity.getBody().getHeightZ());
           //  projectile.getBody().setVelocity(entity.getBody().getOrientation().cpy().nor().scl(speed));
             Utils.log("INITIAL PROJECTILE POSITION: " + projectile.getPosition());
@@ -94,7 +101,11 @@ public class GunComponent extends WeaponComponent {
             projectile.getBody().getPosition().sub(projectile.getBody().getImpulses().get(0).cpy().scl(1/60f));
             projectile.getBody().setAngleOfRotation(entity.getBody().getAngleOfRotation());
             projectile.setOwner(entity.getOwner().getOwner());
-            projectile.register();
+            projectile.register();*/
+            Vector2 origin = entity.getBody().getCenter().cpy();
+            Vector2 direction = entity.getOwner().getBody().getOrientation().cpy().nor();
+            ProjectileRay ray = new ProjectileRay(origin, direction, penetrationPower, baseDamage, knockBack);
+            ray.register();
 
             timeFired = entity.time;
         }
@@ -160,12 +171,13 @@ public class GunComponent extends WeaponComponent {
     }
 
 
-    public class GunBuilder {
-        public int ammo, clipSize;
-        public float recoverTime, reloadTime;
-        public int baseDamage, penetrationPower = 100;
+    public static class GunBuilder {
+        int ammo, clipSize;
+        float recoverTime, reloadTime;
+        float baseDamage, penetrationPower = 100;
+        float knockback = 1f;
         public String name;
-        public int rays;
+        int rays;
 
         private Weapon weapon;
 
@@ -198,12 +210,12 @@ public class GunComponent extends WeaponComponent {
             return this;
         }
 
-        public GunBuilder baseDamage(int baseDamage) {
+        public GunBuilder baseDamage(float baseDamage) {
             this.baseDamage = baseDamage;
             return this;
         }
 
-        public GunBuilder penetrationPower(int penetrationPower) {
+        public GunBuilder penetrationPower(float penetrationPower) {
             this.penetrationPower = penetrationPower;
             return this;
         }
@@ -213,6 +225,10 @@ public class GunComponent extends WeaponComponent {
             return this;
         }
 
+        public GunBuilder knockBack(float knockBack) {
+            this.knockback = knockBack;
+            return this;
+        }
         public GunComponent assemble() {
             return new GunComponent(this);
         }

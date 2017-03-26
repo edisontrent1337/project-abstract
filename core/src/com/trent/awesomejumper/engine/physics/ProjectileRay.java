@@ -2,6 +2,8 @@ package com.trent.awesomejumper.engine.physics;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
+import com.trent.awesomejumper.controller.entitymanagement.EntityManager;
+import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.Body;
 import com.trent.awesomejumper.utils.Utils;
 
@@ -13,16 +15,18 @@ public class ProjectileRay extends Ray {
     private float penetrationPower = 0f;
     private float remainingPower = 0f;
     private float baseDamage = 100;
-    private float force = 1f;
+    private float knockBack = 1f;
 
-
-    public ProjectileRay(Vector2 origin, Vector2 direction, float penetrationPower, float baseDamage, float force) {
+    // ---------------------------------------------------------------------------------------------
+    // CONSTRUCTOR
+    // ---------------------------------------------------------------------------------------------
+    public ProjectileRay(Vector2 origin, Vector2 direction, float penetrationPower, float baseDamage, float knockBack) {
         // Create an infinite ray in the specified direction, starting at origin
         super(origin, direction);
         // adding penetration power and other projectile specific stuff
         this.penetrationPower = penetrationPower;
         this.baseDamage = baseDamage;
-        this.force = force;
+        this.knockBack = knockBack;
         this.remainingPower = penetrationPower;
     }
 
@@ -35,8 +39,14 @@ public class ProjectileRay extends Ray {
             remainingPower = 0;
     }
 
+    /**
+     * Damage method. Needs a lot of balancing and rework.
+     * @param collisionBox The hitbox the damage is applied to.
+     * @param body The body object of the entity.
+     * @return amount of damage dealt
+     */
     public int dealDamage(CollisionBox collisionBox, Body body) {
-        float coeff = 0.97f + (float)(Math.random()*0.03f);
+        float coeff = 0.97f + (float)(Math.random()*0.06f);
         float dmgCoeff = collisionBox.getDamageCoefficient();
         float power = remainingPower/penetrationPower;
         float power3 = power*power*power;
@@ -44,21 +54,21 @@ public class ProjectileRay extends Ray {
         Utils.log("POWER ", power);
         Utils.log("REMAINING POWER", remainingPower);
         reducePenetrationPower(body.getDensity());
-        Vector2 impulse = dir.cpy().scl(force*power3*1f/mass);
-        //TODO: this impulse has to be a reflection impulse, using the method in cd
-        //TODO: impulse creation should be outsourced to collision controller.
+        Vector2 impulse = dir.cpy().scl(knockBack *power3*1f/mass);
         Utils.log("----------IMPULSE CALC-------------");
         Utils.log("CURRENT ENTITY: ", body.getEntity().toString());
         Utils.log("IMPULSE", impulse);
         Utils.log("SCALED IMPULSE", impulse.cpy().scl(Gdx.graphics.getDeltaTime()));
         Utils.log("BODY", body.toString());
-        //int damage = (int) (coeff * density * power * baseDamage);
         body.addImpulse(impulse);
-        //body.setAcceleration(impulse.x,impulse.y);
         return (int) (coeff * dmgCoeff * power * baseDamage);
     }
 
 
 
+    @Override
+    public void register() {
+        EntityManager.getInstance().registerRay(this);
+    }
 
 }

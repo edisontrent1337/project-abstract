@@ -871,6 +871,7 @@ public class CollisionController {
             Utils.log("ID: " + entry.getKey() + " , POINT: " + entry.getValue());
         }
 
+        ray.destroy();
     }
 
 

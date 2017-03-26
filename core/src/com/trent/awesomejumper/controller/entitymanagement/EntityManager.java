@@ -117,12 +117,12 @@ public class EntityManager {
         renderingEngine.initGraphics(entity);
     }
 
-    public void  registerRay(Ray ray) {
-
+    public void registerRay(Ray ray) {
+        worldContainer.getRays().add(ray);
     }
 
     public void registerRay(ProjectileRay ray) {
-
+        worldContainer.getProjectileRays().add(ray);
     }
 
     public void reset() {

@@ -404,9 +404,7 @@ public class InputHandler implements InputProcessor {
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         if(button == MOUSE1.keyCode) {
             pressedKeysMap.put(MOUSE1, true);
-            //player.getWeaponInventory().fire();
-            ProjectileRay r = new ProjectileRay(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter(), player.getWeaponInventory().getSelectedWeapon().getBody().getOrientation().cpy(), 100f, 600f, 12f);
-            worldContainer.projectileRayCast(r);
+            player.getWeaponInventory().fire();
         }
         return false;
     }
@@ -489,10 +487,7 @@ public class InputHandler implements InputProcessor {
             if(isPressed(RAY_CASTING)) {
                 if(!player.getWeaponInventory().isHoldingAWeapon())
                     return;
-               // Weapon w = player.getWeaponInventory().getSelectedWeapon();
-                //TODO Move this code to the weapon class and let it return a ray.
                 ProjectileRay r = new ProjectileRay(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter(), player.getWeaponInventory().getSelectedWeapon().getBody().getOrientation().cpy(), 100f, 200f, 12f);
-
                 worldContainer.projectileRayCast(r);
             }
         }

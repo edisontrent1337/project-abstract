@@ -283,7 +283,6 @@ public class Entity implements EntityInterface {
      */
     @Override
     public void register() {
-
         EntityManager.getInstance().registerEntity(this);
     }
 

@@ -68,7 +68,9 @@ public class WorldContainer {
     // Subset containing all projectiles
     private HashSet<Projectile> projectiles = new HashSet<>();
 
+    // TESTING RAYS
     private HashSet<Ray> rays = new HashSet<>();
+    private HashSet<ProjectileRay> projectileRays = new HashSet<>();
 
     // Subset containing all pickups (ammo, medikits,...)
     private HashSet<Pickup> pickups = new HashSet<>();
@@ -950,6 +952,11 @@ public class WorldContainer {
                 it.remove();
         }
 
+        for(Iterator<ProjectileRay> it = projectileRays.iterator(); it.hasNext();) {
+            if(!it.next().isActive())
+                it.remove();
+        }
+
         /**
          * Remove penetration points from ray casting
          */
@@ -1093,6 +1100,10 @@ public class WorldContainer {
 
     public HashSet<Ray> getRays() {
         return rays;
+    }
+
+    public HashSet<ProjectileRay> getProjectileRays() {
+        return projectileRays;
     }
 
 

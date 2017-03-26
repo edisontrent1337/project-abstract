@@ -31,6 +31,7 @@ public class Ray {
     protected HashMap<Integer, Vector2> penetratedEntities = new HashMap<>();
     protected ArrayList<Vector2> hitHashCells = new ArrayList<>();
     protected ArrayList<Vector2> penetrations = new ArrayList<>();
+    protected boolean active = true;
 
     // ---------------------------------------------------------------------------------------------
     // CONSTRUCTOR
@@ -126,10 +127,16 @@ public class Ray {
         EntityManager.getInstance().registerRay(this);
     }
 
+    public void destroy() {
+        active = false;
+    }
 
     // ---------------------------------------------------------------------------------------------
     // GETTER & SETTER
     // ---------------------------------------------------------------------------------------------
+    public boolean isActive() {
+        return active;
+    }
     public Vector2 getOrigin() {
         return origin;
     }
