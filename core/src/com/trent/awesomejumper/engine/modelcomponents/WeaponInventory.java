@@ -20,9 +20,9 @@ import java.util.ArrayList;
  */
 public class WeaponInventory extends ModelComponent {
 
-    // MEMBERS & INSTANCES
     // ---------------------------------------------------------------------------------------------
-
+    // MEMBERS
+    // ---------------------------------------------------------------------------------------------
     private Weapon selectedWeapon;               // currently selected weapon entity
     private static int MAX_SLOTS = 3;            // number of weapon slots this inventory has
     private static final int NO_WEAPON = -1;     // constant representing id of no weapon
@@ -40,6 +40,7 @@ public class WeaponInventory extends ModelComponent {
     public float equipTime = 0f;
     private boolean inventoryFull = false;
 
+    // ---------------------------------------------------------------------------------------------
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
 
