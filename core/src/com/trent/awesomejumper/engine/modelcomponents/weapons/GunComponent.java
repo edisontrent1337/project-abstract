@@ -1,12 +1,12 @@
 package com.trent.awesomejumper.engine.modelcomponents.weapons;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.physics.ProjectileRay;
-import com.trent.awesomejumper.models.projectile.Projectile;
 import com.trent.awesomejumper.models.weapons.Weapon;
-import com.trent.awesomejumper.utils.Utils;
+import com.trent.awesomejumper.utils.Interval;
+
+import java.util.HashSet;
 
 /**
  * Weapon component class. Defines the behaviour and attributes of weapons in the game.
@@ -18,10 +18,22 @@ import com.trent.awesomejumper.utils.Utils;
  */
 public class GunComponent extends WeaponComponent {
 
+    enum GunType {
+        SEMI_AUTOMATIC,
+        FULL_AUTOMATIC
+    }
 
+    private GunType type;
+
+    // ---------------------------------------------------------------------------------------------
+    // MEMBERS
+    // ---------------------------------------------------------------------------------------------
     private static final int DEFAULT_DMG = 100;             // default damage
     private static final float DEFAULT_PN_POW = 100;        // default penetration power
     private static final int DEFAULT_NUM_OF_RAYS = 1;       // default number of rays
+
+
+    private static final float MAX_SPREAD = (float) Math.toRadians(45);    // maximum spread
 
     // TODO: implement recoil with a vertex shader.
     private int ammo;
@@ -30,12 +42,18 @@ public class GunComponent extends WeaponComponent {
     private int currentClip;
     private float recoverTime, reloadTime;
     private float speed;
+
+    // DAMAGE DEALING & RANGE
     private float baseDamage;
-    private float penetrationPower;
-    private float pentrationDmgScale;
+    private float basePenetrationPower;
+    private float basePenetrationDamage;
+    private float baseRange;
+    private float baseSpread;
+    private float knockBack = 1f;
+
+
     private float timeFired = 0f;
     private float timeReloaded = 0f;
-    private float knockBack = 1f;
 
     private String name;
     private String weaponDesc;
@@ -52,13 +70,12 @@ public class GunComponent extends WeaponComponent {
         this.entity = weapon;
         this.name = name;
         this.NUMBER_OF_RAYS = rays;
-        this.TAG = "GUN COMPONENT";
         entity.enableComponent(ComponentID.WEAPON_COMPONENT);
     }
 
     /**
      * Constructor that can only be accessed via a gun builder.
-     * @param builder gun builder
+     * @param builder gun builderre
      */
     private GunComponent(GunBuilder builder) {
         this.entity = builder.weapon;
@@ -68,10 +85,12 @@ public class GunComponent extends WeaponComponent {
         this.recoverTime = builder.recoverTime;
         this.reloadTime = builder.reloadTime;
         this.baseDamage = builder.baseDamage;
-        this.penetrationPower = builder.penetrationPower;
-        this.knockBack = builder.knockback;
+        this.basePenetrationPower = builder.basePenetrationPower;
+        this.basePenetrationDamage = builder.basePenetrationDamage;
+        this.baseRange = builder.baseRange;
+        this.baseSpread = builder.baseSpread;
+        this.knockBack = builder.knockBack;
         this.NUMBER_OF_RAYS = builder.rays;
-        this.pentrationDmgScale = builder.penetrationDmgScale;
         setAmmoAndClips(ammo,clipSize);
     }
 
@@ -95,7 +114,7 @@ public class GunComponent extends WeaponComponent {
             currentClip--;
             Vector2 origin = entity.getBody().getCenter().cpy();
             Vector2 direction = entity.getOwner().getBody().getOrientation().cpy().nor();
-            ProjectileRay ray = new ProjectileRay(origin, direction, penetrationPower, pentrationDmgScale, baseDamage, knockBack);
+            ProjectileRay ray = new ProjectileRay(origin, direction, basePenetrationPower, basePenetrationDamage, baseDamage, knockBack);
             ray.register();
 
             timeFired = entity.time;
@@ -111,6 +130,9 @@ public class GunComponent extends WeaponComponent {
         this.isEquipped = isEquipped;
     }
 
+    /**
+     * Reload method.
+     */
     public void reload() {
 
         if (ammo != 0) {
@@ -124,8 +146,9 @@ public class GunComponent extends WeaponComponent {
 
 
     public void modifyPenetrationPower(float increase) {
-        penetrationPower += increase;
+        basePenetrationPower += increase;
     }
+
     // ---------------------------------------------------------------------------------------------
     // GETTER AND SETTER
     // ---------------------------------------------------------------------------------------------
@@ -166,12 +189,41 @@ public class GunComponent extends WeaponComponent {
     }
 
 
+    /**
+     * Builds a number of rays specified by NUMBER_OF_RAYS and registers them in the system.
+     * @return the set of rays if needed for further computations.
+     */
+    @Override
+    protected HashSet<ProjectileRay> buildRays() {
+        Vector2 origin = entity.getBody().getCenter().cpy();
+        Vector2 direction = entity.getOwner().getBody().getOrientation().cpy().nor();
+        // calculate an array of angles which are used to spread the rays
+        // maximum spread should be 45 degrees
+        float currentMaxSpread = baseSpread * MAX_SPREAD;
+        float angleStep = (2 * currentMaxSpread) / NUMBER_OF_RAYS;
+        float[] angles = new float[NUMBER_OF_RAYS];
+        for(int i = 0; i < NUMBER_OF_RAYS; i++) {
+            angles[i] = -currentMaxSpread + i*angleStep;
+        }
+
+        return null;
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // BUILDER
+    // ---------------------------------------------------------------------------------------------
+
+    /**
+     * Builder class used to assemble different gun components.
+     */
     public static class GunBuilder {
-        int ammo, clipSize;
+        int ammo, clips, clipSize;
         float recoverTime, reloadTime;
-        float baseDamage, penetrationPower = 100;
-        float penetrationDmgScale = 1f;
-        float knockback = 1f;
+        float baseDamage, basePenetrationPower = 100;
+        float basePenetrationDamage = 1f;
+        float baseRange = 2f;
+        float baseSpread = 0f;
+        float knockBack = 1f;
         public String name;
         int rays;
 
@@ -196,6 +248,11 @@ public class GunComponent extends WeaponComponent {
             return this;
         }
 
+        public GunBuilder clips(int clips) {
+            this.clips = clips;
+            return this;
+        }
+
         public GunBuilder recoverTime(float recoverTime) {
             this.recoverTime = recoverTime;
             return this;
@@ -211,13 +268,18 @@ public class GunComponent extends WeaponComponent {
             return this;
         }
 
-        public GunBuilder penetrationPower(float penetrationPower) {
-            this.penetrationPower = penetrationPower;
+        public GunBuilder penetrationPower(float basePenetrationPower) {
+            this.basePenetrationPower = basePenetrationPower;
             return this;
         }
 
-        public GunBuilder penetrationDmgScale(float penetrationDmgScale){
-            this.penetrationDmgScale = penetrationDmgScale;
+        public GunBuilder penetrationDamage(float basePenetrationDamage){
+            this.basePenetrationDamage = basePenetrationDamage;
+            return this;
+        }
+
+        public GunBuilder range(float baseRange) {
+            this.baseRange = baseRange;
             return this;
         }
 
@@ -227,9 +289,15 @@ public class GunComponent extends WeaponComponent {
         }
 
         public GunBuilder knockBack(float knockBack) {
-            this.knockback = knockBack;
+            this.knockBack = knockBack;
             return this;
         }
+
+        public GunBuilder spread(float baseSpread) {
+            this.baseSpread = baseSpread;
+            return this;
+        }
+
         public GunComponent assemble() {
             return new GunComponent(this);
         }

@@ -4,7 +4,6 @@ package com.trent.awesomejumper.models.weapons;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.engine.modelcomponents.Graphics;
-import com.trent.awesomejumper.engine.modelcomponents.weapons.GunComponent;
 import com.trent.awesomejumper.engine.modelcomponents.weapons.GunComponent.GunBuilder;
 
 import static com.trent.awesomejumper.engine.modelcomponents.Body.BodyBuilder;
@@ -63,7 +62,7 @@ public class Pistol extends Weapon {
                 .reloadTime(RELOAD_TIME)
                 .baseDamage(BASE_DMG)
                 .penetrationPower(PENETRATION_POWER)
-                .penetrationDmgScale(PENETRATION_DMG_SCALE)
+                .penetrationDamage(PENETRATION_DMG_SCALE)
                 .knockBack(KNOCKBACK)
                 .assemble();
         state = State.IDLE;

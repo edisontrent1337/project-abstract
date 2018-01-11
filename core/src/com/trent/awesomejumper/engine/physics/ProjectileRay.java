@@ -3,7 +3,6 @@ package com.trent.awesomejumper.engine.physics;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.trent.awesomejumper.controller.entitymanagement.EntityManager;
-import com.trent.awesomejumper.engine.entity.Entity;
 import com.trent.awesomejumper.engine.modelcomponents.Body;
 import com.trent.awesomejumper.utils.Utils;
 
@@ -12,8 +11,8 @@ import com.trent.awesomejumper.utils.Utils;
  */
 
 public class ProjectileRay extends Ray {
-    private float penetrationPower = 0f;
-    private float penetrationDmgScale = 1f;
+    private float basePenetrationPower = 0f;
+    private float basePenetrationDamage = 1f;
     private float remainingPower = 0f;
     private float baseDamage = 100;
     private float knockBack = 1f;
@@ -23,15 +22,15 @@ public class ProjectileRay extends Ray {
     // ---------------------------------------------------------------------------------------------
     // CONSTRUCTOR
     // ---------------------------------------------------------------------------------------------
-    public ProjectileRay(Vector2 origin, Vector2 direction, float penetrationPower, float penetrationDmgScale, float baseDamage, float knockBack) {
+    public ProjectileRay(Vector2 origin, Vector2 direction, float basePenetrationPower, float basePenetrationDamage, float baseDamage, float knockBack) {
         // Create an infinite ray in the specified direction, starting at origin
         super(origin, direction);
         // adding penetration power and other projectile specific stuff
-        this.penetrationPower = penetrationPower;
-        this.penetrationDmgScale = penetrationDmgScale;
+        this.basePenetrationPower = basePenetrationPower;
+        this.basePenetrationDamage = basePenetrationDamage;
         this.baseDamage = baseDamage;
         this.knockBack = knockBack;
-        this.remainingPower = penetrationPower;
+        this.remainingPower = basePenetrationPower;
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -50,13 +49,31 @@ public class ProjectileRay extends Ray {
      * @return amount of damage dealt
      */
     public int dealDamage(CollisionBox collisionBox, Body body) {
+
+
+        /**
+         * baseDamage               := base damage of the projectile
+         * currentBaseDamage        := base damage adjusted regarding the range
+         *
+         * basePenetrationPower     := base penetration power. describes, how many entities can be penetrated.
+         * remainingPower           := remaining penetration power
+         * currentPower             := percentage of remaining power
+         *
+         * basePenetrationDamage    := determines, how much of the damage remains after passing several entities
+         * currentPenetrationDamage := current penetration damage, calculated on basis of currentPower
+         *
+         * randomness               := random coefficient
+         * armor                    := amount of damage the collision box simply blocks
+         */
+
+
         float coeff = 0.97f + (float)(Math.random()*0.06f);
         float dmgCoeff = collisionBox.getDamageCoefficient();
-        float power = remainingPower/penetrationPower;
-        float dmgPenetrationScale = (float) Math.pow(power,1f/(0.1f*penetrationDmgScale));
-        float power3 = power*power*power;
+        float currentPower = remainingPower/ basePenetrationPower;
+        float dmgPenetrationScale = (float) Math.pow(currentPower,1f/(0.1f* basePenetrationDamage));
+        float power3 = currentPower*currentPower*currentPower;
         float mass = body.getMass();
-        Utils.log("POWER ", power);
+        Utils.log("POWER ", currentPower);
         Utils.log("REMAINING POWER", remainingPower);
         reducePenetrationPower(body.getDensity());
         Vector2 impulse = dir.cpy().scl(knockBack*power3*1f/mass);
