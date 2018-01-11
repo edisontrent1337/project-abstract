@@ -27,6 +27,7 @@ public class AwesomeJumperMain extends Game {
     public static void toggleDebugMode() {debugMode = !debugMode;
     }
 
+
     public static void toggleLogging() {
         logging = !logging;
     }

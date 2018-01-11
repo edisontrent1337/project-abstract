@@ -806,6 +806,7 @@ public class CollisionController {
                 rays.clear();
 
 
+                // Determine which cell is the next one in the ray casting algorithm
                 if (closestHashCellIntersection.origin == currentXAxis || closestHashCellIntersection.origin == nextYCellXAxis) {
                     if(!rayHashCells.contains(nextYCell) && worldContainer.isValid(nextYCell)) {
                         rayHashCells.add(nextYCell);

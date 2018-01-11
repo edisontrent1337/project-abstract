@@ -559,6 +559,7 @@ public class WorldContainer {
      * @deprecated
      */
 
+
     public HashSet<Entity> updatedEntityNeighbourHood(Entity e) {
 
         HashSet<Entity> entityNeighbourhood = e.getBody().getEntityNeighbourHood();

@@ -386,7 +386,8 @@ public class RenderingEngine extends Renderer {
 
     // DRAW TILES
     // ---------------------------------------------------------------------------------------------
-
+    //TODO for REWRITE:
+    // TODO handle tiles like entities with graphics components
     private void renderTiles() {
         Vector2 cameraPosition = new Vector2(camera.position.x, camera.position.y);
         TextureRegion wall;
@@ -562,7 +563,7 @@ public class RenderingEngine extends Renderer {
         setDebugTag(DE_CURRENT_HASH_CELL, builder);
 
         // CURRENT HASH CELLS COVERED BY THE AIM RAY
-        //for(Vector2 index: worldContainer.generateCrossedIndexes(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter().cpy(),player.getWeaponInventory().getSelectedWeapon().getBody().getOrientation().cpy() )) {
+       // for(Vector2 index: worldContainer.getSpatialIndex(player.getWeaponInventory().getSelectedWeapon().getBody().getCenter().cpy(),player.getWeaponInventory().getSelectedWeapon().getBody().getOrientation().cpy() )) {
         for(Vector2 index : player.getBody().getBounds().getEdges()) {
             builder.append(printVec(index));
         }

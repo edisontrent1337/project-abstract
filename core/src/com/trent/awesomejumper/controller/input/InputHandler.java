@@ -261,6 +261,7 @@ public class InputHandler implements InputProcessor {
 
         // WALKING UP
 
+        //TODO: write a method that uses var args to check a variable amount of pressed keys
         if (isPressed(MOVE_UP) & !(isPressed(MOVE_DOWN) || isPressed(MOVE_RIGHT) || isPressed(MOVE_LEFT))) {
             player.setState(Entity.State.WALKING);
             player.setAccelY(ACCELERATION);

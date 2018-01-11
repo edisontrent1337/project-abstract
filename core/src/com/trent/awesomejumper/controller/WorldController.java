@@ -10,6 +10,7 @@ import com.trent.awesomejumper.utils.Utils;
 
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.function.Consumer;
 
 import static com.trent.awesomejumper.utils.PhysicalConstants.MIN_WALKING_SPEED;
 

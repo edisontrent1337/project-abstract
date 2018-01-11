@@ -686,6 +686,7 @@ public class RandomLevelGenerator {
                         continue;
 
                     int exits = 0;
+                    // scan around the current tile for walls
                     for (Vector2 c : CARDINAL_DIRS) {
                         if (getTile(new Vector2(x, y).add(c)).getType() != WALL)
                             exits++;
